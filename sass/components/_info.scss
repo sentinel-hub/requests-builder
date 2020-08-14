@@ -1,0 +1,29 @@
+.info {
+  display: flex;
+  background-color: #333634;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 1.7rem;
+  color: #fff;
+  justify-content: center;
+  align-items: center;
+  cursor: help;
+
+  @include respond(tab-port) {
+    width: 17px;
+    height: 17px;
+    font-size: 1.2rem;
+  }
+}
+
+.label-with-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  label {
+    margin-bottom: 0 !important;
+    margin-right: 1rem;
+  }
+}

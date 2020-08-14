@@ -1,0 +1,293 @@
+.tpdi-first-row {
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+  overflow-y: hidden;
+
+  @include respond(phone) {
+    flex-direction: column;
+  }
+
+  &-first-item {
+    width: 20%;
+
+    @include respond(tab-port) {
+      width: 25%;
+    }
+
+    @include respond(phone) {
+      width: 100%;
+    }
+  }
+
+  &-second-item {
+    width: 100%;
+  }
+}
+
+.tpdi-second-row {
+  margin-top: 3rem;
+  width: 100%;
+  display: flex;
+  // overflow-y: hidden;
+  align-items: stretch;
+
+  @include respond(phone) {
+    flex-direction: column;
+  }
+
+  &-first-item {
+    display: flex;
+    flex-direction: column;
+    width: 16.5%;
+
+    @include respond(tab-port) {
+      width: 21%;
+    }
+
+    @include respond(phone) {
+      width: 100%;
+    }
+  }
+
+  &-second-item {
+    display: flex;
+    flex-direction: column;
+    width: 15%;
+
+    @include respond(phone) {
+      width: 100%;
+
+      & button {
+        align-self: center;
+        width: 25%;
+      }
+    }
+  }
+
+  &-third-item {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+
+    & > :first-child {
+      width: 20%;
+
+      @include respond(phone) {
+        width: 100%;
+      }
+    }
+
+    & > div {
+      width: 33%;
+
+      @include respond(phone) {
+        width: 100%;
+      }
+    }
+
+    & > :last-child {
+      width: 47%;
+
+      @include respond(phone) {
+        width: 100%;
+      }
+    }
+
+    @include respond(phone) {
+      width: 100%;
+      flex-direction: column;
+    }
+  }
+}
+
+.tpdi-third-row {
+  margin-top: 3rem;
+
+  &-first-item {
+    display: flex;
+    flex-direction: column;
+
+    select {
+      width: fit-content;
+    }
+  }
+}
+////////////////////////////
+
+.product-id {
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  input {
+    width: 75%;
+    margin: 0 !important;
+  }
+}
+
+.remove-product-id {
+  font-size: 3rem;
+  cursor: pointer;
+  margin-left: 1rem;
+  display: inline-block;
+}
+
+.tpdi-actions-buttons {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 2rem;
+}
+
+.tpdi-feature {
+  &-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+
+    label {
+      margin: 0;
+      cursor: pointer;
+    }
+  }
+
+  &-extra-info {
+    display: flex;
+    flex-direction: column;
+
+    span {
+      font-weight: bold;
+    }
+
+    button {
+      margin-top: 1rem;
+      width: fit-content;
+    }
+  }
+}
+
+.tpdi-info {
+  display: flex;
+  height: 300px;
+  overflow-y: scroll;
+  justify-content: space-between;
+  white-space: nowrap;
+
+  &-title-label {
+    cursor: pointer;
+    border-bottom: 1px solid black;
+  }
+
+  &-first-item {
+    width: 30%;
+
+    @include respond(tab-port) {
+      width: 100%;
+      margin-left: 1rem;
+      margin-bottom: 3rem;
+      border-bottom: 1px solid black;
+    }
+  }
+
+  &-second-item {
+    margin-left: 3rem;
+    width: 60%;
+
+    @include respond(tab-port) {
+      width: 100%;
+      margin-bottom: 3rem;
+      border-bottom: 1px solid black;
+      margin-left: 1rem;
+    }
+  }
+
+  &-third-item {
+    margin-left: 3rem;
+    width: 100%;
+
+    @include respond(tab-port) {
+      width: 100%;
+      margin-bottom: 1rem;
+      margin-left: 1rem;
+    }
+  }
+
+  @include respond(tab-port) {
+    flex-direction: column;
+  }
+}
+
+.order-info {
+  margin-bottom: 1.5rem;
+
+  label {
+    cursor: pointer;
+  }
+
+  span {
+    font-weight: bold;
+  }
+
+  button {
+    margin-right: 0.5rem;
+  }
+}
+
+.quota-info {
+  label {
+    cursor: pointer;
+  }
+}
+
+.tpdi-add-product {
+  display: flex;
+  align-items: center;
+
+  * {
+    margin: 0;
+  }
+}
+
+.tpdi-limit {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  label {
+    margin-bottom: 0;
+    margin-right: 1rem;
+  }
+}
+
+.tpdi-request-preview {
+  width: 95%;
+  padding: 1rem 2rem;
+}
+
+.tpdi-request-preview-buttons {
+  display: flex;
+  margin-left: 2rem;
+}
+
+.tpdi-request-preview-select-request {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  label {
+    margin-bottom: 0;
+    margin-right: 1rem;
+    margin-left: 2rem;
+  }
+}
+
+.tpdi-search-orders {
+  display: flex;
+  align-items: center;
+
+  input {
+    margin-bottom: 1.5rem;
+    margin-left: 1.5rem;
+  }
+}

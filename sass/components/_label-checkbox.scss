@@ -1,0 +1,15 @@
+.label-checkbox {
+  display: flex;
+  align-items: center;
+
+  label {
+    margin: 0;
+    margin-right: 1rem;
+    cursor: pointer;
+  }
+
+  input {
+    height: 100%;
+    transform: translateY(20%);
+  }
+}

@@ -1,0 +1,31 @@
+.header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  i {
+    color: var(--primary);
+    cursor: default;
+  }
+
+  @include respond(phone) {
+    margin-bottom: 2rem;
+    flex-direction: column;
+  }
+
+  &__buttons {
+    display: flex;
+    flex-direction: row;
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.logo-image {
+  width: 200px;
+  height: auto;
+}

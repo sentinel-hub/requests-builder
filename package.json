@@ -1,0 +1,77 @@
+{
+  "name": "requests-tool",
+  "version": "0.1.0",
+  "homepage": ".",
+  "private": true,
+  "dependencies": {
+    "@geoman-io/leaflet-geoman-free": "^2.6.0",
+    "@reduxjs/toolkit": "^1.3.6",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.3.2",
+    "@testing-library/user-event": "^7.1.2",
+    "@tmcw/togeojson": "^4.1.0",
+    "@turf/area": "^6.0.1",
+    "@turf/bbox": "^6.0.1",
+    "@turf/bbox-polygon": "^6.0.1",
+    "@types/jest": "^24.0.0",
+    "@types/node": "^12.0.0",
+    "@types/react": "^16.9.0",
+    "@types/react-dom": "^16.9.0",
+    "axios": "^0.19.2",
+    "client-oauth2": "^4.3.0",
+    "codemirror": "^5.54.0",
+    "jshint": "^2.11.1",
+    "jwt-decode": "^2.2.0",
+    "leaflet": "^1.6.0",
+    "moment": "^2.26.0",
+    "mousetrap": "^1.6.5",
+    "proj4": "^2.6.2",
+    "react": "^16.13.1",
+    "react-codemirror2": "^7.2.1",
+    "react-debounce-render": "^6.0.0",
+    "react-dom": "^16.13.1",
+    "react-redux": "^7.2.0",
+    "react-scripts": "3.4.1",
+    "typescript": "~3.7.2"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "watch:sass": "node-sass sass/main.scss src/App2.css -w",
+    "lint": "eslint --max-warnings 0 --ext .js src/",
+    "lint-style": "stylelint --max-warnings 0 \"sass/**/*.scss\"",
+    "prettier": "prettier --write \"src/**/*.{js,json}\"",
+    "prettier-style": "stylelint --fix \"sass/**/*.scss\""
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "husky": "^4.2.5",
+    "node-sass": "^4.14.1",
+    "prettier": "2.0.5",
+    "stylelint": "^13.6.1",
+    "stylelint-config-recommended-scss": "^4.2.0",
+    "stylelint-config-standard": "^20.0.0",
+    "stylelint-scss": "^3.18.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint && npm run lint-style"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+.width-or-res {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 1.5rem;
+
+  &:first-child {
+    white-space: nowrap;
+  }
+}
+
+.response {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  margin-bottom: 1rem;
+
+  button {
+    width: fit-content;
+  }
+}

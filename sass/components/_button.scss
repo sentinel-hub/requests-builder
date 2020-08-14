@@ -1,0 +1,114 @@
+.button {
+  font-size: 1.75rem;
+  border: none;
+  padding: 1.25rem 3rem;
+  margin-right: 1rem;
+  border-radius: 3px;
+  font-weight: bold;
+  cursor: pointer;
+
+  &--active {
+    background-color: var(--primary);
+  }
+
+  &--inactive {
+    background-color: var(--white);
+    border: 1px solid var(--primary);
+  }
+
+  &--disabled {
+    cursor: not-allowed;
+  }
+
+  &--cancel {
+    background-color: #b51818;
+  }
+
+  @include respond(tab-port) {
+    padding: 1rem 3rem;
+    font-size: 1.25rem;
+  }
+}
+
+.secondary-button {
+  margin-top: 1rem;
+  border: none;
+  font-size: 1.4rem;
+  background-color: var(--primary);
+  border-radius: 3px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+
+  &:hover {
+    background-color: lighten(#b2c22d, 20%);
+  }
+
+  &:active {
+    background-color: darken(#b2c22d, 20%);
+  }
+
+  &--disabled {
+    background-color: grey;
+    color: black;
+    cursor: not-allowed;
+
+    &:hover {
+      background-color: grey;
+    }
+  }
+
+  &--cancel {
+    background-color: #b51818;
+
+    &:hover {
+      background-color: #b51818;
+    }
+  }
+
+  &--fit {
+    width: fit-content;
+  }
+
+  @include respond(1400) {
+    font-size: 1.2rem;
+  }
+
+  @include respond(tab-land) {
+    font-size: 1rem;
+    padding: 0.25 0.5rem;
+  }
+}
+
+.collapse-button {
+  font-size: 2.5rem;
+  border: none;
+  font-weight: bold;
+  background-color: var(--white);
+  cursor: pointer;
+  border-radius: 2px;
+  padding: 0.5rem 2rem;
+  padding-right: 3rem;
+  margin-top: 4rem;
+  margin-bottom: 4rem;
+  border-bottom: 2px solid var(--primary);
+
+  &:focus {
+    outline: none;
+    border-bottom: 2px solid var(--primary);
+  }
+
+  &:active {
+    border-bottom: 2px solid var(--primary);
+  }
+}
+
+.select-request-text {
+  margin-left: 3rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+  // text-align: right;
+  // width: 100%;
+  display: inline-block;
+  // width: 70%;
+  text-align: center;
+}

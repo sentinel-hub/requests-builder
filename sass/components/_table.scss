@@ -1,0 +1,43 @@
+.table {
+  border-collapse: collapse;
+  margin: 2.5rem 0;
+  font-size: 1.5rem;
+  width: fit-content;
+  border-radius: 5px 5px 0 0;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+
+  @include respond(1400) {
+    font-size: 1.25rem;
+  }
+
+  @include respond(tab-land) {
+    font-size: 1rem;
+  }
+}
+
+.table caption {
+  font-weight: bold;
+  text-align: left;
+  margin-bottom: 1.5rem;
+}
+
+.table thead tr {
+  background-color: var(--primary);
+  color: #fff;
+  text-align: left;
+  font-weight: bold;
+}
+
+.table th,
+.table td {
+  padding: 1.2rem 1.5rem;
+}
+
+.table tbody tr {
+  border-bottom: 1px solid black;
+}
+
+.table tbody tr:last-of-type {
+  border-bottom: 2px solid var(--primary);
+}

@@ -1,0 +1,49 @@
+.heading-primary {
+  font-size: 2.5rem;
+}
+
+.heading-secondary {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  white-space: nowrap;
+
+  @include respond(1400) {
+    font-size: 1.7rem;
+  }
+
+  @include respond(tab-land) {
+    font-size: 1.5rem;
+  }
+}
+
+.text {
+  font-size: 1.4rem;
+
+  @include respond(1400) {
+    font-size: 1.2rem;
+  }
+
+  @include respond(tab-land) {
+    font-size: 1rem;
+  }
+
+  &--bold {
+    font-weight: bold;
+  }
+
+  &--clickable {
+    cursor: pointer;
+  }
+
+  &--info {
+    margin-bottom: 0.5rem;
+  }
+
+  &--warning {
+    color: #b51818;
+  }
+
+  span {
+    font-weight: bold;
+  }
+}

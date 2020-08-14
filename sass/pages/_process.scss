@@ -1,0 +1,200 @@
+.App { /* stylelint-disable-line */
+  padding: 2rem;
+
+  @include respond(tab-port) {
+    padding: 0;
+    padding-left: 1rem;
+  }
+}
+
+.process-first-row {
+  display: flex;
+  align-items: stretch;
+  height: 100%;
+  overflow-y: hidden;
+  margin-bottom: 3rem;
+
+  &-first-item {
+    display: flex;
+    flex-direction: column;
+    width: 27%;
+
+    @include respond(tab-port) {
+      width: 100%;
+    }
+  }
+
+  &-second-item {
+    display: flex;
+    width: 30%;
+    flex-direction: column;
+
+    @include respond(tab-port) {
+      width: 100%;
+    }
+
+    button {
+      width: fit-content;
+    }
+  }
+
+  &-third-item {
+    width: 100%;
+
+    @include respond(tab-port) {
+      width: 100%;
+    }
+  }
+
+  @include respond(tab-port) {
+    flex-direction: column;
+  }
+}
+
+.timerange {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.output {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+
+  .form {
+    overflow-y: scroll;
+    height: 365px;
+
+    @include respond(tab-port) {
+      height: 250px;
+    }
+  }
+
+  button {
+    width: fit-content;
+  }
+}
+
+.toggle-with-label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+
+  label {
+    margin-bottom: 0;
+    margin-right: 1rem;
+    cursor: pointer;
+  }
+}
+
+.crs {
+  border: 1px solid black;
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  height: 100%;
+}
+
+.map-container {
+  display: flex;
+  justify-content: space-between;
+  height: 100%;
+  align-items: stretch;
+
+  @include respond(tab-land) {
+    flex-direction: column;
+  }
+}
+
+//Second row
+.process-second-row {
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+  overflow-y: hidden;
+
+  &-first-item {
+    width: 57%;
+    display: flex;
+    flex-direction: column;
+
+    @include respond(tab-port) {
+      width: 100%;
+    }
+  }
+
+  &-second-item {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    textarea {
+      @include respond(tab-land) {
+        width: 95%;
+      }
+
+      @include respond(phone) {
+        width: 90%;
+      }
+    }
+
+    @include respond(tab-port) {
+      width: 100%;
+    }
+  }
+
+  @include respond(tab-port) {
+    flex-direction: column;
+  }
+}
+
+.evalscript-editor {
+  height: 90%;
+
+  @include respond(big-desktop) {
+    width: 40%;
+  }
+
+  @include respond(tab-land) {
+    width: 40%;
+  }
+
+  @include respond(tab-port) {
+    width: 100%;
+  }
+}
+
+.byoc-options {
+  select {
+    width: 90%;
+  }
+}
+
+.datafusion-options {
+  max-height: 570px;
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.request-preview-buttons {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+
+  & * {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 1rem;
+  }
+}
+
+.process-request-preview {
+  width: 100%;
+}

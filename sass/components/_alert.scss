@@ -1,0 +1,68 @@
+.alert {
+  position: sticky;
+  top: 5%;
+  right: 0;
+  z-index: 100000;
+  max-width: 500px;
+  align-items: stretch;
+  font-size: 2rem;
+  cursor: pointer;
+  border-radius: 5px;
+  display: none;
+
+  @include respond(tab-land) {
+    font-size: 1rem;
+    max-width: 300px;
+  }
+
+  &-first-item {
+    display: flex;
+    width: 30%;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 3rem;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+
+    @include respond(tab-land) {
+      font-size: 2rem;
+    }
+  }
+
+  &--success {
+    display: flex;
+    background-color: lighten(#b2c22d, 10);
+
+    .alert-first-item {
+      background-color: darken(#b2c22d, 10);
+    }
+  }
+
+  &--warning {
+    display: flex;
+    background-color: lighten(#b51818, 20);
+
+    .alert-first-item {
+      background-color: darken(#b51818, 10);
+    }
+  }
+
+  &-second-item {
+    display: flex;
+    padding: 1rem 1rem;
+  }
+
+  &-third-item {
+    display: flex;
+    width: 30%;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 3rem;
+
+    @include respond(tab-land) {
+      font-size: 2rem;
+    }
+  }
+}
