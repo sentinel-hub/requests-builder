@@ -22,14 +22,19 @@ Request builder tool for creating [Sentinel Hub](https://www.sentinel-hub.com/de
 
 This repository production deployment (based on latest tag) can be found on the following [link](https://apps.sentinel-hub.com/requests-builder/).
 
-### Stage deployment
-
-The latest changes (current master) can be found deployed on the following [link](https://webdev.sentinel-hub.com/requests-builder/).
-
 ### How to run it locally.
 
-1. Clone the repository `git clone 
-2. Install all the dependencies using `npm install` inside the project root folder.
-3. Start the project using `npm start`.
+1. Clone the repository using `git clone https://github.com/sentinel-hub/requests-builder`
+2. Move to the project folder: `cd requests-builder` 
+3. Install all the dependencies: `npm install`.
 
-*To make use of authentication you will need a client Id that is only provided from Sentinel Hub*
+To get authentication running you will need to do the following:
+
+- Go to your dashboard: https://apps.sentinel-hub.com/dashboard/#/ 
+- Under `User Settings` create a new OAuth Client using `IMPLICIT` grant type and the following redirect url: http://localhost:3000/oauthCallback.html
+- Inside the root project folder, fill up the `.env.example` with the following values:
+    * REACT_APP_CLIENTID=<your_client_ID_from_previous_step>
+    * REACT_APP_AUTH_BASEURL=https://services.sentinel-hub.com/
+    * REACT_APP_ROOT_URL=http://localhost:3000/
+4. Copy your .env.example to an .env file using: `cp .env.example .env`
+5. Finally, start your local development server using: `npm start` 
