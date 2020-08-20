@@ -32,9 +32,9 @@ To get authentication running you will need to do the following:
 
 - Go to your dashboard: https://apps.sentinel-hub.com/dashboard/#/ 
 - Under `User Settings` create a new OAuth Client using `IMPLICIT` grant type and the following redirect url: http://localhost:3000/oauthCallback.html
-- Inside the root project folder, fill up the `.env.example` with the following values:
+4. Inside the root project folder, copy the `.env.example` to an `.env` using: `cp .env.example .env`
+5. Fill up the `.env` file with the following values:
     * REACT_APP_CLIENTID=<your_client_ID_from_previous_step>
     * REACT_APP_AUTH_BASEURL=https://services.sentinel-hub.com/
     * REACT_APP_ROOT_URL=http://localhost:3000/
-4. Copy your .env.example to an .env file using: `cp .env.example .env`
-5. Finally, start your local development server using: `npm start` 
+6. Finally, start your local development server using: `npm start` 
