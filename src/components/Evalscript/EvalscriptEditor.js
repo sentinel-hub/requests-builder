@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { connect } from 'react-redux';
 import store, { requestSlice, alertSlice } from '../../store';
 import { Controlled as CodeMirror } from 'react-codemirror2';
-import { DEFAULT_EVALSCRIPTS } from '../../utils/const';
+import { DEFAULT_EVALSCRIPTS, CUSTOM, DATAFUSION } from '../../utils/const';
 import RequestButton from '../RequestButton';
-import { convertEvalscript } from '../../utils/generateRequest';
+import { convertEvalscript, fetchDataProducts } from './utils';
 import { JSHINT } from 'jshint';
 import Toggle from '../Toggle';
+import DataProductSelection from './DataProductSelection';
+import Axios from 'axios';
 
 require('codemirror/lib/codemirror.css');
 require('codemirror/theme/eclipse.css');
@@ -22,13 +24,50 @@ require('codemirror/addon/selection/active-line.js');
 
 window.JSHINT = JSHINT;
 
+const canUseDataProducts = (datasource, token) => token && datasource !== CUSTOM && datasource !== DATAFUSION;
+
 const EvalscriptEditor = ({ datasource, evalscript, token, consoleValue }) => {
   const [toggledConsole, setToggledConsole] = useState(false);
+  const [useDataProduct, setUseDataProduct] = useState(false);
+  const [dataProducts, setDataProducts] = useState([]);
+  const [isFetchingDataProducts, setIsFetchingDataProducts] = useState(false);
+
+  const fetchAndSetDataProducts = useCallback(async (datasource, token, reqConfig) => {
+    try {
+      setIsFetchingDataProducts(true);
+      const dataproducts = await fetchDataProducts(datasource, token, reqConfig);
+      setDataProducts(dataproducts);
+      setIsFetchingDataProducts(false);
+    } catch (error) {
+      if (!Axios.isCancel(error)) {
+        console.error(error);
+      }
+    }
+  }, []);
+
   useEffect(() => {
     if (consoleValue) {
       setToggledConsole(true);
     }
   }, [consoleValue]);
+
+  // Fetch Data Products if needed.
+  useEffect(() => {
+    let source = Axios.CancelToken.source();
+    if (useDataProduct && dataProducts.length === 0 && canUseDataProducts(datasource, token)) {
+      fetchAndSetDataProducts(datasource, token, { cancelToken: source.token });
+    }
+    return () => {
+      if (source) {
+        source.cancel();
+      }
+    };
+  }, [datasource, useDataProduct, token, dataProducts.length, fetchAndSetDataProducts]);
+
+  // Reset Data Products when datasource changes.
+  useEffect(() => {
+    setDataProducts([]);
+  }, [datasource]);
 
   const handleChange = (code) => {
     store.dispatch(requestSlice.actions.setEvalscript(code));
@@ -37,6 +76,10 @@ const EvalscriptEditor = ({ datasource, evalscript, token, consoleValue }) => {
   const handleSetDefaultEvalscript = () => {
     const defaultEvalscript = DEFAULT_EVALSCRIPTS[datasource];
     store.dispatch(requestSlice.actions.setEvalscript(defaultEvalscript));
+  };
+
+  const handleUseDataProductChange = () => {
+    setUseDataProduct(!useDataProduct);
   };
 
   const convertEvalscriptResponseHandler = (response) => {
@@ -74,7 +117,25 @@ const EvalscriptEditor = ({ datasource, evalscript, token, consoleValue }) => {
           validation={Boolean(token) && !evalscript.startsWith('//VERSION=3')}
         />
       </div>
+
       <div className="form">
+        {canUseDataProducts(datasource, token) ? (
+          <div className="toggle-with-label">
+            <label htmlFor="use-dataproduct" className="form__label">
+              Use Dataproduct
+            </label>
+            <Toggle checked={useDataProduct} onChange={handleUseDataProductChange} id="use-dataproduct" />
+          </div>
+        ) : null}
+
+        {canUseDataProducts(datasource, token) && useDataProduct ? (
+          isFetchingDataProducts ? (
+            <p className="text u-margin-bottom-small">Loading Data Products...</p>
+          ) : (
+            <DataProductSelection dataproducts={dataProducts} />
+          )
+        ) : null}
+
         <CodeMirror
           value={evalscript}
           options={{
@@ -98,7 +159,7 @@ const EvalscriptEditor = ({ datasource, evalscript, token, consoleValue }) => {
           onBeforeChange={(editor, data, value) => {
             handleChange(value);
           }}
-          className="editor"
+          className="process-editor"
         />
 
         <div className="toggle-with-label u-margin-top-tiny">
@@ -113,6 +174,7 @@ const EvalscriptEditor = ({ datasource, evalscript, token, consoleValue }) => {
             &#8505;
           </span>
         </div>
+
         {toggledConsole ? (
           <div className="u-margin-top-tiny">
             <textarea

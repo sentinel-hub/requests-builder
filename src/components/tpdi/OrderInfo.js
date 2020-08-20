@@ -3,6 +3,7 @@ import store, { tpdiSlice, requestSlice } from '../../store';
 import RequestButton from '../RequestButton';
 import { deleteTPDIOrder, confirmTPDIOrder, getAllDeliveries } from './generateTPDIRequests';
 import { getTransformedGeometryFromBounds } from '../../utils/crsTransform';
+import { focusMap } from '../input/MapContainer';
 
 const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder }) => {
   const [expandOrder, setExpandOrder] = useState(false);
@@ -11,11 +12,13 @@ const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder }) => {
   const handleSeeGeometry = () => {
     const transformedGeo = getTransformedGeometryFromBounds(order.input.bounds);
     store.dispatch(tpdiSlice.actions.setExtraMapGeometry(transformedGeo));
+    focusMap();
   };
 
   const handleSetGeometry = () => {
     const transformedGeo = getTransformedGeometryFromBounds(order.input.bounds);
     store.dispatch(requestSlice.actions.setGeometry(transformedGeo));
+    focusMap();
   };
 
   const handleConfirm = (response) => {

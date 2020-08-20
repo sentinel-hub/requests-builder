@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import store, { tpdiSlice } from '../../store';
+import { focusMap } from '../input/MapContainer';
 
 const AirbusFeatureInfo = ({ feature }) => {
   const [expandedInfo, setExpandedInfo] = useState(false);
 
   const handleParseGeometryToMap = () => {
     store.dispatch(tpdiSlice.actions.setExtraMapGeometry(feature.geometry));
+    focusMap();
   };
 
   const handleAddToOrder = () => {

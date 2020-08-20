@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import RequestButton from '../RequestButton';
 import { getTPDISearchRequest } from './generateTPDIRequests';
-import { errorHandlerNoEnoughPermissions } from './TPDIOrderOptions';
+import { errorHandlerTPDI } from './TPDIOrderOptions';
 import { connect } from 'react-redux';
 import PlanetFeatureInfo from './PlanetFeatureInfo';
 import AirbusFeatureInfo from './AirbusFeatureInfo';
@@ -61,7 +61,7 @@ const SearchResultsContainer = ({ tpdi, request, airbus, planet, token }) => {
             className="secondary-button"
             responseHandler={handleSearchFeatures}
             disabledTitle="Log in to use this"
-            errorHandler={errorHandlerNoEnoughPermissions}
+            errorHandler={errorHandlerTPDI}
           />
         </div>
         {featuresWithProvider.features.length > 0 ? generateFeatures(featuresWithProvider) : null}

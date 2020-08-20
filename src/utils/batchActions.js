@@ -108,8 +108,18 @@ const getConfigHelper = (token, reqConfig) => {
 export const generateBatchBodyRequest = (requestState, batchState) => {
   const batchRequest = {};
   const processBody = getRequestObject(requestState);
+
   batchRequest.processRequest = processBody;
-  batchRequest.tillingGridId = batchState.tillingGrid;
+
+  // todo update it whenever is deployed to prod.
+  // batchRequest.tilingGrid = {
+  //   id: batchState.tillingGrid,
+  //   resolution: batchState.resolution,
+  // };
+  // todo delete this 
+  batchRequest.tilingGridId = batchState.tillingGrid;
+  batchRequest.resolution = batchState.resolution;
+
   if (batchState.specifyingBucketName) {
     batchRequest.bucketName = batchState.bucketName;
   } else {
@@ -117,17 +127,17 @@ export const generateBatchBodyRequest = (requestState, batchState) => {
       defaultTilePath: `s3://${batchState.bucketName}/${batchState.defaultTilePath}`,
     };
   }
+
   if (batchState.cogOutput) {
     batchRequest.output = {
       ...batchRequest.output,
       cogOutput: true,
     };
   }
-  batchRequest.resolution = batchState.resolution;
+
   if (batchState.description) {
     batchRequest.description = batchState.description;
   }
-
   return batchRequest;
 };
 

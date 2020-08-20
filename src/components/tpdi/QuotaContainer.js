@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { errorHandlerNoEnoughPermissions } from './TPDIOrderOptions';
+import { errorHandlerTPDI } from './TPDIOrderOptions';
 import RequestButton from '../RequestButton';
 import { getTPDIQuota } from './generateTPDIRequests';
 import { connect } from 'react-redux';
@@ -23,7 +23,7 @@ const QuotaContainer = ({ token }) => {
             className="secondary-button"
             responseHandler={handleGetQuota}
             disabledTitle="Log in to use this"
-            errorHandler={errorHandlerNoEnoughPermissions}
+            errorHandler={errorHandlerTPDI}
           />
         </div>
 

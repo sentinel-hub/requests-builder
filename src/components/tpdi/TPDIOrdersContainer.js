@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import RequestButton from '../RequestButton';
 import { getAllTPDIOrders } from './generateTPDIRequests';
-import { errorHandlerNoEnoughPermissions } from './TPDIOrderOptions';
+import { errorHandlerTPDI } from './TPDIOrderOptions';
 import OrderInfo from './OrderInfo';
 
 import { connect } from 'react-redux';
@@ -40,7 +40,7 @@ const TPDIOrdersContainer = ({ token }) => {
             className={'secondary-button'}
             responseHandler={handleGetOrders}
             disabledTitle="Log in to use this"
-            errorHandler={errorHandlerNoEnoughPermissions}
+            errorHandler={errorHandlerTPDI}
           />
         </div>
         {orders.length > 0

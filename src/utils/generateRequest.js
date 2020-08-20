@@ -261,15 +261,3 @@ export const getCustomCollections = (token, location) => {
   };
   return Axios.get(url, config);
 };
-
-export const convertEvalscript = (evalscript, datasource, token, reqConfig) => {
-  const url = `${DATASOURCES[datasource].url}/convertscript?datasetType=${datasource}`;
-  const config = {
-    headers: {
-      'Content-Type': 'application/ecmascript',
-      Authorization: `Bearer ${token}`,
-    },
-    ...reqConfig,
-  };
-  return Axios.post(url, evalscript, config);
-};

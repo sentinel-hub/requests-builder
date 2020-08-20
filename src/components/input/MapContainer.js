@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Map from '../Map';
 import { connect } from 'react-redux';
 import { CRS } from '../../utils/const';
-import store, { requestSlice } from '../../store';
+import store, { requestSlice, tpdiSlice } from '../../store';
 import { transformGeometryToNewCrs } from '../../utils/crsTransform';
 import L from 'leaflet';
 import bboxPolygon from '@turf/bbox-polygon';
@@ -108,6 +108,10 @@ const convertToCRS84AndDispatch = (parsedGeo, selectedCrs) => {
   store.dispatch(requestSlice.actions.setGeometry(transformedGeo));
 };
 
+export const focusMap = () => {
+  document.getElementById('map').focus();
+};
+
 //Component
 const MapContainer = ({ geometry, selectedCrs, extraMapGeometry }) => {
   //functions for leaflet map.
@@ -191,6 +195,12 @@ const MapContainer = ({ geometry, selectedCrs, extraMapGeometry }) => {
     }
   }, []);
 
+  const fitToMainBounds = useCallback(() => {
+    if (layersRef.current.length > 0) {
+      mapRef.current.fitBounds(layersRef.current[0].layer.getBounds());
+    }
+  }, []);
+
   const handleParseGeometry = (text = geometryText) => {
     try {
       let parsedGeo = JSON.parse(text);
@@ -223,6 +233,8 @@ const MapContainer = ({ geometry, selectedCrs, extraMapGeometry }) => {
   useEffect(() => {
     if (extraMapGeometry) {
       parseExtraGeometryToMap(extraMapGeometry);
+    } else {
+      deleteExtraLayerIfPossible();
     }
   }, [extraMapGeometry, parseExtraGeometryToMap]);
 
@@ -249,6 +261,11 @@ const MapContainer = ({ geometry, selectedCrs, extraMapGeometry }) => {
     } catch (err) {
       console.error('Error uploading file', err);
     }
+  };
+
+  const handleClearExtraGeometry = () => {
+    store.dispatch(tpdiSlice.actions.setExtraMapGeometry(null));
+    fitToMainBounds();
   };
 
   return (
@@ -293,6 +310,11 @@ const MapContainer = ({ geometry, selectedCrs, extraMapGeometry }) => {
               >
                 &#8505;
               </span>
+              {extraMapGeometry ? (
+                <button className="secondary-button" onClick={handleClearExtraGeometry}>
+                  Clear Extra Geometry
+                </button>
+              ) : null}
             </div>
           </div>
         </div>

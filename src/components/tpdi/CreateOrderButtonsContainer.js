@@ -3,6 +3,7 @@ import { createTPDIOrder, createTPDIDataFilterOrder } from './generateTPDIReques
 import { connect } from 'react-redux';
 import store, { alertSlice } from '../../store';
 import RequestButton from '../RequestButton';
+import { errorHandlerTPDI } from './TPDIOrderOptions';
 const validateCreateOrderWithProducts = (products) => {
   for (let prod of products) {
     if (prod.id && prod.id !== '') {
@@ -12,9 +13,17 @@ const validateCreateOrderWithProducts = (products) => {
   return false;
 };
 
-const CreateOrderButtonsContainer = ({ areaSelected, limit, request, airbus, planet, tpdi, token }) => {
+const CreateOrderButtonsContainer = ({
+  areaSelected,
+  limit,
+  request,
+  airbus,
+  planet,
+  tpdi,
+  token,
+  collectionId,
+}) => {
   const products = tpdi.products;
-
   const state = {
     request,
     airbus,
@@ -26,9 +35,7 @@ const CreateOrderButtonsContainer = ({ areaSelected, limit, request, airbus, pla
     store.dispatch(alertSlice.actions.addAlert({ type: 'SUCCESS', text: 'Order successfully created' }));
   };
 
-  const handleCreateOrderError = () => {
-    store.dispatch(alertSlice.actions.addAlert({ type: 'WARNING', text: 'Something went wrong' }));
-  };
+  const shouldConfirm = !Boolean(collectionId);
 
   return (
     <>
@@ -39,8 +46,10 @@ const CreateOrderButtonsContainer = ({ areaSelected, limit, request, airbus, pla
         validation={validateCreateOrderWithProducts(products) && areaSelected <= limit}
         className="secondary-button"
         responseHandler={handleCreateOrderSuccess}
-        errorHandler={handleCreateOrderError}
+        errorHandler={errorHandlerTPDI}
         disabledTitle="Add products and check the limit"
+        useConfirmation={shouldConfirm}
+        dialogText="Are you sure you want to create an order without a Collection ID?"
       />
 
       <hr className="u-margin-top-tiny"></hr>
@@ -52,8 +61,10 @@ const CreateOrderButtonsContainer = ({ areaSelected, limit, request, airbus, pla
         validation={Boolean(token) && areaSelected <= limit}
         className="secondary-button"
         responseHandler={handleCreateOrderSuccess}
-        errorHandler={handleCreateOrderError}
+        errorHandler={errorHandlerTPDI}
         disabledTitle={Boolean(token) ? 'Check the limit' : 'Log in'}
+        useConfirmation={shouldConfirm}
+        dialogText="Are you sure you want to create an order without a Collection ID?"
       />
     </>
   );
@@ -65,6 +76,7 @@ const mapStateToProps = (state) => ({
   airbus: state.airbus,
   planet: state.planet,
   token: state.auth.user.access_token,
+  collectionId: state.tpdi.collectionId,
 });
 
 export default connect(mapStateToProps)(CreateOrderButtonsContainer);

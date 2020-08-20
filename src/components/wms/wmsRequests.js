@@ -14,9 +14,9 @@ const getConfigHelper = (token, reqConfig) => {
 
 const BASE_WMS_URL = 'https://services.sentinel-hub.com/configuration/v1/wms/instances/';
 
-export const getAllInstances = (token) => {
+export const getAllInstances = (token, reqConfig) => {
   const url = BASE_WMS_URL;
-  const config = getConfigHelper(token);
+  const config = getConfigHelper(token, reqConfig);
   return axios.get(url, config);
 };
 

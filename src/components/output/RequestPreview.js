@@ -97,16 +97,6 @@ const RequestPreview = ({ requestState, token }) => {
         Request Preview
       </h2>
       <div className="form">
-        <CodeMirror
-          value={text}
-          options={{
-            mode: getCodeMirrorMode(codeMode),
-            theme: 'eclipse',
-            matchBrackets: true,
-          }}
-          onBeforeChange={(editor, data, value) => handleTextChange(value)}
-          className="process-request-preview"
-        />
         <div className="request-preview-buttons">
           <button className="secondary-button" onClick={handleCopy}>
             Copy
@@ -124,6 +114,17 @@ const RequestPreview = ({ requestState, token }) => {
             </button>
           ) : null}
         </div>
+
+        <CodeMirror
+          value={text}
+          options={{
+            mode: getCodeMirrorMode(codeMode),
+            theme: 'eclipse',
+            matchBrackets: true,
+          }}
+          onBeforeChange={(editor, data, value) => handleTextChange(value)}
+          className="process-editor"
+        />
       </div>
     </>
   );

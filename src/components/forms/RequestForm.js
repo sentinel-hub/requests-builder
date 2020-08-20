@@ -2,7 +2,7 @@ import React from 'react';
 import DataSourceSelect from '../input/DataSourceSelect';
 import TimeRangeSelect from '../input/TimeRangeSelect';
 import Output from '../output/Output';
-import EvalscriptEditor from '../input/EvalscriptEditor';
+import EvalscriptEditor from '../Evalscript/EvalscriptEditor';
 import RequestPreview from '../output/RequestPreview';
 import MapContainer from '../input/MapContainer';
 

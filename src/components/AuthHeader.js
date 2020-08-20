@@ -45,10 +45,13 @@ export const doLogout = () => {
     });
 };
 
-const AuthHeader = ({ user }) => {
+const AuthHeader = ({ user, isEdcUser }) => {
   useEffect(() => {
-    signInOnLoad();
-  }, []);
+    if (!isEdcUser) {
+      // edc token won't be saved on localstorage since a call to the /token_sentinel_hub needs to be done to know if it's deployed on EDC or not.
+      signInOnLoad();
+    }
+  }, [isEdcUser]);
 
   const signInOnLoad = async () => {
     try {
@@ -63,22 +66,27 @@ const AuthHeader = ({ user }) => {
     }
   };
   return (
-    <div>
-      {user.userdata !== null ? (
-        <button onClick={doLogout} className="button button--inactive">
-          Logout
-        </button>
-      ) : (
-        <button onClick={doLogin} className="button button--inactive">
-          Login
-        </button>
-      )}
-    </div>
+    <>
+      {!isEdcUser ? (
+        <div>
+          {user.userdata !== null ? (
+            <button onClick={doLogout} className="button button--inactive">
+              Logout
+            </button>
+          ) : (
+            <button onClick={doLogin} className="button button--inactive">
+              Login
+            </button>
+          )}
+        </div>
+      ) : null}
+    </>
   );
 };
 
 const mapStateToProps = (store) => ({
   user: store.auth.user,
+  isEdcUser: store.auth.isEDC,
 });
 
 export default connect(mapStateToProps, null)(AuthHeader);

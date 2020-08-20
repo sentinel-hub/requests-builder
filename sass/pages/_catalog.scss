@@ -1,0 +1,123 @@
+.catalog-first-row {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  height: 100%;
+  margin-bottom: 2rem;
+
+  &-first-item {
+    display: flex;
+    flex-direction: column;
+    width: 15%;
+
+    @include respond(phone) {
+      width: 100%;
+    }
+  }
+
+  &-second-item {
+    display: flex;
+    flex-direction: column;
+    width: 15%;
+
+    @include respond(phone) {
+      width: 100%;
+    }
+  }
+
+  &-third-item {
+    width: 70%;
+
+    @include respond(phone) {
+      width: 100%;
+    }
+  }
+
+  @include respond(phone) {
+    flex-direction: column;
+  }
+}
+
+.catalog-second-row {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  height: 100%;
+  margin-bottom: 2rem;
+
+  @include respond(phone) {
+    flex-direction: column;
+  }
+
+  &-first-item {
+    display: flex;
+    flex-direction: column;
+    width: 20%;
+
+    @include respond(phone) {
+      width: 100%;
+    }
+  }
+
+  &-second-item {
+    display: flex;
+    flex-direction: column;
+    width: 40%;
+
+    @include respond(phone) {
+      width: 100%;
+    }
+  }
+
+  &-third-item {
+    display: flex;
+    flex-direction: column;
+    width: 40%;
+
+    .form {
+      max-height: 500px;
+      overflow-y: scroll;
+    }
+
+    @include respond(phone) {
+      width: 100%;
+    }
+  }
+}
+
+.property-selection {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  select {
+    margin-right: 1rem;
+    margin-bottom: 0 !important;
+
+    &:first-of-type {
+      width: 80%;
+    }
+  }
+}
+
+.catalog-feature-info {
+  margin-left: 2rem;
+
+  & > * {
+    margin-bottom: 1rem;
+  }
+}
+
+.catalog-feature-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding: 1rem 0;
+  cursor: pointer;
+  margin-right: 1rem;
+  overflow-wrap: break-word;
+  width: 90%;
+
+  @include respond(tab-land) {
+    font-size: 1rem;
+  }
+}

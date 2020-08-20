@@ -61,13 +61,9 @@
 }
 
 .CodeMirror {  /* stylelint-disable-line */
-  height: 389px !important;
   font-size: 1.5rem;
+  height: auto !important;
   width: 100%;
-
-  @include respond(big-desktop) {
-    height: 397px !important;
-  }
 
   @include respond(tab-land) {
     font-size: 1rem;
@@ -97,4 +93,19 @@
   width: 95%;
   height: 50px;
   padding: 0.5rem 1rem;
+}
+
+.process-editor {
+
+  .CodeMirror-scroll { /* stylelint-disable-line */
+    overflow-y: scroll;
+    min-height: 400px;
+    max-height: 500px;
+  }
+}
+
+.tpdi-editor {
+  .CodeMirror-scroll { /* stylelint-disable-line */
+    height: 414px !important;
+  }
 }

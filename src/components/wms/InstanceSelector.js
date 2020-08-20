@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { getAllInstances } from './wmsRequests';
 import store, { wmsSlice } from '../../store';
+import Axios from 'axios';
 
 const generateInstanceOptions = (instances) => {
   return instances
@@ -17,12 +18,11 @@ const InstanceSelector = ({ token, instanceId }) => {
   const [instances, setInstances] = useState([]);
 
   useEffect(() => {
+    let source = Axios.CancelToken.source();
+
     const loadInstances = async () => {
-      if (!token) {
-        return;
-      }
       try {
-        const res = await getAllInstances(token);
+        const res = await getAllInstances(token, { cancelToken: source.token });
         if (res.data) {
           setInstances(
             res.data.map((instance) => ({
@@ -33,10 +33,20 @@ const InstanceSelector = ({ token, instanceId }) => {
           );
         }
       } catch (err) {
-        console.error('Something went wrong loading instances', err);
+        if (!Axios.isCancel(err)) {
+          console.error(err);
+        }
       }
     };
-    loadInstances();
+    if (token) {
+      loadInstances();
+    }
+
+    return () => {
+      if (source) {
+        source.cancel();
+      }
+    };
   }, [token]);
 
   const handleInstanceIdChange = (e) => {

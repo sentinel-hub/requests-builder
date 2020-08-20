@@ -5,11 +5,29 @@ import { connect } from 'react-redux';
 import { DATAFUSION } from '../../utils/const';
 import Toggle from '../Toggle';
 
-const convertUtcDateToInput = (utcDate) => {
+export const convertUtcDateToInput = (utcDate) => {
   if (utcDate) {
     return utcDate.split('T')[0];
   }
   return '';
+};
+
+export const returnValidatedTimeFrom = (stringDate) => {
+  let d = moment.utc(stringDate);
+  let today = moment().utc().startOf('day');
+  if (today - d < 0) {
+    d = today;
+  }
+  return d;
+};
+
+export const returnValidatedTimeTo = (stringDate) => {
+  let d = moment.utc(stringDate).endOf('day');
+  let today = moment().utc().endOf('day');
+  if (today - d < 0) {
+    d = today;
+  }
+  return d;
 };
 
 const multipleTimeRangeIsValid = (mode, datasource) => {
@@ -71,11 +89,7 @@ const TimeRangeSelect = ({ timeFromArray, timeToArray, datasource, isDisabled, m
   };
 
   const handleChangeTimeFrom = (e) => {
-    let d = moment.utc(e.target.value);
-    let today = moment().utc().startOf('day');
-    if (today - d < 0) {
-      d = today;
-    }
+    let d = returnValidatedTimeFrom(e.target.value);
     store.dispatch(
       requestSlice.actions.setTimeFrom({
         idx: e.target.name,
@@ -85,11 +99,7 @@ const TimeRangeSelect = ({ timeFromArray, timeToArray, datasource, isDisabled, m
   };
 
   const handleChangeTimeTo = (e) => {
-    let d = moment.utc(e.target.value).endOf('day');
-    let today = moment().utc().endOf('day');
-    if (today - d < 0) {
-      d = today;
-    }
+    let d = returnValidatedTimeTo(e.target.value);
     store.dispatch(
       requestSlice.actions.setTimeTo({
         timeTo: d.format(),

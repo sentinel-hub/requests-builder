@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import ProcessRequestForm from './components/forms/RequestForm';
-import configureAxios from './utils/configureAxios';
+import configureAxios, { shResponseInterceptor, edcResponseInterceptor } from './utils/configureAxios';
 import ModeSelector from './components/ModeSelector';
 import { connect } from 'react-redux';
 import ProcessHeaderButtons from './components/ProcessHeaderButtons';
@@ -12,6 +12,10 @@ import TPDIRequestForm from './components/forms/TPDIRequestForm';
 import WMSRequestForm from './components/wms/WMSRequestForm';
 import HeaderLogo from './components/HeaderLogo';
 import OverlayResponse from './components/OverlayResponse';
+import CatalogRequestForm from './components/forms/CatalogRequestForm';
+import '@fortawesome/free-solid-svg-icons/index';
+import Axios from 'axios';
+import store, { authSlice } from './store';
 
 const getForm = mode => {
   switch(mode) {
@@ -23,6 +27,8 @@ const getForm = mode => {
       return <TPDIRequestForm />
     case('WMS'):
       return <WMSRequestForm />
+    case('CATALOG'): 
+      return <CatalogRequestForm />
     default:
       return null;
     }
@@ -32,7 +38,7 @@ const getHeaderButtons =  mode => {
   if (mode === 'PROCESS') {
     return <ProcessHeaderButtons />
   }
-  else if (mode === 'BATCH' || mode === 'TPDI') {
+  else if (mode === 'BATCH' || mode === 'TPDI' || mode === 'CATALOG') {
     return <BatchHeaderButtons />
   }
   else if (mode === 'WMS') {
@@ -43,6 +49,22 @@ const getHeaderButtons =  mode => {
 function App({mode}) {
 
   useEffect(() => {
+    const fetchTokenEdc = async () => {
+      try {
+        let res = await Axios.post('/token_sentinel_hub');
+        if (res.data && res.data.access_token) {
+          store.dispatch(authSlice.actions.setUser({userdata: 'EDC User', access_token: res.data.access_token}));
+          edcResponseInterceptor();
+        }
+        else {
+          throw new Error('Token not found');   
+        }
+      } catch (err) {
+        shResponseInterceptor();    
+        store.dispatch(authSlice.actions.setIsEDC(false));        
+      }
+    }
+    fetchTokenEdc();
     configureAxios();
   }, []);
 

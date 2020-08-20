@@ -3,6 +3,7 @@ import store, { batchSlice, tpdiSlice, requestSlice, alertSlice } from '../../st
 import { getTransformedGeometryFromBounds } from '../../utils/crsTransform';
 import { dispatchChanges } from '../../utils/parseRequest';
 import { fetchTilesBatchRequest } from '../../utils/batchActions';
+import { focusMap } from '../input/MapContainer';
 
 const tillingGridIdToName = (id) => {
   return ['S2GM Grid', '10km Grid', '100,08km Grid'][id];
@@ -114,11 +115,13 @@ const BatchRequestSummary = ({ props, token }) => {
   const handleSeeGeometry = () => {
     const transformedGeo = getTransformedGeometryFromBounds(props.processRequest.input.bounds);
     store.dispatch(tpdiSlice.actions.setExtraMapGeometry(transformedGeo));
+    focusMap();
   };
 
   const handleSetGeometry = () => {
     const transformedGeo = getTransformedGeometryFromBounds(props.processRequest.input.bounds);
     store.dispatch(requestSlice.actions.setGeometry(transformedGeo));
+    focusMap();
   };
 
   const handleParseBatch = () => {
@@ -274,7 +277,7 @@ const BatchRequestSummary = ({ props, token }) => {
             style={{ width: 'fit-content', marginRight: '1rem' }}
             className="secondary-button u-margin-bottom-small"
           >
-            SET geometry on map
+            Set geometry on map
           </button>
           <button onClick={handleParseBatch} className="secondary-button">
             Parse Batch Request

@@ -1,8 +1,9 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import Axios from 'axios';
 import Mousetrap from 'mousetrap';
+import ConfirmDialog from './ConfirmDialog';
 
-//Abstraction of button that sends a request. To be implemented on the main Send Request (ProcessAPI)
+//Abstraction of button that sends a request.
 const RequestButton = ({
   buttonText,
   request,
@@ -12,9 +13,14 @@ const RequestButton = ({
   responseHandler,
   errorHandler,
   disabledTitle,
+  //allow shortcut (ctr+enter)
   useShortcut,
+  // params to use ConfirmDialog.
+  useConfirmation,
+  dialogText,
 }) => {
   const [isFetching, setIsFetching] = useState(false);
+  const [openedConfirmDialog, setOpenedConfirmDialog] = useState(false);
   const sourceRef = useRef();
 
   useEffect(() => {
@@ -29,8 +35,14 @@ const RequestButton = ({
   const handleSendRequest = useCallback(async () => {
     if (isFetching) {
       sourceRef.current.cancel();
+      setIsFetching(false);
+    } else if (useConfirmation && !openedConfirmDialog) {
+      setOpenedConfirmDialog(true);
     } else {
       try {
+        if (useConfirmation && openedConfirmDialog) {
+          setOpenedConfirmDialog(false);
+        }
         setIsFetching(true);
         sourceRef.current = Axios.CancelToken.source();
         const reqConfig = {
@@ -42,8 +54,8 @@ const RequestButton = ({
           responseHandler(res.data);
         }
       } catch (err) {
-        setIsFetching(false);
         if (!Axios.isCancel(err)) {
+          setIsFetching(false);
           if (errorHandler) {
             errorHandler(err);
           } else {
@@ -52,7 +64,7 @@ const RequestButton = ({
         }
       }
     }
-  }, [isFetching, args, request, errorHandler, responseHandler]);
+  }, [isFetching, args, request, errorHandler, responseHandler, openedConfirmDialog, useConfirmation]);
 
   //Mousetrap effect, binds
   useEffect(() => {
@@ -78,14 +90,23 @@ const RequestButton = ({
   };
 
   return (
-    <button
-      className={`${className} ${generateClassName()}`}
-      disabled={!validation}
-      onClick={handleSendRequest}
-      title={!validation ? disabledTitle : null}
-    >
-      {isFetching ? 'Cancel Request' : buttonText}
-    </button>
+    <>
+      <button
+        className={`${className} ${generateClassName()}`}
+        disabled={!validation}
+        onClick={handleSendRequest}
+        title={!validation ? disabledTitle : null}
+      >
+        {isFetching ? 'Cancel Request' : buttonText}
+      </button>
+      {useConfirmation && openedConfirmDialog ? (
+        <ConfirmDialog
+          onConfirm={handleSendRequest}
+          onDecline={() => setOpenedConfirmDialog(false)}
+          dialogText={dialogText}
+        />
+      ) : null}
+    </>
   );
 };
 

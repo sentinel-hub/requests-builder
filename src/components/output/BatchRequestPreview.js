@@ -73,7 +73,7 @@ const BatchRequestPreview = ({ token, requestState, batchState }) => {
             matchBrackets: true,
           }}
           onBeforeChange={(editor, data, value) => setText(value)}
-          className="textarea textarea--batch"
+          className="process-editor"
         />
         <button
           style={{ width: 'fit-content', marginLeft: '2rem' }}

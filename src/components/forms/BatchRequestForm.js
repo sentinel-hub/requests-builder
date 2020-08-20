@@ -3,7 +3,7 @@ import BatchRequestPreview from '../output/BatchRequestPreview';
 import DataSourceSelect from '../input/DataSourceSelect';
 import TimeRangeSelect from '../input/TimeRangeSelect';
 import Output from '../output/Output';
-import EvalscriptEditor from '../input/EvalscriptEditor';
+import EvalscriptEditor from '../Evalscript/EvalscriptEditor';
 import BatchOptions from '../batch/BatchOptions';
 import BatchActions from '../batch/BatchActions';
 import MapContainer from '../input/MapContainer';

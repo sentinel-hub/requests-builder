@@ -72,7 +72,7 @@ const TPDIRequestPreview = ({ state }) => {
             matchBrackets: true,
           }}
           onBeforeChange={(editor, data, value) => setText(value)}
-          className="tpdi-request-preview u-margin-bottom-small"
+          className="process-editor"
         />
         <div className="tpdi-request-preview-buttons">
           <button className="secondary-button" onClick={handleCopy}>

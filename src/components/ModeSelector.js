@@ -49,6 +49,18 @@ const ModeSelector = ({ mode }) => {
 
         <input
           className="mode-selector mode-selector--input"
+          checked={mode === 'CATALOG'}
+          onChange={handleModeChange}
+          type="radio"
+          id="catalog"
+          value="CATALOG"
+        />
+        <label className="mode-selector mode-selector--label" htmlFor="catalog">
+          CATALOG
+        </label>
+
+        <input
+          className="mode-selector mode-selector--input"
           checked={mode === 'WMS'}
           onChange={handleModeChange}
           type="radio"

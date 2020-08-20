@@ -29,7 +29,6 @@
   margin-top: 3rem;
   width: 100%;
   display: flex;
-  // overflow-y: hidden;
   align-items: stretch;
 
   @include respond(phone) {
@@ -278,7 +277,6 @@
   label {
     margin-bottom: 0;
     margin-right: 1rem;
-    margin-left: 2rem;
   }
 }
 

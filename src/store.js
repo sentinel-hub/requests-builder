@@ -9,6 +9,8 @@ export const authSlice = createSlice({
       userdata: null,
       access_token: null,
     },
+    // For EDC Deployment. Assume it's true so feature get toggled and not dissapear.
+    isEDC: true,
   },
   reducers: {
     setUser: (state, action) => {
@@ -18,6 +20,9 @@ export const authSlice = createSlice({
     resetUser: (state, action) => {
       state.user.userdata = null;
       state.user.access_token = null;
+    },
+    setIsEDC: (state, action) => {
+      state.isEDC = action.payload;
     },
   },
 });
@@ -430,6 +435,14 @@ export const tpdiSlice = createSlice({
         state.products.push({ idx: lastItem.idx + 1, id: '' });
       }
     },
+    clearProducts: (state) => {
+      state.products = [
+        {
+          idx: 0,
+          id: '',
+        },
+      ];
+    },
     removeProductId: (state, action) => {
       state.products = state.products.filter((prod) => prod.idx !== parseInt(action.payload));
     },
@@ -572,6 +585,122 @@ export const responsesSlice = createSlice({
   },
 });
 
+export const catalogSlice = createSlice({
+  name: 'catalog',
+  initialState: {
+    timeFrom: {
+      time: moment.utc().subtract(1, 'month').startOf('day').format(),
+      isOpen: false,
+    },
+    timeTo: {
+      time: moment.utc().endOf('day').format(),
+      isOpen: false,
+    },
+    selectedCollection: '',
+    queryProperties: [],
+    limit: 10,
+    next: '',
+    disableInclude: true,
+    includeFields: [''],
+    disableExclude: true,
+    excludeFields: [''],
+    distinct: '',
+  },
+  reducers: {
+    setTimeFrom: (state, action) => {
+      state.timeFrom.time = action.payload;
+    },
+    setTimeTo: (state, action) => {
+      state.timeTo.time = action.payload;
+    },
+    openTimeFrom: (state, action) => {
+      state.timeFrom.isOpen = action.payload;
+    },
+    openTimeTo: (state, action) => {
+      state.timeTo.isOpen = action.payload;
+    },
+    setSelectedCollection: (state, action) => {
+      state.selectedCollection = action.payload;
+      state.queryProperties = [];
+    },
+    addQueryProperty: (state, action) => {
+      state.queryProperties.push({
+        propertyName: '',
+        propertyValue: '',
+        operator: '',
+      });
+    },
+    removeQueryProperty: (state, action) => {
+      let idx = action.payload;
+      state.queryProperties = state.queryProperties
+        .slice(0, idx)
+        .concat(state.queryProperties.slice(idx + 1));
+    },
+    setQueryProperty: (state, action) => {
+      let idx = action.payload.idx;
+      if (action.payload.propertyName !== undefined) {
+        state.queryProperties[idx] = {
+          propertyName: action.payload.propertyName,
+          propertyValue: '',
+          operator: '',
+        };
+      }
+      if (action.payload.propertyValue) {
+        state.queryProperties[idx].propertyValue = action.payload.propertyValue;
+      }
+      if (action.payload.operator) {
+        state.queryProperties[idx].operator = action.payload.operator;
+      }
+    },
+    setLimit: (state, action) => {
+      state.limit = action.payload;
+    },
+    addIncludeField: (state) => {
+      state.includeFields.push('');
+    },
+    addExcludeField: (state) => {
+      state.excludeFields.push('');
+    },
+    deleteIncludeField: (state, action) => {
+      const idx = action.payload;
+      state.includeFields = state.includeFields.slice(0, idx).concat(state.includeFields.slice(idx + 1));
+    },
+    deleteExcludeField: (state, action) => {
+      const idx = action.payload;
+      state.excludeFields = state.excludeFields.slice(0, idx).concat(state.excludeFields.slice(idx + 1));
+    },
+    setIncludeField: (state, action) => {
+      let idx = action.payload.idx;
+      state.includeFields[idx] = action.payload.value;
+    },
+    setExcludeField: (state, action) => {
+      let idx = action.payload.idx;
+      state.excludeFields[idx] = action.payload.value;
+    },
+    setDisableIncludeFields: (state, action) => {
+      state.disableInclude = action.payload;
+    },
+    setDisableExcludeFields: (state, action) => {
+      state.disableExclude = action.payload;
+    },
+    setDistinct: (state, action) => {
+      state.distinct = action.payload;
+    },
+    setNext: (state, action) => {
+      state.next = action.payload;
+    },
+    // addSelectedCollection: (state, action) => {
+    //   state.selectedCollections.push(action.payload);
+    // },
+    // removeFromSelectedCollections: (state, action) => {
+    //   let idx = state.selectedCollections.indexOf(action.payload);
+    //   state.selectedCollections = state.selectedCollections
+    //     .slice(0, idx)
+    //     .concat(state.selectedCollections.slice(idx + 1));
+    // },
+  },
+});
+
 const reducers = combineReducers({
   auth: authSlice.reducer,
   request: requestSlice.reducer,
@@ -582,6 +711,7 @@ const reducers = combineReducers({
   alert: alertSlice.reducer,
   wms: wmsSlice.reducer,
   response: responsesSlice.reducer,
+  catalog: catalogSlice.reducer,
 });
 
 const store = configureStore({

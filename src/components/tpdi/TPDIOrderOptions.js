@@ -4,10 +4,14 @@ import store, { tpdiSlice, alertSlice } from '../../store';
 import { getAreaFromGeometry } from '../input/MapContainer';
 import CreateOrderButtonsContainer from './CreateOrderButtonsContainer';
 
-export const errorHandlerNoEnoughPermissions = (error) => {
-  if (error.response && error.response.status === 403) {
+export const errorHandlerTPDI = (error) => {
+  if (error.response && error.response.data && error.response.data.error) {
+    let returnedError = error.response.data.error;
     store.dispatch(
-      alertSlice.actions.addAlert({ type: 'WARNING', text: "You don't have enough permissions" }),
+      alertSlice.actions.addAlert({
+        type: 'WARNING',
+        text: 'Error: ' + returnedError.status + ' - ' + returnedError.message,
+      }),
     );
   } else {
     store.dispatch(alertSlice.actions.addAlert({ type: 'WARNING', text: 'Something went wrong' }));
@@ -71,6 +75,12 @@ const TPDIOrderOptions = ({ products, name, collectionId, geometry }) => {
     }
   };
 
+  const handleClearProducts = () => {
+    store.dispatch(tpdiSlice.actions.clearProducts());
+  };
+
+  const couldClear = Boolean(products.length > 1 || products.find((p) => p.id));
+
   return (
     <>
       <h2 className="heading-secondary">Order Options</h2>
@@ -106,6 +116,12 @@ const TPDIOrderOptions = ({ products, name, collectionId, geometry }) => {
         </div>
 
         {generateProductIdInputs(products)}
+
+        {couldClear ? (
+          <button className="secondary-button u-margin-bottom-small" onClick={handleClearProducts}>
+            Clear Products
+          </button>
+        ) : null}
 
         <label className="form__label">Area selected</label>
         <p className="text u-margin-bottom-tiny">{areaSelected} sqKm</p>
