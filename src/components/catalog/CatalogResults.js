@@ -1,16 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkedAlt, faAngleDoubleDown, faAngleDoubleUp } from '@fortawesome/free-solid-svg-icons';
 import store, { tpdiSlice } from '../../store';
 import { S1GRD_CATALOG_ID, S2L2A_CATALOG_ID, S2L1C_CATALOG_ID } from './const';
-import { focusMap } from '../input/MapContainer';
+import { focusMap } from '../common/Map/utils/crsTransform';
+
+const filterResults = (features, filterText) => {
+  if (filterText === '') {
+    return features;
+  }
+  return features.filter((feature) => {
+    if (feature.id.toLowerCase().includes(filterText.toLowerCase())) {
+      return true;
+    }
+    return false;
+  });
+};
 
 const CatalogResults = ({ results }) => {
+  const [filterText, setFilterText] = useState('');
+  const [filteredResults, setFilteredResults] = useState(results.results);
+  const handleFilterTextChange = (e) => {
+    setFilterText(e.target.value);
+  };
+
+  useEffect(() => {
+    setFilteredResults(filterResults(results.results, filterText));
+  }, [results, filterText]);
   return (
     <>
       <h2 className="heading-secondary">Catalog Results</h2>
       <div className="form">
-        {results.results.length > 0 ? renderFeatureByType(results) : <p className="text">No results</p>}
+        <label htmlFor="catalog-search" className="form__label">
+          Search Features
+        </label>
+        <input
+          id="catalog-search"
+          placeholder="Search features by id"
+          onChange={handleFilterTextChange}
+          type="text"
+          className="form__input"
+        />
+        {filteredResults.length > 0 ? (
+          renderFeatureByType({ ...results, results: filteredResults })
+        ) : (
+          <p className="text">No results</p>
+        )}
       </div>
     </>
   );
@@ -63,15 +98,14 @@ const CommonFeatureInfo = ({ feature, isExpanded, setIsExpanded }) => {
     focusMap();
   };
 
+  const handleExpandResult = () => {
+    setIsExpanded(!isExpanded);
+  };
+
   return (
     <>
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        <p
-          className="catalog-feature-title"
-          onClick={() => {
-            setIsExpanded(!isExpanded);
-          }}
-        >
+        <p className="catalog-feature-title" onClick={handleExpandResult}>
           {feature.id ? feature.id : 'Catalog Result'}
         </p>
         <FontAwesomeIcon icon={isExpanded ? faAngleDoubleUp : faAngleDoubleDown} />

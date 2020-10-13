@@ -30,51 +30,55 @@ export const DATASOURCES = {
   S2L1C: {
     url: 'https://services.sentinel-hub.com/api/v1/process',
     ogcUrl: 'https://services.sentinel-hub.com/ogc/',
+    defaultDatafusionId: 'l1c',
   },
   S2L2A: {
     url: 'https://services.sentinel-hub.com/api/v1/process',
     ogcUrl: 'https://services.sentinel-hub.com/ogc/',
+    defaultDatafusionId: 'l2a',
   },
   L8L1C: {
     url: 'https://services-uswest2.sentinel-hub.com/api/v1/process',
     ogcUrl: 'https://services-uswest2.sentinel-hub.com/ogc/',
+    defaultDatafusionId: 'l8l1c',
   },
   MODIS: {
     url: 'https://services-uswest2.sentinel-hub.com/api/v1/process',
     ogcUrl: 'https://services-uswest2.sentinel-hub.com/ogc/',
+    defaultDatafusionId: 'modis',
   },
   DEM: {
     url: 'https://services.sentinel-hub.com/api/v1/process',
     ogcUrl: 'https://services.sentinel-hub.com/ogc/',
+    defaultDatafusionId: 'dem',
   },
   S1GRD: {
     url: 'https://services.sentinel-hub.com/api/v1/process',
     ogcUrl: 'https://services.sentinel-hub.com/ogc/',
+    defaultDatafusionId: 's1',
   },
   S3OLCI: {
     url: 'https://creodias.sentinel-hub.com/api/v1/process',
     ogcUrl: 'https://creodias.sentinel-hub.com/ogc/',
+    defaultDatafusionId: 'olci',
   },
   S3SLSTR: {
     url: 'https://creodias.sentinel-hub.com/api/v1/process',
     ogcUrl: 'https://creodias.sentinel-hub.com/ogc/',
+    defaultDatafusionId: 'slstr',
   },
   S5PL2: {
     url: 'https://creodias.sentinel-hub.com/api/v1/process',
     ogcUrl: 'https://creodias.sentinel-hub.com/ogc/',
+    defaultDatafusionId: 's5pl2',
   },
   CUSTOM: {
     url: 'https://services.sentinel-hub.com/api/v1/process',
+    ogcUrl: 'https://services.sentinel-hub.com/api/v1/process',
   },
   DATAFUSION: {
     url: 'https://services.sentinel-hub.com/api/v1/process',
   },
-};
-
-export const LOCATIONS = {
-  'https://services.sentinel-hub.com/api/v1/process': 'AWS:eu-central-1',
-  'https://services-uswest2.sentinel-hub.com/api/v1/process': 'AWS:eu-west-2',
-  'https://creodias.sentinel-hub.com/api/v1/process': 'NOT-SUPPORTED',
 };
 
 export const OUTPUT_FORMATS = [
@@ -286,6 +290,10 @@ export const CRS = {
     projection: '+proj=utm +zone=45 +ellps=WGS84 +datum=WGS84 +units=m +no_defs',
     internal: true,
   },
+};
+
+export const crsUrlToCrsKey = (crsUrl) => {
+  return Object.keys(CRS).find((key) => CRS[key].url === crsUrl);
 };
 
 export const isEmpty = (obj) => Object.keys(obj).length === 0;

@@ -112,3 +112,14 @@
   // width: 70%;
   text-align: center;
 }
+
+.button-link {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-style: italic;
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: darkgreen;
+  text-decoration: underline;
+}

@@ -6,6 +6,16 @@
   }
 }
 
+.batch-responses {
+  max-height: 200px;
+  overflow-y: scroll;
+
+  @include respond(tab-port) {
+    overflow-y: auto;
+    max-height: 100%;
+  }
+}
+
 .batch-actions-info-container {
   display: flex;
   width: 100%;

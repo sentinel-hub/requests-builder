@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { errorHandlerTPDI } from './TPDIOrderOptions';
-import RequestButton from '../RequestButton';
+import RequestButton from '../common/RequestButton';
 import { getTPDIQuota } from './generateTPDIRequests';
 import { connect } from 'react-redux';
 

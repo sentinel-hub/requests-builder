@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { transformGeometryToNewCrs } from '../../utils/crsTransform';
+import { transformGeometryToNewCrs } from '../common/Map/utils/crsTransform';
 import BBox from '@turf/bbox';
 import { DATASOURCES } from '../../utils/const';
 

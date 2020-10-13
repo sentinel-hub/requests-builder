@@ -21,8 +21,10 @@ const TPDISources = ({ provider }) => {
     <>
       <h2 className="heading-secondary">Search Options</h2>
       <div className="form">
-        <label className="form__label">Provider</label>
-        <select className="form__input" value={provider} onChange={handleChange}>
+        <label htmlFor="tpdi-provider" className="form__label">
+          Provider
+        </label>
+        <select id="tpdi-provider" className="form__input" value={provider} onChange={handleChange}>
           <option value="AIRBUS">Airbus</option>
           <option value="PLANET">Planet Scope</option>
         </select>

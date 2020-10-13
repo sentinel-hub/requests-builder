@@ -5,6 +5,7 @@
     align-items: stretch;
     height: 100%;
     margin-bottom: 2rem;
+    overflow-y: hidden;
 
     &-first-item {
       display: flex;
@@ -28,6 +29,8 @@
 
     &-third-item {
       width: 65%;
+      display: flex;
+      flex-direction: column;
 
       @include respond(tab-port) {
         width: 100%;

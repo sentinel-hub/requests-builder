@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import store, { tpdiSlice, requestSlice } from '../../store';
-import RequestButton from '../RequestButton';
-import { deleteTPDIOrder, confirmTPDIOrder, getAllDeliveries } from './generateTPDIRequests';
-import { getTransformedGeometryFromBounds } from '../../utils/crsTransform';
-import { focusMap } from '../input/MapContainer';
+import RequestButton from '../common/RequestButton';
+import { deleteTPDIOrder, confirmTPDIOrder } from './generateTPDIRequests';
+import { getTransformedGeometryFromBounds, focusMap } from '../common/Map/utils/crsTransform';
+import GetDeliveriesButton from './GetDeliveriesButton';
+import { parseTPDIRequest } from './parse';
 
 const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder }) => {
   const [expandOrder, setExpandOrder] = useState(false);
@@ -36,13 +37,17 @@ const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder }) => {
     }
   };
 
-  const handleGetDeliveries = (response) => {
-    setDeliveries(response.data);
+  const handleSetExpandOrder = () => {
+    setExpandOrder(!expandOrder);
+  };
+
+  const handleParseRequest = () => {
+    parseTPDIRequest(order);
   };
 
   return (
     <div className="order-info">
-      <label onClick={() => setExpandOrder(!expandOrder)} className="form__label">
+      <label onClick={handleSetExpandOrder} className="form__label">
         {order.id} - {order.name ? order.name + ' -' : null}{' '}
         {order.created ? order.created.replace('T', ' ').slice(0, -8) : null} -{' '}
         {expandOrder ? String.fromCharCode(0x25b2) : String.fromCharCode(0x25bc)}
@@ -96,6 +101,9 @@ const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder }) => {
           <button className="secondary-button" onClick={handleSetGeometry}>
             Set geometry on map
           </button>
+          <button className="secondary-button" onClick={handleParseRequest}>
+            Parse Request
+          </button>
           {order.status !== 'DONE' && order.status !== 'RUNNING' ? (
             <RequestButton
               request={confirmTPDIOrder}
@@ -109,13 +117,11 @@ const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder }) => {
           <button className="secondary-button secondary-button--cancel" onClick={handleDeleteClick}>
             Delete Order
           </button>
-          <RequestButton
-            request={getAllDeliveries}
-            args={[token, order.id]}
-            buttonText="Get deliveries"
-            validation={Boolean(token)}
-            className="secondary-button"
-            responseHandler={handleGetDeliveries}
+          <GetDeliveriesButton
+            id={order.id}
+            token={token}
+            status={order.status}
+            setDeliveries={setDeliveries}
           />
         </div>
       ) : null}

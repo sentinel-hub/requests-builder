@@ -1,5 +1,8 @@
 import Axios from 'axios';
 import bbox from '@turf/bbox';
+import { getUrlFromCurl, getRequestBody } from '../../process/requests/parseRequest';
+import { S2L1C, S1GRD, S2L2A } from '../../../utils/const';
+import { datasourceToCollection } from '../const';
 
 const getConfigHelper = (token, reqConfig) => {
   return {
@@ -73,7 +76,9 @@ export const getCatalogRequestBody = (catalogState, geometry) => {
   } else {
     body.bbox = getBbox(geometry);
   }
-  body.limit = catalogState.limit;
+  if (catalogState.limit) {
+    body.limit = parseInt(catalogState.limit);
+  }
   if (catalogState.distinct) {
     body.distinct = catalogState.distinct;
   }
@@ -110,4 +115,38 @@ export const generateCatalogCurlCommand = (catalogState, geometry, token) => {
     token ? token : '<your token here>'
   }' \n -d '${body}'`;
   return curlCommand;
+};
+
+export const sendCatalogEditedRequest = (text, token, reqConfig) => {
+  try {
+    const url = getUrlFromCurl(text);
+    const parsed = JSON.parse(getRequestBody(text));
+    const config = getConfigHelper(token, reqConfig);
+    return Axios.post(url, parsed, config);
+  } catch (err) {
+    return Promise.reject(err);
+  }
+};
+
+//
+export const fetchAvailableDatesWithCatalog = async (datasource, timerange, geometry, token, reqConfig) => {
+  const url = CATALOG_BASE_URL + 'search';
+  const body = {};
+  const config = getConfigHelper(token, reqConfig);
+  if (datasource === S2L1C || datasource === S2L2A || datasource === S1GRD) {
+    body.collections = [datasourceToCollection[datasource]];
+    body.datetime = timerange.timeFrom + '/' + timerange.timeTo;
+    body.distinct = 'date';
+    body.limit = 100;
+    if (shouldIntersect(geometry)) {
+      body.intersects = geometry;
+    } else {
+      body.bbox = getBbox(geometry);
+    }
+    return Axios.post(url, body, config);
+  } else {
+    return new Promise((resolve, reject) => {
+      resolve({ data: { features: [] } });
+    });
+  }
 };

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import RequestButton from '../RequestButton';
+import RequestButton from '../common/RequestButton';
 import { getTPDISearchRequest } from './generateTPDIRequests';
 import { errorHandlerTPDI } from './TPDIOrderOptions';
 import { connect } from 'react-redux';
@@ -11,6 +11,15 @@ const validateSearch = (token, state) => {
     return Boolean(token && state.planet.planetApiKey);
   } else {
     return Boolean(token);
+  }
+};
+
+const getDisabledTitle = (token, state) => {
+  if (!token) {
+    return 'Log in to use this';
+  }
+  if (state.tpdi.provider === 'PLANET') {
+    return 'You need an API Key to use this.';
   }
 };
 
@@ -60,7 +69,7 @@ const SearchResultsContainer = ({ tpdi, request, airbus, planet, token }) => {
             validation={validateSearch(token, state)}
             className="secondary-button"
             responseHandler={handleSearchFeatures}
-            disabledTitle="Log in to use this"
+            disabledTitle={getDisabledTitle(token, state)}
             errorHandler={errorHandlerTPDI}
           />
         </div>

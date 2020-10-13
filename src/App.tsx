@@ -1,21 +1,24 @@
-import React, { useEffect } from 'react';
-import ProcessRequestForm from './components/forms/RequestForm';
+import React, { useEffect, lazy, Suspense } from 'react';
 import configureAxios, { shResponseInterceptor, edcResponseInterceptor } from './utils/configureAxios';
-import ModeSelector from './components/ModeSelector';
+import ModeSelector from './components/common/ModeSelector';
 import { connect } from 'react-redux';
-import ProcessHeaderButtons from './components/ProcessHeaderButtons';
+import ProcessHeaderButtons from './components/process/ProcessHeaderButtons';
 import BatchHeaderButtons from './components/batch/BatchHeaderButtons';
 import WMSHeaderButtons from './components/wms/WMSHeaderButtons';
-import BatchRequestForm from './components/forms/BatchRequestForm';
-import Alert from './components/Alert';
-import TPDIRequestForm from './components/forms/TPDIRequestForm';
-import WMSRequestForm from './components/wms/WMSRequestForm';
-import HeaderLogo from './components/HeaderLogo';
-import OverlayResponse from './components/OverlayResponse';
-import CatalogRequestForm from './components/forms/CatalogRequestForm';
+import Alert from './components/common/Alert';
+import HeaderLogo from './components/common/HeaderLogo';
+import OverlayResponse from './components/common/OverlayResponse';
+import ProcessRequestForm from './forms/RequestForm';
 import '@fortawesome/free-solid-svg-icons/index';
 import Axios from 'axios';
 import store, { authSlice } from './store';
+import BatchBannerInfo from './components/batch/BatchBannerInfo';
+import TPDIBannerInfo from './components/tpdi/TPDIBannerInfo';
+
+const BatchRequestForm = lazy(() => import('./forms/BatchRequestForm'));
+const TPDIRequestForm = lazy(() => import('./forms/TPDIRequestForm'));
+const CatalogRequestForm = lazy(() => import('./forms/CatalogRequestForm'));
+const WMSRequestForm = lazy(() => import('./forms/WMSRequestForm'));
 
 const getForm = mode => {
   switch(mode) {
@@ -43,6 +46,17 @@ const getHeaderButtons =  mode => {
   }
   else if (mode === 'WMS') {
     return <WMSHeaderButtons />
+  }
+}
+
+const getInformativeBanner = mode => {
+  switch(mode) {
+    case 'BATCH':
+      return <BatchBannerInfo />
+    case 'TPDI':
+      return <TPDIBannerInfo />
+    default: 
+      return null;
   }
 }
 
@@ -78,8 +92,11 @@ function App({mode}) {
         </div>
         {getHeaderButtons(mode)}
       </div>
+      {getInformativeBanner(mode)}
       <ModeSelector />
-      {getForm(mode)}
+      <Suspense fallback={<p className='text'>Loading...</p>}>
+        {getForm(mode)}
+      </Suspense>
     </div>
   );
 }

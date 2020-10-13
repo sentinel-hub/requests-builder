@@ -1,4 +1,4 @@
-import { getRequestBody } from '../../../utils/parseRequest';
+import { getRequestBody } from '../../process/requests/parseRequest';
 import store, { catalogSlice, requestSlice } from '../../../store';
 
 export const parseCatalogBody = (str) => {
@@ -49,7 +49,7 @@ const dispatchDateTime = (datetime) => {
     store.dispatch(catalogSlice.actions.setTimeFrom(from));
   }
   if (to && to !== '..') {
-    store.dispatch(catalogSlice.actions.setTimeFrom(to));
+    store.dispatch(catalogSlice.actions.setTimeTo(to));
   }
 };
 

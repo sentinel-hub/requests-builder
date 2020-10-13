@@ -7,21 +7,31 @@ import CancelBatchRequestButton from './CancelBatchRequestButton';
 import GetSingleRequestButton from './GetSingleRequestButton';
 import RestartPartialRequestButton from './RestartPartialRequestButton';
 
-export const addAlertOnError = (err, message) => {
-  if (err.response && err.response.status === 403) {
+export const addAlertOnError = (error, message) => {
+  if (error.response?.status === 403) {
     store.dispatch(
       alertSlice.actions.addAlert({
         type: 'WARNING',
         text: "You don't have enough permissions to use this",
       }),
     );
-    console.error(err);
   } else if (message) {
     store.dispatch(alertSlice.actions.addAlert({ type: 'WARNING', text: message }));
-    console.error(err);
+    console.error(error);
   } else {
-    console.error(err);
-    store.dispatch(alertSlice.actions.addAlert({ type: 'WARNING', text: 'Something went wrong' }));
+    try {
+      const err = error.response.data.error;
+      console.log(err);
+      let errorMsg = err.message;
+      if (err.errors) {
+        errorMsg += err.errors.map((subErr) => (subErr.violation ? '\n' + subErr.violation : ''));
+      }
+      console.log(errorMsg);
+      store.dispatch(alertSlice.actions.addAlert({ type: 'WARNING', text: errorMsg }));
+    } catch (exc) {
+      store.dispatch(alertSlice.actions.addAlert({ type: 'WARNING', text: 'Something went wrong' }));
+      console.error(error);
+    }
   }
 };
 
@@ -40,8 +50,16 @@ const BatchActions = ({ selectedBatchId, setFetchedRequests }) => {
     <>
       <h2 className="heading-secondary u-margin-top-small">Batch Actions</h2>
       <div className="form">
-        <label className="form__label u-margin-top-tiny">Batch Request Id</label>
-        <input onChange={handleBatchIdChange} className="form__input" type="text" value={selectedBatchId} />
+        <label htmlFor="batch-request-id" className="form__label u-margin-top-tiny">
+          Batch Request Id
+        </label>
+        <input
+          id="batch-request-id"
+          onChange={handleBatchIdChange}
+          className="form__input"
+          type="text"
+          value={selectedBatchId}
+        />
         <div className="buttons-container">
           <AnalyseBatchRequestButton />
           <StartBatchRequestButton />

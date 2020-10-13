@@ -1,0 +1,28 @@
+.info-banner {
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+
+  p {
+    border-radius: 3px;
+    padding: 1rem 2rem;
+    background: lighten(#b2c22d, 30);
+    color: darken(#b2c22d, 25);
+    font-size: 1.6rem;
+    font-weight: bold;
+    letter-spacing: 0.25px;
+    font-style: italic;
+
+    @include respond(tab-land) {
+      font-size: 1.2rem;
+    }
+  }
+
+  a {
+    color: darkgreen;
+
+    &:visited {
+      color: darkgreen;
+    }
+  }
+}

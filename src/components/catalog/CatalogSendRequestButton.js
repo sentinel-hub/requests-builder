@@ -1,5 +1,5 @@
 import React from 'react';
-import RequestButton from '../RequestButton';
+import RequestButton from '../common/RequestButton';
 import { connect } from 'react-redux';
 import { generateCatalogRequest } from './requests';
 import store, { catalogSlice, alertSlice } from '../../store';
@@ -24,6 +24,8 @@ const CatalogSendRequestButton = ({ catalogState, geometry, token, setResults })
   const responseHandler = (response) => {
     if (response.context.next) {
       store.dispatch(catalogSlice.actions.setNext(response.context.next));
+    } else {
+      store.dispatch(catalogSlice.actions.setNext(''));
     }
     setResults((res) => ({
       results: response.features,

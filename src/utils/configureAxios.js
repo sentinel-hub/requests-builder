@@ -1,6 +1,6 @@
 import Axios from 'axios';
 import store, { alertSlice, authSlice } from '../store';
-import { doLogout, doLogin } from '../components/AuthHeader';
+import { doLogout, doLogin } from '../components/common/AuthHeader';
 
 const lastUsedToken = {
   token: '',

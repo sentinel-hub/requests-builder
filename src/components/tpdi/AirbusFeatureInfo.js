@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import store, { tpdiSlice } from '../../store';
-import { focusMap } from '../input/MapContainer';
+import { focusMap } from '../common/Map/utils/crsTransform';
+import { getFormattedDatetime } from './utils';
 
 const AirbusFeatureInfo = ({ feature }) => {
   const [expandedInfo, setExpandedInfo] = useState(false);
@@ -14,11 +15,16 @@ const AirbusFeatureInfo = ({ feature }) => {
     store.dispatch(tpdiSlice.actions.addProduct(feature.properties.id));
   };
 
+  const handleSetExpandedInfo = () => {
+    setExpandedInfo(!expandedInfo);
+  };
+
   return (
     <div className="tpdi-feature">
       <div className="tpdi-feature-title">
-        <label onClick={() => setExpandedInfo(!expandedInfo)} className="form__label">
-          {feature.properties.id} {expandedInfo ? String.fromCharCode(0x25b2) : String.fromCharCode(0x25bc)}
+        <label onClick={handleSetExpandedInfo} className="form__label">
+          {getFormattedDatetime(feature.properties.acquisitionDate)}{' '}
+          {expandedInfo ? String.fromCharCode(0x25b2) : String.fromCharCode(0x25bc)}
         </label>
         <button className="secondary-button" onClick={handleParseGeometryToMap}>
           See on Map
@@ -26,6 +32,10 @@ const AirbusFeatureInfo = ({ feature }) => {
       </div>
       {expandedInfo ? (
         <div className="tpdi-feature-extra-info u-margin-bottom-tiny">
+          <p className="text">
+            <span>Product Id:</span>
+            {feature.properties.id}
+          </p>
           <p className="text">
             <span>Acquisition Date: </span>
             {feature.properties.acquisitionDate}

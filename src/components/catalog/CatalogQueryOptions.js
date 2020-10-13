@@ -36,7 +36,7 @@ const CatalogQueryOptions = ({ selectedCollection, queryProperties }) => {
   const generateQueryOptions = () => {
     return queryProperties.map((property, idx) => (
       <div key={'property' + idx} className="u-margin-bottom-small">
-        <label className="form__label">Property</label>
+        <label className="form__label">Property {idx + 1}</label>
         {generateOptionsByCollectionId(selectedCollection, idx)}
         <button
           onClick={handleRemoveProperty}

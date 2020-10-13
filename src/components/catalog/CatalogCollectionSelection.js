@@ -65,8 +65,11 @@ const CatalogCollectionSelection = ({ token, selectedCollection }) => {
           <p className="text">Loading...</p>
         ) : (
           <>
-            <label className="form__label">Selected Collection</label>
+            <label htmlFor="catalog-collection" className="form__label">
+              Selected Collection
+            </label>
             <select
+              id="catalog-collection"
               value={selectedCollection}
               onChange={handleSelectedCollectionChange}
               className="form__input"

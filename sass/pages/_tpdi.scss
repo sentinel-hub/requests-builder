@@ -21,6 +21,8 @@
   }
 
   &-second-item {
+    display: flex;
+    flex-direction: column;
     width: 100%;
   }
 }
@@ -143,7 +145,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
 
     label {
       margin: 0;

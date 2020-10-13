@@ -1,26 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import store, { batchSlice, tpdiSlice, requestSlice, alertSlice } from '../../store';
-import { getTransformedGeometryFromBounds } from '../../utils/crsTransform';
-import { dispatchChanges } from '../../utils/parseRequest';
-import { fetchTilesBatchRequest } from '../../utils/batchActions';
-import { focusMap } from '../input/MapContainer';
+import { getTransformedGeometryFromBounds, focusMap } from '../common/Map/utils/crsTransform';
+import { dispatchChanges } from '../process/requests/parseRequest';
+import { parseBatchRequest, getBucketName } from './parse';
+import { fetchTilesBatchRequest } from './requests';
 
 const tillingGridIdToName = (id) => {
-  return ['S2GM Grid', '10km Grid', '100,08km Grid'][id];
+  return ['S2GM Grid', '10km Grid', '100,08km Grid', 'WGS84'][id];
 };
 
 const validStatus = (status) => {
   return Boolean(status !== 'CREATED' && status !== 'CANCELED' && status !== 'ANALYSING');
-};
-
-const getBucketName = (member) => {
-  if (member.bucketName) {
-    return member.bucketName;
-  }
-  //tilepath
-  else {
-    return member.output.defaultTilePath.split('/')[2];
-  }
 };
 
 const updateTileInfo = (tiles) => {
@@ -56,17 +46,7 @@ const updateTileInfo = (tiles) => {
 };
 
 const BatchRequestSummary = ({ props, token }) => {
-  const {
-    id,
-    status,
-    description,
-    tileCount,
-    valueEstimate,
-    created,
-    processRequest,
-    tilingGridId,
-    resolution,
-  } = props;
+  const { id, status, description, tileCount, valueEstimate, created, processRequest } = props;
   const bucketName = getBucketName(props);
 
   const [showAllInfo, setShowAllInfo] = useState(false);
@@ -127,22 +107,7 @@ const BatchRequestSummary = ({ props, token }) => {
   const handleParseBatch = () => {
     try {
       dispatchChanges(processRequest);
-      store.dispatch(batchSlice.actions.setBucketName(bucketName));
-      store.dispatch(batchSlice.actions.setDescription(description));
-      store.dispatch(batchSlice.actions.setTillingGrid(tilingGridId));
-      store.dispatch(batchSlice.actions.setResolution(resolution));
-      // check if tile path or cogOutput and dispatch.
-      if (props.output) {
-        if (props.output.cogOutput) {
-          store.dispatch(batchSlice.actions.setCogOutput(true));
-        }
-        if (props.output.defaultTilePath) {
-          store.dispatch(batchSlice.actions.setSpecifyingBucketName(false));
-          store.dispatch(
-            batchSlice.actions.setDefaultTilePath(props.output.defaultTilePath.split(bucketName + '/')[1]),
-          );
-        }
-      }
+      parseBatchRequest(props);
       store.dispatch(alertSlice.actions.addAlert({ type: 'SUCCESS', text: 'Request successfully parsed' }));
     } catch (err) {
       console.error(err);
@@ -206,10 +171,10 @@ const BatchRequestSummary = ({ props, token }) => {
               </p>
             ) : null} */}
             <p className="text">
-              <span>Tilling Grid:</span> {tillingGridIdToName(props.tilingGridId)}
+              <span>Tilling Grid:</span> {tillingGridIdToName(props.tilingGrid.id)}
             </p>
             <p className="text">
-              <span>Resolution:</span> {props.resolution}
+              <span>Resolution:</span> {props.tilingGrid.resolution}
             </p>
             <p className="text">
               <span>Last user Action:</span> {props.userAction}

@@ -29,7 +29,7 @@ const renderBatchRequestSummary = (requests, limit, token) => {
   return res;
 };
 
-const BatchInformation = ({ fetchedRequests, extraInfo, setFetchedRequests, token }) => {
+const BatchInformation = ({ fetchedRequests, extraInfo, setFetchedRequests, token, specifyingCogParams }) => {
   const [searchText, setSearchText] = useState('');
   const [filteredRequests, setFilteredRequests] = useState(fetchedRequests);
   //  limit to render amount of BatchRequestSummary
@@ -74,7 +74,10 @@ const BatchInformation = ({ fetchedRequests, extraInfo, setFetchedRequests, toke
             <hr></hr>
           </>
         ) : null}
-        <div onScroll={handleScroll} style={{ overflowY: 'scroll', maxHeight: '450px' }}>
+        <div
+          onScroll={handleScroll}
+          style={{ overflowY: 'scroll', maxHeight: `${specifyingCogParams ? '900px' : '600px'}` }}
+        >
           {filteredRequests.length > 0 ? renderBatchRequestSummary(filteredRequests, limit, token) : null}
         </div>
       </div>
@@ -85,6 +88,7 @@ const BatchInformation = ({ fetchedRequests, extraInfo, setFetchedRequests, toke
 const mapStateToProps = (state) => ({
   extraInfo: state.batch.extraInfo,
   token: state.auth.user.access_token,
+  specifyingCogParams: state.batch.specifyingCogParams,
 });
 
 export default connect(mapStateToProps)(BatchInformation);

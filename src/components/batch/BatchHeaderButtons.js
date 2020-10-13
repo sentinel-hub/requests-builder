@@ -1,5 +1,5 @@
 import React from 'react';
-import AuthHeader from '../AuthHeader';
+import AuthHeader from '../common/AuthHeader';
 
 const BatchHeaderButtons = () => {
   return (

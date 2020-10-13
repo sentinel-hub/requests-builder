@@ -1,5 +1,5 @@
 import { configureStore, combineReducers, createSlice } from '@reduxjs/toolkit';
-import { DEFAULT_EVALSCRIPTS, S1GRD, S2L2A } from './utils/const';
+import { DEFAULT_EVALSCRIPTS, S1GRD, S2L2A, DATASOURCES } from './utils/const';
 import moment from 'moment';
 
 export const authSlice = createSlice({
@@ -224,7 +224,13 @@ export const requestSlice = createSlice({
       }
     },
     setDatafusionSource: (state, action) => {
-      state.datafusionSources[action.payload.idx].datasource = action.payload.datasource;
+      const datasource = action.payload.datasource;
+      state.datafusionSources[action.payload.idx].datasource = datasource;
+      // Set id
+      let newId = DATASOURCES[datasource].defaultDatafusionId;
+      if (newId) {
+        state.datafusionSources[action.payload.idx].id = newId;
+      }
 
       //Reset advanced options on datasource change
       const idx = action.payload.idx;
@@ -363,6 +369,13 @@ export const batchSlice = createSlice({
     // bucketName -> true, if defaultTilePath -> false
     specifyingBucketName: true,
     extraInfo: '',
+    specifyingCogParams: false,
+    overviewLevels: '',
+    overviewMinSize: '',
+    blockxsize: '',
+    blockysize: '',
+    createCollection: false,
+    collectionId: '',
   },
   reducers: {
     setTillingGrid: (state, action) => {
@@ -392,6 +405,27 @@ export const batchSlice = createSlice({
     setExtraInfo: (state, action) => {
       state.extraInfo = action.payload;
     },
+    setOverviewLevels: (state, action) => {
+      state.overviewLevels = action.payload;
+    },
+    setOverviewMinSize: (state, action) => {
+      state.overviewMinSize = action.payload;
+    },
+    setBlockxsize: (state, action) => {
+      state.blockxsize = action.payload;
+    },
+    setBlockysize: (state, action) => {
+      state.blockysize = action.payload;
+    },
+    setCreateCollection: (state, action) => {
+      state.createCollection = action.payload;
+    },
+    setCollectionId: (state, action) => {
+      state.collectionId = action.payload;
+    },
+    setSpecifyingCogParams: (state, action) => {
+      state.specifyingCogParams = action.payload;
+    },
   },
 });
 
@@ -420,9 +454,13 @@ export const tpdiSlice = createSlice({
     setCollectionId: (state, action) => {
       state.collectionId = action.payload;
     },
-    setProducts: (state, action) => {
+    setProduct: (state, action) => {
       const toChange = state.products.find((prod) => prod.idx === parseInt(action.payload.idx));
       toChange.id = action.payload.id;
+    },
+    setProducts: (state, action) => {
+      const products = action.payload.map((product, i) => ({ id: product, idx: i }));
+      state.products = products;
     },
     addProduct: (state, action) => {
       const lastItem = state.products[state.products.length - 1];
@@ -494,10 +532,14 @@ export const planetSlice = createSlice({
   name: 'planet',
   initialState: {
     planetApiKey: '',
+    maxCloudCoverage: 100,
   },
   reducers: {
     setApiKey: (state, action) => {
       state.planetApiKey = action.payload;
+    },
+    setMaxCloudCoverage: (state, action) => {
+      state.maxCloudCoverage = parseInt(action.payload);
     },
   },
 });
@@ -521,6 +563,7 @@ export const alertSlice = createSlice({
   reducers: {
     addAlert: (state, action) => {
       const { type, text } = action.payload;
+      const time = action.payload.time ?? 2500;
       state.text = text;
       state.type = type;
       let id = uuidv4();
@@ -528,7 +571,7 @@ export const alertSlice = createSlice({
 
       setTimeout(() => {
         store.dispatch(alertSlice.actions.removeAlert(id));
-      }, 2500);
+      }, time);
     },
     removeAlert: (state, action) => {
       if (action.payload === state.id) {
@@ -716,7 +759,7 @@ const reducers = combineReducers({
 
 const store = configureStore({
   reducer: reducers,
-  devTools: process.env.REACT_APP_PRODUCTION ? false : true,
+  devTools: process.env.NODE_ENV !== 'production',
 });
 
 export default store;

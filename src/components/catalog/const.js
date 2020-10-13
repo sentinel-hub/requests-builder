@@ -1,3 +1,5 @@
+import { S2L2A, S2L1C, S1GRD } from '../../utils/const';
+
 export const S2L1C_CATALOG_ID = 'sentinel-2-l1c';
 export const S2L2A_CATALOG_ID = 'sentinel-2-l2a';
 export const S1GRD_CATALOG_ID = 'sentinel-1-grd';
@@ -29,3 +31,9 @@ export const S1OPTIONS = [
     operators: ['eq'],
   },
 ];
+
+export const datasourceToCollection = {
+  [S2L2A]: S2L2A_CATALOG_ID,
+  [S2L1C]: S2L1C_CATALOG_ID,
+  [S1GRD]: S1GRD_CATALOG_ID,
+};

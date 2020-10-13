@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import RequestButton from '../RequestButton';
+import RequestButton from '../common/RequestButton';
 import { addAlertOnError, batchIdValidation } from './BatchActions';
-import { restartPartialRequest } from '../../utils/batchActions';
+import { restartPartialRequest } from './requests';
 import store, { batchSlice } from '../../store';
 
 const RestartPartialRequestButton = ({ selectedBatchId, token }) => {

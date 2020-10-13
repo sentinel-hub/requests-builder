@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { getMapWms, getFisStats } from './wmsRequests';
-import RequestButton from '../RequestButton';
+import RequestButton from '../common/RequestButton';
 import store, { responsesSlice } from '../../store';
 
 const SendWmsRequest = ({ wmsState, requestState, token, mode }) => {

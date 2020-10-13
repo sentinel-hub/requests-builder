@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import store, { catalogSlice } from '../../store';
-import Toggle from '../Toggle';
+import Toggle from '../common/Toggle';
 
 const CatalogFields = ({ includeFields, disableInclude, excludeFields, disableExclude }) => {
   const handleDisableInclude = () => {
@@ -40,8 +40,10 @@ const CatalogFields = ({ includeFields, disableInclude, excludeFields, disableEx
       <h2 className="heading-secondary">Fields Selection</h2>
       <div className="form">
         <div className="toggle-with-label">
-          <label className="form__label">Include</label>
-          <Toggle checked={!disableInclude} onChange={handleDisableInclude} />
+          <label htmlFor="catalog-include" className="form__label">
+            Include
+          </label>
+          <Toggle id="catalog-include" checked={!disableInclude} onChange={handleDisableInclude} />
         </div>
         {includeFields.map((field, idx) => (
           <div key={'include - ' + idx} className="input-with-item">
@@ -69,8 +71,10 @@ const CatalogFields = ({ includeFields, disableInclude, excludeFields, disableEx
           Add Field
         </button>
         <div className="toggle-with-label u-margin-top-small">
-          <label className="form__label">Exclude</label>
-          <Toggle checked={!disableExclude} onChange={handleDisableExclude} />
+          <label htmlFor="catalog-exclude" className="form__label">
+            Exclude
+          </label>
+          <Toggle id="catalog-exclude" checked={!disableExclude} onChange={handleDisableExclude} />
         </div>
         {excludeFields.map((field, idx) => (
           <div key={'exclude - ' + idx} className="input-with-item">

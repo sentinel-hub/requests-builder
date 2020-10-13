@@ -1,7 +1,7 @@
 import React from 'react';
-import CancelablePopUpRequestButton from '../CancelablePopUpRequestButton';
+import CancelablePopUpRequestButton from '../common/CancelablePopUpRequestButton';
 import { connect } from 'react-redux';
-import { createLowResPreviewRequest } from '../../utils/batchActions';
+import { createLowResPreviewRequest } from './requests';
 import { validateRequestState } from '../../utils/validator';
 
 const GetLowResPreviewButton = ({ requestState, token }) => {

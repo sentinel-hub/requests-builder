@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { generateBounds } from '../../utils/generateRequest';
+import { generateBounds } from '../process/requests';
+import { dataFilterDefaultValues } from './const';
 
 const BASE_TPDI_URL = 'https://services.sentinel-hub.com/api/v1/dataimport';
 
@@ -15,11 +16,12 @@ const getReqConfig = (token, reqConfig) => {
   return config;
 };
 
-const getAirbusDataFilterOptions = (dataFitlerOptions) => {
+const getAirbusDataFilterOptions = (dataFilterOptions) => {
   let options = {};
-  for (let key in dataFitlerOptions) {
-    if (dataFitlerOptions[key] !== 'DEFAULT') {
-      options[key] = dataFitlerOptions[key];
+  for (let key in dataFilterOptions) {
+    // check if the property is not default or have the default value
+    if (dataFilterOptions[key] !== 'DEFAULT' && dataFilterDefaultValues[key] !== dataFilterOptions[key]) {
+      options[key] = dataFilterOptions[key];
     }
   }
   return options;
@@ -67,8 +69,10 @@ const getPlanetSearchRequestBody = (state) => {
     data: [
       {
         itemType: 'PSScene4Band',
+        productBundle: 'analytic',
         dataFilter: {
           ...getTimeRange(state.request),
+          maxCloudCoverage: state.planet.maxCloudCoverage,
         },
       },
     ],
@@ -95,7 +99,7 @@ const getPlanetOrderBody = (state) => {
   requestBody.name = state.tpdi.name;
   requestBody.collectionId = state.tpdi.collectionId;
   delete requestBody.input.data[0].dataFilter;
-  requestBody.input.data[0].productBundle = 'analytic'; //listofstrings
+  requestBody.input.data[0].productBundle = 'analytic';
   requestBody.input.data[0].itemIds = state.tpdi.products.map((product) => product.id);
 
   return requestBody;

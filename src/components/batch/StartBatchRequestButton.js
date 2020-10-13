@@ -1,7 +1,7 @@
 import React from 'react';
-import RequestButton from '../RequestButton';
+import RequestButton from '../common/RequestButton';
 import { addAlertOnError, batchIdValidation } from './BatchActions';
-import { startBatchRequest } from '../../utils/batchActions';
+import { startBatchRequest } from './requests';
 
 import { connect } from 'react-redux';
 import store, { batchSlice } from '../../store';

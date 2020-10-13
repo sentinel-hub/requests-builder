@@ -3,6 +3,7 @@ import { Controlled as CodeMirror } from 'react-codemirror2';
 import { connect } from 'react-redux';
 import { generateCatalogCurlCommand } from './requests';
 import { parseCatalogBody } from './parse';
+import CatalogSendEditedRequest from './CatalogSendEditedRequest';
 require('codemirror/lib/codemirror.css');
 require('codemirror/theme/eclipse.css');
 require('codemirror/theme/neat.css');
@@ -10,8 +11,9 @@ require('codemirror/mode/xml/xml.js');
 require('codemirror/mode/powershell/powershell.js');
 require('codemirror/addon/edit/matchbrackets.js');
 
-const CatalogRequestPreview = ({ catalogState, geometry, token }) => {
+const CatalogRequestPreview = ({ catalogState, geometry, token, setResults }) => {
   const [text, setText] = useState(generateCatalogCurlCommand(catalogState, geometry, token));
+  const [isEdited, setIsEdited] = useState(false);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(text.replace(/(\r\n|\n|\r)/gm, ''));
@@ -20,12 +22,14 @@ const CatalogRequestPreview = ({ catalogState, geometry, token }) => {
   const handleParse = () => {
     parseCatalogBody(text);
   };
-  const handleChange = (val) => {
+  const handleTextChange = (editor, data, val) => {
     setText(val);
+    setIsEdited(true);
   };
 
   useEffect(() => {
     setText(generateCatalogCurlCommand(catalogState, geometry, token));
+    setIsEdited(false);
   }, [catalogState, geometry, token]);
 
   return (
@@ -40,9 +44,7 @@ const CatalogRequestPreview = ({ catalogState, geometry, token }) => {
           }}
           className="tpdi-editor"
           value={text}
-          onBeforeChange={(editor, data, value) => {
-            handleChange(value);
-          }}
+          onBeforeChange={handleTextChange}
         />
 
         <div className="buttons-container">
@@ -53,6 +55,8 @@ const CatalogRequestPreview = ({ catalogState, geometry, token }) => {
           <button className="secondary-button secondary-button--fit" onClick={handleParse}>
             Parse
           </button>
+
+          {isEdited ? <CatalogSendEditedRequest setResults={setResults} text={text} token={token} /> : null}
         </div>
       </div>
     </>

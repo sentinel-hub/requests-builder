@@ -1,21 +1,25 @@
 import React from 'react';
-import {
-  convertUtcDateToInput,
-  returnValidatedTimeTo,
-  returnValidatedTimeFrom,
-} from '../input/TimeRangeSelect';
 import { connect } from 'react-redux';
 import store, { catalogSlice } from '../../store';
-import Toggle from '../Toggle';
+import Toggle from '../common/Toggle';
+import moment from 'moment';
+import DayPickerInput from 'react-day-picker/DayPickerInput';
+
+const convertUtcDateToInput = (utcDate) => {
+  if (utcDate) {
+    return utcDate.split('T')[0];
+  }
+  return '';
+};
 
 const CatalogTimeRange = ({ timeFrom, timeTo }) => {
-  const handleChangeTimeFrom = (e) => {
-    let d = returnValidatedTimeFrom(e.target.value);
-    store.dispatch(catalogSlice.actions.setTimeFrom(d.format()));
+  const handleChangeTimeFrom = (d) => {
+    const date = moment(d).utc().startOf('day').format();
+    store.dispatch(catalogSlice.actions.setTimeFrom(date));
   };
-  const handleChangeTimeTo = (e) => {
-    let d = returnValidatedTimeTo(e.target.value);
-    store.dispatch(catalogSlice.actions.setTimeTo(d.format()));
+  const handleChangeTimeTo = (d) => {
+    const date = moment(d).utc().endOf('day').format();
+    store.dispatch(catalogSlice.actions.setTimeTo(date));
   };
   const handleOpenTimeTo = () => {
     // if one is already open it cannot be opened.
@@ -38,28 +42,34 @@ const CatalogTimeRange = ({ timeFrom, timeTo }) => {
       <div className="form">
         <div className="timerange">
           <div className="toggle-with-label">
-            <label className="form__label">From</label>
-            <Toggle checked={timeFrom.isOpen} onChange={handleOpenTimeFrom} />
+            <label htmlFor="catalog-from" className="form__label">
+              From
+            </label>
+            <Toggle id="catalog-from" checked={timeFrom.isOpen} onChange={handleOpenTimeFrom} />
           </div>
-          <input
-            disabled={timeFrom.isOpen}
+          <DayPickerInput
             value={convertUtcDateToInput(timeFrom.time)}
-            required
-            className="form__input"
-            onChange={handleChangeTimeFrom}
-            type="date"
-          ></input>
-          <div className="toggle-with-label">
-            <label className="form__label">To</label>
-            <Toggle checked={timeTo.isOpen} onChange={handleOpenTimeTo} />
+            inputProps={{
+              disabled: timeFrom.isOpen,
+              required: true,
+              className: 'form__input',
+            }}
+            onDayChange={handleChangeTimeFrom}
+          />
+          <div className="toggle-with-label u-margin-top-small">
+            <label htmlFor="catalog-to" className="form__label">
+              To
+            </label>
+            <Toggle id="catalog-to" checked={timeTo.isOpen} onChange={handleOpenTimeTo} />
           </div>
-          <input
-            disabled={timeTo.isOpen}
+          <DayPickerInput
             value={convertUtcDateToInput(timeTo.time)}
-            required
-            className="form__input"
-            onChange={handleChangeTimeTo}
-            type="date"
+            inputProps={{
+              disabled: timeTo.isOpen,
+              required: true,
+              className: 'form__input',
+            }}
+            onDayChange={handleChangeTimeTo}
           />
         </div>
       </div>

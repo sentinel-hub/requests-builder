@@ -2,7 +2,7 @@ import React from 'react';
 import { createTPDIOrder, createTPDIDataFilterOrder } from './generateTPDIRequests';
 import { connect } from 'react-redux';
 import store, { alertSlice } from '../../store';
-import RequestButton from '../RequestButton';
+import RequestButton from '../common/RequestButton';
 import { errorHandlerTPDI } from './TPDIOrderOptions';
 const validateCreateOrderWithProducts = (products) => {
   for (let prod of products) {
@@ -12,6 +12,9 @@ const validateCreateOrderWithProducts = (products) => {
   }
   return false;
 };
+
+const DIALOG_TEXT =
+  'Are you sure you want to create an order without a Collection ID?\nIf you proceed a new collection will be created automatically.';
 
 const CreateOrderButtonsContainer = ({
   areaSelected,
@@ -49,7 +52,7 @@ const CreateOrderButtonsContainer = ({
         errorHandler={errorHandlerTPDI}
         disabledTitle="Add products and check the limit"
         useConfirmation={shouldConfirm}
-        dialogText="Are you sure you want to create an order without a Collection ID?"
+        dialogText={DIALOG_TEXT}
       />
 
       <hr className="u-margin-top-tiny"></hr>
@@ -64,7 +67,7 @@ const CreateOrderButtonsContainer = ({
         errorHandler={errorHandlerTPDI}
         disabledTitle={Boolean(token) ? 'Check the limit' : 'Log in'}
         useConfirmation={shouldConfirm}
-        dialogText="Are you sure you want to create an order without a Collection ID?"
+        dialogText={DIALOG_TEXT}
       />
     </>
   );

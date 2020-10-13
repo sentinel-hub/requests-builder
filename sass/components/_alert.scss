@@ -51,6 +51,7 @@
   &-second-item {
     display: flex;
     padding: 1rem 1rem;
+    flex-direction: column;
   }
 
   &-third-item {

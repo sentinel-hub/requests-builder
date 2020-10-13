@@ -48,13 +48,27 @@ const TPDIRequestPreview = ({ state }) => {
     navigator.clipboard.writeText(text.replace(/(\r\n|\n|\r)/gm, ''));
   };
 
+  const handleSetRequest = (e) => {
+    setRequest(e.target.value);
+  };
+  const handleTextChange = (editor, data, value) => {
+    setText(value);
+  };
+
   return (
     <>
       <h2 className="heading-secondary">Request Preview</h2>
       <div className="form">
         <div className="tpdi-request-preview-select-request">
-          <label className="form__label">Request</label>
-          <select value={request} onChange={(e) => setRequest(e.target.value)} className="form__input">
+          <label htmlFor="tpdi-request-preview" className="form__label">
+            Request
+          </label>
+          <select
+            id="tpdi-request-preview"
+            value={request}
+            onChange={handleSetRequest}
+            className="form__input"
+          >
             <option value="DATAFILTER">create with datafilter</option>
             <option value="PRODUCTS">create with product id</option>
             <option value="SEARCH">search</option>
@@ -71,7 +85,7 @@ const TPDIRequestPreview = ({ state }) => {
             theme: 'eclipse',
             matchBrackets: true,
           }}
-          onBeforeChange={(editor, data, value) => setText(value)}
+          onBeforeChange={handleTextChange}
           className="process-editor"
         />
         <div className="tpdi-request-preview-buttons">

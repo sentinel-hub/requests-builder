@@ -58,8 +58,11 @@ const InstanceSelector = ({ token, instanceId }) => {
   };
   return (
     <>
-      <label className="form__label">Instance</label>
+      <label htmlFor="instance" className="form__label">
+        Instance
+      </label>
       <input
+        id="instance"
         className="form__input"
         placeholder="Enter your instance id"
         type="text"
@@ -67,9 +70,13 @@ const InstanceSelector = ({ token, instanceId }) => {
         value={instanceId}
       />
       {!token ? <p className="text">Log in to see your personal instances</p> : null}
-      {instances.length > 0 ? <label className="form__label">Personal Instances</label> : null}
       {instances.length > 0 ? (
-        <select onChange={handleSelectInstanceId} className="form__input">
+        <label htmlFor="personal-instances" className="form__label">
+          Personal Instances
+        </label>
+      ) : null}
+      {instances.length > 0 ? (
+        <select id="personal-instances" onChange={handleSelectInstanceId} className="form__input">
           <option value="">Select an instance</option>
           {generateInstanceOptions(instances)}
         </select>

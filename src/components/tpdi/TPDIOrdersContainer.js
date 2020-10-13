@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import RequestButton from '../RequestButton';
+import RequestButton from '../common/RequestButton';
 import { getAllTPDIOrders } from './generateTPDIRequests';
 import { errorHandlerTPDI } from './TPDIOrderOptions';
 import OrderInfo from './OrderInfo';

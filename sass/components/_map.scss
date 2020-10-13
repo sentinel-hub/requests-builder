@@ -18,18 +18,22 @@
   flex-direction: column;
   width: 50%;
   align-items: center;
-  overflow: hidden;
+  height: 90%;
 
   @include respond(tab-land) {
     width: 100%;
   }
 
   textarea {
+    height: 600px;
     width: 90%;
-    height: 100%;
 
     @include respond(tab-land) {
-      height: 150px;
+      height: 300px;
+    }
+
+    @include respond(phone) {
+      height: 200px;
     }
   }
 

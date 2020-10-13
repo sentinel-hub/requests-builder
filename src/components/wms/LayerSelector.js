@@ -52,8 +52,11 @@ const LayerSelector = ({ layerId, instanceId, token }) => {
 
   return (
     <>
-      <label className="form__label">Layer</label>
+      <label htmlFor="layer" className="form__label">
+        Layer
+      </label>
       <input
+        id="layer"
         type="text"
         className="form__input"
         placeholder="Layer id"
@@ -62,8 +65,10 @@ const LayerSelector = ({ layerId, instanceId, token }) => {
       />
       {layers.length > 0 ? (
         <>
-          <label className="form__label">Instance Layers</label>
-          <select className="form__input" onChange={handleSelectLayerChange}>
+          <label htmlFor="instance-layers" className="form__label">
+            Instance Layers
+          </label>
+          <select id="instance-layers" className="form__input" onChange={handleSelectLayerChange}>
             <option value="">Select an instance layer</option>
             {generateLayersOptions(layers)}
           </select>

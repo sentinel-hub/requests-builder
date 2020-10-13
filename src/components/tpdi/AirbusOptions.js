@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import store, { airbusSlice } from '../../store';
 import { connect } from 'react-redux';
 import AirbusAdvancedOptions from './AirbusAdvancedOptions';
-import Toggle from '../Toggle';
+import Toggle from '../common/Toggle';
 
 const AirbusOptions = ({ constellation }) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -17,8 +17,15 @@ const AirbusOptions = ({ constellation }) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <label className="form__label">Constellation</label>
-      <select className="form__input" value={constellation} onChange={handleConstellationChange}>
+      <label htmlFor="constellation" className="form__label">
+        Constellation
+      </label>
+      <select
+        id="constellation"
+        className="form__input"
+        value={constellation}
+        onChange={handleConstellationChange}
+      >
         <option value="PHR">PHR (Pleiades)</option>
         <option value="SPOT">SPOT</option>
       </select>

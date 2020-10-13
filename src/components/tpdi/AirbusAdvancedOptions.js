@@ -28,8 +28,11 @@ const AirbusAdvancedOptions = ({ dataFilterOptions }) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <label className="form__label">Cloud Coverage - {dataFilterOptions.maxCloudCoverage} %</label>
+      <label htmlFor="tpdi-cloud-coverage" className="form__label">
+        Cloud Coverage - {dataFilterOptions.maxCloudCoverage} %
+      </label>
       <input
+        id="tpdi-cloud-coverage"
         value={dataFilterOptions.maxCloudCoverage}
         className="form__input form__input--range"
         onChange={handleMaxCCChange}
@@ -38,8 +41,11 @@ const AirbusAdvancedOptions = ({ dataFilterOptions }) => {
         max="100"
       />
 
-      <label className="form__label">Processing Level</label>
+      <label htmlFor="processing-level" className="form__label">
+        Processing Level
+      </label>
       <select
+        id="processing-level"
         value={dataFilterOptions.processingLevel}
         className="form__input"
         onChange={handleProcessingLevelChange}
@@ -49,8 +55,11 @@ const AirbusAdvancedOptions = ({ dataFilterOptions }) => {
         <option value="ALBUM">Album</option>
       </select>
 
-      <label className="form__label">Snow Coverage - {dataFilterOptions.maxSnowCoverage} %</label>
+      <label htmlFor="snow-coverage" className="form__label">
+        Snow Coverage - {dataFilterOptions.maxSnowCoverage} %
+      </label>
       <input
+        id="snow-coverage"
         value={dataFilterOptions.maxSnowCoverage}
         className="form__input form__input--range"
         onChange={handleMaxSnowChange}
@@ -59,8 +68,11 @@ const AirbusAdvancedOptions = ({ dataFilterOptions }) => {
         max="90"
       />
 
-      <label className="form__label">Incidence Angle - {dataFilterOptions.maxIncidenceAngle} °</label>
+      <label htmlFor="incidence-angle" className="form__label">
+        Incidence Angle - {dataFilterOptions.maxIncidenceAngle} °
+      </label>
       <input
+        id="incidence-angle"
         value={dataFilterOptions.maxIncidenceAngle}
         className="form__input form__input--range"
         onChange={handleMaxIncidenceChange}

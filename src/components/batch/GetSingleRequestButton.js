@@ -1,8 +1,8 @@
 import React from 'react';
-import RequestButton from '../RequestButton';
+import RequestButton from '../common/RequestButton';
 import { connect } from 'react-redux';
 import { addAlertOnError, batchIdValidation } from './BatchActions';
-import { getSingleBatchRequest } from '../../utils/batchActions';
+import { getSingleBatchRequest } from './requests';
 import store, { batchSlice } from '../../store';
 
 const GetSingleRequestButton = ({ token, selectedBatchId, setFetchedRequests }) => {

@@ -1,22 +1,39 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import store, { tpdiSlice, alertSlice } from '../../store';
-import { getAreaFromGeometry } from '../input/MapContainer';
 import CreateOrderButtonsContainer from './CreateOrderButtonsContainer';
+import TPDICollectionSelection from './TPDICollectionSelection';
+import { getAreaFromGeometry } from '../common/Map/utils/crsTransform';
 
 export const errorHandlerTPDI = (error) => {
-  if (error.response && error.response.data && error.response.data.error) {
-    let returnedError = error.response.data.error;
+  if (error.response?.status === 403) {
     store.dispatch(
       alertSlice.actions.addAlert({
         type: 'WARNING',
-        text: 'Error: ' + returnedError.status + ' - ' + returnedError.message,
+        text: "You don't have enough permissions to use this",
       }),
     );
   } else {
-    store.dispatch(alertSlice.actions.addAlert({ type: 'WARNING', text: 'Something went wrong' }));
+    try {
+      const err = error.response.data.error;
+      let errorMsg = err.message;
+      if (err.errors) {
+        const subErr = err.errors;
+        if (subErr.violation) {
+          errorMsg += '\n' + subErr.violation;
+        }
+        if (subErr.invalidValue && subErr.parameter) {
+          errorMsg += '\nInvalid Value ' + subErr.invalidValue + 'on ' + subErr.parameter;
+        }
+      }
+      store.dispatch(alertSlice.actions.addAlert({ type: 'WARNING', text: errorMsg, time: 5000 }));
+    } catch (exc) {
+      store.dispatch(
+        alertSlice.actions.addAlert({ type: 'WARNING', text: 'Something went wrong', time: 5000 }),
+      );
+      console.error(error);
+    }
   }
-  console.error(error);
 };
 
 const TPDIOrderOptions = ({ products, name, collectionId, geometry }) => {
@@ -48,7 +65,7 @@ const TPDIOrderOptions = ({ products, name, collectionId, geometry }) => {
   const areaSelected = ((getAreaFromGeometry(geometry) / 1e6) * products.length).toFixed(3);
 
   const handleProductIdChange = (e) => {
-    store.dispatch(tpdiSlice.actions.setProducts({ idx: e.target.name, id: e.target.value }));
+    store.dispatch(tpdiSlice.actions.setProduct({ idx: e.target.name, id: e.target.value }));
   };
 
   const removeProductId = (e) => {
@@ -85,8 +102,11 @@ const TPDIOrderOptions = ({ products, name, collectionId, geometry }) => {
     <>
       <h2 className="heading-secondary">Order Options</h2>
       <div className="form">
-        <label className="form__label">Name</label>
+        <label htmlFor="tpdi-name" className="form__label">
+          Name
+        </label>
         <input
+          id="tpdi-name"
           placeholder="Enter the name of the order"
           type="text"
           value={name}
@@ -94,8 +114,12 @@ const TPDIOrderOptions = ({ products, name, collectionId, geometry }) => {
           onChange={handleOrderNameChange}
         />
 
-        <label className="form__label">Collection ID</label>
+        <label htmlFor="tpdi-collection-id" className="form__label">
+          Collection ID
+        </label>
+        <TPDICollectionSelection />
         <input
+          id="tpdi-collection-id"
           value={collectionId}
           placeholder="Enter your collection Id"
           type="text"
@@ -127,7 +151,9 @@ const TPDIOrderOptions = ({ products, name, collectionId, geometry }) => {
         <p className="text u-margin-bottom-tiny">{areaSelected} sqKm</p>
 
         <div className="tpdi-limit">
-          <label className="form__label">Order Limit (in sqKm)</label>
+          <label htmlFor="order-limit" className="form__label">
+            Order Limit (in sqKm)
+          </label>
           <span
             className="info"
             title="Set an approximate order limit to prevent undesired large area requests."
@@ -136,6 +162,7 @@ const TPDIOrderOptions = ({ products, name, collectionId, geometry }) => {
           </span>
         </div>
         <input
+          id="order-limit"
           type="number"
           placeholder="No limit"
           onChange={handleLimitChange}

@@ -1,5 +1,5 @@
 import React from 'react';
-import RequestButton from '../RequestButton';
+import RequestButton from '../common/RequestButton';
 import { generateCatalogRequest } from './requests';
 import { connect } from 'react-redux';
 import store, { catalogSlice } from '../../store';
