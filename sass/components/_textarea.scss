@@ -100,6 +100,31 @@
   padding: 0.5rem 1rem;
 }
 
+.quota-preview {
+  width: 100%;
+
+  .CodeMirror-scroll { /* stylelint-disable-line */
+    overflow-y: scroll;
+    height: 455px !important;
+  }
+}
+
+.tpdi-order-preview {
+
+  .CodeMirror-scroll { /* stylelint-disable-line */
+    overflow-y: scroll;
+    height: 400px;
+  }
+}
+
+.tpdi-search-preview {
+
+  .CodeMirror-scroll { /* stylelint-disable-line */
+    overflow-y: scroll;
+    height: 390px;
+  }
+}
+
 .process-editor {
 
   .CodeMirror-scroll { /* stylelint-disable-line */

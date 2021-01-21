@@ -1,6 +1,11 @@
 const validateDatasource = (requestState) => {
   if (requestState.datasource) {
-    if (requestState.datasource === 'CUSTOM' && requestState.dataFilterOptions[0].options.collectionId) {
+    if (
+      requestState.datasource === 'CUSTOM' &&
+      requestState.byocCollectionId &&
+      requestState.byocLocation &&
+      requestState.byocCollectionType
+    ) {
       return true;
     }
     if (requestState.datasource !== 'CUSTOM') {

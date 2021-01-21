@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import store, { tpdiSlice, alertSlice } from '../../store';
-import CreateOrderButtonsContainer from './CreateOrderButtonsContainer';
+import store, { tpdiSlice, alertSlice, planetSlice } from '../../store';
+import TPDIPlaceOrderButton from './TPDIPlaceOrderButton';
 import TPDICollectionSelection from './TPDICollectionSelection';
-import { getAreaFromGeometry } from '../common/Map/utils/crsTransform';
+import { getAreaCoverPercentage, getAreaFromGeometry } from '../common/Map/utils/crsTransform';
+import Tooltip from '../common/Tooltip/Tooltip';
+import Toggle from '../common/Toggle';
 
 export const errorHandlerTPDI = (error) => {
   if (error.response?.status === 403) {
@@ -36,8 +38,42 @@ export const errorHandlerTPDI = (error) => {
   }
 };
 
-const TPDIOrderOptions = ({ products, name, collectionId, geometry }) => {
+const getTpdiAreaSelected = (products, selectedGeometry) => {
+  const selectedGeometryArea = getAreaFromGeometry(selectedGeometry);
+  if (products.length === 0) {
+    return selectedGeometryArea;
+  }
+  if (products.some((prod) => !prod.geometry)) {
+    return selectedGeometryArea * products.length;
+  }
+  return products.reduce((acc, currentProd) => {
+    return acc + getAreaCoverPercentage(selectedGeometry, currentProd.geometry) * selectedGeometryArea;
+  }, 0);
+};
+
+const TPDIOrderOptions = ({
+  products,
+  name,
+  geometry,
+  provider,
+  isParsing,
+  isUsingQuery,
+  setCreateQueryResponse,
+  setCreateProductsResponse,
+  afterOrderCreationAction,
+  amountOfFoundProducts,
+  harmonizeTo,
+}) => {
   const [limit, setLimit] = useState(10.0);
+
+  useEffect(() => {
+    if (!isParsing) {
+      handleClearProducts();
+    } else {
+      store.dispatch(tpdiSlice.actions.setTpdiParsing(false));
+    }
+    // eslint-disable-next-line
+  }, [geometry, provider]);
 
   //Generate product Inputs depeneding on internal redux state (one input per product)
   const generateProductIdInputs = (products) => {
@@ -46,12 +82,13 @@ const TPDIOrderOptions = ({ products, name, collectionId, geometry }) => {
         <div key={prod.idx} className="product-id u-margin-bottom-tiny">
           <input
             required
-            placeholder="Enter the product id"
+            placeholder="Add products by search"
             value={prod.id}
             name={prod.idx}
             type="text"
             className="form__input"
-            onChange={handleProductIdChange}
+            autoComplete="off"
+            readOnly
           />
           {prod.idx !== 0 ? (
             <span value={prod.idx} onClick={removeProductId} className="remove-product-id">
@@ -62,26 +99,15 @@ const TPDIOrderOptions = ({ products, name, collectionId, geometry }) => {
       ));
     }
   };
-  const areaSelected = ((getAreaFromGeometry(geometry) / 1e6) * products.length).toFixed(3);
-
-  const handleProductIdChange = (e) => {
-    store.dispatch(tpdiSlice.actions.setProduct({ idx: e.target.name, id: e.target.value }));
-  };
+  const areaSelected = (getTpdiAreaSelected(products, geometry) / 1e6).toFixed(3);
+  const isAreaExact = !isUsingQuery && products.every((prod) => prod.geometry);
 
   const removeProductId = (e) => {
     store.dispatch(tpdiSlice.actions.removeProductId(e.target.getAttribute('value')));
   };
 
-  const handleCollectiondIdChange = (e) => {
-    store.dispatch(tpdiSlice.actions.setCollectionId(e.target.value));
-  };
-
   const handleOrderNameChange = (e) => {
     store.dispatch(tpdiSlice.actions.setName(e.target.value));
-  };
-
-  const addProductIdInput = () => {
-    store.dispatch(tpdiSlice.actions.addProduct());
   };
 
   const handleLimitChange = (e) => {
@@ -96,8 +122,18 @@ const TPDIOrderOptions = ({ products, name, collectionId, geometry }) => {
     store.dispatch(tpdiSlice.actions.clearProducts());
   };
 
-  const couldClear = Boolean(products.length > 1 || products.find((p) => p.id));
+  const canClear = Boolean(products.length > 1 || products.find((p) => p.id));
 
+  const handleOrderTypeChange = () => {
+    store.dispatch(tpdiSlice.actions.setIsUsingQuery(!isUsingQuery));
+  };
+  const handleHarmonizeChange = () => {
+    if (harmonizeTo === 'PS2') {
+      store.dispatch(planetSlice.actions.setHarmonizeTo('NONE'));
+    } else {
+      store.dispatch(planetSlice.actions.setHarmonizeTo('PS2'));
+    }
+  };
   return (
     <>
       <h2 className="heading-secondary">Order Options</h2>
@@ -107,69 +143,126 @@ const TPDIOrderOptions = ({ products, name, collectionId, geometry }) => {
         </label>
         <input
           id="tpdi-name"
-          placeholder="Enter the name of the order"
+          placeholder="e.g: My planet"
           type="text"
           value={name}
           className="form__input"
           onChange={handleOrderNameChange}
+          autoComplete="off"
         />
+        <div className="u-flex-aligned u-margin-bottom-tiny" style={{ justifyContent: 'space-between' }}>
+          <label className="form__label">Choose order type</label>
+          <Tooltip
+            direction="right"
+            content={
+              <div>
+                <h3 style={{ marginBottom: '0.5rem' }}>ORDER USING PRODUCTS IDS</h3>
+                <p className="text">
+                  Search for data and add products to you order by clicking on "Add to Order" buttons. This
+                  will add product IDs to your Order Options under "Added Products (by ID)."
+                </p>
+                <h3 style={{ marginBottom: '0.5rem', marginTop: '1rem' }}>ORDER USING QUERY</h3>
+                <p className="text">
+                  Your order will be based on your AOI and time range, without searching for data and adding
+                  products to your order. Especially useful for ordering time-series data. <br />
+                  It's possible for some products to be partially covered by clouds, despite the cloud
+                  coverage % information being 0.
+                </p>
+              </div>
+            }
+          />
+        </div>
 
+        <div className="toggle-with-label" style={{ marginLeft: '1rem' }}>
+          <label className="form__label">
+            <input
+              type="radio"
+              style={{ marginRight: '1rem' }}
+              checked={!isUsingQuery}
+              onChange={handleOrderTypeChange}
+            />
+            Order Product IDs
+          </label>
+        </div>
+        <div className="toggle-with-label" style={{ marginLeft: '1rem' }}>
+          <label className="form__label">
+            <input
+              type="radio"
+              style={{ marginRight: '1rem' }}
+              checked={isUsingQuery}
+              onChange={handleOrderTypeChange}
+            />
+            Order using query
+          </label>
+        </div>
         <label htmlFor="tpdi-collection-id" className="form__label">
           Collection ID
         </label>
         <TPDICollectionSelection />
-        <input
-          id="tpdi-collection-id"
-          value={collectionId}
-          placeholder="Enter your collection Id"
-          type="text"
-          className="form__input"
-          onChange={handleCollectiondIdChange}
-        />
 
-        <div className="tpdi-add-product">
-          <label style={{ display: 'inline-block' }} className="form__label">
-            Product Ids
-          </label>
-          <span
-            style={{ cursor: 'pointer', fontSize: '3rem', display: 'inline', marginLeft: '2rem' }}
-            onClick={addProductIdInput}
-          >
-            +
-          </span>
+        <label className="form__label">Order size{!isAreaExact ? ' (approx)' : ''}</label>
+        <div className="u-flex-aligned u-margin-bottom-tiny" style={{ justifyContent: 'space-between' }}>
+          <p className="text u-margin-bottom-tiny">
+            {!isUsingQuery ? (
+              <span>
+                {areaSelected} km<sup>2</sup>
+              </span>
+            ) : (
+              <span>You will see the estimate cost once you prepare the order.</span>
+            )}
+          </p>
+          <Tooltip content="Ordered products will be clipped to the selected area" direction="right" />
         </div>
 
-        {generateProductIdInputs(products)}
+        <div className="tpdi-limit">
+          <label htmlFor="order-limit" className="form__label">
+            Order Limit (in km<sup>2</sup>)
+          </label>
+        </div>
+        <div className="u-flex-aligned u-margin-bottom-tiny" style={{ justifyContent: 'space-between' }}>
+          <input
+            id="order-limit"
+            type="number"
+            placeholder="No limit"
+            onChange={handleLimitChange}
+            defaultValue={10}
+            className="form__input"
+          />
+          <Tooltip
+            content="Set an approximate order limit to prevent undesired large area requests."
+            direction="right"
+          ></Tooltip>
+        </div>
 
-        {couldClear ? (
+        {!isUsingQuery && (
+          <label style={{ display: 'inline-block' }} className="form__label">
+            Added Products (by ID)
+          </label>
+        )}
+
+        {!isUsingQuery && generateProductIdInputs(products)}
+
+        {canClear ? (
           <button className="secondary-button u-margin-bottom-small" onClick={handleClearProducts}>
             Clear Products
           </button>
         ) : null}
 
-        <label className="form__label">Area selected</label>
-        <p className="text u-margin-bottom-tiny">{areaSelected} sqKm</p>
+        {provider === 'PLANET' && (
+          <div className="u-flex-aligned">
+            <label className="form__label u-margin-right-tiny">Harmonize data</label>
+            <Toggle onChange={handleHarmonizeChange} checked={harmonizeTo === 'PS2'} />
+          </div>
+        )}
 
-        <div className="tpdi-limit">
-          <label htmlFor="order-limit" className="form__label">
-            Order Limit (in sqKm)
-          </label>
-          <span
-            className="info"
-            title="Set an approximate order limit to prevent undesired large area requests."
-          >
-            &#8505;
-          </span>
-        </div>
-        <input
-          id="order-limit"
-          type="number"
-          placeholder="No limit"
-          onChange={handleLimitChange}
-          defaultValue={10}
-          className="form__input"
+        <TPDIPlaceOrderButton
+          limit={limit}
+          areaSelected={areaSelected}
+          setCreateQueryResponse={setCreateQueryResponse}
+          setCreateProductsResponse={setCreateProductsResponse}
+          afterOrderCreationAction={afterOrderCreationAction}
+          amountOfFoundProducts={amountOfFoundProducts}
         />
-        <CreateOrderButtonsContainer limit={limit} areaSelected={areaSelected} />
       </div>
     </>
   );
@@ -178,8 +271,11 @@ const TPDIOrderOptions = ({ products, name, collectionId, geometry }) => {
 const mapStateToProps = (state) => ({
   products: state.tpdi.products,
   name: state.tpdi.name,
-  collectionId: state.tpdi.collectionId,
   geometry: state.request.geometry,
+  provider: state.tpdi.provider,
+  isParsing: state.tpdi.isParsing,
+  isUsingQuery: state.tpdi.isUsingQuery,
+  harmonizeTo: state.planet.harmonizeTo,
 });
 
 export default connect(mapStateToProps)(TPDIOrderOptions);

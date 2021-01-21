@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import debounceRender from 'react-debounce-render';
 import { connect } from 'react-redux';
+import omit from 'lodash.omit';
 import {
   createBatchRequestCurlCommand,
   analyseBatchRequestCurlCommand,
@@ -12,6 +13,9 @@ import {
 } from './requests';
 import { Controlled as CodeMirror } from 'react-codemirror2';
 import SendEditedBatchRequest from './SendEditedBatchRequest';
+import { getRequestBody, dispatchChanges } from '../process/requests/parseRequest';
+import { parseBatchRequest } from './parse';
+import store, { alertSlice } from '../../store';
 require('codemirror/lib/codemirror.css');
 require('codemirror/theme/eclipse.css');
 require('codemirror/mode/powershell/powershell.js');
@@ -61,6 +65,20 @@ const BatchRequestPreview = ({ token, requestState, batchState, setFetchedReques
     setIsEdited(true);
   };
 
+  const handleParseRequest = () => {
+    try {
+      const request = JSON.parse(getRequestBody(text));
+      if (request.processRequest) {
+        dispatchChanges(request.processRequest);
+      }
+      parseBatchRequest(omit(request, ['processRequest']));
+    } catch (err) {
+      store.dispatch(
+        alertSlice.actions.addAlert({ type: 'WARNING', text: 'Something went wrong parsing the request.' }),
+      );
+      console.error('Something went wrong parsing the request', err);
+    }
+  };
   return (
     <>
       <h2 className="heading-secondary u-margin-bottom-tiny">Request Preview</h2>
@@ -98,6 +116,15 @@ const BatchRequestPreview = ({ token, requestState, batchState, setFetchedReques
           {isEdited && request === 'CREATE' ? (
             <SendEditedBatchRequest setFetchedRequests={setFetchedRequests} text={text} token={token} />
           ) : null}
+          {isEdited && (
+            <button
+              className="secondary-button"
+              onClick={handleParseRequest}
+              title="Parse the body of a batch request"
+            >
+              Parse Request
+            </button>
+          )}
         </div>
       </div>
     </>

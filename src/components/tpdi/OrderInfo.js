@@ -1,24 +1,67 @@
 import React, { useState } from 'react';
-import store, { tpdiSlice, requestSlice } from '../../store';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faAngleDoubleDown, faAngleDoubleUp } from '@fortawesome/free-solid-svg-icons';
+import store, { tpdiSlice } from '../../store';
 import RequestButton from '../common/RequestButton';
 import { deleteTPDIOrder, confirmTPDIOrder } from './generateTPDIRequests';
 import { getTransformedGeometryFromBounds, focusMap } from '../common/Map/utils/crsTransform';
 import GetDeliveriesButton from './GetDeliveriesButton';
 import { parseTPDIRequest } from './parse';
+import Tooltip from '../common/Tooltip/Tooltip';
+import { getFormattedDatetime } from './utils';
+import { formatNumber } from '../../utils/const';
 
-const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder }) => {
-  const [expandOrder, setExpandOrder] = useState(false);
+const getColorByStatus = (status) => {
+  if (status === 'PARTIAL') {
+    return '#f39c12';
+  }
+  if (status === 'FAILED') {
+    return '#c0392b';
+  }
+  return undefined;
+};
+const TooltipInfo = ({ isGeneral }) => {
+  return (
+    <div>
+      {isGeneral ? (
+        <p className="text">To see all possible options expand the order by clicking on the title</p>
+      ) : (
+        <p className="text">Your order is ready and needs to be confirmed to be completed.</p>
+      )}
+      <p className="text">See "Requested Quota" for the quota your order will use, when confirmed.</p>
+      <p className="text">To proceed, click the "Confirm Order" button.</p>
+      <p className="text">To delete an order, click the "Delete Order" button.</p>
+      <p className="text">To parse the geometry of the order and see it on a map, click "See on map".</p>
+      <p className="text">To parse the whole request (use its data to update UI), click "Update UI"</p>
+      <p className="text">To see the status of the all the order's deliveries, click on "Get Deliveries"</p>
+      <br />
+      <p className="text">
+        When you click on "Confirm Order", the collection ID will be created in your Dashboard and order
+        STATUS will display CREATED.
+      </p>
+      <p className="text">
+        When order STATUS displays DONE, the tiles will be successfully ingested into your collection.
+      </p>
+      <br />
+      {isGeneral && (
+        <p className="text">
+          Orders are grouped by status (Created, running and done). Once an order finishes or gets confirmed
+          it will automatically move to the appropiate section
+        </p>
+      )}
+    </div>
+  );
+};
+
+export const OrdersTooltip = ({ isGeneral = false }) => (
+  <Tooltip direction="bottom" content={<TooltipInfo isGeneral={isGeneral} />} width="400px" />
+);
+
+const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder, expandOrder, updateToFinished }) => {
   const [deliveries, setDeliveries] = useState([]);
-
   const handleSeeGeometry = () => {
     const transformedGeo = getTransformedGeometryFromBounds(order.input.bounds);
     store.dispatch(tpdiSlice.actions.setExtraMapGeometry(transformedGeo));
-    focusMap();
-  };
-
-  const handleSetGeometry = () => {
-    const transformedGeo = getTransformedGeometryFromBounds(order.input.bounds);
-    store.dispatch(requestSlice.actions.setGeometry(transformedGeo));
     focusMap();
   };
 
@@ -26,19 +69,12 @@ const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder }) => {
     handleUpdateOrder(response);
   };
 
-  const handleDeleteClick = async () => {
-    try {
-      const res = await deleteTPDIOrder(token, order.id);
-      if (res.status === 204) {
-        handleDeleteOrder(order.id);
-      }
-    } catch (err) {
-      console.error('Cannot delete order', err);
-    }
+  const handleDelete = (res) => {
+    handleDeleteOrder(order.id);
   };
 
   const handleSetExpandOrder = () => {
-    setExpandOrder(!expandOrder);
+    expandOrder(order.id);
   };
 
   const handleParseRequest = () => {
@@ -47,19 +83,41 @@ const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder }) => {
 
   return (
     <div className="order-info">
-      <label onClick={handleSetExpandOrder} className="form__label">
-        {order.id} - {order.name ? order.name + ' -' : null}{' '}
-        {order.created ? order.created.replace('T', ' ').slice(0, -8) : null} -{' '}
-        {expandOrder ? String.fromCharCode(0x25b2) : String.fromCharCode(0x25bc)}
-      </label>
-      {expandOrder ? (
-        <div className="u-margin-bottom-small">
+      <div className="tpdi-feature-title">
+        <div
+          onClick={handleSetExpandOrder}
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            width: '50%',
+            color: getColorByStatus(order.status),
+            cursor: 'pointer',
+          }}
+        >
+          <p className="text">
+            {order.name && <span>{order.name} -</span>}
+            {getFormattedDatetime(order.created)}
+          </p>
+          {order.isExpanded ? (
+            <FontAwesomeIcon className="icon" icon={faAngleDoubleUp} />
+          ) : (
+            <FontAwesomeIcon className="icon" icon={faAngleDoubleDown} />
+          )}
+        </div>
+      </div>
+      {order.isExpanded ? (
+        <div className="order-info-extra-info">
           {order.name ? (
             <p className="text">
               <span>Name: </span>
               {order.name}
             </p>
           ) : null}
+          <p className="text">
+            <span>Id: </span>
+            {order.id}
+          </p>
           <p className="text">
             <span>Provider: </span>
             {order.provider}
@@ -69,8 +127,8 @@ const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder }) => {
             {order.status}
           </p>
           <p className="text">
-            <span>SqKm: </span>
-            {order.sqkm}
+            <span>Size: </span>
+            {formatNumber(order.sqkm, 3)}km<sup>2</sup>
           </p>
           {order.collectionId ? (
             <p className="text">
@@ -80,7 +138,7 @@ const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder }) => {
           ) : null}
           <p className="text">
             <span>Created at: </span>
-            {order.created}
+            {getFormattedDatetime(order.created)}
           </p>
           {deliveries.length > 0 ? (
             <>
@@ -95,36 +153,60 @@ const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder }) => {
               </p>
             </>
           ) : null}
-          <button className="secondary-button" onClick={handleSeeGeometry}>
-            See on map
-          </button>
-          <button className="secondary-button" onClick={handleSetGeometry}>
-            Set geometry on map
-          </button>
-          <button className="secondary-button" onClick={handleParseRequest}>
-            Parse Request
-          </button>
-          {order.status !== 'DONE' && order.status !== 'RUNNING' ? (
-            <RequestButton
-              request={confirmTPDIOrder}
-              args={[token, order.id]}
-              buttonText="Confirm Order"
-              className="secondary-button"
-              validation={Boolean(token)}
-              responseHandler={handleConfirm}
-            />
-          ) : null}
-          <button className="secondary-button secondary-button--cancel" onClick={handleDeleteClick}>
-            Delete Order
-          </button>
-          <GetDeliveriesButton
-            id={order.id}
-            token={token}
-            status={order.status}
-            setDeliveries={setDeliveries}
-          />
+          <div className="u-flex-aligned">
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                width: '50%',
+                columnGap: '1rem',
+                marginRight: '1rem',
+              }}
+            >
+              {order.status !== 'DONE' && order.status !== 'RUNNING' && (
+                <RequestButton
+                  request={confirmTPDIOrder}
+                  args={[token, order.id]}
+                  buttonText="Confirm Order"
+                  className="secondary-button"
+                  validation={Boolean(token)}
+                  responseHandler={handleConfirm}
+                  useConfirmation={true}
+                  dialogText="Are you sure you want to confirm this order?"
+                />
+              )}
+              <button className="secondary-button" onClick={handleSeeGeometry}>
+                See on map
+              </button>
+              {order.status !== 'RUNNING' && (
+                <RequestButton
+                  request={deleteTPDIOrder}
+                  args={[token, order.id]}
+                  buttonText="Delete order"
+                  className="secondary-button secondary-button--cancel"
+                  responseHandler={handleDelete}
+                  useConfirmation={true}
+                  dialogText="Are you sure you want to delete this order?"
+                  validation={true}
+                />
+              )}
+              <button className="secondary-button" onClick={handleParseRequest}>
+                Update UI
+              </button>
+              <GetDeliveriesButton
+                id={order.id}
+                token={token}
+                status={order.status}
+                setDeliveries={setDeliveries}
+                updateToFinished={updateToFinished}
+              />
+            </div>
+
+            <OrdersTooltip />
+          </div>
         </div>
       ) : null}
+      <hr />
     </div>
   );
 };

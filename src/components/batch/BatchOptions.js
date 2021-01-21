@@ -35,11 +35,10 @@ const BatchOptions = ({
 }) => {
   const handleGridChange = (e) => {
     store.dispatch(batchSlice.actions.setTillingGrid(Number(e.target.value)));
-    // If 100.08 select 60.0 as resolution.
-    if (Number(e.target.value) === 2) {
-      store.dispatch(batchSlice.actions.setResolution(60.0));
-    } else if (Number(e.target.value) === 3) {
-      store.dispatch(batchSlice.actions.setResolution(0.0001));
+
+    const possibleResolutions = generateResolutions(Number(e.target.value));
+    if (!possibleResolutions.includes(resolution)) {
+      store.dispatch(batchSlice.actions.setResolution(possibleResolutions[0]));
     }
   };
 
@@ -88,10 +87,10 @@ const BatchOptions = ({
           Tiling Grid
         </label>
         <select id="tiling-grid" className="form__input" value={tillingGrid} onChange={handleGridChange}>
-          <option value={0}>S2GM Grid</option>
-          <option value={1}>10km Grid</option>
-          <option value={2}>100,08km Grid</option>
-          <option value={3}>WGS84 Grid</option>
+          <option value={0}>S2GM grid</option>
+          <option value={1}>10km grid</option>
+          <option value={2}>100.08km grid</option>
+          <option value={3}>WGS84 1 degree grid</option>
         </select>
 
         <label htmlFor="resolution" className="form__label">
@@ -129,6 +128,7 @@ const BatchOptions = ({
           placeholder="Add a short description to your request"
           onChange={handleDescriptionChange}
           value={description}
+          autoComplete="off"
         />
 
         <div className="toggle-with-label">

@@ -78,3 +78,14 @@ export function useOnClickOutside(ref, handler) {
     };
   }, [ref, handler]);
 }
+
+// like useeffect but it doesn't run on first mount.
+export const useDidMountEffect = (func, deps) => {
+  const didMount = useRef(false);
+
+  useEffect(() => {
+    if (didMount.current) func();
+    else didMount.current = true;
+    // eslint-disable-next-line
+  }, deps);
+};

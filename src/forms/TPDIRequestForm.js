@@ -1,22 +1,45 @@
-import React from 'react';
-import TPDISourcesAndOptions from '../components/tpdi/TPDISources';
+import React, { useState } from 'react';
+import TPDISourcesAndOptions from '../components/tpdi/TPDISearchOptions';
 import MapContainer from '../components/common/Map/MapContainer';
 import TPDIOrderOptions from '../components/tpdi/TPDIOrderOptions';
-import TPDIRequestPreview from '../components/tpdi/TPDIRequestPreview';
+import TPDIOrderRequestPreview from '../components/tpdi/TPDIOrderRequestPreview';
 import QuotaContainer from '../components/tpdi/QuotaContainer';
 import SearchResultsContainer from '../components/tpdi/SearchResultsContainer';
 import TPDIOrdersContainer from '../components/tpdi/TPDIOrdersContainer';
-import TimeRangeContainer from '../components/common/TimeRange/TimeRangeContainer';
+import TPDITimerange from '../components/tpdi/TPDITimerange';
+import TPDISearchRequestPreview from '../components/tpdi/TPDISearchRequestPreview';
+import store, { alertSlice } from '../store';
 
 // Components needed to do TPDI Requests:
 // Timerange + AOI
 // TPDI Related options and actions
 const TPDIRequestForm = () => {
+  const [searchResponse, setSearchResponse] = useState();
+  const [createQueryResponse, setCreateQueryResponse] = useState();
+  const [createProductsResponse, setCreateProductsResponse] = useState();
+  const [getOrdersResponse, setGetOrdersResponse] = useState();
+  // Search results.
+  const [featuresWithProvider, setFeaturesWithProvider] = useState({
+    provider: '',
+    features: [],
+  });
+  const [orders, setOrders] = useState([]);
+  const afterOrderCreationAction = (newOrder) => {
+    const newExpandedOrder = { ...newOrder, isExpanded: true };
+    setOrders((orders) => [newExpandedOrder, ...orders.map((ord) => ({ ...ord, isExpanded: false }))]);
+    store.dispatch(
+      alertSlice.actions.addAlert({
+        type: 'SUCCESS',
+        text: 'Order successfully placed. Confirm the order to proceed.',
+      }),
+    );
+  };
   return (
     <div>
       <div className="tpdi-first-row">
         <div className="tpdi-first-row-first-item">
-          <TimeRangeContainer />
+          <TPDITimerange />
+          <QuotaContainer />
         </div>
         <div className="tpdi-first-row-second-item">
           <MapContainer />
@@ -24,20 +47,40 @@ const TPDIRequestForm = () => {
       </div>
       <div className="tpdi-second-row">
         <div className="tpdi-second-row-first-item">
-          <TPDISourcesAndOptions />
+          <TPDISourcesAndOptions
+            setFeaturesWithProvider={setFeaturesWithProvider}
+            setSearchResponse={setSearchResponse}
+          />
         </div>
         <div className="tpdi-second-row-second-item">
-          <TPDIOrderOptions />
+          <SearchResultsContainer featuresWithProvider={featuresWithProvider} />
         </div>
         <div className="tpdi-second-row-third-item">
-          <QuotaContainer />
-          <SearchResultsContainer />
-          <TPDIOrdersContainer />
+          <TPDISearchRequestPreview searchResponse={searchResponse} />
         </div>
       </div>
       <div className="tpdi-third-row">
         <div className="tpdi-third-row-first-item">
-          <TPDIRequestPreview />
+          <TPDIOrderOptions
+            setCreateQueryResponse={setCreateQueryResponse}
+            setCreateProductsResponse={setCreateProductsResponse}
+            afterOrderCreationAction={afterOrderCreationAction}
+            amountOfFoundProducts={featuresWithProvider.features.length}
+          />
+        </div>
+        <div className="tpdi-third-row-second-item">
+          <TPDIOrdersContainer
+            setGetOrdersResponse={setGetOrdersResponse}
+            orders={orders}
+            setOrders={setOrders}
+          />
+        </div>
+        <div className="tpdi-third-row-third-item">
+          <TPDIOrderRequestPreview
+            getOrdersResponse={getOrdersResponse}
+            createQueryResponse={createQueryResponse}
+            createProductsResponse={createProductsResponse}
+          />
         </div>
       </div>
     </div>

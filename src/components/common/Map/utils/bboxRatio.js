@@ -1,28 +1,5 @@
 import convertToBbox from '@turf/bbox';
 
-export const calculateDimensionsLowResPreview = (geometry) => {
-  try {
-    const distances = calculateMaxMetersPerPixel(geometry);
-    const totX = distances[0];
-    const totY = distances[1];
-    let ratio, newWidth, newHeight;
-
-    if (totX >= totY) {
-      newWidth = 512;
-      ratio = totX / totY;
-      newHeight = 512 / ratio;
-      return [newWidth, newHeight];
-    } else {
-      newHeight = 512;
-      ratio = totY / totX;
-      newWidth = 512 / ratio;
-      return [newWidth, newHeight];
-    }
-  } catch (err) {
-    console.error('Something went wrong while calculating dimensions', err);
-  }
-};
-
 export const calculateAutoDimensions = (geometry, maxWidth, maxHeight) => {
   try {
     const distances = calculateMaxMetersPerPixel(geometry);
@@ -30,13 +7,13 @@ export const calculateAutoDimensions = (geometry, maxWidth, maxHeight) => {
     const totY = distances[1];
     let newWidth, newHeight;
     const ratio = totX / totY;
-    if (maxWidth) {
+    if (maxWidth !== undefined) {
       newWidth = maxWidth;
-      newHeight = newWidth / ratio;
+      newHeight = parseFloat((newWidth / ratio).toFixed(3));
       return [newWidth, newHeight];
-    } else if (maxHeight) {
+    } else if (maxHeight !== undefined) {
       newHeight = maxHeight;
-      newWidth = newHeight * ratio;
+      newWidth = parseFloat((newHeight * ratio).toFixed(3));
       return [newWidth, newHeight];
     }
   } catch (err) {

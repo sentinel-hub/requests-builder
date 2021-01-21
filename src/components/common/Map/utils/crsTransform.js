@@ -1,8 +1,9 @@
 import bboxPolygon from '@turf/bbox-polygon';
 import proj4 from 'proj4';
-import { CRS } from '../../../../utils/const';
 import bbox from '@turf/bbox';
 import area from '@turf/area';
+import intersect from '@turf/intersect';
+import { CRS } from '../../../../utils/const';
 
 export const getAreaFromGeometry = (geometry) => {
   if (geometry.length === 4) {
@@ -10,6 +11,27 @@ export const getAreaFromGeometry = (geometry) => {
   } else {
     return area(geometry);
   }
+};
+
+const getIntersection = (geo1, geo2) => {
+  if (geo1.length === 4 && geo2.length === 4) {
+    return intersect(bboxPolygon(geo1), bboxPolygon(geo2));
+  }
+  if (geo1.length === 4) {
+    return intersect(bboxPolygon(geo1), geo2);
+  }
+  if (geo2.length === 4) {
+    return intersect(geo2, bboxPolygon(geo1));
+  }
+  return intersect(geo1, geo2);
+};
+
+export const getAreaCoverPercentage = (selectedGeometry, coverGeometry) => {
+  const intersection = getIntersection(selectedGeometry, coverGeometry);
+  if (intersection === null) {
+    return 0;
+  }
+  return getAreaFromGeometry(intersection) / getAreaFromGeometry(selectedGeometry);
 };
 
 export const focusMap = () => {

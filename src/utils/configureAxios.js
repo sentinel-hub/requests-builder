@@ -85,9 +85,6 @@ export const shResponseInterceptor = () => {
       let originalRequest = error.config;
       if (checkStatusCode401(error) && !originalRequest._retry && !checkIfPlanetApiFail(error)) {
         originalRequest._retry = true;
-        store.dispatch(
-          alertSlice.actions.addAlert({ type: 'WARNING', text: 'Expired token. Log in again!' }),
-        );
         doLogout();
         return doLogin().then((token) => {
           originalRequest.headers['Authorization'] = 'Bearer ' + token;

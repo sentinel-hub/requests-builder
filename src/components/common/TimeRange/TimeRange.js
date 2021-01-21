@@ -19,7 +19,7 @@ const getMinMaxDates = (timeFrom, timeTo) => ({
   to: moment(timeTo).endOf('month').format(),
 });
 
-const utcDateToYYYYMMDDFormat = (utcDate) => utcDate.split('T')[0];
+export const utcDateToYYYYMMDDFormat = (utcDate) => utcDate.split('T')[0];
 
 const shouldFetchDates = (datasource, mode) =>
   (datasource === S1GRD || datasource === S2L2A || datasource === S2L1C) &&

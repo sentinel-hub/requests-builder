@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import store, { catalogSlice } from '../../store';
+import store, { catalogSlice, requestSlice } from '../../store';
 import Toggle from '../common/Toggle';
 import moment from 'moment';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
@@ -12,28 +12,28 @@ const convertUtcDateToInput = (utcDate) => {
   return '';
 };
 
-const CatalogTimeRange = ({ timeFrom, timeTo }) => {
+const CatalogTimeRange = ({ isTimeToOpen, timeTo, isTimeFromOpen, timeFrom }) => {
   const handleChangeTimeFrom = (d) => {
     const date = moment(d).utc().startOf('day').format();
-    store.dispatch(catalogSlice.actions.setTimeFrom(date));
+    store.dispatch(requestSlice.actions.setTimeFrom({ timeFrom: date, idx: 0 }));
   };
   const handleChangeTimeTo = (d) => {
     const date = moment(d).utc().endOf('day').format();
-    store.dispatch(catalogSlice.actions.setTimeTo(date));
+    store.dispatch(requestSlice.actions.setTimeTo({ timeTo: date, idx: 0 }));
   };
   const handleOpenTimeTo = () => {
     // if one is already open it cannot be opened.
-    if (timeFrom.isOpen && !timeTo.isOpen) {
+    if (isTimeFromOpen && !isTimeToOpen) {
       return;
     }
-    store.dispatch(catalogSlice.actions.openTimeTo(!timeTo.isOpen));
+    store.dispatch(catalogSlice.actions.openTimeTo(!isTimeToOpen));
   };
   const handleOpenTimeFrom = () => {
     // if one is already open it cannot be opened.
-    if (timeTo.isOpen && !timeFrom.isOpen) {
+    if (isTimeToOpen && !isTimeFromOpen) {
       return;
     }
-    store.dispatch(catalogSlice.actions.openTimeFrom(!timeFrom.isOpen));
+    store.dispatch(catalogSlice.actions.openTimeFrom(!isTimeFromOpen));
   };
 
   return (
@@ -45,12 +45,12 @@ const CatalogTimeRange = ({ timeFrom, timeTo }) => {
             <label htmlFor="catalog-from" className="form__label">
               From
             </label>
-            <Toggle id="catalog-from" checked={timeFrom.isOpen} onChange={handleOpenTimeFrom} />
+            <Toggle id="catalog-from" checked={isTimeFromOpen} onChange={handleOpenTimeFrom} />
           </div>
           <DayPickerInput
-            value={convertUtcDateToInput(timeFrom.time)}
+            value={convertUtcDateToInput(timeFrom)}
             inputProps={{
-              disabled: timeFrom.isOpen,
+              disabled: isTimeFromOpen,
               required: true,
               className: 'form__input',
             }}
@@ -60,12 +60,12 @@ const CatalogTimeRange = ({ timeFrom, timeTo }) => {
             <label htmlFor="catalog-to" className="form__label">
               To
             </label>
-            <Toggle id="catalog-to" checked={timeTo.isOpen} onChange={handleOpenTimeTo} />
+            <Toggle id="catalog-to" checked={isTimeToOpen} onChange={handleOpenTimeTo} />
           </div>
           <DayPickerInput
-            value={convertUtcDateToInput(timeTo.time)}
+            value={convertUtcDateToInput(timeTo)}
             inputProps={{
-              disabled: timeTo.isOpen,
+              disabled: isTimeToOpen,
               required: true,
               className: 'form__input',
             }}
@@ -78,8 +78,10 @@ const CatalogTimeRange = ({ timeFrom, timeTo }) => {
 };
 
 const mapStateToProps = (state) => ({
-  timeFrom: state.catalog.timeFrom,
-  timeTo: state.catalog.timeTo,
+  timeTo: state.request.timeTo[0],
+  timeFrom: state.request.timeFrom[0],
+  isTimeToOpen: state.catalog.isTimeToOpen,
+  isTimeFromOpen: state.catalog.isTimeFromOpen,
 });
 
 export default connect(mapStateToProps)(CatalogTimeRange);

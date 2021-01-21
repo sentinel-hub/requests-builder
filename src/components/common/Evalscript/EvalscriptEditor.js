@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { connect } from 'react-redux';
-import store, { requestSlice, alertSlice } from '../../../store';
+import store, { requestSlice } from '../../../store';
 import { Controlled as CodeMirror } from 'react-codemirror2';
 import { DEFAULT_EVALSCRIPTS, CUSTOM, DATAFUSION } from '../../../utils/const';
-import RequestButton from '../RequestButton';
-import { convertEvalscript, fetchDataProducts } from './utils';
+import { fetchDataProducts } from './utils';
 import { JSHINT } from 'jshint';
 import Toggle from '../Toggle';
 import DataProductSelection from './DataProductSelection';
@@ -86,19 +85,6 @@ const EvalscriptEditor = ({ datasource, evalscript, token, consoleValue }) => {
     setToggledConsole(!toggledConsole);
   };
 
-  const convertEvalscriptResponseHandler = (response) => {
-    store.dispatch(
-      alertSlice.actions.addAlert({ type: 'SUCCESS', text: 'Evalscript successfully converted' }),
-    );
-    store.dispatch(requestSlice.actions.setEvalscript(response));
-  };
-
-  const convertEvalscriptErrorHandler = (err) => {
-    store.dispatch(
-      alertSlice.actions.addAlert({ type: 'WARNING', text: 'Evalscript failed to convert to V3' }),
-    );
-    console.error('Evalscript failed to convert to V3', err);
-  };
   return (
     <>
       <div className="evalscript-title-button">
@@ -110,16 +96,6 @@ const EvalscriptEditor = ({ datasource, evalscript, token, consoleValue }) => {
         >
           Set evalscript to default
         </button>
-        <RequestButton
-          buttonText="Convert Evalscript"
-          request={convertEvalscript}
-          args={[evalscript, datasource, token]}
-          responseHandler={convertEvalscriptResponseHandler}
-          errorHandler={convertEvalscriptErrorHandler}
-          className="secondary-button"
-          disabledTitle="Log in and use a non v3 evalscript to use this"
-          validation={Boolean(token) && !evalscript.startsWith('//VERSION=3')}
-        />
       </div>
 
       <div className="form">

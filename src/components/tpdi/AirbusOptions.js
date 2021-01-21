@@ -1,34 +1,16 @@
 import React, { useState } from 'react';
-import store, { airbusSlice } from '../../store';
-import { connect } from 'react-redux';
 import AirbusAdvancedOptions from './AirbusAdvancedOptions';
 import Toggle from '../common/Toggle';
 
-const AirbusOptions = ({ constellation }) => {
+const AirbusOptions = () => {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const handleShowAdvancedChange = () => {
     setShowAdvanced(!showAdvanced);
   };
 
-  const handleConstellationChange = (e) => {
-    store.dispatch(airbusSlice.actions.setConstellation(e.target.value));
-  };
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <label htmlFor="constellation" className="form__label">
-        Constellation
-      </label>
-      <select
-        id="constellation"
-        className="form__input"
-        value={constellation}
-        onChange={handleConstellationChange}
-      >
-        <option value="PHR">PHR (Pleiades)</option>
-        <option value="SPOT">SPOT</option>
-      </select>
       <div className="toggle-with-label">
         <label htmlFor="adv-options" className="form__label">
           Advanced Options
@@ -40,8 +22,4 @@ const AirbusOptions = ({ constellation }) => {
   );
 };
 
-const mapStateToProps = (state) => ({
-  constellation: state.airbus.constellation,
-});
-
-export default connect(mapStateToProps)(AirbusOptions);
+export default AirbusOptions;

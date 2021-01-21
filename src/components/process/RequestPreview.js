@@ -126,7 +126,7 @@ const RequestPreview = ({ requestState, token }) => {
             <option value="SHJS">sh-js</option>
             <option value="SHPY">sh-py</option>
           </select>
-          {codeMode === 'CURL' || codeMode === 'BODY' ? (
+          {(codeMode === 'CURL' || codeMode === 'BODY') && edited ? (
             <button onClick={handleParseRequest} style={{ marginLeft: '1rem' }} className="secondary-button">
               Parse request
             </button>

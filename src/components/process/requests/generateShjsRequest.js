@@ -42,8 +42,8 @@ const formatToSHJS = {
 };
 
 const locationToSHJSLocation = {
-  'EU-CENTRAL-1': 'awsEuCentral1',
-  'US-WEST-2': 'awsUsWest2',
+  'aws-eu-central-1': 'awsEuCentral1',
+  'aws-us-west-2': 'awsUsWest2',
 };
 
 const getSHJSImports = (reqState) => {
@@ -119,10 +119,13 @@ const getSHJSOptions = (reqState, idx = 0) => {
     });
   }
 
-  // If byoc, need to specify location
+  // If byoc, need to specify location + collectionId
   if (reqState.datasource === CUSTOM) {
     shjsOptions =
-      shjsOptions + `\n  locationId: LocationIdSHv3.${locationToSHJSLocation[reqState.byocLocation]}`;
+      shjsOptions +
+      `\n  locationId: LocationIdSHv3.${locationToSHJSLocation[reqState.byocLocation]},\n  collectionId: '${
+        reqState.byocCollectionId
+      }'`;
   }
   return shjsOptions;
 };

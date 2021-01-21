@@ -18,6 +18,7 @@ const RequestButton = ({
   // params to use ConfirmDialog.
   useConfirmation,
   dialogText,
+  style,
 }) => {
   const [isFetching, setIsFetching] = useState(false);
   const [openedConfirmDialog, setOpenedConfirmDialog] = useState(false);
@@ -100,6 +101,7 @@ const RequestButton = ({
         disabled={!validation}
         onClick={handleSendRequest}
         title={!validation ? disabledTitle : null}
+        style={style}
       >
         {isFetching ? 'Cancel Request' : buttonText}
       </button>

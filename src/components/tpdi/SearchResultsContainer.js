@@ -1,89 +1,50 @@
-import React, { useState } from 'react';
-import RequestButton from '../common/RequestButton';
-import { getTPDISearchRequest } from './generateTPDIRequests';
-import { errorHandlerTPDI } from './TPDIOrderOptions';
+import React from 'react';
 import { connect } from 'react-redux';
 import PlanetFeatureInfo from './PlanetFeatureInfo';
 import AirbusFeatureInfo from './AirbusFeatureInfo';
+import { isAirbus } from './utils';
 
-const validateSearch = (token, state) => {
-  if (state.tpdi.provider === 'PLANET') {
-    return Boolean(token && state.planet.planetApiKey);
-  } else {
-    return Boolean(token);
-  }
-};
-
-const getDisabledTitle = (token, state) => {
-  if (!token) {
-    return 'Log in to use this';
-  }
-  if (state.tpdi.provider === 'PLANET') {
-    return 'You need an API Key to use this.';
-  }
-};
-
-const generateFeatures = (featuresWithProvider) => {
-  if (featuresWithProvider.provider === 'AIRBUS') {
+const generateFeatures = (featuresWithProvider, geometry, productIds) => {
+  if (isAirbus(featuresWithProvider.provider)) {
     return featuresWithProvider.features.map((feature) => (
-      <AirbusFeatureInfo key={feature.properties.id} feature={feature} />
+      <AirbusFeatureInfo
+        geometry={geometry}
+        key={feature.properties.id}
+        feature={feature}
+        isDisabled={productIds.find((id) => id === feature.properties.id)}
+      />
     ));
   } else if (featuresWithProvider.provider === 'PLANET') {
     return featuresWithProvider.features.map((feature) => (
-      <PlanetFeatureInfo key={feature.id} feature={feature} />
+      <PlanetFeatureInfo
+        geometry={geometry}
+        key={feature.id}
+        feature={feature}
+        isDisabled={productIds.find((id) => id === feature.id)}
+      />
     ));
   }
 };
 
-const SearchResultsContainer = ({ tpdi, request, airbus, planet, token }) => {
-  const state = {
-    tpdi,
-    request,
-    airbus,
-    planet,
-  };
-
-  const [featuresWithProvider, setFeaturesWithProvider] = useState({
-    provider: '',
-    features: [],
-  });
-
-  const handleSearchFeatures = (response) => {
-    if (response.features) {
-      setFeaturesWithProvider({
-        provider: tpdi.provider,
-        features: response.features,
-      });
-    }
-  };
-
+const SearchResultsContainer = ({ featuresWithProvider, geometry, products }) => {
+  const productIds = products.map((prod) => prod.id);
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <h2 className="heading-secondary">Search Results</h2>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <h2 className="heading-secondary">Search Results (Products Found)</h2>
       <div className="form" style={{ overflowY: 'scroll', maxHeight: '450px' }}>
-        <div className="u-margin-bottom-small">
-          <RequestButton
-            request={getTPDISearchRequest}
-            args={[state, token]}
-            buttonText="Search for data"
-            validation={validateSearch(token, state)}
-            className="secondary-button"
-            responseHandler={handleSearchFeatures}
-            disabledTitle={getDisabledTitle(token, state)}
-            errorHandler={errorHandlerTPDI}
-          />
-        </div>
-        {featuresWithProvider.features.length > 0 ? generateFeatures(featuresWithProvider) : null}
+        {featuresWithProvider.features.length > 0 ? (
+          generateFeatures(featuresWithProvider, geometry, productIds)
+        ) : (
+          <p className="text">No results found</p>
+        )}
       </div>
     </div>
   );
 };
+
 const mapStateToProps = (state) => ({
-  tpdi: state.tpdi,
-  request: state.request,
-  airbus: state.airbus,
-  planet: state.planet,
-  token: state.auth.user.access_token,
+  geometry: state.request.geometry,
+  products: state.tpdi.products,
 });
 
 export default connect(mapStateToProps)(SearchResultsContainer);

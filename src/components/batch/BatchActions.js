@@ -21,12 +21,10 @@ export const addAlertOnError = (error, message) => {
   } else {
     try {
       const err = error.response.data.error;
-      console.log(err);
       let errorMsg = err.message;
       if (err.errors) {
         errorMsg += err.errors.map((subErr) => (subErr.violation ? '\n' + subErr.violation : ''));
       }
-      console.log(errorMsg);
       store.dispatch(alertSlice.actions.addAlert({ type: 'WARNING', text: errorMsg }));
     } catch (exc) {
       store.dispatch(alertSlice.actions.addAlert({ type: 'WARNING', text: 'Something went wrong' }));

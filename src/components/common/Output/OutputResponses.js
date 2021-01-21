@@ -69,6 +69,7 @@ const generateResponses = (responses, mode) => {
         name={resp.idx}
         type="text"
         className="form__input"
+        autoComplete="off"
       />
 
       {resp.idx !== 0 ? (

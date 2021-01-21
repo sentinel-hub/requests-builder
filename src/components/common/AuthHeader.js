@@ -25,7 +25,11 @@ export const doLogin = () => {
   }).then((token) => {
     saveTokenToLocalStorage(token);
     store.dispatch(
-      authSlice.actions.setUser({ userdata: decodeToken(token), access_token: token.access_token }),
+      authSlice.actions.setUser({
+        userdata: decodeToken(token),
+        access_token: token.access_token,
+        expires_in: token.expires_in,
+      }),
     );
     return token.access_token;
   });

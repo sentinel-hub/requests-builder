@@ -18,7 +18,7 @@ export const catalogErrorHandler = (error) => {
   console.error(error);
 };
 
-const CatalogSendRequestButton = ({ catalogState, geometry, token, setResults }) => {
+const CatalogSendRequestButton = ({ catalogState, geometry, timeRange, token, setResults }) => {
   let type = catalogState.selectedCollection;
 
   const responseHandler = (response) => {
@@ -37,7 +37,7 @@ const CatalogSendRequestButton = ({ catalogState, geometry, token, setResults })
     <>
       <RequestButton
         request={generateCatalogRequest}
-        args={[catalogState, geometry, token, undefined]}
+        args={[catalogState, geometry, timeRange, token, undefined]}
         validation={Boolean(token)}
         className="secondary-button"
         disabledTitle="Log in to use this"
@@ -53,6 +53,10 @@ const CatalogSendRequestButton = ({ catalogState, geometry, token, setResults })
 const mapStateToProps = (state) => ({
   catalogState: state.catalog,
   geometry: state.request.geometry,
+  timeRange: {
+    timeTo: state.request.timeTo[0],
+    timeFrom: state.request.timeFrom[0],
+  },
   token: state.auth.user.access_token,
 });
 

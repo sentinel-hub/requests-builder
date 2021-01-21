@@ -146,6 +146,11 @@ const BatchRequestSummary = ({ props, token }) => {
             <p className="text">
               <span>Status:</span> {status}
             </p>
+            {props.error !== undefined ? (
+              <p className="text" style={{ color: 'red' }}>
+                <span>Error:</span> {props.error}
+              </p>
+            ) : null}
             {description ? (
               <p className="text">
                 <span>Description:</span> {description}
@@ -162,7 +167,7 @@ const BatchRequestSummary = ({ props, token }) => {
             </p>
             {valueEstimate ? (
               <p className="text">
-                <span>Estimated Value (in PU):</span> {Math.round(valueEstimate)}
+                <span>Estimated Value (in PU):</span> {Math.round(valueEstimate / 3)}
               </p>
             ) : null}
             {/* {fetchedTiles.consumedPu ? (

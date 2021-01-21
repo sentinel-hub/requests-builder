@@ -8,3 +8,15 @@ export const getFormattedDatetime = (date) => {
     return date;
   }
 };
+
+export const isAirbus = (constellation) => ['AIRBUS_SPOT', 'AIRBUS_PHR'].includes(constellation);
+
+export const stateConstellationToConstellation = {
+  AIRBUS_SPOT: 'SPOT',
+  AIRBUS_PHR: 'PHR',
+};
+
+export const constellationToStateConstellation = {
+  SPOT: 'AIRBUS_SPOT',
+  PHR: 'AIRBUS_PHR',
+};

@@ -1,9 +1,9 @@
 .map {
-  width: 60%;
+  width: 67%;
   height: 647px;
 
-  @include respond(big-desktop) {
-    width: 60%;
+  .leaflet-bottom .leaflet-control-scale {
+    margin-bottom: 2rem;
   }
 
   @include respond(tab-land) {
@@ -16,7 +16,7 @@
 .textarea-aoi-container {
   display: flex;
   flex-direction: column;
-  width: 50%;
+  width: 30%;
   align-items: center;
   height: 90%;
 

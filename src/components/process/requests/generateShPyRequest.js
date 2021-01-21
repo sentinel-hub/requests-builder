@@ -16,14 +16,15 @@ import { generateSHBbox } from './generateShjsRequest';
 import { transformGeometryToNewCrs } from '../../common/Map/utils/crsTransform';
 
 const formatToSHPY = {
-  'image/jpeg': 'MimeType.JPG',
+  // JPEG not supported on shpy
+  'image/jpeg': 'MimeType.PNG',
   'image/png': 'MimeType.PNG',
   'image/tiff': 'MimeType.TIFF',
 };
 
 const getSHPYImports = () => {
   return `import matplotlib.pyplot as plt \n
-from sentinelhub import SentinelHubRequest, SentinelHubDownloadClient, DataSource, \
+from sentinelhub import SentinelHubRequest, SentinelHubDownloadClient, DataCollection, \
 MimeType, DownloadRequest, CRS, BBox, SHConfig, Geometry\n`;
 };
 
@@ -72,28 +73,25 @@ const getSHPYS1Datasource = (reqState) => {
 const datasourceToSHPYDatasource = (datasource, requestState) => {
   switch (datasource) {
     case S1GRD:
-      return `DataSource.${getSHPYS1Datasource(requestState)}`;
+      return `DataCollection.${getSHPYS1Datasource(requestState)}`;
     case S2L2A:
-      return 'DataSource.SENTINEL2_L2A';
+      return 'DataCollection.SENTINEL2_L2A';
     case S2L1C:
-      return 'DataSource.SENTINEL2_L1C';
+      return 'DataCollection.SENTINEL2_L1C';
     case S3OLCI:
+      return 'DataCollection.SENTINEL3_OLCI';
     case S3SLSTR:
-      return 'DataSource.SENTINEL3';
+      return 'DataCollection.SENTINEL3_SLSTR';
     case MODIS:
-      return 'DataSource.MODIS';
+      return 'DataCollection.MODIS';
     case DEM:
-      return 'DataSource.DEM';
+      return 'DataCollection.DEM';
     case L8L1C:
-      return 'DataSource.LANDSAT8_L1C';
+      return 'DataCollection.LANDSAT8';
     case S5PL2:
-      return 'DataSource.SENTINEL5P';
+      return 'DataCollection.SENTINEL5P';
     case CUSTOM:
-      return `DataSource('${
-        requestState.dataFilterOptions[0].options.collectionId
-          ? requestState.dataFilterOptions[0].options.collectionId
-          : ''
-      }')`;
+      return `DataCollection.define_byoc('${requestState.byocCollectionId}')`;
     default:
       return '';
   }
@@ -149,7 +147,7 @@ const generateSHPYInputs = (reqState) => {
     let datafusionString = '';
     reqState.datafusionSources.forEach((source, idx) => {
       datafusionString += `SentinelHubRequest.input_data(
-      data_source=${datasourceToSHPYDatasource(source.datasource, reqState)},
+      data_collection=${datasourceToSHPYDatasource(source.datasource, reqState)},
       ${getSHPYTimerange(reqState, idx)}\
         ${getSHPYAdvancedOptions(reqState, idx)}
     ),\n    `;
@@ -159,7 +157,7 @@ const generateSHPYInputs = (reqState) => {
 
   // No datafusion
   return `SentinelHubRequest.input_data(
-    data_source=${datasourceToSHPYDatasource(reqState.datasource, reqState)},
+    data_collection=${datasourceToSHPYDatasource(reqState.datasource, reqState)},
     ${getSHPYTimerange(reqState)}\
     ${getSHPYAdvancedOptions(reqState)}
 )`;

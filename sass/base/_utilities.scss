@@ -23,3 +23,19 @@
 .u-border-bottom-dark-medium { border-bottom: 2px solid var(--color-grey-dark-2); }
 
 .u-width-100 { width: 100% !important; }
+
+.u-flex-aligned {
+  display: flex;
+  align-items: center;
+
+  & > * {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+}
+
+.u-flex-column-centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

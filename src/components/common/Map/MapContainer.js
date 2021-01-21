@@ -6,7 +6,7 @@ import bbox from '@turf/bbox';
 
 import Map from './Map';
 import store, { requestSlice } from '../../../store';
-import { transformGeometryToWGS84IfNeeded } from './utils/crsTransform';
+import { getAreaFromGeometry, transformGeometryToWGS84IfNeeded } from './utils/crsTransform';
 import CRSSelection from './CRSSelection';
 import MapTextarea from './MapTextarea';
 
@@ -170,8 +170,12 @@ const MapContainer = ({ geometry, selectedCrs, extraMapGeometry }) => {
     <div>
       <h2 className="heading-secondary">Area of interest</h2>
       <div className="form">
-        <CRSSelection selectedCrs={selectedCrs} />
-
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <CRSSelection selectedCrs={selectedCrs} />
+          <p className="text" style={{ marginLeft: '2rem', marginBottom: '1rem', height: '100%' }}>
+            <span>Area selected:</span> {(getAreaFromGeometry(geometry) / 1e6).toFixed(2)} km<sup>2</sup>
+          </p>
+        </div>
         <div className="map-container">
           <Map mapRef={mapRef} drawnItemsRef={drawnItemsRef} layersRef={layersRef} />
 

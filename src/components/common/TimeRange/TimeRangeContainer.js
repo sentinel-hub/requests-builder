@@ -1,12 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import TimeRange from './TimeRange';
 import store, { requestSlice } from '../../../store';
 import Toggle from '../Toggle';
-import { DATAFUSION } from '../../../utils/const';
+import { DATAFUSION, DEM } from '../../../utils/const';
 
 const multipleTimeRangeIsValid = (mode, datasource) => {
   return (mode === 'PROCESS' || mode === 'BATCH') && datasource === DATAFUSION;
+};
+
+const supportsTimeRange = (datasource) => {
+  if (datasource === DEM) {
+    return false;
+  }
+  return true;
 };
 
 const TimeRangeContainer = ({
@@ -19,8 +26,16 @@ const TimeRangeContainer = ({
   geometry,
   token,
 }) => {
+  useEffect(() => {
+    if (!supportsTimeRange(datasource)) {
+      store.dispatch(requestSlice.actions.disableTimerange(true));
+    }
+  }, [datasource]);
+
   const handleDisableTimerange = () => {
-    store.dispatch(requestSlice.actions.disableTimerange(!isDisabled));
+    if (supportsTimeRange(datasource)) {
+      store.dispatch(requestSlice.actions.disableTimerange(!isDisabled));
+    }
   };
 
   const generateTimeRangesJSX = () => {
@@ -84,7 +99,7 @@ const TimeRangeContainer = ({
           <label htmlFor="toggle-timerange" className="form__label">
             {isDisabled ? 'Enable timerange' : 'Disable timerange'}
           </label>
-          <Toggle id="toggle-timerange" onChange={handleDisableTimerange} defaultChecked={true} />
+          <Toggle id="toggle-timerange" onChange={handleDisableTimerange} checked={isDisabled} />
         </div>
 
         {generateTimeRangesJSX()}

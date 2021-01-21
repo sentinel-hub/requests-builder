@@ -9,7 +9,7 @@ const ModeSelector = ({ mode }) => {
 
   return (
     <div>
-      <h2 className="heading-secondary u-margin-bottom-small">Mode</h2>
+      <h2 className="heading-secondary u-margin-bottom-small">Select API</h2>
       <div className="mode-selector">
         <input
           className="mode-selector mode-selector--input"

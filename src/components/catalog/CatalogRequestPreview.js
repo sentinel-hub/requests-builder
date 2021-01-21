@@ -11,8 +11,8 @@ require('codemirror/mode/xml/xml.js');
 require('codemirror/mode/powershell/powershell.js');
 require('codemirror/addon/edit/matchbrackets.js');
 
-const CatalogRequestPreview = ({ catalogState, geometry, token, setResults }) => {
-  const [text, setText] = useState(generateCatalogCurlCommand(catalogState, geometry, token));
+const CatalogRequestPreview = ({ catalogState, geometry, timeRange, token, setResults }) => {
+  const [text, setText] = useState(generateCatalogCurlCommand(catalogState, geometry, timeRange, token));
   const [isEdited, setIsEdited] = useState(false);
 
   const handleCopy = () => {
@@ -28,9 +28,9 @@ const CatalogRequestPreview = ({ catalogState, geometry, token, setResults }) =>
   };
 
   useEffect(() => {
-    setText(generateCatalogCurlCommand(catalogState, geometry, token));
+    setText(generateCatalogCurlCommand(catalogState, geometry, timeRange, token));
     setIsEdited(false);
-  }, [catalogState, geometry, token]);
+  }, [catalogState, geometry, token, timeRange]);
 
   return (
     <>
@@ -66,6 +66,10 @@ const CatalogRequestPreview = ({ catalogState, geometry, token, setResults }) =>
 const mapStateToProps = (state) => ({
   catalogState: state.catalog,
   geometry: state.request.geometry,
+  timeRange: {
+    timeTo: state.request.timeTo[0],
+    timeFrom: state.request.timeFrom[0],
+  },
   token: state.auth.user.access_token,
 });
 

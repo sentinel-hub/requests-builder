@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import store, { requestSlice } from '../../../store';
-import { calculateDimensionsLowResPreview, calculateAutoDimensions } from '../Map/utils/bboxRatio';
+import { calculateAutoDimensions } from '../Map/utils/bboxRatio';
 import Toggle from '../Toggle';
 
 import { connect } from 'react-redux';
@@ -23,11 +23,11 @@ const generatePlaceholder = (heightOrRes, input) => {
   }
 };
 
-const OutputDimensions = ({ geometry, heightOrRes, height, width }) => {
-  const [isAuto, setIsAuto] = useState(true);
+const isWritingDecimal = (input) => /^\d*(\.|,)0*$/.test(input);
 
+const OutputDimensions = ({ geometry, heightOrRes, height, width, isAutoRatio }) => {
   const handleSetAutoRatio = () => {
-    setIsAuto(!isAuto);
+    store.dispatch(requestSlice.actions.setIsAutoRatio(!isAutoRatio));
   };
 
   const dispatchNewDimensions = (newDimensions) => {
@@ -39,12 +39,16 @@ const OutputDimensions = ({ geometry, heightOrRes, height, width }) => {
   };
 
   const handleTextChange = (e) => {
-    if (isAuto && e.target.value !== '') {
+    if (isWritingDecimal(e.target.value)) {
+      store.dispatch(requestSlice.actions.setWidthOrHeight({ [e.target.name]: e.target.value }));
+      return;
+    }
+    if (isAutoRatio && e.target.value !== '') {
       if (e.target.name === 'x') {
-        const newDimensions = calculateAutoDimensions(geometry, parseInt(e.target.value), undefined);
+        const newDimensions = calculateAutoDimensions(geometry, Number(e.target.value), undefined);
         dispatchNewDimensions(newDimensions);
       } else if (e.target.name === 'y') {
-        const newDimensions = calculateAutoDimensions(geometry, undefined, parseInt(e.target.value));
+        const newDimensions = calculateAutoDimensions(geometry, undefined, Number(e.target.value));
         dispatchNewDimensions(newDimensions);
       }
     } else {
@@ -55,16 +59,35 @@ const OutputDimensions = ({ geometry, heightOrRes, height, width }) => {
   const handleRadioChange = (e) => {
     store.dispatch(requestSlice.actions.setHeightOrRes(e.target.value));
     if (e.target.value === 'RES') {
+      store.dispatch(requestSlice.actions.setIsAutoRatio(false));
       store.dispatch(requestSlice.actions.setWidthOrHeight({ x: 100, y: 100 }));
+    } else {
+      store.dispatch(requestSlice.actions.setIsAutoRatio(true));
     }
   };
 
+  // Effect that takes care to update dimensions when geometry and isAutoRatio (toggle) changes.
   useEffect(() => {
-    if (isAuto && geometry && heightOrRes === 'HEIGHT') {
-      const newDimensions = calculateDimensionsLowResPreview(geometry);
+    if (isAutoRatio && geometry && heightOrRes === 'HEIGHT') {
+      let newDimensions;
+      if (width >= height) {
+        newDimensions = calculateAutoDimensions(geometry, Number(width), undefined);
+      } else {
+        newDimensions = calculateAutoDimensions(geometry, undefined, Number(height));
+      }
       dispatchNewDimensions(newDimensions);
     }
-  }, [geometry, isAuto, heightOrRes]);
+    // We don't want to re-calculate dimensions when height/width changes. Only when geometry does.
+    // eslint-disable-next-line
+  }, [geometry, isAutoRatio]);
+
+  // Effect that resets the dimensions to proper ratio (default 512 width) when changin between heigth/res.
+  useEffect(() => {
+    if (isAutoRatio && geometry && heightOrRes === 'HEIGHT') {
+      dispatchNewDimensions(calculateAutoDimensions(geometry, 512, undefined));
+    }
+    // eslint-disable-next-line
+  }, [heightOrRes]);
 
   return (
     <>
@@ -109,6 +132,7 @@ const OutputDimensions = ({ geometry, heightOrRes, height, width }) => {
         value={width}
         onChange={handleTextChange}
         placeholder={generatePlaceholder(heightOrRes, 'x')}
+        autoComplete="off"
       />
       <label htmlFor="height-input" className="form__label">
         {heightOrRes === 'HEIGHT' ? 'Height' : 'Res Y (in CRS units)'}
@@ -122,6 +146,7 @@ const OutputDimensions = ({ geometry, heightOrRes, height, width }) => {
         value={height}
         onChange={handleTextChange}
         placeholder={generatePlaceholder(heightOrRes, 'y')}
+        autoComplete="off"
       />
 
       {heightOrRes === 'HEIGHT' ? (
@@ -129,7 +154,7 @@ const OutputDimensions = ({ geometry, heightOrRes, height, width }) => {
           <label htmlFor="auto" className="form__label">
             Keep ratio automatically
           </label>
-          <Toggle id="auto" checked={isAuto} onChange={handleSetAutoRatio} />
+          <Toggle id="auto" checked={isAutoRatio} onChange={handleSetAutoRatio} />
         </div>
       ) : null}
     </>
@@ -141,6 +166,7 @@ const mapStateToProps = (state) => ({
   height: state.request.height,
   width: state.request.width,
   geometry: state.request.geometry,
+  isAutoRatio: state.request.isAutoRatio,
 });
 
 export default connect(mapStateToProps)(OutputDimensions);

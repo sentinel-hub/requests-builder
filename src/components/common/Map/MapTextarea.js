@@ -78,13 +78,13 @@ const MapTextarea = ({ selectedCrs, fitToMainBounds, extraMapGeometry, geometry 
       />
       <div className="map-buttons">
         <button onClick={handleParseGeometryClick} className="secondary-button">
-          Parse Geometry
+          Parse
         </button>
         <input onChange={handleFileUpload} id="file-input" type="file" style={{ display: 'none' }} />
         <button
           title="Upload a KML or GeoJSON file to parse the geometry."
           onClick={handleUploadFileButtonClick}
-          className="secondary-button"
+          className="secondary-button secondary-button--wrapped"
         >
           Upload KML/GeoJSON
         </button>

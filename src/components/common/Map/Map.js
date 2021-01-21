@@ -18,6 +18,8 @@ const Map = ({ mapRef, layersRef, drawnItemsRef }) => {
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>',
     }).addTo(mapRef.current);
 
+    L.control.scale().addTo(mapRef.current);
+
     // FeatureGroup is to store editable layers
     var drawnItems = new L.FeatureGroup();
     drawnItemsRef.current = drawnItems;

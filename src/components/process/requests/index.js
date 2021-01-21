@@ -9,7 +9,10 @@ const byocLocationToBaseUrl = (location) => {
   } else if (location === 'US-WEST-2') {
     return 'https://services-uswest2.sentinel-hub.com/';
   }
+  return 'https://services.sentinel-hub.com/';
 };
+
+const GLOBAL_BYOC_ENDPOINT = 'https://services.sentinel-hub.com/api/v1/byoc/global';
 
 export const getUrl = (requestState) => {
   if (requestState.datasource === 'CUSTOM') {
@@ -100,6 +103,15 @@ const getRequestData = (reqState) => {
       ...getDataFilter(reqState, idx),
       ...getProcessingOptions(reqState, idx),
     }));
+  }
+  if (reqState.datasource === 'CUSTOM') {
+    return [
+      {
+        type: `${reqState.byocCollectionType.toLowerCase()}-${reqState.byocCollectionId}`,
+        ...getDataFilter(reqState),
+        ...getProcessingOptions(reqState),
+      },
+    ];
   } else {
     return [
       {
@@ -162,21 +174,20 @@ export const generateBounds = (requestState) => {
 };
 
 const generateOutput = (state) => {
+  let { width, height } = state;
+  width = Number(width);
+  height = Number(height);
   //HEIGHT or RES
-  if (state.mode === 'PROCESS') {
-    if (state.heightOrRes === 'HEIGHT') {
-      return {
-        width: state.width,
-        height: state.height,
-      };
-    } else if (state.heightOrRes === 'RES') {
-      return {
-        resx: state.width,
-        resy: state.height,
-      };
-    }
-  } else if (state.mode === 'BATCH') {
-    return {};
+  if (state.heightOrRes === 'HEIGHT') {
+    return {
+      width,
+      height,
+    };
+  } else if (state.heightOrRes === 'RES') {
+    return {
+      resx: width,
+      resy: height,
+    };
   }
 };
 
@@ -256,8 +267,7 @@ export const getProcessRequestConfig = (token, reqConfig, reqState) => {
   return config;
 };
 
-export const getCustomCollections = (token, location = 'EU-CENTRAL-1', reqConfig) => {
-  const url = byocLocationToBaseUrl(location) + 'api/v1/byoc/collections';
+export const getCustomCollections = (token, reqConfig) => {
   const config = {
     headers: {
       'Content-Type': 'application/json',
@@ -265,7 +275,7 @@ export const getCustomCollections = (token, location = 'EU-CENTRAL-1', reqConfig
     },
     ...reqConfig,
   };
-  return Axios.get(url, config);
+  return Axios.get(GLOBAL_BYOC_ENDPOINT, config);
 };
 
 export const sendEditedRequest = (token, text, reqConfig) => {

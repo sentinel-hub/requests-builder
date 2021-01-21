@@ -63,6 +63,7 @@ export const requestSlice = createSlice({
     heightOrRes: 'HEIGHT',
     width: 512,
     height: 512,
+    isAutoRatio: true,
     evalscript: DEFAULT_EVALSCRIPTS['S2L2A'],
     CRS: 'EPSG:4326',
     geometryType: 'BBOX',
@@ -99,7 +100,9 @@ export const requestSlice = createSlice({
         idx: 0,
       },
     ],
-    byocLocation: 'EU-CENTRAL-1',
+    byocLocation: 'aws-eu-central-1',
+    byocCollectionType: '',
+    byocCollectionId: '',
     consoleValue: '',
   },
   reducers: {
@@ -155,10 +158,10 @@ export const requestSlice = createSlice({
     setWidthOrHeight: (state, action) => {
       const { x, y } = action.payload;
       if (x !== undefined) {
-        state.width = x === '' ? '' : parseInt(x);
+        state.width = x === '' ? '' : x;
       }
       if (y !== undefined) {
-        state.height = y === '' ? '' : parseInt(y);
+        state.height = y === '' ? '' : y;
       }
     },
     setWidth: (state, action) => {
@@ -166,6 +169,9 @@ export const requestSlice = createSlice({
     },
     setHeight: (state, action) => {
       state.height = action.payload;
+    },
+    setIsAutoRatio: (state, action) => {
+      state.isAutoRatio = action.payload;
     },
     setEvalscript: (state, action) => {
       state.evalscript = action.payload;
@@ -322,6 +328,12 @@ export const requestSlice = createSlice({
     setConsoleValue: (state, action) => {
       state.consoleValue = '> ' + action.payload.slice(0, -2);
     },
+    setByocCollectionType: (state, action) => {
+      state.byocCollectionType = action.payload;
+    },
+    setByocCollectionId: (state, action) => {
+      state.byocCollectionId = action.payload;
+    },
   },
 });
 
@@ -356,27 +368,29 @@ export const wmsSlice = createSlice({
   },
 });
 
+const batchInitialState = {
+  tillingGrid: 0,
+  resolution: 10,
+  description: '',
+  bucketName: '',
+  selectedBatchId: '',
+  cogOutput: false,
+  defaultTilePath: '',
+  // bucketName -> true, if defaultTilePath -> false
+  specifyingBucketName: true,
+  extraInfo: '',
+  specifyingCogParams: false,
+  overviewLevels: '',
+  overviewMinSize: '',
+  blockxsize: '',
+  blockysize: '',
+  createCollection: false,
+  collectionId: '',
+};
+
 export const batchSlice = createSlice({
   name: 'batch',
-  initialState: {
-    tillingGrid: 0,
-    resolution: 10,
-    description: '',
-    bucketName: '',
-    selectedBatchId: '',
-    cogOutput: false,
-    defaultTilePath: '',
-    // bucketName -> true, if defaultTilePath -> false
-    specifyingBucketName: true,
-    extraInfo: '',
-    specifyingCogParams: false,
-    overviewLevels: '',
-    overviewMinSize: '',
-    blockxsize: '',
-    blockysize: '',
-    createCollection: false,
-    collectionId: '',
-  },
+  initialState: batchInitialState,
   reducers: {
     setTillingGrid: (state, action) => {
       state.tillingGrid = action.payload;
@@ -426,6 +440,9 @@ export const batchSlice = createSlice({
     setSpecifyingCogParams: (state, action) => {
       state.specifyingCogParams = action.payload;
     },
+    resetBatchState: (state) => {
+      state = batchInitialState;
+    },
   },
 });
 
@@ -433,15 +450,19 @@ export const batchSlice = createSlice({
 export const tpdiSlice = createSlice({
   name: 'tpdi',
   initialState: {
-    provider: 'AIRBUS', // airbus or planet.
+    provider: 'AIRBUS_PHR', // airbus or planet.
     name: '',
     collectionId: '',
     products: [
       {
         idx: 0,
         id: '',
+        geometry: '',
       },
     ],
+    isParsing: false,
+    isSingleDate: false,
+    isUsingQuery: false,
     extraMapGeometry: null,
   },
   reducers: {
@@ -457,6 +478,9 @@ export const tpdiSlice = createSlice({
     setProduct: (state, action) => {
       const toChange = state.products.find((prod) => prod.idx === parseInt(action.payload.idx));
       toChange.id = action.payload.id;
+      if (toChange.geometry) {
+        toChange.geometry = '';
+      }
     },
     setProducts: (state, action) => {
       const products = action.payload.map((product, i) => ({ id: product, idx: i }));
@@ -466,11 +490,18 @@ export const tpdiSlice = createSlice({
       const lastItem = state.products[state.products.length - 1];
       const firstEmptyItem = state.products.find((prod) => prod.id === '');
       if (action.payload) {
-        firstEmptyItem
-          ? (firstEmptyItem.id = action.payload)
-          : state.products.push({ idx: lastItem.idx + 1, id: action.payload });
+        if (firstEmptyItem) {
+          firstEmptyItem.id = action.payload.id;
+          firstEmptyItem.geometry = action.payload.geometry;
+        } else {
+          state.products.push({
+            idx: lastItem.idx + 1,
+            id: action.payload.id,
+            geometry: action.payload.geometry,
+          });
+        }
       } else {
-        state.products.push({ idx: lastItem.idx + 1, id: '' });
+        state.products.push({ idx: lastItem.idx + 1, id: '', geometry: '' });
       }
     },
     clearProducts: (state) => {
@@ -478,6 +509,7 @@ export const tpdiSlice = createSlice({
         {
           idx: 0,
           id: '',
+          geometry: '',
         },
       ];
     },
@@ -487,6 +519,15 @@ export const tpdiSlice = createSlice({
     setExtraMapGeometry: (state, action) => {
       state.extraMapGeometry = action.payload;
     },
+    setTpdiParsing: (state, action) => {
+      state.isParsing = action.payload;
+    },
+    setIsSingleDate: (state, action) => {
+      state.isSingleDate = action.payload;
+    },
+    setIsUsingQuery: (state, action) => {
+      state.isUsingQuery = action.payload;
+    },
   },
 });
 
@@ -494,7 +535,6 @@ export const tpdiSlice = createSlice({
 export const airbusSlice = createSlice({
   name: 'airbus',
   initialState: {
-    constellation: 'PHR', // PHR or SPOT (phr = pleiades)
     dataFilterOptions: {
       maxCloudCoverage: 100,
       maxSnowCoverage: 90,
@@ -502,9 +542,6 @@ export const airbusSlice = createSlice({
     }, //timerange, maxcc, processinglevel(sensor / album), maxsnowcoverage [0-100 - 100], maxincidenceangle [0-90 - 90], expirationdate
   },
   reducers: {
-    setConstellation: (state, action) => {
-      state.constellation = action.payload;
-    },
     setDataFilterOptions: (state, action) => {
       state.dataFilterOptions = {
         ...state.dataFilterOptions,
@@ -533,6 +570,7 @@ export const planetSlice = createSlice({
   initialState: {
     planetApiKey: '',
     maxCloudCoverage: 100,
+    harmonizeTo: 'PS2',
   },
   reducers: {
     setApiKey: (state, action) => {
@@ -540,6 +578,9 @@ export const planetSlice = createSlice({
     },
     setMaxCloudCoverage: (state, action) => {
       state.maxCloudCoverage = parseInt(action.payload);
+    },
+    setHarmonizeTo: (state, action) => {
+      state.harmonizeTo = action.payload;
     },
   },
 });
@@ -631,14 +672,8 @@ export const responsesSlice = createSlice({
 export const catalogSlice = createSlice({
   name: 'catalog',
   initialState: {
-    timeFrom: {
-      time: moment.utc().subtract(1, 'month').startOf('day').format(),
-      isOpen: false,
-    },
-    timeTo: {
-      time: moment.utc().endOf('day').format(),
-      isOpen: false,
-    },
+    isTimeToOpen: false,
+    isTimeFromOpen: false,
     selectedCollection: '',
     queryProperties: [],
     limit: 10,
@@ -650,17 +685,11 @@ export const catalogSlice = createSlice({
     distinct: '',
   },
   reducers: {
-    setTimeFrom: (state, action) => {
-      state.timeFrom.time = action.payload;
-    },
-    setTimeTo: (state, action) => {
-      state.timeTo.time = action.payload;
-    },
     openTimeFrom: (state, action) => {
-      state.timeFrom.isOpen = action.payload;
+      state.isTimeFromOpen = action.payload;
     },
     openTimeTo: (state, action) => {
-      state.timeTo.isOpen = action.payload;
+      state.isTimeToOpen = action.payload;
     },
     setSelectedCollection: (state, action) => {
       state.selectedCollection = action.payload;

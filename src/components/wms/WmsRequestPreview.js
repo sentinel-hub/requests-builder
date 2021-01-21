@@ -1,9 +1,20 @@
 import React from 'react';
-import { getWmsUrl, getFisUrl } from './wmsRequests';
+import { getWmsUrl, getFisUrl, getWcsUrl } from './wmsRequests';
 import { connect } from 'react-redux';
 
 const WmsRequestPreview = ({ wmsState, requestState, mode }) => {
-  const url = mode === 'WMS' ? getWmsUrl(wmsState, requestState) : getFisUrl(wmsState, requestState);
+  const url = (() => {
+    switch (mode) {
+      case 'WMS':
+        return getWmsUrl(wmsState, requestState);
+      case 'FIS':
+        return getFisUrl(wmsState, requestState);
+      case 'WCS':
+        return getWcsUrl(wmsState, requestState);
+      default:
+        return getWmsUrl(wmsState, requestState);
+    }
+  })();
 
   const handleClipboardCopy = () => {
     navigator.clipboard.writeText(url);

@@ -1,6 +1,8 @@
 import axios from 'axios';
+import moment from 'moment';
 import { generateBounds } from '../process/requests';
 import { dataFilterDefaultValues } from './const';
+import { isAirbus, stateConstellationToConstellation } from './utils';
 
 const BASE_TPDI_URL = 'https://services.sentinel-hub.com/api/v1/dataimport';
 
@@ -27,9 +29,14 @@ const getAirbusDataFilterOptions = (dataFilterOptions) => {
   return options;
 };
 
-const getTimeRange = (requestState) => {
-  if (requestState.isTimeRangeDisabled) {
-    return {};
+const getTimeRange = (requestState, isSingleDate) => {
+  if (isSingleDate) {
+    return {
+      timeRange: {
+        from: requestState.timeFrom[0],
+        to: moment.utc(requestState.timeFrom[0]).endOf('day').format(),
+      },
+    };
   }
   return {
     timeRange: {
@@ -41,16 +48,16 @@ const getTimeRange = (requestState) => {
 
 const getAirbusSearchRequestBody = (state) => {
   const request = {
-    provider: state.tpdi.provider,
+    provider: 'AIRBUS',
     bounds: {
       ...generateBounds(state.request),
     },
     data: [
       {
-        constellation: state.airbus.constellation,
+        constellation: stateConstellationToConstellation[state.tpdi.provider],
         dataFilter: {
           ...getAirbusDataFilterOptions(state.airbus.dataFilterOptions),
-          ...getTimeRange(state.request),
+          ...getTimeRange(state.request, state.tpdi.isSingleDate),
         },
       },
     ],
@@ -71,7 +78,7 @@ const getPlanetSearchRequestBody = (state) => {
         itemType: 'PSScene4Band',
         productBundle: 'analytic',
         dataFilter: {
-          ...getTimeRange(state.request),
+          ...getTimeRange(state.request, state.tpdi.isSingleDate),
           maxCloudCoverage: state.planet.maxCloudCoverage,
         },
       },
@@ -101,14 +108,14 @@ const getPlanetOrderBody = (state) => {
   delete requestBody.input.data[0].dataFilter;
   requestBody.input.data[0].productBundle = 'analytic';
   requestBody.input.data[0].itemIds = state.tpdi.products.map((product) => product.id);
-
+  requestBody.input.data[0].harmonizeTo = state.planet.harmonizeTo;
   return requestBody;
 };
 
 //SEARCH
 const getSearchTpdiBody = (state) => {
   let requestBody;
-  if (state.tpdi.provider === 'AIRBUS') {
+  if (isAirbus(state.tpdi.provider)) {
     requestBody = getAirbusSearchRequestBody(state);
   } else if (state.tpdi.provider === 'PLANET') {
     requestBody = getPlanetSearchRequestBody(state);
@@ -116,17 +123,28 @@ const getSearchTpdiBody = (state) => {
   return requestBody;
 };
 
-export const getTPDISearchRequest = (state, token, reqConfig) => {
+const getTPDISearchHelper = (requestBody, config, next = undefined) => {
+  const url = next ?? BASE_TPDI_URL + '/search';
+  return axios.post(url, requestBody, config);
+};
+
+export const getTPDISearchRequest = async (state, token, reqConfig, next = undefined) => {
   const requestBody = getSearchTpdiBody(state);
-  const url = BASE_TPDI_URL + '/search';
   const config = getReqConfig(token, reqConfig);
-  return axios.post(url, JSON.stringify(requestBody), config);
+
+  let res = await getTPDISearchHelper(requestBody, config);
+  const results = res.data.features;
+  while (res.data.links.next) {
+    res = await getTPDISearchHelper(requestBody, config, res.data.links.next);
+    results.push(...res.data.features);
+  }
+  return Promise.resolve({ data: { features: results } });
 };
 
 //ORDER
 export const tpdiCreateOrderBodyViaProducts = (state) => {
   let requestBody;
-  if (state.tpdi.provider === 'AIRBUS') {
+  if (isAirbus(state.tpdi.provider)) {
     requestBody = getAirbusOrderBody(state);
   } else if (state.tpdi.provider === 'PLANET') {
     requestBody = getPlanetOrderBody(state);
@@ -143,10 +161,11 @@ export const createTPDIOrder = (state, token, reqConfig) => {
 
 export const tpdiCreateOrderBodyViaDataFilter = (state) => {
   let requestBody = {};
-  if (state.tpdi.provider === 'AIRBUS') {
+  if (isAirbus(state.tpdi.provider)) {
     requestBody.input = getAirbusSearchRequestBody(state);
   } else if (state.tpdi.provider === 'PLANET') {
     requestBody.input = getPlanetSearchRequestBody(state);
+    requestBody.input.data[0].harmonizeTo = state.planet.harmonizeTo;
   }
   requestBody.name = state.tpdi.name;
   requestBody.collectionId = state.tpdi.collectionId;
@@ -196,6 +215,19 @@ export const getTPDIQuota = (token, reqConfig) => {
 export const getAllDeliveries = (token, orderId, reqConfig) => {
   const url = BASE_TPDI_URL + '/orders/' + orderId + '/deliveries';
   const config = getReqConfig(token, reqConfig);
+  return axios.get(url, config);
+};
+
+// Thumbnails
+export const getProductThumbnail = (productId, collectionId, token, reqConfig) => {
+  const url = `${BASE_TPDI_URL}/collections/${collectionId}/products/${productId}/thumbnail`;
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    responseType: 'blob',
+    ...reqConfig,
+  };
   return axios.get(url, config);
 };
 
@@ -261,4 +293,9 @@ export const getDeleteOrderTpdiCurlCommand = (state) => {
   }' \n`;
 
   return curlCommand;
+};
+
+export const getQuotaCurlCommand = (token) => {
+  const url = BASE_TPDI_URL + '/quotas';
+  return `curl -X GET ${url} \n -H 'Authorization: Bearer ${token ? token : '<your-token-here>'}'\n`;
 };

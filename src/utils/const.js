@@ -74,7 +74,8 @@ export const DATASOURCES = {
   },
   CUSTOM: {
     url: 'https://services.sentinel-hub.com/api/v1/process',
-    ogcUrl: 'https://services.sentinel-hub.com/api/v1/process',
+    ogcUrl: 'https://services.sentinel-hub.com/ogc/',
+    selectName: 'Bring your own COG',
   },
   DATAFUSION: {
     url: 'https://services.sentinel-hub.com/api/v1/process',
@@ -311,4 +312,20 @@ export const isEmptyDefault = (obj) => {
     }
   }
   return true;
+};
+
+export const formatNumber = (n, roundedDigits, fixed = false) => {
+  const roundedResult = Math.round(n * 10 ** roundedDigits) / 10 ** roundedDigits;
+  if (fixed) {
+    return roundedResult.toFixed(roundedDigits);
+  }
+  return roundedResult.toString();
+};
+
+export const groupBy = (xs, key) => {
+  return xs.reduce(function (rv, x) {
+    let v = key instanceof Function ? key(x) : x[key];
+    (rv[v] = rv[v] || []).push(x);
+    return rv;
+  }, {});
 };

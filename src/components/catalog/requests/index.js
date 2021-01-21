@@ -35,13 +35,13 @@ const shouldIntersect = (geometry) => {
   return true;
 };
 
-const getDateTime = (catalogState) => {
-  if (catalogState.timeFrom.isOpen) {
-    return `../${catalogState.timeFrom.time}`;
-  } else if (catalogState.timeTo.isOpen) {
-    return `${catalogState.timeTo.time}/..`;
+const getDateTime = (catalogState, timeRange) => {
+  if (catalogState.isTimeFromOpen) {
+    return `../${timeRange.timeTo}`;
+  } else if (catalogState.isTimeToOpen) {
+    return `${timeRange.timeFrom}/..`;
   }
-  return catalogState.timeFrom.time + '/' + catalogState.timeTo.time;
+  return timeRange.timeFrom + '/' + timeRange.timeTo;
 };
 
 const getCatalogQueries = (catalogState) => {
@@ -67,10 +67,10 @@ const getCatalogFields = (catalogState) => {
   return fields;
 };
 
-export const getCatalogRequestBody = (catalogState, geometry) => {
+export const getCatalogRequestBody = (catalogState, geometry, timeRange) => {
   const body = {};
   body.collections = [catalogState.selectedCollection];
-  body.datetime = getDateTime(catalogState);
+  body.datetime = getDateTime(catalogState, timeRange);
   if (shouldIntersect(geometry)) {
     body.intersects = geometry;
   } else {
@@ -96,8 +96,8 @@ export const getCatalogRequestBody = (catalogState, geometry) => {
   return body;
 };
 
-export const generateCatalogRequest = (catalogState, geometry, token, next = 0, reqConfig) => {
-  const body = getCatalogRequestBody(catalogState, geometry);
+export const generateCatalogRequest = (catalogState, geometry, timeRange, token, next = 0, reqConfig) => {
+  const body = getCatalogRequestBody(catalogState, geometry, timeRange);
   const config = getConfigHelper(token, reqConfig);
   const url = CATALOG_BASE_URL + 'search';
 
@@ -108,9 +108,9 @@ export const generateCatalogRequest = (catalogState, geometry, token, next = 0, 
   return Axios.post(url, body, config);
 };
 
-export const generateCatalogCurlCommand = (catalogState, geometry, token) => {
+export const generateCatalogCurlCommand = (catalogState, geometry, timeRange, token) => {
   const url = CATALOG_BASE_URL + 'search';
-  const body = JSON.stringify(getCatalogRequestBody(catalogState, geometry), null, 2);
+  const body = JSON.stringify(getCatalogRequestBody(catalogState, geometry, timeRange), null, 2);
   const curlCommand = `curl -X POST ${url} \n -H 'Content-Type: application/json' \n -H 'Authorization: Bearer ${
     token ? token : '<your token here>'
   }' \n -d '${body}'`;

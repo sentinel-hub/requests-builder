@@ -33,6 +33,17 @@ const WmsModeSelector = ({ mode }) => {
         <label htmlFor="fis" className="form__label">
           FIS
         </label>
+        <input
+          id="wcs"
+          onChange={handleWmsModeChange}
+          className="form__input"
+          type="radio"
+          value="WCS"
+          checked={mode === 'WCS'}
+        />
+        <label htmlFor="wcs" className="form__label">
+          WCS
+        </label>
       </div>
     </>
   );

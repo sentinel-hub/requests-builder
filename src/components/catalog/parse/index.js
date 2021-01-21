@@ -46,10 +46,10 @@ const dispatchDateTime = (datetime) => {
   }
 
   if (from && from !== '..') {
-    store.dispatch(catalogSlice.actions.setTimeFrom(from));
+    store.dispatch(requestSlice.actions.setTimeFrom({ timeFrom: from, idx: 0 }));
   }
   if (to && to !== '..') {
-    store.dispatch(catalogSlice.actions.setTimeTo(to));
+    store.dispatch(requestSlice.actions.setTimeTo({ timeTo: to, idx: 0 }));
   }
 };
 

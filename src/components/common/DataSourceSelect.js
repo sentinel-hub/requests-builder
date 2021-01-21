@@ -29,7 +29,7 @@ import Toggle from './Toggle';
 export const generateDatasourcesOptions = () =>
   Object.keys(DATASOURCES).map((key) => (
     <option key={key} value={key}>
-      {key}
+      {DATASOURCES[key].selectName ?? key}
     </option>
   ));
 

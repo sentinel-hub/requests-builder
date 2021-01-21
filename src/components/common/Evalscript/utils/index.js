@@ -1,17 +1,4 @@
-import { DATASOURCES } from '../../../../utils/const';
 import Axios from 'axios';
-
-export const convertEvalscript = (evalscript, datasource, token, reqConfig) => {
-  const url = `${DATASOURCES[datasource].url}/convertscript?datasetType=${datasource}`;
-  const config = {
-    headers: {
-      'Content-Type': 'application/ecmascript',
-      Authorization: `Bearer ${token}`,
-    },
-    ...reqConfig,
-  };
-  return Axios.post(url, evalscript, config);
-};
 
 const fetchDataProductsHelper = (token, datasource, viewtoken = 0, reqConfig) => {
   const config = {

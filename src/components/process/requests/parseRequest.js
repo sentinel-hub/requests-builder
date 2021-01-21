@@ -1,5 +1,7 @@
+import omit from 'lodash.omit';
 import store, { requestSlice } from '../../../store';
-import { DATASOURCES_NAMES, CRS, OUTPUT_FORMATS } from '../../../utils/const';
+import { DATASOURCES_NAMES, CRS, OUTPUT_FORMATS, CUSTOM } from '../../../utils/const';
+import { calculateMaxMetersPerPixel } from '../../common/Map/utils/bboxRatio';
 import { transformGeometryToNewCrs } from '../../common/Map/utils/crsTransform';
 
 const dispatchEvalscript = (parsedBody) => {
@@ -64,34 +66,84 @@ const dispatchTimeRange = (parsedBody) => {
   }
 };
 
+const handleDatafusionParsing = (parsedBody) => {
+  store.dispatch(requestSlice.actions.setDatasource('DATAFUSION'));
+  let dataFusionSources = [];
+  parsedBody.input.data.forEach((data) => {
+    dataFusionSources.push({ datasource: data.type, id: data.id ? data.id : '' });
+  });
+  store.dispatch(requestSlice.actions.setDatafusionSourcesAbs(dataFusionSources));
+};
+
+const handleOldByocParsing = (parsedBody) => {
+  // {type: 'CUSTOM', dataFilter: {collectionId: <id>}}
+  store.dispatch(requestSlice.actions.setByocCollectionType('BYOC'));
+  if (parsedBody.input.data[0].dataFilter.collectionId) {
+    store.dispatch(
+      requestSlice.actions.setByocCollectionId(parsedBody.input.data[0].dataFilter.collectionId),
+    );
+  }
+};
+
+const handleByocParsing = (datasource) => {
+  // {type: byoc-<id>}
+  const [type, ...rest] = datasource.split('-');
+  store.dispatch(requestSlice.actions.setDatasource(CUSTOM));
+  store.dispatch(requestSlice.actions.setByocCollectionId(rest.join('-')));
+  store.dispatch(requestSlice.actions.setByocCollectionType(type.toUpperCase()));
+};
+
 const dispatchDatasource = (parsedBody) => {
   try {
-    //Datafusion
     if (parsedBody.input.data.length > 1) {
-      store.dispatch(requestSlice.actions.setDatasource('DATAFUSION'));
-      let dataFusionSources = [];
-      parsedBody.input.data.forEach((data) => {
-        dataFusionSources.push({ datasource: data.type, id: data.id ? data.id : '' });
-      });
-      store.dispatch(requestSlice.actions.setDatafusionSourcesAbs(dataFusionSources));
-    } else {
-      const datasource = parsedBody.input.data[0].type;
-      const validDatasource = DATASOURCES_NAMES.find((d) => d === datasource);
-      if (validDatasource) {
-        store.dispatch(requestSlice.actions.setDatasource(validDatasource));
+      handleDatafusionParsing(parsedBody);
+      return;
+    }
+    const datasource = parsedBody.input.data[0].type;
+    const validDatasource = DATASOURCES_NAMES.find((d) => d === datasource);
+    if (validDatasource) {
+      store.dispatch(requestSlice.actions.setDatasource(validDatasource));
+      if (validDatasource === CUSTOM) {
+        handleOldByocParsing(parsedBody);
+        return;
       }
+    }
+    if (datasource.includes('byoc-') || datasource.includes('batch-')) {
+      handleByocParsing(datasource);
+      return;
     }
   } catch (err) {
     console.error('Error while parinsg datasources', err);
   }
 };
 
+// Should keep ratio if dimension are close to 5% to geometry ratio.
+const shouldKeepRatio = (geometry, width, height) => {
+  if (!geometry) {
+    return true;
+  }
+  const dimensionsRatio = width / height;
+  const [x, y] = calculateMaxMetersPerPixel(geometry);
+  const geometryRatio = x / y;
+  return Math.abs(geometryRatio - dimensionsRatio) <= 0.05 * geometryRatio;
+};
+
 const dispatchDimensions = (parsedBody) => {
   try {
-    const { output } = parsedBody;
+    const {
+      output,
+      input: { bounds },
+    } = parsedBody;
     const width = output.width;
     const height = output.height;
+    const geometry = bounds.geometry ? bounds.geometry : bounds.bbox;
+    const keepRatio = shouldKeepRatio(geometry, width, height);
 
+    if (keepRatio) {
+      store.dispatch(requestSlice.actions.setIsAutoRatio(true));
+    } else {
+      store.dispatch(requestSlice.actions.setIsAutoRatio(false));
+    }
     if (height && width) {
       store.dispatch(requestSlice.actions.setHeightOrRes('HEIGHT'));
       store.dispatch(requestSlice.actions.setWidth(width));
@@ -137,11 +189,12 @@ const dispatchResponses = (parsedBody) => {
 };
 
 const dispatchAdvancedOptions = (parsedBody) => {
+  // timeRange and collectionId are handled somewhere else.
+  const omittedDataFilterProperties = ['collectionId', 'timeRange'];
   try {
     if (parsedBody.input.data.length > 0) {
       parsedBody.input.data.forEach((data, idx) => {
-        const dataFilterOptions = data.dataFilter;
-        delete dataFilterOptions.timeRange;
+        const dataFilterOptions = omit(data.dataFilter, omittedDataFilterProperties);
 
         if (dataFilterOptions && Object.keys(dataFilterOptions).length > 0) {
           dataFilterOptions.idx = idx;

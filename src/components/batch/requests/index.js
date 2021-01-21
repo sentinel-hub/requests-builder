@@ -1,3 +1,4 @@
+import omit from 'lodash.omit';
 import { getRequestObject, getProcessRequestConfig, getUrl } from '../../process/requests';
 import axios from 'axios';
 import { getRequestBody, getUrlFromCurl } from '../../process/requests/parseRequest';
@@ -37,21 +38,18 @@ export const startBatchRequest = (token, batchId) => {
   return axios.post(url, null, config);
 };
 
-const getAllBatchRequestsHelper = (token, viewtoken, reqConfig) => {
+const getAllBatchRequestsHelper = (token, next, reqConfig) => {
   const config = getConfigHelper(token, reqConfig);
-  let url = BASE_BATCH_URL;
-  if (viewtoken) {
-    url = url + '?viewtoken=' + viewtoken;
-  }
+  let url = next ? next : BASE_BATCH_URL;
   return axios.get(url, config);
 };
 
 export const getAllBatchRequests = async (token, reqConfig) => {
   let res = await getAllBatchRequestsHelper(token, undefined, reqConfig);
-  let requests = res.data.member;
-  while (res.data.view.nextToken) {
-    res = await getAllBatchRequestsHelper(token, res.data.view.nextToken, reqConfig);
-    requests = requests.concat(res.data.member);
+  let requests = res.data.data;
+  while (res.data.links.next) {
+    res = await getAllBatchRequestsHelper(token, res.data.links.next, reqConfig);
+    requests = requests.concat(res.data.data);
   }
   return new Promise((resolve, reject) => {
     resolve({ data: { member: requests } });
@@ -68,16 +66,17 @@ export const getSingleBatchRequest = (token, batchId) => {
 export const fetchTilesBatchRequest = async (id, token) => {
   const config = getConfigHelper(token);
 
-  const fetchTilesHelper = async (viewtoken = 0) => {
-    const url = `https://services.sentinel-hub.com/api/v1/batch/process/${id}/tiles?viewtoken=${viewtoken}`;
+  const fetchTilesHelper = async (next = undefined) => {
+    const BASE_TILES_URL = `https://services.sentinel-hub.com/api/v1/batch/process/${id}/tiles`;
+    const url = next ? next : BASE_TILES_URL;
     let res = await axios.get(url, config);
     return res.data;
   };
   let res = await fetchTilesHelper();
-  let tiles = res.member;
-  while (res.view.nextToken) {
-    res = await fetchTilesHelper(res.view.nextToken);
-    tiles = tiles.concat(res.member);
+  let tiles = res.data;
+  while (res.links.next) {
+    res = await fetchTilesHelper(res.links.next);
+    tiles = tiles.concat(res.data);
   }
   return new Promise((resolve, reject) => {
     resolve(tiles);
@@ -86,11 +85,6 @@ export const fetchTilesBatchRequest = async (id, token) => {
 
 export const createLowResPreviewRequest = (requestState, token, reqConfig) => {
   const request = getRequestObject(requestState);
-
-  // Set width/height to do a process request.
-  request.output.width = requestState.width;
-  request.output.height = requestState.height;
-
   const body = JSON.stringify(request, null, 2);
   const config = getProcessRequestConfig(token, reqConfig, requestState);
   return axios.post(getUrl(requestState), body, config);
@@ -148,7 +142,8 @@ const handleAdvancedCogParams = (batchState) => {
 export const generateBatchBodyRequest = (requestState, batchState) => {
   const batchRequest = {};
   const processBody = getRequestObject(requestState);
-
+  // omit width/height or resx/resy on batch create.
+  processBody.output = { ...omit(processBody.output, ['resx', 'resy', 'width', 'height']) };
   batchRequest.processRequest = processBody;
 
   batchRequest.tilingGrid = {

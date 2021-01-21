@@ -1,6 +1,7 @@
 import React from 'react';
 import store, { planetSlice } from '../../store';
 import { connect } from 'react-redux';
+import Tooltip from '../common/Tooltip/Tooltip';
 
 const PlanetOptions = ({ apiKey, maxCC }) => {
   const handleApiKeyChange = (e) => {
@@ -15,17 +16,23 @@ const PlanetOptions = ({ apiKey, maxCC }) => {
       <label htmlFor="planet-api-key" className="form__label">
         Planet API Key
       </label>
-      <input
-        id="planet-api-key"
-        placeholder="Your Planet API key"
-        value={apiKey}
-        required
-        type="text"
-        className="form__input"
-        onChange={handleApiKeyChange}
-      />
+      <div className="u-flex-aligned u-margin-bottom-tiny" style={{ justifyContent: 'space-between' }}>
+        <input
+          id="planet-api-key"
+          placeholder="Your Planet API key"
+          value={apiKey}
+          required
+          type="text"
+          className="form__input"
+          onChange={handleApiKeyChange}
+        />
+        <Tooltip
+          content="Enter a Planet API key, that you received via email after purchasing a PlanetScope Sentinel Hub Package"
+          direction="right"
+        />
+      </div>
       <label htmlFor="planet-cc" className="form__label">
-        Max Cloud Coverage
+        Max Cloud Coverage - {maxCC}%
       </label>
       <input
         id="planet-cc"

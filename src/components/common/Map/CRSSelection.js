@@ -20,14 +20,14 @@ const CRSSelection = ({ selectedCrs }) => {
   };
 
   return (
-    <div className="input-with-item">
-      <label htmlFor="crs" className="form__label">
+    <div className="u-flex-aligned" style={{ marginBottom: '1rem' }}>
+      <label htmlFor="crs" className="form__label" style={{ marginBottom: '0' }}>
         CRS:{' '}
       </label>
       <select
         id="crs"
         className="form__input"
-        style={{ transform: 'translateY(-5px)', marginLeft: '1rem' }}
+        style={{ marginLeft: '1rem' }}
         onChange={handleCRSChange}
         value={selectedCrs}
       >

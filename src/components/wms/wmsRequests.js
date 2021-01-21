@@ -70,7 +70,7 @@ const getWMSBbox = (requestState, mode = 'WMS') => {
 
 const getWidthOrResWms = (requestState) => {
   if (requestState.heightOrRes === 'HEIGHT') {
-    return `WIDTH=${requestState.width}&HEIGHT=${requestState.height}`;
+    return `WIDTH=${parseInt(requestState.width, 10)}&HEIGHT=${parseInt(requestState.height, 10)}`;
   }
   return `RESX=${requestState.width}&RESY=${requestState.height}`;
 };
@@ -95,9 +95,9 @@ const getOGCAdvancedOptions = (wmsState) => {
   return advancedOptionsString;
 };
 
-const getMapWmsParams = (requestState, wmsState) => {
+const getWmsRequestParams = (requestState, wmsState, request = 'GetMap') => {
   let params = '';
-  params += 'REQUEST=GetMap&';
+  params += `REQUEST=${request}&`;
   params += `CRS=${crsToWMSCrs[requestState.CRS]}&`;
   params += `${getWMSBbox(requestState)}&`;
   params += `LAYERS=${wmsState.layerId}&`;
@@ -118,6 +118,10 @@ const getFisParams = (requestState, wmsState) => {
   return params;
 };
 
+const getWcsParams = (wmsState) => {
+  return `&COVERAGE=${wmsState.layerId}`;
+};
+
 const getServicesEndpoint = (datasource) => {
   return DATASOURCES[datasource] ? DATASOURCES[datasource].ogcUrl : 'https://services.sentinel-hub.com/ogc/';
 };
@@ -125,13 +129,19 @@ const getServicesEndpoint = (datasource) => {
 export const getWmsUrl = (wmsState, requestState) => {
   return `${getServicesEndpoint(wmsState.datasource)}wms/${
     wmsState.instanceId ? wmsState.instanceId : '<your instance id>'
-  }?${getMapWmsParams(requestState, wmsState)}`;
+  }?${getWmsRequestParams(requestState, wmsState)}`;
 };
 
 export const getFisUrl = (wmsState, requestState) => {
   return `${getServicesEndpoint(wmsState.datasource)}fis/${
     wmsState.instanceId ? wmsState.instanceId : '<your instance id>'
   }?${getFisParams(requestState, wmsState)}`;
+};
+
+export const getWcsUrl = (wmsState, requestState) => {
+  return `${getServicesEndpoint(wmsState.datasource)}wcs/${
+    wmsState.instanceId ?? '<your instance id>'
+  }?${getWmsRequestParams(requestState, wmsState, 'GetCoverage')}${getWcsParams(wmsState)}`;
 };
 
 export const getMapWms = (wmsState, requestState, token, reqConfig) => {
@@ -144,5 +154,12 @@ export const getMapWms = (wmsState, requestState, token, reqConfig) => {
 export const getFisStats = (wmsState, requestState, token, reqConfig) => {
   const url = getFisUrl(wmsState, requestState);
   const config = getConfigHelper(token, reqConfig);
+  return axios.get(url, config);
+};
+
+export const getCoverageWcs = (wmsState, requestState, token, reqConfig) => {
+  const url = getWcsUrl(wmsState, requestState);
+  const config = getConfigHelper(token, reqConfig);
+  config.responseType = 'blob';
   return axios.get(url, config);
 };

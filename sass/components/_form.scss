@@ -44,6 +44,10 @@
     font-size: 1.4rem;
     display: block;
 
+    &::placeholder {
+      font-style: italic;
+    }
+
     &:not(:last-child) {
       margin-bottom: 1rem;
     }

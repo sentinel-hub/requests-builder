@@ -35,9 +35,10 @@
   border: none;
   font-size: 1.4rem;
   background-color: var(--primary);
-  border-radius: 3px;
   padding: 0.5rem 1rem;
   cursor: pointer;
+  color: #01282f;
+  font-weight: bold;
 
   &:hover {
     background-color: lighten(#b2c22d, 20%);
@@ -59,6 +60,7 @@
 
   &--cancel {
     background-color: #b51818;
+    color: black;
 
     &:hover {
       background-color: #b51818;
@@ -67,6 +69,12 @@
 
   &--fit {
     width: fit-content;
+  }
+
+  &--wrapped {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   @include respond(1400) {

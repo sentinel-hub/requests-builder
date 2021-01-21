@@ -2,7 +2,13 @@ import React from 'react';
 import store, { requestSlice } from '../../../store';
 import BaseOptionsNoCC from './BaseOptionsNoCC';
 import { connect } from 'react-redux';
-import Toggle from '../Toggle';
+
+const getOrthorectifyValue = (orthorectify, demInstance) => {
+  if (!Boolean(orthorectify)) {
+    return false;
+  }
+  return demInstance;
+};
 
 const S1GRDOptions = ({
   reduxResolution,
@@ -12,6 +18,7 @@ const S1GRDOptions = ({
   reduxBackCoeff,
   reduxOrthorectify,
   reduxTimeliness,
+  reduxDemInstance,
   idx,
 }) => {
   const handleResolutionChange = (e) => {
@@ -38,8 +45,14 @@ const S1GRDOptions = ({
     store.dispatch(requestSlice.actions.setDataFilterOptions({ timeliness: e.target.value, idx: idx }));
   };
 
-  const handleOrthorectifyChange = () => {
-    store.dispatch(requestSlice.actions.setProcessingOptions({ orthorectify: !reduxOrthorectify, idx: idx }));
+  const handleOrthorectifyChange = (e) => {
+    const orthorectify = Boolean(e.target.value);
+    store.dispatch(requestSlice.actions.setProcessingOptions({ orthorectify: orthorectify, idx: idx }));
+    if (orthorectify) {
+      store.dispatch(requestSlice.actions.setDataFilterOptions({ demInstance: e.target.value, idx: idx }));
+    } else {
+      store.dispatch(requestSlice.actions.setDataFilterOptions({ demInstance: 'DEFAULT', idx: idx }));
+    }
   };
 
   return (
@@ -137,16 +150,21 @@ const S1GRDOptions = ({
         <option value="Reprocessing">Reprocessing</option>
         <option value="ArchNormal">ArchNormal</option>
       </select>
-      <div className="toggle-with-label">
-        <label htmlFor={`orthorectify-${idx}`} className="form__label">
-          Orthorectify
-        </label>
-        <Toggle
-          id={`orthorectify-${idx}`}
-          checked={Boolean(reduxOrthorectify)}
-          onChange={handleOrthorectifyChange}
-        />
-      </div>
+      <label htmlFor={`orthorectify-${idx}`} className="form__label">
+        Orthorectify
+      </label>
+      <select
+        id={`orthorectify-${idx}`}
+        value={getOrthorectifyValue(reduxOrthorectify, reduxDemInstance)}
+        onChange={handleOrthorectifyChange}
+        className="form__input"
+      >
+        <option value="">Disabled</option>
+        <option value="MAPZEN">Yes - using Mapzen DEM</option>
+        <option value="COPERNICUS">Yes - using Copernicus 10m/30m DEM</option>
+        <option value="COPERNICUS_30">Yes - using Copernicus 30m DEM</option>
+        <option value="COPERNICUS_90">Yes - using Copernicus 90m DEM</option>
+      </select>
     </div>
   );
 };
@@ -159,6 +177,7 @@ const mapStateToProps = (store, ownProps) => ({
   reduxBackCoeff: store.request.processingOptions[ownProps.idx].options.backCoeff,
   reduxOrthorectify: store.request.processingOptions[ownProps.idx].options.orthorectify,
   reduxTimeliness: store.request.processingOptions[ownProps.idx].options.timeliness,
+  reduxDemInstance: store.request.dataFilterOptions[ownProps.idx].options.demInstance,
 });
 
 export default connect(mapStateToProps)(S1GRDOptions);

@@ -1,7 +1,7 @@
 import store, { batchSlice } from '../../../store';
 
 export const getBucketName = (member) => {
-  if (member.bucketName) {
+  if (member.bucketName !== undefined) {
     return member.bucketName;
   }
   //tilepath
@@ -12,8 +12,8 @@ export const getBucketName = (member) => {
 
 export const parseBatchRequest = (props) => {
   const bucketName = getBucketName(props);
-
-  if (bucketName) {
+  store.dispatch(batchSlice.actions.resetBatchState());
+  if (bucketName !== undefined) {
     store.dispatch(batchSlice.actions.setBucketName(bucketName));
   }
   if (props.description) {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getMapWms, getFisStats } from './wmsRequests';
+import { getMapWms, getFisStats, getCoverageWcs } from './wmsRequests';
 import RequestButton from '../common/RequestButton';
 import store, { responsesSlice } from '../../store';
 
@@ -30,15 +30,28 @@ const SendWmsRequest = ({ wmsState, requestState, token, mode }) => {
     console.error('Something went wrong', err);
   };
 
+  const request = (() => {
+    switch (mode) {
+      case 'WMS':
+        return getMapWms;
+      case 'FIS':
+        return getFisStats;
+      case 'WCS':
+        return getCoverageWcs;
+      default:
+        return getMapWms;
+    }
+  })();
+
   return (
     <div>
       <RequestButton
         buttonText="Send Request"
         className="button"
-        request={mode === 'WMS' ? getMapWms : getFisStats}
+        request={request}
         args={[wmsState, requestState, token]}
         validation={validateWmsSendRequest()}
-        responseHandler={mode === 'WMS' ? responseHandler : responseHandlerFis}
+        responseHandler={mode === 'WMS' || mode === 'WCS' ? responseHandler : responseHandlerFis}
         errorHandler={errorHandler}
         useShortcut={true}
       />

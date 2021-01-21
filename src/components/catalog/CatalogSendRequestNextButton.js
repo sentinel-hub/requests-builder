@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import store, { catalogSlice } from '../../store';
 import { catalogErrorHandler } from './CatalogSendRequestButton';
 
-const CatalogSendRequestNextButton = ({ catalogState, geometry, token, setResults }) => {
+const CatalogSendRequestNextButton = ({ catalogState, geometry, timeRange, token, setResults }) => {
   const { next } = catalogState;
 
   const responseHandler = (response) => {
@@ -24,7 +24,7 @@ const CatalogSendRequestNextButton = ({ catalogState, geometry, token, setResult
     <>
       <RequestButton
         request={generateCatalogRequest}
-        args={[catalogState, geometry, token, next]}
+        args={[catalogState, geometry, timeRange, token, next]}
         className="secondary-button"
         validation={Boolean(next && token)}
         buttonText="Get Next"
@@ -40,6 +40,10 @@ const CatalogSendRequestNextButton = ({ catalogState, geometry, token, setResult
 const mapStateToProps = (state) => ({
   catalogState: state.catalog,
   geometry: state.request.geometry,
+  timeRange: {
+    timeTo: state.request.timeTo[0],
+    timeFrom: state.request.timeFrom[0],
+  },
   token: state.auth.user.access_token,
 });
 
