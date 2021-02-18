@@ -28,4 +28,8 @@
 .logo-image {
   width: 200px;
   height: auto;
+
+  @include respond(phone) {
+    width: 100px;
+  }
 }

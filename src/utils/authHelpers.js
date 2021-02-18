@@ -1,3 +1,4 @@
+import Axios from 'axios';
 import jwt_dec from 'jwt-decode';
 
 export const LOCAL_STORAGE_AUTH_KEY = 'requests-builder_oauth';
@@ -32,3 +33,12 @@ export const isTokenExpired = (token) => {
 };
 
 export const decodeToken = (token) => jwt_dec(token['id_token']);
+
+export const getAssistedTokenDocument = () => {
+  return Axios.get(
+    `${process.env.REACT_APP_AUTH_BASEURL}oauth/token/assisted/?client_id=${process.env.REACT_APP_CLIENTID}&response_type=token&redirect_uri=${process.env.REACT_APP_ROOT_URL}`,
+    {
+      withCredentials: true,
+    },
+  );
+};

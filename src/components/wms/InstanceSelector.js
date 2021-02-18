@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { getAllInstances } from './wmsRequests';
-import store, { wmsSlice } from '../../store';
+import store from '../../store';
+import wmsSlice from '../../store/wms';
 import Axios from 'axios';
 
 const generateInstanceOptions = (instances) => {

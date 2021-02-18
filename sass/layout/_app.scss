@@ -2,12 +2,23 @@
   font-size: 1.8rem;
   margin-bottom: 1.5rem;
   letter-spacing: 1px;
+  display: flex;
+
+  & > div.u-flex-aligned:not(:last-child) {
+    margin-right: 1.5rem;
+  }
 
   &--input {
     cursor: pointer;
 
     &:not(:first-of-type) {
       margin-left: 2rem;
+    }
+
+    @include respond(phone) {
+      &[type=radio] {
+        width: 0.8rem;
+      }
     }
   }
 

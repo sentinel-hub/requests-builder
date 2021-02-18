@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import store, { batchSlice } from '../../store';
+import store from '../../store';
+import batchSlice from '../../store/batch';
 import Toggle from '../common/Toggle';
 import GetLowResPreviewButton from './GetLowResPreviewButton';
 import CreateBatchRequestButton from './CreateBatchRequestButton';
@@ -32,6 +33,7 @@ const BatchOptions = ({
   setFetchedRequests,
   createCollection,
   collectionId,
+  setCreateResponse,
 }) => {
   const handleGridChange = (e) => {
     store.dispatch(batchSlice.actions.setTillingGrid(Number(e.target.value)));
@@ -213,7 +215,10 @@ const BatchOptions = ({
         ) : null}
         <div className="buttons-container">
           <GetLowResPreviewButton />
-          <CreateBatchRequestButton setFetchedRequests={setFetchedRequests} />
+          <CreateBatchRequestButton
+            setFetchedRequests={setFetchedRequests}
+            setCreateResponse={setCreateResponse}
+          />
         </div>
       </div>
     </>

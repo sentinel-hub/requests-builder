@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { transformGeometryToNewCrs } from '../common/Map/utils/crsTransform';
+import { isBbox, transformGeometryToNewCrs } from '../common/Map/utils/crsTransform';
 import BBox from '@turf/bbox';
 import { DATASOURCES } from '../../utils/const';
 
@@ -53,7 +53,7 @@ const getWMSBbox = (requestState, mode = 'WMS') => {
   const geometry = requestState.geometry;
   let geoString = '';
   const transformedGeo = transformGeometryToNewCrs(geometry, requestState.CRS);
-  if (geometry.length === 4) {
+  if (isBbox(geometry)) {
     geoString = `BBOX=${transformedGeo[0]},${transformedGeo[1]},${transformedGeo[2]},${transformedGeo[3]}`;
   } else if (geometry.type === 'Polygon' || geometry.type === 'MultiPolygon') {
     // create bbox

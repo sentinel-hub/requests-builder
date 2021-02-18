@@ -2,7 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import RequestButton from '../common/RequestButton';
 import { createBatchRequest } from './requests';
-import store, { batchSlice } from '../../store';
+import store from '../../store';
+import batchSlice from '../../store/batch';
 import { addAlertOnError } from './BatchActions';
 import { validateRequestState } from '../../utils/validator';
 
@@ -13,8 +14,15 @@ const isCreatePossible = (batchState, requestState, token) => {
   return resolution && bucketName && isValid && tillingGrid !== undefined && token;
 };
 
-const CreateBatchRequestButton = ({ batchState, requestState, token, setFetchedRequests }) => {
+const CreateBatchRequestButton = ({
+  batchState,
+  requestState,
+  token,
+  setFetchedRequests,
+  setCreateResponse,
+}) => {
   const createResponseHandler = (response) => {
+    setCreateResponse(JSON.stringify(response, null, 2));
     setFetchedRequests([response]);
     store.dispatch(batchSlice.actions.setSelectedBatchId(response['id']));
   };

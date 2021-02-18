@@ -1,4 +1,5 @@
 import convertToBbox from '@turf/bbox';
+import { isBbox } from './crsTransform';
 
 export const calculateAutoDimensions = (geometry, maxWidth, maxHeight) => {
   try {
@@ -24,7 +25,7 @@ export const calculateAutoDimensions = (geometry, maxWidth, maxHeight) => {
 export const calculateMaxMetersPerPixel = (geometry) => {
   try {
     let bbox;
-    if (geometry.length === 4) {
+    if (isBbox(geometry)) {
       bbox = geometry;
     } else if (geometry.type === 'Polygon' || geometry.type === 'MultiPolygon') {
       bbox = convertToBbox(geometry);

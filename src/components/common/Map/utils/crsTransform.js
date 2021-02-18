@@ -6,7 +6,7 @@ import intersect from '@turf/intersect';
 import { CRS } from '../../../../utils/const';
 
 export const getAreaFromGeometry = (geometry) => {
-  if (geometry.length === 4) {
+  if (isBbox(geometry)) {
     return area(bboxPolygon(geometry));
   } else {
     return area(geometry);
@@ -14,13 +14,13 @@ export const getAreaFromGeometry = (geometry) => {
 };
 
 const getIntersection = (geo1, geo2) => {
-  if (geo1.length === 4 && geo2.length === 4) {
+  if (isBbox(geo1) && isBbox(geo2)) {
     return intersect(bboxPolygon(geo1), bboxPolygon(geo2));
   }
-  if (geo1.length === 4) {
+  if (isBbox(geo1)) {
     return intersect(bboxPolygon(geo1), geo2);
   }
-  if (geo2.length === 4) {
+  if (isBbox(geo2)) {
     return intersect(geo2, bboxPolygon(geo1));
   }
   return intersect(geo1, geo2);
@@ -45,7 +45,7 @@ export const transformGeometryToNewCrs = (geometry, toCrs, fromCrs) => {
       fromCrs = 'EPSG:4326';
     }
     //bbox
-    if (geometry.length === 4) {
+    if (isBbox(geometry)) {
       return transformBboxToNewCrs(geometry, CRS[toCrs].projection, CRS[fromCrs].projection);
     }
     //polygon
@@ -140,3 +140,6 @@ export const transformGeometryToWGS84IfNeeded = (selectedCRS, geometry) => {
   }
   return geometry;
 };
+
+export const isPolygon = (geometry) => geometry?.type === 'Polygon' ?? false;
+export const isBbox = (geometry) => geometry.length === 4;

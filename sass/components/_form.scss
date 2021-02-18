@@ -43,6 +43,7 @@
     padding: 0.25rem 0.75rem;
     font-size: 1.4rem;
     display: block;
+    width: 90%;
 
     &::placeholder {
       font-style: italic;
@@ -58,6 +59,23 @@
 
     &--range {
       padding: 0;
+      width: 80%;
+
+      @include respond(phone) {
+        height: 0.5rem;
+      }
+    }
+
+    &[type=radio] {
+      width: auto;
+
+      @include respond(phone) {
+        width: 0.8rem;
+      }
+    }
+
+    &--fit {
+      width: fit-content;
     }
 
     @include respond(1400) {

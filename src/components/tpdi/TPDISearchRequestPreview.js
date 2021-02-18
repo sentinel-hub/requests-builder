@@ -32,6 +32,7 @@ const TPDISearchRequestPreview = ({ state, searchResponse }) => {
           canCopy
           onParse={handleParseSearch}
           supportedParseNames={['search']}
+          id="tpdi-search-req-preview"
         />
       </div>
     </>

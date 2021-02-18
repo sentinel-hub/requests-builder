@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import store, { requestSlice } from '../../../store';
+import store from '../../../store';
+import requestSlice from '../../../store/request';
 import { connect } from 'react-redux';
 import { getCustomCollections } from '../../process/requests';
 
@@ -59,7 +60,7 @@ const BYOCOptions = ({ token, byocLocation, byocCollectionType, byocCollectionId
   };
 
   return (
-    <div className="byoc-options">
+    <div className="form byoc-options">
       {collections.length > 0 ? (
         <>
           <label htmlFor="personal-collections" className="form__label">

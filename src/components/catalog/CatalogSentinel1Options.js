@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import store, { catalogSlice } from '../../store';
+import store from '../../store';
+import catalogSlice from '../../store/catalog';
 import { S1OPTIONS } from './const';
 
 const CatalogSentinel1Options = ({ queryProperties, idx }) => {
@@ -11,12 +12,9 @@ const CatalogSentinel1Options = ({ queryProperties, idx }) => {
 
   const filteredOptions =
     alreadyDefined.length > 0
-      ? S1OPTIONS.filter((option) => {
-          if (alreadyDefined.find((defined) => defined === option.propertyName)) {
-            return false;
-          }
-          return true;
-        })
+      ? S1OPTIONS.filter((option) =>
+          Boolean(!alreadyDefined.find((defined) => defined === option.propertyName)),
+        )
       : S1OPTIONS;
 
   const handlePropertyChange = (e) => {

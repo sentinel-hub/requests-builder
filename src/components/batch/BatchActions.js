@@ -1,6 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import store, { alertSlice, batchSlice } from '../../store';
+import store from '../../store';
+import alertSlice from '../../store/alert';
+import batchSlice from '../../store/batch';
 import AnalyseBatchRequestButton from './AnalyseBatchRequestButton';
 import StartBatchRequestButton from './StartBatchRequestButton';
 import CancelBatchRequestButton from './CancelBatchRequestButton';
@@ -39,7 +41,7 @@ const checkValidId = (id) =>
 
 export const batchIdValidation = (token, batchId) => token && checkValidId(batchId);
 
-const BatchActions = ({ selectedBatchId, setFetchedRequests }) => {
+const BatchActions = ({ selectedBatchId, setFetchedRequests, setSingleResponse }) => {
   const handleBatchIdChange = (e) => {
     store.dispatch(batchSlice.actions.setSelectedBatchId(e.target.value));
   };
@@ -63,7 +65,10 @@ const BatchActions = ({ selectedBatchId, setFetchedRequests }) => {
           <StartBatchRequestButton />
           <CancelBatchRequestButton />
           <RestartPartialRequestButton />
-          <GetSingleRequestButton setFetchedRequests={setFetchedRequests} />
+          <GetSingleRequestButton
+            setFetchedRequests={setFetchedRequests}
+            setSingleResponse={setSingleResponse}
+          />
         </div>
       </div>
     </>

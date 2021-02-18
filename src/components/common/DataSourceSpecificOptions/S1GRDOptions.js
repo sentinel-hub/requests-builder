@@ -1,5 +1,6 @@
 import React from 'react';
-import store, { requestSlice } from '../../../store';
+import store from '../../../store';
+import requestSlice from '../../../store/request';
 import BaseOptionsNoCC from './BaseOptionsNoCC';
 import { connect } from 'react-redux';
 
@@ -7,7 +8,7 @@ const getOrthorectifyValue = (orthorectify, demInstance) => {
   if (!Boolean(orthorectify)) {
     return false;
   }
-  return demInstance;
+  return demInstance !== undefined ? demInstance : 'MAPZEN';
 };
 
 const S1GRDOptions = ({
@@ -49,14 +50,14 @@ const S1GRDOptions = ({
     const orthorectify = Boolean(e.target.value);
     store.dispatch(requestSlice.actions.setProcessingOptions({ orthorectify: orthorectify, idx: idx }));
     if (orthorectify) {
-      store.dispatch(requestSlice.actions.setDataFilterOptions({ demInstance: e.target.value, idx: idx }));
+      store.dispatch(requestSlice.actions.setProcessingOptions({ demInstance: e.target.value, idx: idx }));
     } else {
-      store.dispatch(requestSlice.actions.setDataFilterOptions({ demInstance: 'DEFAULT', idx: idx }));
+      store.dispatch(requestSlice.actions.setProcessingOptions({ demInstance: 'DEFAULT', idx: idx }));
     }
   };
 
   return (
-    <div>
+    <>
       <BaseOptionsNoCC idx={idx} />
       <label htmlFor={`s1-resolution-${idx}`} className="form__label u-margin-top-tiny">
         Resolution
@@ -127,10 +128,11 @@ const S1GRDOptions = ({
         value={reduxBackCoeff}
         className="form__input"
       >
-        <option value="DEFAULT">Default (gamma0)</option>
+        <option value="DEFAULT">Default (gamma0 ellipsoid)</option>
         <option value="BETA0">beta0</option>
         <option value="SIGMA0_ELLIPSOID">sigma0</option>
-        <option value="GAMMA0_ELLIPSOID">gamma0</option>
+        <option value="GAMMA0_ELLIPSOID">gamma0 (ellipsoid)</option>
+        <option value="GAMMA0_TERRAIN">gamma0 (terrain)</option>
       </select>
       <label htmlFor={`timeliness-${idx}`} className="form__label">
         Timeliness
@@ -165,7 +167,7 @@ const S1GRDOptions = ({
         <option value="COPERNICUS_30">Yes - using Copernicus 30m DEM</option>
         <option value="COPERNICUS_90">Yes - using Copernicus 90m DEM</option>
       </select>
-    </div>
+    </>
   );
 };
 
@@ -177,7 +179,7 @@ const mapStateToProps = (store, ownProps) => ({
   reduxBackCoeff: store.request.processingOptions[ownProps.idx].options.backCoeff,
   reduxOrthorectify: store.request.processingOptions[ownProps.idx].options.orthorectify,
   reduxTimeliness: store.request.processingOptions[ownProps.idx].options.timeliness,
-  reduxDemInstance: store.request.dataFilterOptions[ownProps.idx].options.demInstance,
+  reduxDemInstance: store.request.processingOptions[ownProps.idx].options.demInstance,
 });
 
 export default connect(mapStateToProps)(S1GRDOptions);

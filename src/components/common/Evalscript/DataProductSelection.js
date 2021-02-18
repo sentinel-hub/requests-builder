@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import store, { requestSlice } from '../../../store';
+import store from '../../../store';
+import requestSlice from '../../../store/request';
 
 // Search by id, name, description.
 const filterDataProducts = (dataproducts, filterText) => {

@@ -1,12 +1,18 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { connect } from 'react-redux';
 import L from 'leaflet';
 import bboxPolygon from '@turf/bbox-polygon';
 import bbox from '@turf/bbox';
 
 import Map from './Map';
-import store, { requestSlice } from '../../../store';
-import { getAreaFromGeometry, transformGeometryToWGS84IfNeeded } from './utils/crsTransform';
+import store from '../../../store';
+import requestSlice from '../../../store/request';
+import {
+  getAreaFromGeometry,
+  isBbox,
+  isPolygon,
+  transformGeometryToWGS84IfNeeded,
+} from './utils/crsTransform';
 import CRSSelection from './CRSSelection';
 import MapTextarea from './MapTextarea';
 
@@ -83,6 +89,9 @@ const MapContainer = ({ geometry, selectedCrs, extraMapGeometry }) => {
   //reference to layers no-related to redux geometry (tpdi)
   const extraLayersRef = useRef([]);
 
+  // Polygon saved from swapping between bbox<->polygon
+  const [polygonBeforeConversion, setPolygonBeforeConversion] = useState();
+
   // Parses geometry on textarea to layers on leaflet.
   // 1. Create leaflet layer based on geo 2. add it to drawn items 3. Fit Bounds to the new layer.
   const parseProperGeometryToMap = useCallback((parsedGeometry) => {
@@ -155,6 +164,9 @@ const MapContainer = ({ geometry, selectedCrs, extraMapGeometry }) => {
   // Effect that converts internal geometry to Leaflet Layers visible on the Map.
   useEffect(() => {
     parseProperGeometryToMap(geometry);
+    if (isPolygon(geometry)) {
+      setPolygonBeforeConversion(geometry);
+    }
   }, [geometry, parseProperGeometryToMap]);
 
   // Effect that converts internal extra-geometry to leaflet layers.
@@ -166,15 +178,36 @@ const MapContainer = ({ geometry, selectedCrs, extraMapGeometry }) => {
     }
   }, [extraMapGeometry, parseExtraGeometryToMap]);
 
+  const handleSwapToBbox = () => {
+    store.dispatch(requestSlice.actions.setGeometry(bbox(geometry)));
+  };
+
   return (
     <div>
       <h2 className="heading-secondary">Area of interest</h2>
       <div className="form">
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
           <CRSSelection selectedCrs={selectedCrs} />
-          <p className="text" style={{ marginLeft: '2rem', marginBottom: '1rem', height: '100%' }}>
+          <p
+            className="text"
+            style={{ margin: '0 2rem', height: '100%', display: 'flex', alignItems: 'center' }}
+          >
             <span>Area selected:</span> {(getAreaFromGeometry(geometry) / 1e6).toFixed(2)} km<sup>2</sup>
           </p>
+          {geometry.type === 'Polygon' && (
+            <button style={{ marginTop: '0' }} className="secondary-button" onClick={handleSwapToBbox}>
+              Get bbox
+            </button>
+          )}
+          {isBbox(geometry) && polygonBeforeConversion && (
+            <button
+              style={{ marginTop: '0' }}
+              className="secondary-button"
+              onClick={() => store.dispatch(requestSlice.actions.setGeometry(polygonBeforeConversion))}
+            >
+              Undo
+            </button>
+          )}
         </div>
         <div className="map-container">
           <Map mapRef={mapRef} drawnItemsRef={drawnItemsRef} layersRef={layersRef} />

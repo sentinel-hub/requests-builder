@@ -6,6 +6,7 @@ import OrderInfo, { OrdersTooltip } from './OrderInfo';
 
 import { connect } from 'react-redux';
 import { groupBy } from '../../utils/const';
+import OverlayButton from '../common/OverlayButton';
 
 const groupAggregator = (el) => {
   if (el.status === 'PARTIAL' || el.status === 'DONE' || el.status === 'FAILED') {
@@ -86,11 +87,14 @@ const TPDIOrdersContainer = ({ token, setGetOrdersResponse, orders, setOrders })
   const { FINISHED, CREATED, RUNNING } = groupBy(orders, groupAggregator);
   return (
     <>
-      <div className="u-flex-aligned" style={{ marginBottom: '0.5rem' }}>
-        <h2 className="heading-secondary" style={{ marginRight: '3rem' }}>
-          My Orders
-        </h2>
-        <OrdersTooltip isGeneral />
+      <div className="u-expand-title">
+        <div className="u-flex-aligned" style={{ marginBottom: '0.5rem' }}>
+          <h2 className="heading-secondary" style={{ marginRight: '3rem' }}>
+            My Orders
+          </h2>
+          <OrdersTooltip isGeneral />
+        </div>
+        <OverlayButton elementRef={containerRef} />
       </div>
       <div className="form" style={{ overflowY: 'scroll', maxHeight: '500px' }} ref={containerRef}>
         <div className="u-margin-bottom-small">

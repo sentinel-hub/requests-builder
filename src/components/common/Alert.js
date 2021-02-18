@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import store, { alertSlice } from '../../store';
+import store from '../../store';
+import alertSlice from '../../store/alert';
 
 const generateAlertClass = (type) => {
   if (type === 'SUCCESS') {

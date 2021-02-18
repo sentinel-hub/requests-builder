@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
-import store, { airbusSlice } from '../../store';
+import store from '../../store';
 import { connect } from 'react-redux';
+import { airbusSlice } from '../../store/tpdi';
 
 const AirbusAdvancedOptions = ({ dataFilterOptions }) => {
   const handleMaxCCChange = (e) => {

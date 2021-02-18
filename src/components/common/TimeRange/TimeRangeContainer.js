@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import TimeRange from './TimeRange';
-import store, { requestSlice } from '../../../store';
+import store from '../../../store';
+import requestSlice from '../../../store/request';
 import Toggle from '../Toggle';
 import { DATAFUSION, DEM } from '../../../utils/const';
 
@@ -9,12 +10,7 @@ const multipleTimeRangeIsValid = (mode, datasource) => {
   return (mode === 'PROCESS' || mode === 'BATCH') && datasource === DATAFUSION;
 };
 
-const supportsTimeRange = (datasource) => {
-  if (datasource === DEM) {
-    return false;
-  }
-  return true;
-};
+const supportsTimeRange = (datasource) => !(datasource === DEM);
 
 const TimeRangeContainer = ({
   timeToArray,

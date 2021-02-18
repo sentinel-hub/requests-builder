@@ -1,0 +1,101 @@
+.statistical-first-row {
+  display: flex;
+  width: 100%;
+  border: '1px solid black';
+  height: 100%;
+  margin-bottom: 2rem;
+  overflow-y: hidden;
+
+  @include respond(tab-port) {
+    flex-direction: column;
+  }
+
+  &-first-item {
+    display: flex;
+    flex-direction: column;
+    width: 22%;
+
+    @include respond(tab-port) {
+      width: 100%;
+    }
+  }
+
+  &-second-item {
+    display: flex;
+    flex-direction: column;
+    width: 18%;
+
+    @include respond(tab-port) {
+      width: 100%;
+    }
+  }
+
+  &-third-item {
+    display: flex;
+    flex-direction: column;
+    width: 60%;
+    height: 100%;
+
+    @include respond(tab-port) {
+      width: 100%;
+    }
+  }
+}
+
+.statistical-second-row {
+  display: flex;
+  height: 100%;
+  width: 100%;
+
+  @include respond(tab-port) {
+    flex-direction: column;
+  }
+
+  &-first-item {
+    display: flex;
+    flex-direction: column;
+    width: 37%;
+
+    @include respond(tab-port) {
+      width: 100%;
+    }
+  }
+
+  &-second-item {
+    display: flex;
+    flex-direction: column;
+    width: 26%;
+
+    & > div.form {
+      overflow-y: scroll;
+      height: 600px;
+
+      @include respond(tab-port) {
+        height: 100%;
+      }
+    }
+
+    @include respond(tab-port) {
+      width: 100%;
+    }
+  }
+
+  &-third-item {
+    display: flex;
+    flex-direction: column;
+    width: 37%;
+
+    @include respond(tab-port) {
+      width: 100%;
+    }
+  }
+}
+
+.statistical-evalscript-editor {
+
+  .CodeMirror-scroll { /* stylelint-disable-line */
+    overflow-y: scroll;
+    min-height: 400px;
+    max-height: 500px;
+  }
+}

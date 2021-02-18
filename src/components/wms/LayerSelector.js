@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { getLayersByInstanceId } from './wmsRequests';
-import store, { wmsSlice } from '../../store';
+import store from '../../store';
+import wmsSlice from '../../store/wms';
 
 const generateLayersOptions = (layers) => {
   return layers.map((lay) => (

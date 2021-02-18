@@ -15,7 +15,7 @@ const CatalogRequestForm = () => {
     type: '',
     results: [],
   });
-
+  const [catalogSearchResponse, setCatalogSearchResponse] = useState();
   return (
     <div>
       <div className="catalog-first-row">
@@ -35,13 +35,13 @@ const CatalogRequestForm = () => {
       <div className="catalog-second-row">
         <div className="catalog-second-row-first-item">
           <CatalogFields />
-          <CatalogSendRequest setResults={setResults} />
+          <CatalogSendRequest setResults={setResults} setCatalogSearchResponse={setCatalogSearchResponse} />
         </div>
         <div className="catalog-second-row-second-item">
-          <CatalogRequestPreview setResults={setResults} />
+          <CatalogResults results={results} />
         </div>
         <div className="catalog-second-row-third-item">
-          <CatalogResults results={results} />
+          <CatalogRequestPreview setResults={setResults} catalogSearchResponse={catalogSearchResponse} />
         </div>
       </div>
     </div>

@@ -1,7 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import CatalogSentinel1Options from './CatalogSentinel1Options';
-import store, { catalogSlice } from '../../store';
+import store from '../../store';
+import catalogSlice from '../../store/catalog';
 import CatalogSentinel2Options from './CatalogSentinel2Options';
 import { S2L2A_CATALOG_ID, S2L1C_CATALOG_ID, S1GRD_CATALOG_ID, S1OPTIONS } from './const';
 

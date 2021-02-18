@@ -11,10 +11,6 @@
     font-size: 1rem;
   }
 
-  @include respond(phone) {
-    font-size: 1.3rem;
-  }
-
   &:invalid {
     border: 1px solid #f74343;
   }
@@ -105,7 +101,7 @@
 
   .CodeMirror-scroll { /* stylelint-disable-line */
     overflow-y: scroll;
-    height: 455px !important;
+    height: 435px !important;
   }
 }
 
@@ -113,7 +109,7 @@
 
   .CodeMirror-scroll { /* stylelint-disable-line */
     overflow-y: scroll;
-    height: 400px;
+    height: 380px;
   }
 }
 
@@ -121,7 +117,7 @@
 
   .CodeMirror-scroll { /* stylelint-disable-line */
     overflow-y: scroll;
-    height: 390px;
+    height: 370px;
   }
 }
 

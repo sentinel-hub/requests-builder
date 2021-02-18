@@ -269,6 +269,44 @@ function evaluatePixel(samples) {
   }`,
 };
 
+export const DEFAULT_STATISTICAL_EVALSCRIPT = `//VERSION=3
+function setup() {
+  return {
+    input: [{
+      bands: [
+        "B04",
+        "B08",
+        "SCL",
+        "dataMask"
+      ]
+    }],
+    output: [
+      {
+        id: "data",
+        bands: 3
+      },
+      {
+        id: "scl",
+        sampleType: "INT8",
+        bands: 1
+      },
+      {
+        id: "dataMask",
+        bands: 1
+      }]
+  }
+}
+
+function evaluatePixel(samples) {
+    let index = (samples.B08 - samples.B04) / (samples.B08+samples.B04)
+    return {
+        data: [index, samples.B08, samples.B04],
+        dataMask: [samples.dataMask],
+        scl: [samples.SCL]
+        };
+}
+`;
+
 // internal prevents its use on the Map container.
 export const CRS = {
   'EPSG:3857': {

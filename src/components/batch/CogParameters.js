@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import store, { batchSlice } from '../../store';
+import store from '../../store';
+import batchSlice from '../../store/batch';
 
 import Toggle from '../common/Toggle';
 

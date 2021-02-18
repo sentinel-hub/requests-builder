@@ -1,5 +1,6 @@
 import React from 'react';
-import store, { requestSlice } from '../../../store';
+import store from '../../../store';
+import requestSlice from '../../../store/request';
 import { CRS } from '../../../utils/const';
 
 // Generate CRS JSX Options, skip those which have internal:true.
@@ -20,7 +21,7 @@ const CRSSelection = ({ selectedCrs }) => {
   };
 
   return (
-    <div className="u-flex-aligned" style={{ marginBottom: '1rem' }}>
+    <div className="u-flex-aligned">
       <label htmlFor="crs" className="form__label" style={{ marginBottom: '0' }}>
         CRS:{' '}
       </label>

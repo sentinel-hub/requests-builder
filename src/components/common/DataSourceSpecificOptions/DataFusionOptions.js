@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
-import store, { requestSlice } from '../../../store';
+import store from '../../../store';
+import requestSlice from '../../../store/request';
 import { DATASOURCES } from '../../../utils/const';
 import { generateDataSourceRelatedOptions } from '../DataSourceSelect';
 import Toggle from '../Toggle';
@@ -64,7 +65,7 @@ const DataFusionOptions = ({ datafusionSources }) => {
 
   const generateDataFusionInputs = () => {
     return datafusionSources.map((source, idx) => (
-      <div key={idx}>
+      <div className="form" style={{ paddingTop: '0', paddingBottom: '0' }} key={idx}>
         <label htmlFor={`datasource-${idx}`} className="form__label">
           Datasource {idx + 1}
         </label>

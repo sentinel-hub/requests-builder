@@ -26,6 +26,7 @@ export const planetDemoOrder = {
         ],
       },
     },
+    provider: 'PLANET',
     data: [
       {
         dataFilter: {
@@ -40,14 +41,13 @@ export const planetDemoOrder = {
       },
     ],
     planetApiKey: '',
-    provider: 'PLANET',
   },
 };
 
 export const airbusOrderDemo = {
-  name: 'airbus demo request ',
-  provider: 'AIRBUS',
+  name: 'airbus products',
   input: {
+    provider: 'AIRBUS',
     bounds: {
       geometry: {
         type: 'Polygon',
@@ -66,6 +66,11 @@ export const airbusOrderDemo = {
     data: [
       {
         constellation: 'PHR',
+        products: [
+          {
+            id: '6701559b-e11e-43f9-b395-ac04f193a83b',
+          },
+        ],
         dataFilter: {
           timeRange: {
             from: '2017-01-01T00:00:00.000Z',

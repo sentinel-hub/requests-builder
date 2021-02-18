@@ -98,7 +98,7 @@ const datasourceToSHPYDatasource = (datasource, requestState) => {
 };
 
 const getDimensionsSHPY = (requestState) => {
-  if (requestState.heightOrRes === 'HEIGHT') {
+  if (requestState.heightOrRes === 'HEIGHT' || requestState.isOnAutoRes === true) {
     return `size=[${requestState.width}, ${requestState.height}],`;
   } else {
     return `resolution=(${requestState.width}, ${requestState.height}),`;
@@ -234,6 +234,11 @@ const getSHPYResponses = (reqState) => {
   return responsesString;
 };
 
+const booleanToPyBoolean = {
+  true: 'True',
+  false: 'False',
+};
+
 export const getSHPYCode = (requestState) => {
   //add imports
   let shpyCode = `${getSHPYImports()}`;
@@ -259,5 +264,7 @@ export const getSHPYCode = (requestState) => {
 )`;
 
   shpyCode += `\nresponse = request.get_data() `;
-  return shpyCode;
+
+  // Replace booleans on js for booleans on Py.
+  return shpyCode.replace(/true|false/, (matched) => booleanToPyBoolean[matched]);
 };

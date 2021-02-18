@@ -11,6 +11,10 @@ import BatchOutput from '../components/batch/BatchOutput';
 
 const BatchRequestForm = () => {
   const [fetchedRequests, setFetchedRequests] = useState([]);
+  const [createResponse, setCreateResponse] = useState();
+  const [getAllResponse, setGetAllResponse] = useState();
+  const [singleResponse, setSingleResponse] = useState();
+  const [tilesResponse, setTilesResponse] = useState();
 
   return (
     <div>
@@ -32,17 +36,28 @@ const BatchRequestForm = () => {
           <EvalscriptEditor />
         </div>
         <div className="process-second-row-second-item">
-          <BatchRequestPreview setFetchedRequests={setFetchedRequests} />
+          <BatchRequestPreview
+            setFetchedRequests={setFetchedRequests}
+            createResponse={createResponse}
+            getAllResponse={getAllResponse}
+            singleResponse={singleResponse}
+            tilesResponse={tilesResponse}
+          />
         </div>
       </div>
 
       <div className="batch-third-row">
         <div className="batch-third-row-first-item">
-          <BatchOptions setFetchedRequests={setFetchedRequests} />
-          <BatchActions setFetchedRequests={setFetchedRequests} />
+          <BatchOptions setFetchedRequests={setFetchedRequests} setCreateResponse={setCreateResponse} />
+          <BatchActions setFetchedRequests={setFetchedRequests} setSingleResponse={setSingleResponse} />
         </div>
         <div className="batch-third-row-second-item">
-          <BatchInformation setFetchedRequests={setFetchedRequests} fetchedRequests={fetchedRequests} />
+          <BatchInformation
+            setFetchedRequests={setFetchedRequests}
+            fetchedRequests={fetchedRequests}
+            setGetAllResponse={setGetAllResponse}
+            setTilesResponse={setTilesResponse}
+          />
         </div>
       </div>
     </div>

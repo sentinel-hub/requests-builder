@@ -3,7 +3,8 @@ import { connect } from 'react-redux';
 import RequestButton from '../common/RequestButton';
 import { addAlertOnError, batchIdValidation } from './BatchActions';
 import { restartPartialRequest } from './requests';
-import store, { batchSlice } from '../../store';
+import store from '../../store';
+import batchSlice from '../../store/batch';
 
 const RestartPartialRequestButton = ({ selectedBatchId, token }) => {
   const responseHandler = () => {

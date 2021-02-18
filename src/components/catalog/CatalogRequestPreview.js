@@ -1,63 +1,46 @@
-import React, { useState, useEffect } from 'react';
-import { Controlled as CodeMirror } from 'react-codemirror2';
+import React from 'react';
 import { connect } from 'react-redux';
-import { generateCatalogCurlCommand } from './requests';
+import { generateCatalogCurlCommand, sendCatalogEditedRequest } from './requests';
 import { parseCatalogBody } from './parse';
-import CatalogSendEditedRequest from './CatalogSendEditedRequest';
-require('codemirror/lib/codemirror.css');
-require('codemirror/theme/eclipse.css');
-require('codemirror/theme/neat.css');
-require('codemirror/mode/xml/xml.js');
-require('codemirror/mode/powershell/powershell.js');
-require('codemirror/addon/edit/matchbrackets.js');
+import CommonRequestPreview from '../common/CommonRequestPreview';
 
-const CatalogRequestPreview = ({ catalogState, geometry, timeRange, token, setResults }) => {
-  const [text, setText] = useState(generateCatalogCurlCommand(catalogState, geometry, timeRange, token));
-  const [isEdited, setIsEdited] = useState(false);
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(text.replace(/(\r\n|\n|\r)/gm, ''));
-  };
-
-  const handleParse = () => {
+const CatalogRequestPreview = ({
+  catalogState,
+  geometry,
+  timeRange,
+  token,
+  setResults,
+  catalogSearchResponse,
+}) => {
+  const handleParse = (text) => {
     parseCatalogBody(text);
   };
-  const handleTextChange = (editor, data, val) => {
-    setText(val);
-    setIsEdited(true);
-  };
-
-  useEffect(() => {
-    setText(generateCatalogCurlCommand(catalogState, geometry, timeRange, token));
-    setIsEdited(false);
-  }, [catalogState, geometry, token, timeRange]);
-
   return (
     <>
       <h2 className="heading-secondary">Request Preview</h2>
       <div className="form">
-        <CodeMirror
-          options={{
-            mode: 'powershell',
-            theme: 'eclipse',
-            matchBrackets: true,
-          }}
+        <CommonRequestPreview
+          options={[
+            {
+              name: 'search',
+              value: generateCatalogCurlCommand(catalogState, geometry, timeRange, token),
+              toggledValue: catalogSearchResponse,
+            },
+          ]}
+          canCopy
           className="tpdi-editor"
-          value={text}
-          onBeforeChange={handleTextChange}
+          onParse={handleParse}
+          supportedParseNames={['search']}
+          sendEditedRequest={(text, reqConfig) => sendCatalogEditedRequest(text, token, reqConfig)}
+          onSendEdited={(response) => {
+            setResults((res) => ({
+              ...res,
+              results: response.features,
+            }));
+          }}
+          supportedSendEditedNames={['search']}
+          id="catalog-req-preview"
         />
-
-        <div className="buttons-container">
-          <button className="secondary-button secondary-button--fit" onClick={handleCopy}>
-            Copy
-          </button>
-
-          <button className="secondary-button secondary-button--fit" onClick={handleParse}>
-            Parse
-          </button>
-
-          {isEdited ? <CatalogSendEditedRequest setResults={setResults} text={text} token={token} /> : null}
-        </div>
       </div>
     </>
   );

@@ -1,5 +1,5 @@
 import React, { useEffect, lazy, Suspense } from 'react';
-import configureAxios, { shResponseInterceptor, edcResponseInterceptor } from './utils/configureAxios';
+import configureAxios, { edcResponseInterceptor } from './utils/configureAxios';
 import ModeSelector from './components/common/ModeSelector';
 import { connect } from 'react-redux';
 import ProcessHeaderButtons from './components/process/ProcessHeaderButtons';
@@ -11,9 +11,14 @@ import OverlayResponse from './components/common/OverlayResponse';
 import ProcessRequestForm from './forms/RequestForm';
 import '@fortawesome/free-solid-svg-icons/index';
 import Axios from 'axios';
-import store, { authSlice } from './store';
+import store from './store';
+import authSlice from './store/auth';
 import BatchBannerInfo from './components/batch/BatchBannerInfo';
 import TPDIBannerInfo from './components/tpdi/TPDIBannerInfo';
+import { configureParams, getUrlParams } from './params';
+import StatisticalRequestForm from './forms/StatisticalRequestForm';
+import StatisticalAuthHeader from './components/statistical/StatisticalAuthHeader';
+import SavedRequests from './components/common/SavedRequets';
 
 const BatchRequestForm = lazy(() => import('./forms/BatchRequestForm'));
 const TPDIRequestForm = lazy(() => import('./forms/TPDIRequestForm'));
@@ -32,6 +37,8 @@ const getForm = mode => {
       return <WMSRequestForm />
     case('CATALOG'): 
       return <CatalogRequestForm />
+    case('STATISTICAL'):
+      return <StatisticalRequestForm />
     default:
       return null;
     }
@@ -46,6 +53,9 @@ const getHeaderButtons =  mode => {
   }
   else if (mode === 'WMS') {
     return <WMSHeaderButtons />
+  }
+  else if (mode === "STATISTICAL") {
+    return <StatisticalAuthHeader />
   }
 }
 
@@ -74,18 +84,19 @@ function App({mode}) {
           throw new Error('Token not found');   
         }
       } catch (err) {
-        shResponseInterceptor();    
         store.dispatch(authSlice.actions.setIsEDC(false));        
       }
     }
     fetchTokenEdc();
     configureAxios();
+    configureParams(getUrlParams());
   }, []);
 
   return (
     <div className="App">
       <Alert />
       <OverlayResponse />
+      <SavedRequests />
       <div className='header'>
         <div className='header__title'>
           <HeaderLogo />

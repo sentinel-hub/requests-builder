@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { getCatalogCollections } from './requests';
 
 import { connect } from 'react-redux';
-import store, { catalogSlice } from '../../store';
+import store from '../../store';
+import catalogSlice from '../../store/catalog';
 import Axios from 'axios';
 
 const generateCollectionsOptions = (collections) =>

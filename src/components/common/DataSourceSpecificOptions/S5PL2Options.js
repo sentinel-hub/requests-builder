@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import store, { requestSlice } from '../../../store';
+import store from '../../../store';
+import requestSlice from '../../../store/request';
 import { connect } from 'react-redux';
 import BaseOptionsNoCC from './BaseOptionsNoCC';
 
@@ -12,7 +13,7 @@ const S5PL2Options = ({ reduxTimeliness, reduxMinQa, idx }) => {
   };
 
   const handleMinQaChange = (e) => {
-    store.dispatch(requestSlice.actions.setProcessingOptions({ minQa: e.target.value, idx: idx }));
+    store.dispatch(requestSlice.actions.setProcessingOptions({ minQa: Number(e.target.value), idx: idx }));
   };
   useEffect(() => {
     if (reduxMinQa) {
@@ -30,7 +31,7 @@ const S5PL2Options = ({ reduxTimeliness, reduxMinQa, idx }) => {
     setEnableMinQa(!enableMinQa);
   };
   return (
-    <div>
+    <>
       <BaseOptionsNoCC idx={idx} />
       <label htmlFor={`timeliness-${idx}`} className="form__label u-margin-top-tiny">
         Timeliness
@@ -78,7 +79,7 @@ const S5PL2Options = ({ reduxTimeliness, reduxMinQa, idx }) => {
           </label>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

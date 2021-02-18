@@ -1,6 +1,7 @@
 //Common to all datasources
 import React from 'react';
-import store, { requestSlice } from '../../../store';
+import store from '../../../store';
+import requestSlice from '../../../store/request';
 import { connect } from 'react-redux';
 
 //Contains MosaickingOrder, Upsampling, Downsampling.
@@ -22,7 +23,7 @@ const BaseOptionsNoCC = ({ processingOptions, dataFilterOptions, withCC = false,
   };
 
   return (
-    <div>
+    <>
       <label htmlFor={`mosaicking-order-${idx}`} className="form__label">
         Mosaicking Order
       </label>
@@ -65,7 +66,7 @@ const BaseOptionsNoCC = ({ processingOptions, dataFilterOptions, withCC = false,
         <option value="BILINEAR">Bilinear</option>
         <option value="BICUBIC">Bicubic</option>
       </select>
-    </div>
+    </>
   );
 };
 

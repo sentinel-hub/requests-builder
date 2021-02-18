@@ -3,7 +3,8 @@ import { connect } from 'react-redux';
 import RequestButton from '../common/RequestButton';
 import { analyseBatchRequest } from './requests';
 import { addAlertOnError, batchIdValidation } from './BatchActions';
-import store, { batchSlice } from '../../store';
+import store from '../../store';
+import batchSlice from '../../store/batch';
 
 const AnalyseBatchRequestButton = ({ selectedBatchId, token }) => {
   const analyseResponseHandler = () => {

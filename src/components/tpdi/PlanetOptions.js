@@ -1,5 +1,6 @@
 import React from 'react';
-import store, { planetSlice } from '../../store';
+import store from '../../store';
+import { planetSlice } from '../../store/tpdi';
 import { connect } from 'react-redux';
 import Tooltip from '../common/Tooltip/Tooltip';
 

@@ -2,7 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getMapWms, getFisStats, getCoverageWcs } from './wmsRequests';
 import RequestButton from '../common/RequestButton';
-import store, { responsesSlice } from '../../store';
+import store from '../../store';
+import responsesSlice from '../../store/responses';
 
 const SendWmsRequest = ({ wmsState, requestState, token, mode }) => {
   const validateWmsSendRequest = () => {

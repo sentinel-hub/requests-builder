@@ -1,9 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import store, { batchSlice, tpdiSlice, requestSlice, alertSlice } from '../../store';
+import store from '../../store';
+import alertSlice from '../../store/alert';
+import tpdiSlice from '../../store/tpdi';
+import batchSlice from '../../store/batch';
+import requestSlice from '../../store/request';
 import { getTransformedGeometryFromBounds, focusMap } from '../common/Map/utils/crsTransform';
+import RequestButton from '../common/RequestButton';
 import { dispatchChanges } from '../process/requests/parseRequest';
 import { parseBatchRequest, getBucketName } from './parse';
-import { fetchTilesBatchRequest } from './requests';
+import { deleteBatchRequest, fetchTilesBatchRequest } from './requests';
 
 const tillingGridIdToName = (id) => {
   return ['S2GM Grid', '10km Grid', '100,08km Grid', 'WGS84'][id];
@@ -45,7 +50,11 @@ const updateTileInfo = (tiles) => {
   }, initial);
 };
 
-const BatchRequestSummary = ({ props, token }) => {
+const isValidDeleteStatus = (status) => {
+  return ['FAILED', 'CREATED', 'ANALYSIS_DONE'].includes(status);
+};
+
+const BatchRequestSummary = ({ props, token, setTilesResponse, handleDeleteBatchRequest }) => {
   const { id, status, description, tileCount, valueEstimate, created, processRequest } = props;
   const bucketName = getBucketName(props);
 
@@ -64,8 +73,9 @@ const BatchRequestSummary = ({ props, token }) => {
     setIsFetchingTiles(true);
     const res = await fetchTilesBatchRequest(id, token);
     setFetchedTiles(updateTileInfo(res));
+    setTilesResponse(JSON.stringify(res, null, 2));
     setIsFetchingTiles(false);
-  }, [id, token]);
+  }, [id, token, setTilesResponse]);
 
   useEffect(() => {
     if (showAllInfo && validStatus(status)) {
@@ -117,6 +127,24 @@ const BatchRequestSummary = ({ props, token }) => {
 
   const handleRefreshTiles = () => {
     fetchTiles();
+  };
+
+  const deleteResponseHandler = () => {
+    store.dispatch(alertSlice.actions.addAlert({ type: 'SUCCESS', text: 'Request successfully deleted.' }));
+    handleDeleteBatchRequest(id);
+  };
+
+  const deleteErrorHandler = (err) => {
+    const errMsg = err.message;
+    store.dispatch(
+      alertSlice.actions.addAlert({
+        type: 'WARNING',
+        text: `Something went wrong while trying to delete the request. ${
+          errMsg ?? 'Check console for more details.'
+        }`,
+      }),
+    );
+    console.error(err);
   };
 
   return (
@@ -249,9 +277,20 @@ const BatchRequestSummary = ({ props, token }) => {
           >
             Set geometry on map
           </button>
-          <button onClick={handleParseBatch} className="secondary-button">
+          <button onClick={handleParseBatch} className="secondary-button" style={{ marginRight: '1rem' }}>
             Parse Batch Request
           </button>
+          {isValidDeleteStatus(status) && (
+            <RequestButton
+              request={deleteBatchRequest}
+              args={[token, id]}
+              buttonText="Delete Batch Request"
+              className="secondary-button secondary-button--cancel"
+              validation={true}
+              responseHandler={deleteResponseHandler}
+              errorHandler={deleteErrorHandler}
+            />
+          )}
         </div>
       ) : null}
       <hr></hr>

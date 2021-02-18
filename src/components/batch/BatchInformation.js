@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { connect } from 'react-redux';
 import BatchRequestSummary from './BatchRequestSummary';
 import GetAllBatchRequestsButton from './GetAllBatchRequestsButton';
@@ -18,18 +18,34 @@ const filterRequestsResults = (searchText, requests) => {
     });
   }
 };
-const renderBatchRequestSummary = (requests, limit, token) => {
+const renderBatchRequestSummary = (requests, limit, token, setTilesResponse, handleDeleteBatchRequest) => {
   let res = [];
   for (let i = 0; i < requests.length; i++) {
     if (i > limit) {
       break;
     }
-    res.push(<BatchRequestSummary token={token} key={requests[i].id} props={requests[i]} />);
+    res.push(
+      <BatchRequestSummary
+        token={token}
+        key={requests[i].id}
+        props={requests[i]}
+        setTilesResponse={setTilesResponse}
+        handleDeleteBatchRequest={handleDeleteBatchRequest}
+      />,
+    );
   }
   return res;
 };
 
-const BatchInformation = ({ fetchedRequests, extraInfo, setFetchedRequests, token, specifyingCogParams }) => {
+const BatchInformation = ({
+  fetchedRequests,
+  extraInfo,
+  setFetchedRequests,
+  token,
+  specifyingCogParams,
+  setGetAllResponse,
+  setTilesResponse,
+}) => {
   const [searchText, setSearchText] = useState('');
   const [filteredRequests, setFilteredRequests] = useState(fetchedRequests);
   //  limit to render amount of BatchRequestSummary
@@ -54,11 +70,21 @@ const BatchInformation = ({ fetchedRequests, extraInfo, setFetchedRequests, toke
       setLimit(limit + 50);
     }
   };
+
+  const handleDeleteBatchRequest = useCallback(
+    (batchId) => {
+      setFetchedRequests((prevFetched) => prevFetched.filter((batchReq) => batchReq.id !== batchId));
+    },
+    [setFetchedRequests],
+  );
   return (
     <>
       <h2 className="heading-secondary">Batch Information</h2>
       <div className="form">
-        <GetAllBatchRequestsButton setFetchedRequests={setFetchedRequests} />
+        <GetAllBatchRequestsButton
+          setFetchedRequests={setFetchedRequests}
+          setGetAllResponse={setGetAllResponse}
+        />
         <hr className="u-margin-top-small u-margin-bottom-small" />
         <input
           value={searchText}
@@ -78,7 +104,15 @@ const BatchInformation = ({ fetchedRequests, extraInfo, setFetchedRequests, toke
           onScroll={handleScroll}
           style={{ overflowY: 'scroll', maxHeight: `${specifyingCogParams ? '900px' : '600px'}` }}
         >
-          {filteredRequests.length > 0 ? renderBatchRequestSummary(filteredRequests, limit, token) : null}
+          {filteredRequests.length > 0
+            ? renderBatchRequestSummary(
+                filteredRequests,
+                limit,
+                token,
+                setTilesResponse,
+                handleDeleteBatchRequest,
+              )
+            : null}
         </div>
       </div>
     </>

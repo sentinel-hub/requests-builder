@@ -2,10 +2,18 @@ import React from 'react';
 import RequestButton from '../common/RequestButton';
 import { generateCatalogRequest } from './requests';
 import { connect } from 'react-redux';
-import store, { catalogSlice } from '../../store';
+import store from '../../store';
+import catalogSlice from '../../store/catalog';
 import { catalogErrorHandler } from './CatalogSendRequestButton';
 
-const CatalogSendRequestNextButton = ({ catalogState, geometry, timeRange, token, setResults }) => {
+const CatalogSendRequestNextButton = ({
+  catalogState,
+  geometry,
+  timeRange,
+  token,
+  setResults,
+  setCatalogSearchResponse,
+}) => {
   const { next } = catalogState;
 
   const responseHandler = (response) => {
@@ -18,6 +26,7 @@ const CatalogSendRequestNextButton = ({ catalogState, geometry, timeRange, token
       type: res.type,
       results: res.results.concat(response.features),
     }));
+    setCatalogSearchResponse(JSON.stringify(response, null, 2));
   };
 
   return (

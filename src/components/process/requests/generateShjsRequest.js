@@ -13,7 +13,7 @@ import {
   CUSTOM,
   DATAFUSION,
 } from '../../../utils/const';
-import { transformGeometryToNewCrs } from '../../common/Map/utils/crsTransform';
+import { isBbox, transformGeometryToNewCrs } from '../../common/Map/utils/crsTransform';
 
 const datasourceToSHJSLayer = {
   [S2L2A]: 'S2L2ALayer',
@@ -74,7 +74,7 @@ export const generateSHBbox = (geometry, selectedCrs) => {
   if (selectedCrs !== 'EPSG:4326') {
     geo = transformGeometryToNewCrs(geometry, selectedCrs);
   }
-  if (geo.length === 4) {
+  if (isBbox(geo)) {
     const b = `${geo[0]}, ${geo[1]}, ${geo[2]}, ${geo[3]}`;
     return b;
   } else {
@@ -84,15 +84,17 @@ export const generateSHBbox = (geometry, selectedCrs) => {
 };
 
 const addDefaultOptionsS1IfNeeded = (dataFilterOptions) => {
+  const dataFilterOptionsWithDefaults = Object.assign({}, dataFilterOptions);
   if (!dataFilterOptions.acquisitionMode || dataFilterOptions.acquisitionMode === 'DEFAULT') {
-    dataFilterOptions.acquisitionMode = 'IW';
+    dataFilterOptionsWithDefaults.acquisitionMode = 'IW';
   }
   if (!dataFilterOptions.resolution || dataFilterOptions.resolution === 'DEFAULT') {
-    dataFilterOptions.resolution = 'HIGH';
+    dataFilterOptionsWithDefaults.resolution = 'HIGH';
   }
   if (!dataFilterOptions.polarization || dataFilterOptions.polarization === 'DEFAULT') {
-    dataFilterOptions.polarization = 'DV';
+    dataFilterOptionsWithDefaults.polarization = 'DV';
   }
+  return dataFilterOptionsWithDefaults;
 };
 
 const getSHJSOptions = (reqState, idx = 0) => {
@@ -101,13 +103,14 @@ const getSHJSOptions = (reqState, idx = 0) => {
   const dataFilterOptions = reqState.dataFilterOptions[idx].options;
   const processingOptions = reqState.processingOptions[idx].options;
   // If S1, add default options since shjs always need the options
+  let dataFilterOptionsWithDefaults = dataFilterOptions;
   if (reqState.datasource === S1GRD) {
-    addDefaultOptionsS1IfNeeded(dataFilterOptions);
+    dataFilterOptionsWithDefaults = addDefaultOptionsS1IfNeeded(dataFilterOptions);
   }
-  if (!isEmpty(dataFilterOptions)) {
-    Object.keys(dataFilterOptions).forEach((key) => {
-      if (dataFilterOptions[key] !== 'DEFAULT') {
-        shjsOptions = shjsOptions + `\n  ${key}:'${dataFilterOptions[key]}',`;
+  if (!isEmpty(dataFilterOptionsWithDefaults)) {
+    Object.keys(dataFilterOptionsWithDefaults).forEach((key) => {
+      if (dataFilterOptionsWithDefaults[key] !== 'DEFAULT') {
+        shjsOptions = shjsOptions + `\n  ${key}:'${dataFilterOptionsWithDefaults[key]}',`;
       }
     });
   }

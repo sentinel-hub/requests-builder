@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { connect } from 'react-redux';
-import store, { requestSlice } from '../../store';
+import store from '../../store';
+import requestSlice from '../../store/request';
 import {
   DATASOURCES,
   S2L2A,
@@ -25,6 +26,7 @@ import DEMOptions from './DataSourceSpecificOptions/DEMOptions';
 import BYOCOptions from './DataSourceSpecificOptions/BYOCOptions';
 import DataFusionOptions from './DataSourceSpecificOptions/DataFusionOptions';
 import Toggle from './Toggle';
+import OverlayButton from './OverlayButton';
 
 export const generateDatasourcesOptions = () =>
   Object.keys(DATASOURCES).map((key) => (
@@ -64,10 +66,11 @@ export const generateDataSourceRelatedOptions = (datasource, idx = 0) => {
 };
 
 const DataSourceSelect = ({ datasource }) => {
+  const overlayRef = useRef();
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const handleChange = (e) => {
-    store.dispatch(requestSlice.actions.setDatasourceAndEvalscript(e.target.value));
+    store.dispatch(requestSlice.actions.setDatasource(e.target.value));
   };
 
   const handleShowAdvanced = () => {
@@ -81,8 +84,13 @@ const DataSourceSelect = ({ datasource }) => {
 
   return (
     <>
-      <h2 className="heading-secondary">Data source</h2>
-      <div className="form">
+      <h2 className="heading-secondary">
+        <div className="u-expand-title">
+          Data source
+          <OverlayButton elementRef={overlayRef} />
+        </div>
+      </h2>
+      <div className="form" ref={overlayRef}>
         <label htmlFor="datasource-select" className="form__label">
           Datasource
         </label>
@@ -105,19 +113,21 @@ const DataSourceSelect = ({ datasource }) => {
             </div>
           </div>
         ) : null}
-        {datasource === 'CUSTOM' || datasource === 'DATAFUSION' ? (
-          generateDataSourceRelatedOptions(datasource)
-        ) : showAdvanced ? (
-          <>
-            {generateDataSourceRelatedOptions(datasource)}
-            <button
-              onClick={handleReset}
-              className="secondary-button secondary-button--fit u-margin-right-small"
-            >
-              Reset to default
-            </button>
-          </>
-        ) : null}
+        <div style={{ paddingTop: 0 }}>
+          {datasource === 'CUSTOM' || datasource === 'DATAFUSION' ? (
+            generateDataSourceRelatedOptions(datasource)
+          ) : showAdvanced ? (
+            <>
+              {generateDataSourceRelatedOptions(datasource)}
+              <button
+                onClick={handleReset}
+                className="secondary-button secondary-button--fit u-margin-right-small"
+              >
+                Reset to default
+              </button>
+            </>
+          ) : null}
+        </div>
       </div>
     </>
   );

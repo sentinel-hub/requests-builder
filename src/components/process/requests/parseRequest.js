@@ -1,5 +1,6 @@
 import omit from 'lodash.omit';
-import store, { requestSlice } from '../../../store';
+import store from '../../../store';
+import requestSlice from '../../../store/request';
 import { DATASOURCES_NAMES, CRS, OUTPUT_FORMATS, CUSTOM } from '../../../utils/const';
 import { calculateMaxMetersPerPixel } from '../../common/Map/utils/bboxRatio';
 import { transformGeometryToNewCrs } from '../../common/Map/utils/crsTransform';
@@ -15,7 +16,7 @@ const dispatchEvalscript = (parsedBody) => {
   }
 };
 
-const dispatchBounds = (parsedBody) => {
+export const dispatchBounds = (parsedBody) => {
   try {
     let bounds = parsedBody.input.bounds;
     //crs
@@ -54,13 +55,22 @@ const dispatchBounds = (parsedBody) => {
 
 const dispatchTimeRange = (parsedBody) => {
   try {
-    const validTimeRanges = parsedBody.input.data.map((bodyInputData) => {
-      let timeRange = bodyInputData.dataFilter.timeRange;
-      let timeTo = timeRange.to;
-      let timeFrom = timeRange.from;
-      return { timeTo, timeFrom };
-    });
-    store.dispatch(requestSlice.actions.setTimeRanges(validTimeRanges));
+    const validTimeRanges = parsedBody.input.data
+      .map((bodyInputData) => {
+        let timeRange = bodyInputData.dataFilter?.timeRange;
+        let timeTo = timeRange?.to;
+        let timeFrom = timeRange?.from;
+        if (timeTo && timeFrom) {
+          return { timeTo, timeFrom };
+        }
+        return undefined;
+      })
+      .filter((t) => t);
+    if (validTimeRanges.length > 0) {
+      store.dispatch(requestSlice.actions.setTimeRanges(validTimeRanges));
+    } else {
+      store.dispatch(requestSlice.actions.disableTimerange(true));
+    }
   } catch (err) {
     console.error('Error while parsing timerange', err);
   }
@@ -93,7 +103,7 @@ const handleByocParsing = (datasource) => {
   store.dispatch(requestSlice.actions.setByocCollectionType(type.toUpperCase()));
 };
 
-const dispatchDatasource = (parsedBody) => {
+export const dispatchDatasource = (parsedBody) => {
   try {
     if (parsedBody.input.data.length > 1) {
       handleDatafusionParsing(parsedBody);
@@ -113,7 +123,7 @@ const dispatchDatasource = (parsedBody) => {
       return;
     }
   } catch (err) {
-    console.error('Error while parinsg datasources', err);
+    console.error('Error while parsing datasources', err);
   }
 };
 
@@ -154,6 +164,7 @@ const dispatchDimensions = (parsedBody) => {
     const resy = output.resy;
 
     if (resx && resy) {
+      store.dispatch(requestSlice.actions.setIsOnAutoRes(false));
       store.dispatch(requestSlice.actions.setHeightOrRes('RES'));
       store.dispatch(requestSlice.actions.setWidth(resx));
       store.dispatch(requestSlice.actions.setHeight(resy));
@@ -188,7 +199,7 @@ const dispatchResponses = (parsedBody) => {
   }
 };
 
-const dispatchAdvancedOptions = (parsedBody) => {
+export const dispatchAdvancedOptions = (parsedBody) => {
   // timeRange and collectionId are handled somewhere else.
   const omittedDataFilterProperties = ['collectionId', 'timeRange'];
   try {

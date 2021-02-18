@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import 'react-day-picker/lib/style.css';
 import moment from 'moment';
-import store, { requestSlice } from '../../../store';
+import store from '../../../store';
+import requestSlice from '../../../store/request';
 import Axios from 'axios';
 import { fetchAvailableDatesWithCatalog } from '../../catalog/requests';
 import { S1GRD, S2L2A, S2L1C } from '../../../utils/const';
@@ -13,78 +14,96 @@ const highlightedStyle = `.DayPicker-Day--highlighted {
 }
 `;
 
-// given an array of timeFrom and TimeTo get the first day of the month of earliest day and the last day of the month on the latest.
-const getMinMaxDates = (timeFrom, timeTo) => ({
-  from: moment(timeFrom).startOf('month').format(),
-  to: moment(timeTo).endOf('month').format(),
-});
-
 export const utcDateToYYYYMMDDFormat = (utcDate) => utcDate.split('T')[0];
 
 const shouldFetchDates = (datasource, mode) =>
   (datasource === S1GRD || datasource === S2L2A || datasource === S2L1C) &&
   (mode === 'BATCH' || mode === 'PROCESS');
 
+const getStartOfMonth = (dateString) => {
+  return moment(dateString).utc().startOf('month').format();
+};
+
 const TimeRange = ({ index, timeTo, timeFrom, isDisabled, datasource, geometry, token, mode }) => {
-  const [selectedMonths, setSelectedMonths] = useState(getMinMaxDates(timeFrom, timeTo));
   const [availableDates, setAvailableDates] = useState([]);
+  const [fetchedMonths, setFetchedMonths] = useState([]);
+  const sourceRef = useRef(Axios.CancelToken.source());
+  const shouldFetchCatalog = token && shouldFetchDates(datasource, mode);
 
-  // Fetch available dates for a given datasource, aoi and time period.
-  useEffect(() => {
-    const source = Axios.CancelToken.source();
-    const fetchAndSetAvailableDates = async () => {
-      try {
-        const timerange = { timeFrom: selectedMonths.from, timeTo: selectedMonths.to };
-        const res = await fetchAvailableDatesWithCatalog(datasource, timerange, geometry, token, {
-          cancelToken: source.token,
+  const fetchMonths = async (months) => {
+    const fetchHelper = async () => {
+      const promises = months.map((month) => {
+        const timeRange = { timeFrom: month, timeTo: moment.utc(month).endOf('month').format() };
+        return fetchAvailableDatesWithCatalog(datasource, timeRange, geometry, token, {
+          cancelToken: sourceRef.current.token,
         });
-        if (res.data && res.data.features) {
-          setAvailableDates(res.data.features.map((feature) => new Date(feature)));
-        }
-      } catch (err) {
-        if (!Axios.isCancel(err)) {
-          console.error('Error fetching available dates', err);
-        }
-      }
+      });
+      const res = await Promise.all(promises);
+      const newDates = res.reduce((acc, currentResponse) => {
+        return [...acc, ...currentResponse.data.features];
+      }, []);
+      return newDates;
     };
-    if (token && shouldFetchDates(datasource, mode)) {
-      fetchAndSetAvailableDates();
-    } else {
-      setAvailableDates([]);
-    }
-    return () => {
-      source.cancel();
-    };
-  }, [datasource, token, geometry, selectedMonths.from, selectedMonths.to, mode]);
+    const newDates = await fetchHelper();
+    return newDates.map((d) => new Date(d));
+  };
 
-  const handleTimeFromChange = (d) => {
+  const fetchAndSetMonths = async (months, override = false) => {
+    const newMonths = await fetchMonths(months);
+    setAvailableDates((prev) => {
+      if (override) {
+        return newMonths;
+      } else {
+        return [...prev, ...newMonths];
+      }
+    });
+    setFetchedMonths((prev) => {
+      if (override) {
+        return months;
+      } else {
+        return [...prev, ...months];
+      }
+    });
+  };
+
+  useEffect(() => {
+    if (!shouldFetchCatalog) {
+      setFetchedMonths([]);
+      setAvailableDates([]);
+      return;
+    }
+    const fromMonth = getStartOfMonth(timeFrom);
+    const toMonth = getStartOfMonth(timeTo);
+    fetchAndSetMonths([fromMonth, toMonth], true);
+    // eslint-disable-next-line
+  }, [token, mode, datasource, geometry]);
+
+  const handleTimeFromChange = async (d) => {
     if (d) {
-      let date = moment(d).utc().startOf('day').format();
+      const startOfMonth = moment(d).utc().startOf('month').format();
+      const date = moment(d).utc().startOf('day').format();
+      if (shouldFetchCatalog && !fetchedMonths.includes(startOfMonth)) {
+        fetchAndSetMonths([startOfMonth]);
+      }
       store.dispatch(requestSlice.actions.setTimeFrom({ timeFrom: date, idx: index }));
     }
   };
-  const handleTimeToChange = (d) => {
+
+  const handleTimeToChange = async (d) => {
     if (d) {
-      let date = moment(d).utc().endOf('day').format();
+      const startOfMonth = moment(d).utc().startOf('month').format();
+      const date = moment(d).utc().endOf('day').format();
+      if (shouldFetchCatalog && !fetchedMonths.includes(startOfMonth)) {
+        fetchAndSetMonths([startOfMonth]);
+      }
       store.dispatch(requestSlice.actions.setTimeTo({ timeTo: date, idx: index }));
     }
   };
-  const handleFromMonthChange = (month) => {
-    const newMomentFrom = moment(month);
-    if (newMomentFrom < moment(selectedMonths.from)) {
-      setSelectedMonths((prevSelectedMonths) => ({
-        ...prevSelectedMonths,
-        from: newMomentFrom.utc().format(),
-      }));
-    }
-  };
-  const handleToMonthChange = (month) => {
-    const momentTo = moment(month);
-    if (momentTo > moment(selectedMonths.to) && momentTo < moment().endOf('month')) {
-      setSelectedMonths((prevSelectedMonths) => ({
-        ...prevSelectedMonths,
-        to: momentTo.utc().format(),
-      }));
+
+  const handleMonthChange = async (month) => {
+    const newMonth = moment(month).utc().startOf('day').format();
+    if (shouldFetchCatalog && !fetchedMonths.includes(newMonth)) {
+      fetchAndSetMonths([newMonth]);
     }
   };
 
@@ -95,22 +114,20 @@ const TimeRange = ({ index, timeTo, timeFrom, isDisabled, datasource, geometry, 
       <label htmlFor="timefrom" className="form__label">
         Time From
       </label>
-      <div className="u-margin-bottom-small">
-        <DayPickerInput
-          value={utcDateToYYYYMMDDFormat(timeFrom)}
-          onDayChange={handleTimeFromChange}
-          dayPickerProps={{
-            selectedDay: timeFrom,
-            modifiers: { highlighted: availableDates },
-            showOutsideDays: true,
-            onMonthChange: handleFromMonthChange,
-            disabledDays: { after: new Date() },
-          }}
-          inputProps={{ disabled: isDisabled, required: true, className: 'form__input', id: 'timefrom' }}
-        />
-      </div>
+      <DayPickerInput
+        value={utcDateToYYYYMMDDFormat(timeFrom)}
+        onDayChange={handleTimeFromChange}
+        dayPickerProps={{
+          selectedDay: timeFrom,
+          modifiers: { highlighted: availableDates },
+          showOutsideDays: true,
+          onMonthChange: handleMonthChange,
+          disabledDays: { after: new Date() },
+        }}
+        inputProps={{ disabled: isDisabled, required: true, className: 'form__input', id: 'timefrom' }}
+      />
 
-      <label htmlFor="timeto" className="form__label">
+      <label htmlFor="timeto" className="form__label u-margin-top-small">
         Time To
       </label>
       <DayPickerInput
@@ -120,7 +137,7 @@ const TimeRange = ({ index, timeTo, timeFrom, isDisabled, datasource, geometry, 
           disabledDays: { after: new Date(), before: new Date(timeFrom) },
           modifiers: { highlighted: availableDates },
           showOutsideDays: true,
-          onMonthChange: handleToMonthChange,
+          onMonthChange: handleMonthChange,
         }}
         onDayChange={handleTimeToChange}
         inputProps={{ disabled: isDisabled, required: true, className: 'form__input', id: 'timeto' }}

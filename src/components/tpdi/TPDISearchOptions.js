@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import store, { tpdiSlice } from '../../store';
+import store from '../../store';
+import tpdiSlice from '../../store/tpdi';
 import RequestButton from '../common/RequestButton';
 import AirbusOptions from './AirbusOptions';
 import { getTPDISearchRequest } from './generateTPDIRequests';

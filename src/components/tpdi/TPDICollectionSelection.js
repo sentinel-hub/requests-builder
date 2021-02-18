@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { getCustomCollections } from '../process/requests';
 import { connect } from 'react-redux';
-import store, { tpdiSlice } from '../../store';
+import store from '../../store';
+import tpdiSlice from '../../store/tpdi';
 import Axios from 'axios';
 
 const TPDICollectionSelection = ({ token, collectionId }) => {

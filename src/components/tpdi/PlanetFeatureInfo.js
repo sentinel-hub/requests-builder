@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGlobeEurope, faAngleDoubleDown, faAngleDoubleUp } from '@fortawesome/free-solid-svg-icons';
-import store, { tpdiSlice } from '../../store';
+import store from '../../store';
+import tpdiSlice from '../../store/tpdi';
 import { formatPercentage } from '../../utils/stringUtils';
 import { focusMap, getAreaCoverPercentage } from '../common/Map/utils/crsTransform';
 import { getFormattedDatetime } from './utils';

@@ -8,7 +8,8 @@ import SearchResultsContainer from '../components/tpdi/SearchResultsContainer';
 import TPDIOrdersContainer from '../components/tpdi/TPDIOrdersContainer';
 import TPDITimerange from '../components/tpdi/TPDITimerange';
 import TPDISearchRequestPreview from '../components/tpdi/TPDISearchRequestPreview';
-import store, { alertSlice } from '../store';
+import store from '../store';
+import alertSlice from '../store/alert';
 
 // Components needed to do TPDI Requests:
 // Timerange + AOI

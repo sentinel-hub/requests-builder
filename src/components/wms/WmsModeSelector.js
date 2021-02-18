@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import store, { wmsSlice } from '../../store';
+import store from '../../store';
+import wmsSlice from '../../store/wms';
 
 const WmsModeSelector = ({ mode }) => {
   const handleWmsModeChange = (e) => {

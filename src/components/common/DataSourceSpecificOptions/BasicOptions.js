@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import store, { requestSlice } from '../../../store';
+import store from '../../../store';
+import requestSlice from '../../../store/request';
 import BaseOptionsNoCC from './BaseOptionsNoCC';
 import { connect } from 'react-redux';
 
@@ -8,7 +9,7 @@ const BasicOptions = ({ stateMaxCC, idx }) => {
   const [maxCC, setMaxCC] = useState('100');
 
   const handleCCChange = (e) => {
-    setMaxCC(e.target.value);
+    setMaxCC(Number(e.target.value));
   };
 
   useEffect(() => {
@@ -26,7 +27,7 @@ const BasicOptions = ({ stateMaxCC, idx }) => {
   }, [stateMaxCC]);
 
   return (
-    <div>
+    <>
       <label htmlFor={`cloud-coverage-${idx}`} className="form__label">
         Cloud Coverage
       </label>
@@ -46,7 +47,7 @@ const BasicOptions = ({ stateMaxCC, idx }) => {
         </p>
       </div>
       <BaseOptionsNoCC withCC={true} idx={idx} />
-    </div>
+    </>
   );
 };
 

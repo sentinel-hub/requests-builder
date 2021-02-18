@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import store, { tpdiSlice, alertSlice, planetSlice } from '../../store';
+import store from '../../store';
+import alertSlice from '../../store/alert';
 import TPDIPlaceOrderButton from './TPDIPlaceOrderButton';
 import TPDICollectionSelection from './TPDICollectionSelection';
 import { getAreaCoverPercentage, getAreaFromGeometry } from '../common/Map/utils/crsTransform';
 import Tooltip from '../common/Tooltip/Tooltip';
 import Toggle from '../common/Toggle';
+import tpdiSlice, { planetSlice } from '../../store/tpdi';
 
 export const errorHandlerTPDI = (error) => {
   if (error.response?.status === 403) {

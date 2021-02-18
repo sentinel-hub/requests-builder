@@ -1,6 +1,7 @@
 import React from 'react';
 import BasicOptions from './BasicOptions';
-import store, { requestSlice } from '../../../store';
+import store from '../../../store';
+import requestSlice from '../../../store/request';
 import { connect } from 'react-redux';
 
 const S2L1COptions = ({ reduxPreviewMode, idx }) => {
@@ -9,7 +10,7 @@ const S2L1COptions = ({ reduxPreviewMode, idx }) => {
   };
 
   return (
-    <div>
+    <>
       <BasicOptions idx={idx} />
       <label htmlFor={`preview-mode-${idx}`} className="form__label u-margin-top-tiny">
         Preview Mode
@@ -25,7 +26,7 @@ const S2L1COptions = ({ reduxPreviewMode, idx }) => {
         <option value="PREVIEW">Preview</option>
         <option value="EXTENDED_PREVIEW">Extended preview</option>
       </select>
-    </div>
+    </>
   );
 };
 

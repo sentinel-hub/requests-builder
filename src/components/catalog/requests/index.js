@@ -3,6 +3,7 @@ import bbox from '@turf/bbox';
 import { getUrlFromCurl, getRequestBody } from '../../process/requests/parseRequest';
 import { S2L1C, S1GRD, S2L2A } from '../../../utils/const';
 import { datasourceToCollection } from '../const';
+import { isBbox } from '../../common/Map/utils/crsTransform';
 
 const getConfigHelper = (token, reqConfig) => {
   return {
@@ -22,20 +23,18 @@ export const getCatalogCollections = (token, reqConfig) => {
 };
 
 const getBbox = (geometry) => {
-  if (geometry.length === 4) {
+  if (isBbox(geometry)) {
     return geometry;
   }
   return bbox(geometry);
 };
 
-const shouldIntersect = (geometry) => {
-  if (geometry.length === 4) {
-    return false;
-  }
-  return true;
-};
+const shouldIntersect = (geometry) => !isBbox(geometry);
 
 const getDateTime = (catalogState, timeRange) => {
+  if (catalogState.isTimeFromOpen && catalogState.isTimeToOpen) {
+    return `../..`;
+  }
   if (catalogState.isTimeFromOpen) {
     return `../${timeRange.timeTo}`;
   } else if (catalogState.isTimeToOpen) {

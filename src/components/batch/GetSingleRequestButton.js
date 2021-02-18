@@ -3,10 +3,12 @@ import RequestButton from '../common/RequestButton';
 import { connect } from 'react-redux';
 import { addAlertOnError, batchIdValidation } from './BatchActions';
 import { getSingleBatchRequest } from './requests';
-import store, { batchSlice } from '../../store';
+import store from '../../store';
+import batchSlice from '../../store/batch';
 
-const GetSingleRequestButton = ({ token, selectedBatchId, setFetchedRequests }) => {
+const GetSingleRequestButton = ({ token, selectedBatchId, setFetchedRequests, setSingleResponse }) => {
   const getSingleBatchHandler = (response) => {
+    setSingleResponse(JSON.stringify(response, null, 2));
     store.dispatch(batchSlice.actions.setExtraInfo(''));
     setFetchedRequests([response]);
   };

@@ -1,4 +1,5 @@
-import store, { batchSlice } from '../../../store';
+import store from '../../../store';
+import batchSlice from '../../../store/batch';
 
 export const getBucketName = (member) => {
   if (member.bucketName !== undefined) {

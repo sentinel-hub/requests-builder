@@ -1,4 +1,6 @@
-import store, { tpdiSlice, requestSlice, airbusSlice, planetSlice } from '../../../store';
+import store from '../../../store';
+import requestSlice from '../../../store/request';
+import tpdiSlice, { airbusSlice, planetSlice } from '../../../store/tpdi';
 import { transformGeometryToWGS84IfNeeded } from '../../common/Map/utils/crsTransform';
 import omit from 'lodash.omit';
 import { crsUrlToCrsKey } from '../../../utils/const';

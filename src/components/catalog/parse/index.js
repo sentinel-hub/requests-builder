@@ -1,5 +1,7 @@
 import { getRequestBody } from '../../process/requests/parseRequest';
-import store, { catalogSlice, requestSlice } from '../../../store';
+import store from '../../../store';
+import catalogSlice from '../../../store/catalog';
+import requestSlice from '../../../store/request';
 
 export const parseCatalogBody = (str) => {
   let body = getRequestBody(str);

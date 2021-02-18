@@ -1,5 +1,6 @@
 import React from 'react';
-import store, { catalogSlice } from '../../store';
+import store from '../../store';
+import catalogSlice from '../../store/catalog';
 import { connect } from 'react-redux';
 
 const CatalogSentinel2Options = ({ queryProperties, idx }) => {

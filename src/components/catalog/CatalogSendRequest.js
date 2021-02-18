@@ -1,11 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import store, { catalogSlice } from '../../store';
+import store from '../../store';
+import catalogSlice from '../../store/catalog';
 import CatalogSendRequestButton from './CatalogSendRequestButton';
 import CatalogSendRequestNextButton from './CatalogSendRequestNextButton';
 
 //limit, get next, send
-const CatalogSendRequest = ({ limit, next, setResults }) => {
+const CatalogSendRequest = ({ limit, next, setResults, setCatalogSearchResponse }) => {
   const handleLimitChange = (e) => {
     store.dispatch(catalogSlice.actions.setLimit(e.target.value));
   };
@@ -30,8 +31,16 @@ const CatalogSendRequest = ({ limit, next, setResults }) => {
         <input id="next" value={next} className="form__input" type="number" readOnly />
 
         <div className="buttons-container">
-          <CatalogSendRequestButton setResults={setResults} />
-          {next ? <CatalogSendRequestNextButton setResults={setResults} /> : null}
+          <CatalogSendRequestButton
+            setResults={setResults}
+            setCatalogSearchResponse={setCatalogSearchResponse}
+          />
+          {next ? (
+            <CatalogSendRequestNextButton
+              setResults={setResults}
+              setCatalogSearchResponse={setCatalogSearchResponse}
+            />
+          ) : null}
         </div>
       </div>
     </>

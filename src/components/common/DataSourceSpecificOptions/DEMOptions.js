@@ -1,6 +1,7 @@
 //Common to all datasources
 import React from 'react';
-import store, { requestSlice } from '../../../store';
+import store from '../../../store';
+import requestSlice from '../../../store/request';
 import { connect } from 'react-redux';
 import Toggle from '../Toggle';
 
@@ -32,7 +33,7 @@ const DEMOptions = ({ processingOptions, dataFilterOptions, idx }) => {
     store.dispatch(requestSlice.actions.setDataFilterOptions({ demInstance: e.target.value, idx: idx }));
   };
   return (
-    <div>
+    <>
       <label htmlFor={`dem-upsampling-${idx}`} className="form__label">
         Upsampling
       </label>
@@ -88,7 +89,7 @@ const DEMOptions = ({ processingOptions, dataFilterOptions, idx }) => {
         <option value="COPERNICUS_30">Copernicus 30/90m DEM</option>
         <option value="COPERNICUS_90">Copernicus 90m DEM</option>
       </select>
-    </div>
+    </>
   );
 };
 

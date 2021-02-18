@@ -16,7 +16,6 @@ const GetLowResPreviewButton = ({ requestState, token }) => {
         request={createLowResPreviewRequest}
         args={[requestState, token]}
         requestState={requestState}
-        useShortcut={true}
       />
     </div>
   );

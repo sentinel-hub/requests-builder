@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
-import store, { requestSlice } from '../../../store';
-import { calculateAutoDimensions } from '../Map/utils/bboxRatio';
+import React, { useEffect, useState } from 'react';
+import store from '../../../store';
+import requestSlice from '../../../store/request';
+import { calculateAutoDimensions, calculatePixelSize } from '../Map/utils/bboxRatio';
 import Toggle from '../Toggle';
 
 import { connect } from 'react-redux';
@@ -25,18 +26,35 @@ const generatePlaceholder = (heightOrRes, input) => {
 
 const isWritingDecimal = (input) => /^\d*(\.|,)0*$/.test(input);
 
-const OutputDimensions = ({ geometry, heightOrRes, height, width, isAutoRatio }) => {
+const dispatchNewDimensions = (newDimensions) => {
+  if (newDimensions) {
+    const newWidth = newDimensions[0];
+    const newHeight = newDimensions[1];
+    store.dispatch(requestSlice.actions.setWidthOrHeight({ x: newWidth, y: newHeight }));
+  }
+};
+
+const OutputDimensions = ({
+  geometry,
+  heightOrRes,
+  height,
+  width,
+  isAutoRatio,
+  isOnAutoRes,
+  useAutoResMode = true,
+}) => {
   const handleSetAutoRatio = () => {
     store.dispatch(requestSlice.actions.setIsAutoRatio(!isAutoRatio));
   };
 
-  const dispatchNewDimensions = (newDimensions) => {
-    if (newDimensions) {
-      const newWidth = newDimensions[0];
-      const newHeight = newDimensions[1];
-      store.dispatch(requestSlice.actions.setWidthOrHeight({ x: newWidth, y: newHeight }));
+  const handleSetResInCrs = () => {
+    if (isOnAutoRes) {
+      store.dispatch(requestSlice.actions.setWidthOrHeight({ x: 100, y: 100 }));
     }
+    store.dispatch(requestSlice.actions.setIsOnAutoRes(!isOnAutoRes));
   };
+
+  const shouldDisplayAutoRes = heightOrRes === 'RES' && isOnAutoRes && useAutoResMode;
 
   const handleTextChange = (e) => {
     if (isWritingDecimal(e.target.value)) {
@@ -103,7 +121,7 @@ const OutputDimensions = ({ geometry, heightOrRes, height, width, isAutoRatio })
           style={{ cursor: 'pointer' }}
         />
         <label style={{ cursor: 'pointer' }} className="form__label u-margin-right-small" htmlFor="height">
-          Height and width
+          Height/width
         </label>
         <input
           className="form__input u-margin-right-tiny"
@@ -120,34 +138,49 @@ const OutputDimensions = ({ geometry, heightOrRes, height, width, isAutoRatio })
         </label>
       </div>
 
-      <label htmlFor="width-input" className="form__label">
-        {heightOrRes === 'HEIGHT' ? 'Width' : 'Res X (in CRS units)'}
-      </label>
-      <input
-        id="width-input"
-        required
-        className="form__input"
-        type="text"
-        name="x"
-        value={width}
-        onChange={handleTextChange}
-        placeholder={generatePlaceholder(heightOrRes, 'x')}
-        autoComplete="off"
-      />
-      <label htmlFor="height-input" className="form__label">
-        {heightOrRes === 'HEIGHT' ? 'Height' : 'Res Y (in CRS units)'}
-      </label>
-      <input
-        id="height-input"
-        required
-        className="form__input"
-        type="text"
-        name="y"
-        value={height}
-        onChange={handleTextChange}
-        placeholder={generatePlaceholder(heightOrRes, 'y')}
-        autoComplete="off"
-      />
+      {heightOrRes === 'RES' && useAutoResMode && (
+        <div className="toggle-with-label">
+          <label htmlFor="res-in-meters" className="form__label">
+            Resolution in meters
+          </label>
+          <Toggle checked={shouldDisplayAutoRes} id="res-in-meters" onChange={handleSetResInCrs} />
+        </div>
+      )}
+
+      {shouldDisplayAutoRes ? (
+        <AutoResFields geometry={geometry} />
+      ) : (
+        <>
+          <label htmlFor="width-input" className="form__label">
+            {heightOrRes === 'HEIGHT' ? 'Width' : 'Res X (in CRS units)'}
+          </label>
+          <input
+            id="width-input"
+            required
+            className="form__input"
+            type="text"
+            name="x"
+            value={width}
+            onChange={handleTextChange}
+            placeholder={generatePlaceholder(heightOrRes, 'x')}
+            autoComplete="off"
+          />
+          <label htmlFor="height-input" className="form__label">
+            {heightOrRes === 'HEIGHT' ? 'Height' : 'Res Y (in CRS units)'}
+          </label>
+          <input
+            id="height-input"
+            required
+            className="form__input"
+            type="text"
+            name="y"
+            value={height}
+            onChange={handleTextChange}
+            placeholder={generatePlaceholder(heightOrRes, 'y')}
+            autoComplete="off"
+          />
+        </>
+      )}
 
       {heightOrRes === 'HEIGHT' ? (
         <div className="toggle-with-label">
@@ -161,12 +194,48 @@ const OutputDimensions = ({ geometry, heightOrRes, height, width, isAutoRatio })
   );
 };
 
+const AutoResFields = ({ geometry }) => {
+  const [resX, setResX] = useState(20);
+  const [resY, setResY] = useState(20);
+
+  useEffect(() => {
+    const newDimensions = calculatePixelSize(geometry, [resX, resY]);
+    dispatchNewDimensions(newDimensions);
+  }, [resX, resY, geometry]);
+
+  return (
+    <>
+      <label htmlFor="res-x-meters" className="form__label">
+        Res X in meters
+      </label>
+      <input
+        id="res-x-meters"
+        className="form__input"
+        value={resX}
+        onChange={(e) => setResX(Number(e.target.value))}
+        type="number"
+      />
+      <label htmlFor="res-y-meters" className="form__label">
+        Res Y in meters
+      </label>
+      <input
+        id="res-y-meters"
+        className="form__input"
+        value={resY}
+        onChange={(e) => setResY(Number(e.target.value))}
+        type="number"
+      />
+    </>
+  );
+};
+
 const mapStateToProps = (state) => ({
   heightOrRes: state.request.heightOrRes,
   height: state.request.height,
   width: state.request.width,
   geometry: state.request.geometry,
   isAutoRatio: state.request.isAutoRatio,
+  isOnAutoRes: state.request.isOnAutoRes,
 });
 
 export default connect(mapStateToProps)(OutputDimensions);

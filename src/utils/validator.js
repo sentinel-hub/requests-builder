@@ -1,18 +1,12 @@
 const validateDatasource = (requestState) => {
-  if (requestState.datasource) {
-    if (
-      requestState.datasource === 'CUSTOM' &&
-      requestState.byocCollectionId &&
-      requestState.byocLocation &&
-      requestState.byocCollectionType
-    ) {
-      return true;
-    }
-    if (requestState.datasource !== 'CUSTOM') {
-      return true;
-    }
-  }
-  return false;
+  return Boolean(
+    requestState.datasource &&
+      ((requestState.datasource === 'CUSTOM' &&
+        requestState.byocCollectionId &&
+        requestState.byocLocation &&
+        requestState.byocCollectionType) ||
+        requestState.datasource !== 'CUSTOM'),
+  );
 };
 
 export const validateRequestState = (requestState) => {

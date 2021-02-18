@@ -1,6 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import store, { catalogSlice, requestSlice } from '../../store';
+import store from '../../store';
+import catalogSlice from '../../store/catalog';
+import requestSlice from '../../store/request';
 import Toggle from '../common/Toggle';
 import moment from 'moment';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
@@ -22,17 +24,9 @@ const CatalogTimeRange = ({ isTimeToOpen, timeTo, isTimeFromOpen, timeFrom }) =>
     store.dispatch(requestSlice.actions.setTimeTo({ timeTo: date, idx: 0 }));
   };
   const handleOpenTimeTo = () => {
-    // if one is already open it cannot be opened.
-    if (isTimeFromOpen && !isTimeToOpen) {
-      return;
-    }
     store.dispatch(catalogSlice.actions.openTimeTo(!isTimeToOpen));
   };
   const handleOpenTimeFrom = () => {
-    // if one is already open it cannot be opened.
-    if (isTimeToOpen && !isTimeFromOpen) {
-      return;
-    }
     store.dispatch(catalogSlice.actions.openTimeFrom(!isTimeFromOpen));
   };
 

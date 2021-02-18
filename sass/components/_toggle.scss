@@ -4,6 +4,11 @@
   display: inline-block;
   width: 35px;
   height: 22px;
+
+  @include respond(tab-port) {
+    width: 20px;
+    height: 12px;
+  }
 }
 
 /* Hide default HTML checkbox */
@@ -36,6 +41,13 @@
   background-color: white;
   -webkit-transition: 0.2s;
   transition: 0.2s;
+
+  @include respond(tab-port) {
+    width: 8px;
+    height: 8px;
+    left: 2px;
+    bottom: 2px;
+  }
 }
 
 input:checked + .slider {
@@ -50,11 +62,21 @@ input:checked + .slider::before {
   -webkit-transform: translateX(12px);
   -ms-transform: translateX(12px);
   transform: translateX(12px);
+
+  @include respond(tab-port) {
+    -webkit-transform: translateX(8px);
+    -ms-transform: translateX(8px);
+    transform: translateX(8px);
+  }
 }
 
 /* Rounded sliders */
 .slider.round {
   border-radius: 34px;
+
+  @include respond(tab-port) {
+    border-radius: 21px;
+  }
 }
 
 .slider.round::before {

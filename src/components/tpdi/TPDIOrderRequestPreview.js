@@ -63,6 +63,7 @@ const TPDIOrderRequestPreview = ({
           className="tpdi-order-preview"
           onParse={handleParse}
           supportedParseNames={['create with datafilter', 'create with products ids']}
+          id="tpdi-order-req-preview"
         />
       </div>
     </>

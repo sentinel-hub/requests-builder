@@ -1,8 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { generateAxiosRequest } from './requests';
+import { processApiRequest } from './requests';
 import CancelablePopUpRequestButton from '../common/CancelablePopUpRequestButton';
-import store, { requestSlice, responsesSlice } from '../../store';
+import store from '../../store';
+import responsesSlice from '../../store/responses';
+import requestSlice from '../../store/request';
 import { validateRequestState } from '../../utils/validator';
 
 const debugError = (responseString) => {
@@ -37,13 +39,12 @@ const SendRequest = ({ token, requestState }) => {
   return (
     <div>
       <CancelablePopUpRequestButton
-        className={`button`}
+        className="button"
         buttonText="Send Request"
-        request={generateAxiosRequest}
+        request={processApiRequest}
         args={[requestState, token]}
         validation={Boolean(isValid && token)}
         requestState={requestState}
-        useShortcut={true}
       />
     </div>
   );

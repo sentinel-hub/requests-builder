@@ -73,20 +73,9 @@ const QuotaContainer = ({ token }) => {
               ]}
               className="quota-preview"
               canCopy
+              id="quota-req-preview"
             />
           </div>
-        </div>
-        <div className="u-flex-aligned" style={{ marginLeft: '10%' }}>
-          {/* <RequestButton
-            request={getTPDIQuota}
-            args={[token]}
-            buttonText={quotas.length > 0 ? 'Refresh Quotas' : 'Get Quotas'}
-            validation={Boolean(token)}
-            className="secondary-button"
-            responseHandler={handleGetQuota}
-            disabledTitle="Log in to use this"
-            errorHandler={errorHandlerTPDI}
-          /> */}
         </div>
       </div>
     </div>

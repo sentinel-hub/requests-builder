@@ -1,6 +1,7 @@
 import React from 'react';
 import BasicOptions from './BasicOptions';
-import store, { requestSlice } from '../../../store';
+import store from '../../../store';
+import requestSlice from '../../../store/request';
 import { connect } from 'react-redux';
 
 const S3SLSTROptions = ({ reduxOrbitDirection, reduxView, idx }) => {
@@ -13,7 +14,7 @@ const S3SLSTROptions = ({ reduxOrbitDirection, reduxView, idx }) => {
   };
 
   return (
-    <div>
+    <>
       <BasicOptions idx={idx} />
       <label htmlFor={`orbit-direction-${idx}`} className="form__label u-margin-top-tiny">
         Orbit Direction
@@ -36,7 +37,7 @@ const S3SLSTROptions = ({ reduxOrbitDirection, reduxView, idx }) => {
         <option value="NADIR">Nadir</option>
         <option value="OBLIQUE">Oblique</option>
       </select>
-    </div>
+    </>
   );
 };
 

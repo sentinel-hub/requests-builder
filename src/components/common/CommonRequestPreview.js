@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Controlled } from 'react-codemirror2';
+import store from '../../store';
+import alertSlice from '../../store/alert';
+import RequestButton from './RequestButton';
 import Toggle from './Toggle';
 require('codemirror/lib/codemirror.css');
 require('codemirror/theme/eclipse.css');
@@ -17,9 +20,20 @@ options:
 ]
 supportedParseNames: names of options that can be parsed using onParse function.
 canCopy: shows copy to clipboard button
+supportedSendEditedNames: names of options that can be edited and send.
+this requires to pass token as props.
 */
-const CommonRequestPreview = ({ options, className, onParse, supportedParseNames, canCopy = false }) => {
-  const id = `toggle-${Math.random()}`;
+const CommonRequestPreview = ({
+  options,
+  className,
+  onParse,
+  supportedParseNames,
+  supportedSendEditedNames,
+  canCopy = false,
+  sendEditedRequest,
+  onSendEdited,
+  id,
+}) => {
   const [toggled, setToggled] = useState(false);
   const [selectedOption, setSelectedOption] = useState(options ? options[0] : {});
   const [text, setText] = useState(selectedOption.value);
@@ -66,7 +80,11 @@ const CommonRequestPreview = ({ options, className, onParse, supportedParseNames
       {options.length > 1 ? (
         <div className="toggle-with-label">
           <label className="form__label">Request</label>
-          <select className="form__input" value={selectedOption.name} onChange={handleSelectedOptionChange}>
+          <select
+            className="form__input form__input--fit"
+            value={selectedOption.name}
+            onChange={handleSelectedOptionChange}
+          >
             {options.map((opt) => (
               <option key={opt.name} value={opt.name}>
                 {opt.name}
@@ -96,22 +114,34 @@ const CommonRequestPreview = ({ options, className, onParse, supportedParseNames
             See response
           </label>
           <Toggle id={id} checked={toggled} onChange={handleToggleChange} />
-          {canCopy && (
-            <button className="secondary-button" style={{ marginTop: 0 }} onClick={handleCopy}>
-              Copy
-            </button>
-          )}
-          {onParse && hasTextChanged && supportedParseNames.includes(selectedOption.name) && (
-            <button
-              className="secondary-button"
-              style={{ marginTop: 0, marginLeft: '1rem' }}
-              onClick={() => onParse(text)}
-            >
-              Parse
-            </button>
-          )}
         </div>
       )}
+      <div className="u-flex-aligned u-margin-top-tiny">
+        {canCopy && (
+          <button className="secondary-button" style={{ marginTop: 0 }} onClick={handleCopy}>
+            Copy
+          </button>
+        )}
+        {onParse !== undefined && hasTextChanged && supportedParseNames?.includes(selectedOption.name) && (
+          <button className="secondary-button" style={{ margin: '0 1rem' }} onClick={() => onParse(text)}>
+            Parse
+          </button>
+        )}
+        {hasTextChanged && supportedSendEditedNames?.includes(selectedOption.name) && (
+          <RequestButton
+            buttonText="Send Edited Request"
+            request={(args) => sendEditedRequest(text, args)}
+            args={[]}
+            className="secondary-button"
+            responseHandler={onSendEdited}
+            validation={true}
+            errorHandler={() =>
+              store.dispatch(alertSlice.actions.addAlert({ type: 'WARNING', text: 'Something went wrong' }))
+            }
+            style={{ margin: '0 1rem' }}
+          />
+        )}
+      </div>
     </>
   );
 };

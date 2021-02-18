@@ -48,7 +48,7 @@
     "watch:sass": "node-sass sass/main.scss src/App2.css -w",
     "lint": "eslint --max-warnings 0 --ext .js src/",
     "lint-style": "stylelint --max-warnings 0 \"sass/**/*.scss\"",
-    "prettier": "prettier --write \"src/**/*.{js,json}\"",
+    "prettier": "prettier --write \"src/**/*.{js,json,jsx}\"",
     "prettier-style": "stylelint --fix \"sass/**/*.scss\""
   },
   "eslintConfig": {

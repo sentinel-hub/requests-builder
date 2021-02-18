@@ -63,6 +63,13 @@ export const getSingleBatchRequest = (token, batchId) => {
   return axios.get(url, config);
 };
 
+export const deleteBatchRequest = (token, batchId, reqConfig) => {
+  const url = BASE_BATCH_URL + batchId;
+  const config = getConfigHelper(token, reqConfig);
+
+  return axios.delete(url, config);
+};
+
 export const fetchTilesBatchRequest = async (id, token) => {
   const config = getConfigHelper(token);
 

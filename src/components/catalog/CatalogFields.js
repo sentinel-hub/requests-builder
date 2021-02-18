@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import store, { catalogSlice } from '../../store';
+import store from '../../store';
+import catalogSlice from '../../store/catalog';
 import Toggle from '../common/Toggle';
 
 const CatalogFields = ({ includeFields, disableInclude, excludeFields, disableExclude }) => {

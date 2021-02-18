@@ -1,0 +1,39 @@
+.saved-requests-container {
+  position: fixed;
+  right: 0;
+  top: 15%;
+  background-color: var(--primary);
+  user-select: none;
+  z-index: 10;
+}
+
+.saved-requests-toggle {
+  width: 50px;
+  height: 50px;
+  color: var(--black);
+
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-size: 3rem;
+    cursor: pointer;
+  }
+}
+
+.saved-requests-body {
+  display: block;
+  position: fixed;
+  right: 0;
+  width: 300px;
+  height: 300px;
+  padding: 2rem;
+  color: var(--black);
+  background-color: var(--primary);
+  overflow-y: scroll;
+}
+
+.saved-request-entry {
+  font-size: 0.7rem;
+}

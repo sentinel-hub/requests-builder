@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { kml } from '@tmcw/togeojson';
 import { convertToCRS84AndDispatch } from './MapContainer';
-import store, { tpdiSlice } from '../../../store';
+import store from '../../../store';
+import tpdiSlice from '../../../store/tpdi';
 import { transformGeometryToNewCrs } from './utils/crsTransform';
 
 const MapTextarea = ({ selectedCrs, fitToMainBounds, extraMapGeometry, geometry }) => {

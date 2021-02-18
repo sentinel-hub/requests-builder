@@ -2,7 +2,9 @@ import React from 'react';
 import RequestButton from '../common/RequestButton';
 import { connect } from 'react-redux';
 import { generateCatalogRequest } from './requests';
-import store, { catalogSlice, alertSlice } from '../../store';
+import store from '../../store';
+import catalogSlice from '../../store/catalog';
+import alertSlice from '../../store/alert';
 
 export const catalogErrorHandler = (error) => {
   if (error.response && error.response.data) {
@@ -18,7 +20,14 @@ export const catalogErrorHandler = (error) => {
   console.error(error);
 };
 
-const CatalogSendRequestButton = ({ catalogState, geometry, timeRange, token, setResults }) => {
+const CatalogSendRequestButton = ({
+  catalogState,
+  geometry,
+  timeRange,
+  token,
+  setResults,
+  setCatalogSearchResponse,
+}) => {
   let type = catalogState.selectedCollection;
 
   const responseHandler = (response) => {
@@ -31,6 +40,7 @@ const CatalogSendRequestButton = ({ catalogState, geometry, timeRange, token, se
       results: response.features,
       type: type,
     }));
+    setCatalogSearchResponse(JSON.stringify(response, null, 2));
   };
 
   return (

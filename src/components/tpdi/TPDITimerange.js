@@ -1,7 +1,9 @@
 import React from 'react';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import { connect } from 'react-redux';
-import store, { requestSlice, tpdiSlice } from '../../store';
+import store from '../../store';
+import tpdiSlice from '../../store/tpdi';
+import requestSlice from '../../store/request';
 import Toggle from '../common/Toggle';
 import { utcDateToYYYYMMDDFormat } from '../common/TimeRange/TimeRange';
 import moment from 'moment';

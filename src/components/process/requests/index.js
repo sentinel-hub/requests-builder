@@ -150,6 +150,7 @@ const getTimeRange = (requestState, idx = 0) => {
 
 const getBoundsProperties = (crs) => {
   if (crs === 'EPSG:4326') {
+    // non properties is required to demo tpdi orders.
     return {};
   }
   return {
@@ -184,6 +185,12 @@ const generateOutput = (state) => {
       height,
     };
   } else if (state.heightOrRes === 'RES') {
+    if (state.isOnAutoRes) {
+      return {
+        width,
+        height,
+      };
+    }
     return {
       resx: width,
       resy: height,
@@ -193,6 +200,19 @@ const generateOutput = (state) => {
 
 const generateResponses = (reqState) =>
   reqState.responses.map((resp) => ({ identifier: resp.identifier, format: { type: resp.format } }));
+
+export const getNonDefaultOptions = (options) => {
+  const resOptions = {};
+  if (options) {
+    Object.keys(options).forEach((key) => {
+      const value = options[key];
+      if (value !== 'DEFAULT' && value !== undefined) {
+        resOptions[key] = value;
+      }
+    });
+  }
+  return resOptions;
+};
 
 const getProcessingOptions = (reqState, idx = 0) => {
   const resObject = {
@@ -239,7 +259,7 @@ export const generateProcessCurlCommand = (reqState, token) => {
   return curlCommand;
 };
 
-export const generateAxiosRequest = (requestState, token, reqConfig) => {
+export const processApiRequest = (requestState, token, reqConfig) => {
   try {
     const body = getJSONRequestBody(requestState);
     const config = getProcessRequestConfig(token, reqConfig, requestState);

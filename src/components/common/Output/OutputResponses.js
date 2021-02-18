@@ -1,5 +1,6 @@
 import React from 'react';
-import store, { requestSlice } from '../../../store';
+import store from '../../../store';
+import requestSlice from '../../../store/request';
 import { OUTPUT_FORMATS } from '../../../utils/const';
 import { connect } from 'react-redux';
 

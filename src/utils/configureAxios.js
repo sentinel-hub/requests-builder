@@ -1,10 +1,28 @@
 import Axios from 'axios';
-import store, { alertSlice, authSlice } from '../store';
-import { doLogout, doLogin } from '../components/common/AuthHeader';
+import store from '../store';
+import alertSlice from '../store/alert';
+import authSlice from '../store/auth';
+import { getAssistedTokenDocument } from './authHelpers';
 
-const lastUsedToken = {
-  token: '',
-  time: 0,
+const tokenState = {
+  access_token: '',
+  expires_in: null,
+  isFetchingAssisted: false,
+};
+
+export const setTokenState = (access_token, expires_in) => {
+  tokenState.access_token = access_token;
+  tokenState.expires_in = expires_in;
+  tokenState.isFetchingAssisted = false;
+};
+
+const parseAssistedDocument = (stringDoc) => {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(stringDoc, 'text/html');
+  const str = doc.scripts[0].innerText;
+  const ini = str.indexOf('{');
+  const end = str.indexOf('}');
+  return JSON.parse(str.substr(ini, end - ini + 1));
 };
 
 const configureAxios = () => {
@@ -27,20 +45,23 @@ const checkStatusCode401 = (error) => {
   }
 };
 
-const getTokenFromHeaders = (config) => {
-  if (config.headers.Authorization) {
-    return config.headers.Authorization.split('Bearer ')[1];
-  }
-};
-
 Axios.interceptors.request.use(
-  (config) => {
+  async (config) => {
     if (
-      lastUsedToken.time &&
-      getTokenFromHeaders(config) !== lastUsedToken.token &&
-      (lastUsedToken.time - Date.now()) / 1000 < 3600
+      tokenState.expires_in &&
+      tokenState.access_token &&
+      tokenState.expires_in < Date.now() &&
+      tokenState.isFetchingAssisted === false
     ) {
-      config.headers.Authorization = 'Bearer ' + lastUsedToken.token;
+      tokenState.isFetchingAssisted = true;
+      const res = await getAssistedTokenDocument();
+      const parsed = parseAssistedDocument(res.data);
+      const expires_in = Date.now() + parsed.expires_in * 1000;
+      setTokenState(parsed.access_token, expires_in);
+      store.dispatch(
+        authSlice.actions.setToken({ access_token: parsed.access_token, expires_in: expires_in }),
+      );
+      config.headers.Authorization = 'Bearer ' + parsed.access_token;
       return config;
     }
     return config;
@@ -49,6 +70,25 @@ Axios.interceptors.request.use(
     return Promise.reject(error);
   },
 );
+
+export const setBaseUrlAxiosInterpector = (url) => {
+  Axios.interceptors.request.use(
+    (config) => {
+      const originalUrl = new URL(config.url);
+      let newUrl;
+      if (url.slice(-1) === '/') {
+        newUrl = url + originalUrl.pathname.slice(1);
+      } else {
+        newUrl = url + originalUrl.pathname;
+      }
+      config.url = newUrl;
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
+    },
+  );
+};
 
 export const edcResponseInterceptor = () => {
   Axios.interceptors.response.use(
@@ -70,31 +110,6 @@ export const edcResponseInterceptor = () => {
           return Axios(originalRequest);
         });
       }
-    },
-  );
-};
-
-export const shResponseInterceptor = () => {
-  // Interceptor to prompt login in case token is expired.
-  Axios.interceptors.response.use(
-    (response) => {
-      return response;
-    },
-    (error) => {
-      // If 401 prompt login
-      let originalRequest = error.config;
-      if (checkStatusCode401(error) && !originalRequest._retry && !checkIfPlanetApiFail(error)) {
-        originalRequest._retry = true;
-        doLogout();
-        return doLogin().then((token) => {
-          originalRequest.headers['Authorization'] = 'Bearer ' + token;
-          lastUsedToken.token = token;
-          lastUsedToken.time = Date.now();
-          return Axios(originalRequest);
-        });
-      }
-
-      return Promise.reject(error);
     },
   );
 };

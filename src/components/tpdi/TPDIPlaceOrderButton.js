@@ -4,11 +4,10 @@ import { connect } from 'react-redux';
 import RequestButton from '../common/RequestButton';
 import { errorHandlerTPDI } from './TPDIOrderOptions';
 import Tooltip from '../common/Tooltip/Tooltip';
+
 const validateCreateOrderWithProducts = (products) => {
   for (let prod of products) {
-    if (prod.id && prod.id !== '') {
-      return true;
-    }
+    return Boolean(prod.id && prod.id !== '');
   }
   return false;
 };
