@@ -11,6 +11,7 @@ const responsesSlice = createSlice({
     isTar: false,
     request: undefined,
     mode: undefined,
+    isFromCollections: undefined,
   },
   reducers: {
     setResponseUrl: (state, action) => {
@@ -26,6 +27,7 @@ const responsesSlice = createSlice({
         state.isTar = false;
         state.mode = undefined;
         state.request = undefined;
+        state.isFromCollections = undefined;
       }
       state.show = action.payload;
     },
@@ -44,6 +46,9 @@ const responsesSlice = createSlice({
       }
       if (action.payload.mode) {
         state.mode = action.payload.mode;
+      }
+      if (action.payload.isFromCollections !== undefined) {
+        state.isFromCollections = action.payload.isFromCollections;
       }
     },
     setError: (state, action) => {

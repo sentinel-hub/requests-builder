@@ -273,9 +273,9 @@ body {
   cursor: pointer;
   font-weight: bold; }
   .tertiary-button:hover {
-    background-color: rgba(255, 255, 255, 0.1); }
+    background-color: #c3d340; }
   .tertiary-button:active {
-    background-color: rgba(255, 255, 255, 0.3); }
+    background-color: #f7f9e6; }
   @media (max-width: 87.5em) {
     .tertiary-button {
       font-size: 1.2rem; } }
@@ -828,6 +828,13 @@ input:checked + .slider::before {
   max-height: 100%;
   padding: 3rem 0; }
 
+.dialog {
+  width: 50%;
+  background-color: white;
+  z-index: 10;
+  cursor: auto;
+  padding: 2rem; }
+
 .overlayed-element {
   width: 50%;
   min-height: 100%;
@@ -840,11 +847,13 @@ input:checked + .slider::before {
       width: 75%; } }
 
 .overlay-image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background-color: var(--grey);
   height: fit-content;
   border-radius: 10px;
   cursor: default;
-  display: flex;
   flex-direction: column;
   padding: 10rem 10rem;
   position: relative; }
@@ -855,12 +864,12 @@ input:checked + .slider::before {
     margin-bottom: 1rem;
     font-size: 1.5rem; }
   .overlay-image-container img {
-    max-width: 700px;
-    max-height: 700px; }
+    max-width: 450px;
+    max-height: 450px; }
     @media (max-width: 75em) {
       .overlay-image-container img {
-        max-width: 500px;
-        max-height: 500px; } }
+        max-width: 380px;
+        max-height: 380px; } }
     @media (max-width: 50em) {
       .overlay-image-container img {
         max-width: 300px;
@@ -959,21 +968,32 @@ input:checked + .slider::before {
   position: fixed;
   right: 0;
   top: 15%;
-  background-color: var(--primary);
+  background-color: #dde693;
   user-select: none;
   z-index: 10; }
 
 .saved-requests-toggle {
-  width: 50px;
-  height: 50px;
+  width: 65px;
+  height: 65px;
   color: var(--black); }
   .saved-requests-toggle__icon {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: space-evenly;
     height: 100%;
     font-size: 3rem;
     cursor: pointer; }
+    .saved-requests-toggle__icon span {
+      font-size: 1.1rem;
+      font-weight: bold; }
+      @media (max-width: 500px) {
+        .saved-requests-toggle__icon span {
+          display: none; } }
+  @media (max-width: 500px) {
+    .saved-requests-toggle {
+      width: 30px;
+      height: 30px; } }
 
 .saved-requests-body {
   display: block;
@@ -983,7 +1003,7 @@ input:checked + .slider::before {
   height: 300px;
   padding: 2rem;
   color: var(--black);
-  background-color: var(--primary);
+  background-color: #dde693;
   overflow-y: scroll; }
 
 .saved-request-entry {

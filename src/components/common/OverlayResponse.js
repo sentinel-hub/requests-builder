@@ -1,38 +1,37 @@
-import React, { useRef, useCallback, useEffect, useState } from 'react';
+import React, { useRef, useCallback, useState } from 'react';
 import { connect } from 'react-redux';
 import store from '../../store';
 import responsesSlice from '../../store/responses';
-import { useOnClickOutside } from '../../utils/hooks';
-import Mousetrap from 'mousetrap';
+import { useBind, useOnClickOutside, useScrollBlock } from '../../utils/hooks';
 import savedRequestsSlice from '../../store/savedRequests';
 
-const OverlayResponse = ({ show, src, dimensions, error, fisResponse, isTar, request, mode }) => {
+const OverlayResponse = ({
+  show,
+  src,
+  dimensions,
+  error,
+  fisResponse,
+  isTar,
+  request,
+  mode,
+  isFromCollections,
+}) => {
   const ref = useRef();
-  const displaySaveRequestButton = request !== undefined && mode !== undefined;
+  const displaySaveRequestForm = request !== undefined && mode !== undefined && !isFromCollections;
   const [requestName, setRequestName] = useState('');
   const [hasSavedRequest, setHasSavedRequest] = useState(false);
 
   const closeHandler = useCallback(() => {
     store.dispatch(responsesSlice.actions.setShow(false));
-    if (src && !hasSavedRequest) {
+    if (src && !hasSavedRequest && !isFromCollections) {
       URL.revokeObjectURL(src);
     }
     setRequestName('');
     setHasSavedRequest(false);
-  }, [src, hasSavedRequest]);
+  }, [src, hasSavedRequest, isFromCollections]);
 
-  useEffect(() => {
-    if (show) {
-      Mousetrap.bind('escape', closeHandler);
-      //Prevent scroll when is opened
-      document.body.style.overflow = 'hidden';
-    } else {
-      // Restore scroll
-      document.body.style.overflow = 'auto';
-      Mousetrap.unbind('escape', closeHandler);
-    }
-  }, [show, closeHandler]);
-
+  useBind('escape', closeHandler, show);
+  useScrollBlock(show);
   useOnClickOutside(ref, closeHandler);
 
   const handleCloseClick = () => closeHandler();
@@ -95,7 +94,7 @@ const OverlayResponse = ({ show, src, dimensions, error, fisResponse, isTar, req
               &#x2715;
             </span>
             {generateOverlayContents()}
-            {displaySaveRequestButton && (
+            {displaySaveRequestForm && (
               <form className="u-flex-column-centered" style={{ width: '50%' }} onSubmit={handleSaveRequest}>
                 <label className="form__label u-margin-top-small" htmlFor="name-request-input">
                   Request name (optional)
@@ -117,8 +116,8 @@ const OverlayResponse = ({ show, src, dimensions, error, fisResponse, isTar, req
                 </button>
                 <div className="info-banner u-margin-top-tiny">
                   <p>
-                    Saved requests will only last until the page is refreshed! Remember to save your requests
-                    to local files before closing the tab.
+                    Saved requests will only last until the page is refreshed! Remember to export your
+                    requests before closing the tab.
                   </p>
                 </div>
               </form>
@@ -139,6 +138,7 @@ const mapStateToProps = (state) => ({
   isTar: state.response.isTar,
   request: state.response.request,
   mode: state.response.mode,
+  isFromCollections: state.response.isFromCollections,
 });
 
 export default connect(mapStateToProps)(OverlayResponse);

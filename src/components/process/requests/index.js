@@ -298,10 +298,7 @@ export const getCustomCollections = (token, reqConfig) => {
   return Axios.get(GLOBAL_BYOC_ENDPOINT, config);
 };
 
-export const sendEditedRequest = (token, text, reqConfig) => {
-  const url = getUrlFromCurl(text);
-  const body = getRequestBody(text);
-  const parsed = JSON.parse(body);
+export const sendProcessBody = (token, body, url, reqConfig) => {
   const config = {
     headers: {
       'Content-Type': 'application/json',
@@ -310,8 +307,15 @@ export const sendEditedRequest = (token, text, reqConfig) => {
     responseType: 'blob',
     ...reqConfig,
   };
-  if (parsed.output.responses.length > 1) {
+  if (body.output.responses.length > 1) {
     config.headers.Accept = 'application/tar';
   }
-  return Axios.post(url, parsed, config);
+  return Axios.post(url, body, config);
+};
+
+export const sendEditedRequest = (token, text, reqConfig) => {
+  const url = getUrlFromCurl(text);
+  const body = getRequestBody(text);
+  const parsed = JSON.parse(body);
+  return sendProcessBody(token, parsed, url, reqConfig);
 };

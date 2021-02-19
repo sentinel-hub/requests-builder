@@ -209,7 +209,7 @@ const MapContainer = ({ geometry, selectedCrs, extraMapGeometry }) => {
             </button>
           )}
         </div>
-        <div className="map-container">
+        <div className="map-container" style={{ zIndex: '1' }}>
           <Map mapRef={mapRef} drawnItemsRef={drawnItemsRef} layersRef={layersRef} />
 
           <MapTextarea

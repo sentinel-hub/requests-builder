@@ -18,7 +18,7 @@ import TPDIBannerInfo from './components/tpdi/TPDIBannerInfo';
 import { configureParams, getUrlParams } from './params';
 import StatisticalRequestForm from './forms/StatisticalRequestForm';
 import StatisticalAuthHeader from './components/statistical/StatisticalAuthHeader';
-import SavedRequests from './components/common/SavedRequets';
+import SavedRequests from './components/process/Collections/SavedRequests';
 
 const BatchRequestForm = lazy(() => import('./forms/BatchRequestForm'));
 const TPDIRequestForm = lazy(() => import('./forms/TPDIRequestForm'));
@@ -87,9 +87,12 @@ function App({mode}) {
         store.dispatch(authSlice.actions.setIsEDC(false));        
       }
     }
+    const setParams = async () => {
+      await configureParams(getUrlParams());
+    }
     fetchTokenEdc();
     configureAxios();
-    configureParams(getUrlParams());
+    setParams();
   }, []);
 
   return (

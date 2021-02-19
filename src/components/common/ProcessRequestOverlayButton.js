@@ -4,9 +4,19 @@ import RequestButton from './RequestButton';
 import { calculatePixelSize } from './Map/utils/bboxRatio';
 import store from '../../store';
 import responsesSlice from '../../store/responses';
+import savedRequestsSlice from '../../store/savedRequests';
 
 //Abstraction of Request Button.
-const CancelablePopUpRequestButton = ({ buttonText, request, args, validation, className, requestState }) => {
+const ProcessRequestOverlayButton = ({
+  buttonText,
+  request,
+  args,
+  validation,
+  className,
+  requestState,
+  collectionRequestIdx,
+  skipSaving = true,
+}) => {
   const readerRef = useRef();
   const shouldDisplayDimensions =
     requestState &&
@@ -23,15 +33,19 @@ const CancelablePopUpRequestButton = ({ buttonText, request, args, validation, c
     if (shouldDisplayDimensions) {
       dimensions = calculatePixelSize(requestState.geometry, [requestState.width, requestState.height]);
     }
+    const isFromCollections = collectionRequestIdx !== undefined ? true : false;
+    const saveRequestData = skipSaving ? {} : { request: stringRequest, mode: 'PROCESS', isFromCollections };
     store.dispatch(
       responsesSlice.actions.setResponse({
         src: responseUrl,
         dimensions: dimensions,
         isTar: !response.type.includes('image'),
-        request: stringRequest,
-        mode: 'PROCESS',
+        ...saveRequestData,
       }),
     );
+    if (isFromCollections) {
+      store.dispatch(savedRequestsSlice.actions.setResponse({ idx: collectionRequestIdx, responseUrl }));
+    }
   };
 
   const errorHandler = (err) => {
@@ -56,4 +70,4 @@ const CancelablePopUpRequestButton = ({ buttonText, request, args, validation, c
   );
 };
 
-export default CancelablePopUpRequestButton;
+export default ProcessRequestOverlayButton;

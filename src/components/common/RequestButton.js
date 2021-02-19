@@ -52,7 +52,7 @@ const RequestButton = ({
         const res = await request(...args, reqConfig);
         if (res.data || res.status === 204) {
           setIsFetching(false);
-          responseHandler(res.data, res.config.data);
+          responseHandler(res.data, res.config?.data);
         }
       } catch (err) {
         if (!Axios.isCancel(err)) {

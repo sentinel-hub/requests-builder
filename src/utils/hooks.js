@@ -92,12 +92,14 @@ export const useDidMountEffect = (func, deps) => {
   }, deps);
 };
 
-export const useOverlay = (ref) => {
+export const useOverlayComponent = (ref) => {
   const [isOverlayExpanded, setIsOverlayExpanded] = useState(false);
   const overlayRef = useRef();
   const closeOverlay = () => setIsOverlayExpanded(false);
   const openOverlay = () => setIsOverlayExpanded(true);
+  useScrollBlock(isOverlayExpanded);
   useOnClickOutside(ref, closeOverlay);
+  useBind('esc', closeOverlay, isOverlayExpanded);
 
   useLayoutEffect(() => {
     if (isOverlayExpanded) {
@@ -109,20 +111,43 @@ export const useOverlay = (ref) => {
         parent.replaceChild(wrapper, ref.current);
         wrapper.appendChild(ref.current);
         ref.current.classList.add('overlayed-element');
-        Mousetrap.bind('esc', closeOverlay);
-        document.body.style.overflow = 'hidden';
       }
     } else {
       if (overlayRef.current) {
         const childNodes = overlayRef.current.childNodes;
         ref.current.classList.remove('overlayed-element');
         overlayRef.current.replaceWith(...childNodes);
-        Mousetrap.unbind('esc');
-        document.body.style.overflow = 'auto';
       }
     }
     // eslint-disable-next-line
   }, [isOverlayExpanded]);
 
   return { openOverlay };
+};
+
+export const useScrollBlock = (condition) => {
+  const block = () => {
+    document.body.style.overflow = 'hidden';
+  };
+  const unblock = () => {
+    document.body.style.overflow = 'auto';
+  };
+  useEffect(() => {
+    if (condition) {
+      block();
+    } else {
+      unblock();
+    }
+  }, [condition]);
+};
+
+export const useBind = (bind, bindAction, bindCondition) => {
+  useEffect(() => {
+    if (bindCondition) {
+      Mousetrap.bind(bind, bindAction);
+    } else {
+      Mousetrap.unbind(bind);
+    }
+    // eslint-disable-next-line
+  }, [bindCondition]);
 };

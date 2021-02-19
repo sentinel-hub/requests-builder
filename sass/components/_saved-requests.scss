@@ -2,23 +2,38 @@
   position: fixed;
   right: 0;
   top: 15%;
-  background-color: var(--primary);
+  background-color: #dde693;
   user-select: none;
   z-index: 10;
 }
 
 .saved-requests-toggle {
-  width: 50px;
-  height: 50px;
+  width: 65px;
+  height: 65px;
   color: var(--black);
 
   &__icon {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: space-evenly;
     height: 100%;
     font-size: 3rem;
     cursor: pointer;
+
+    span {
+      font-size: 1.1rem;
+      font-weight: bold;
+
+      @media (max-width: 500px) {
+        display: none;
+      }
+    }
+  }
+
+  @media (max-width: 500px) {
+    width: 30px;
+    height: 30px;
   }
 }
 
@@ -30,7 +45,7 @@
   height: 300px;
   padding: 2rem;
   color: var(--black);
-  background-color: var(--primary);
+  background-color: #dde693;
   overflow-y: scroll;
 }
 

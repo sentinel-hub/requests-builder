@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { processApiRequest } from './requests';
-import CancelablePopUpRequestButton from '../common/CancelablePopUpRequestButton';
+import ProcessRequestOverlayButton from '../common/ProcessRequestOverlayButton';
 import store from '../../store';
 import responsesSlice from '../../store/responses';
 import requestSlice from '../../store/request';
@@ -37,16 +37,15 @@ const SendRequest = ({ token, requestState }) => {
   const isValid = validateRequestState(requestState);
 
   return (
-    <div>
-      <CancelablePopUpRequestButton
-        className="button"
-        buttonText="Send Request"
-        request={processApiRequest}
-        args={[requestState, token]}
-        validation={Boolean(isValid && token)}
-        requestState={requestState}
-      />
-    </div>
+    <ProcessRequestOverlayButton
+      className="button"
+      buttonText="Send Request"
+      request={processApiRequest}
+      args={[requestState, token]}
+      validation={Boolean(isValid && token)}
+      requestState={requestState}
+      skipSaving={false}
+    />
   );
 };
 

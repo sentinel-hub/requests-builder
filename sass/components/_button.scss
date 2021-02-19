@@ -98,11 +98,11 @@
   font-weight: bold;
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: darken(#dde693, 20);
   }
 
   &:active {
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: lighten(#dde693, 20);
   }
 
   @include respond(1400) {

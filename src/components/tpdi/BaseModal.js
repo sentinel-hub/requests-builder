@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import Mousetrap from 'mousetrap';
-import { useOnClickOutside } from '../../utils/hooks';
+import React, { useRef, useState } from 'react';
+import { useBind, useOnClickOutside, useScrollBlock } from '../../utils/hooks';
 
 const BaseModal = ({ trigger, content }) => {
   const [active, setActive] = useState(false);
@@ -8,18 +7,8 @@ const BaseModal = ({ trigger, content }) => {
   const handleHide = () => {
     setActive(false);
   };
-
-  // Block scroll and bind escape to close.
-  useEffect(() => {
-    if (active) {
-      document.body.style.overflow = 'hidden';
-      Mousetrap.bind('escape', handleHide);
-    } else {
-      document.body.style.overflow = 'auto';
-      Mousetrap.unbind('escape', handleHide);
-    }
-  }, [active]);
-
+  useBind('esc', handleHide, active);
+  useScrollBlock(active);
   useOnClickOutside(ref, handleHide);
 
   return (
