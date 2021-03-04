@@ -33,6 +33,7 @@ const CommonRequestPreview = ({
   sendEditedRequest,
   onSendEdited,
   id,
+  additionalCodeMirrorOptions = {},
 }) => {
   const [toggled, setToggled] = useState(false);
   const [selectedOption, setSelectedOption] = useState(options ? options[0] : {});
@@ -42,7 +43,7 @@ const CommonRequestPreview = ({
   useEffect(() => {
     setSelectedOption((s) => {
       if (options) {
-        return options.find((opt) => opt.name === s.name ?? options[0]);
+        return options.find((opt) => opt.name === s.name) ?? options[0];
       }
       return {};
     });
@@ -99,6 +100,7 @@ const CommonRequestPreview = ({
           mode: 'powershell',
           theme: 'eclipse',
           matchBrackets: true,
+          ...additionalCodeMirrorOptions,
         }}
         className={className}
         onBeforeChange={(editor, data, value) => {

@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import store from '../../../store';
 import requestSlice from '../../../store/request';
 import { Controlled as CodeMirror } from 'react-codemirror2';
-import { DEFAULT_EVALSCRIPTS, CUSTOM, DATAFUSION } from '../../../utils/const';
+import { DEFAULT_EVALSCRIPTS, CUSTOM, DATAFUSION, datasourceToCustomRepoLink } from '../../../utils/const';
 import { fetchDataProducts } from './utils';
 import { JSHINT } from 'jshint';
 import Toggle from '../Toggle';
@@ -96,8 +96,16 @@ const EvalscriptEditor = ({ datasource, evalscript, token, consoleValue, classNa
           onClick={handleSetDefaultEvalscript}
           title="This will try to set the evalscript to a data-source default one"
         >
-          Set evalscript to default
+          Set to default evalscript
         </button>
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text"
+          href={datasourceToCustomRepoLink(datasource)}
+        >
+          Custom scripts repo
+        </a>
       </div>
 
       <div className="form">

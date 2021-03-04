@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { kml } from '@tmcw/togeojson';
-import { convertToCRS84AndDispatch } from './MapContainer';
 import store from '../../../store';
-import tpdiSlice from '../../../store/tpdi';
-import { transformGeometryToNewCrs } from './utils/crsTransform';
+import mapSlice from '../../../store/map';
+import { addWarningAlert } from '../../../store/alert';
 
-const MapTextarea = ({ selectedCrs, fitToMainBounds, extraMapGeometry, geometry }) => {
+const MapTextarea = ({ fitToMainBounds, extraGeometry, geometry, setParsedError, selectedCrs }) => {
   const [geometryText, setGeometryText] = useState('');
 
   const handleGeometryTextChange = (e) => {
@@ -19,13 +18,19 @@ const MapTextarea = ({ selectedCrs, fitToMainBounds, extraMapGeometry, geometry 
       if (parsedGeo.type === 'FeatureCollection') {
         parsedGeo = parsedGeo.features[0].geometry;
       }
-      convertToCRS84AndDispatch(parsedGeo, selectedCrs);
+      store.dispatch(mapSlice.actions.setTextGeometry(parsedGeo));
     } catch (err) {
+      addWarningAlert('Error parsing the geometry');
       console.error('Error Parsing Geometry', err);
     }
   };
 
   const handleParseGeometryClick = () => {
+    if (selectedCrs === 'EPSG:4326') {
+      setParsedError(false);
+    } else {
+      setParsedError(true);
+    }
     handleParseGeometry();
   };
 
@@ -44,30 +49,30 @@ const MapTextarea = ({ selectedCrs, fitToMainBounds, extraMapGeometry, geometry 
         let parser = new DOMParser();
         let doc = parser.parseFromString(text, 'text/xml');
         let converted = kml(doc);
-        convertToCRS84AndDispatch(converted.features[0].geometry, selectedCrs);
+        store.dispatch(mapSlice.actions.setTextGeometry(converted.features[0].geometry));
       } else {
         handleParseGeometry(text);
       }
       // Reset file value to always detect change on upload.
       fileElement.value = '';
+      if (selectedCrs === 'EPSG:4326') {
+        setParsedError(false);
+      } else {
+        setParsedError(true);
+      }
     } catch (err) {
       console.error('Error uploading file', err);
     }
   };
 
   const handleClearExtraGeometry = () => {
-    store.dispatch(tpdiSlice.actions.setExtraMapGeometry(null));
+    store.dispatch(mapSlice.actions.setExtraGeometry(null));
     fitToMainBounds();
   };
 
   useEffect(() => {
-    if (selectedCrs !== 'EPSG:4326') {
-      const transformedGeo = transformGeometryToNewCrs(geometry, selectedCrs);
-      setGeometryText(JSON.stringify(transformedGeo, null, 2));
-    } else {
-      setGeometryText(JSON.stringify(geometry, null, 2));
-    }
-  }, [geometry, selectedCrs]);
+    setGeometryText(JSON.stringify(geometry, null, 2));
+  }, [geometry]);
 
   return (
     <div className="textarea-aoi-container">
@@ -95,7 +100,7 @@ const MapTextarea = ({ selectedCrs, fitToMainBounds, extraMapGeometry, geometry 
         >
           &#8505;
         </span>
-        {extraMapGeometry ? (
+        {extraGeometry ? (
           <button className="secondary-button" onClick={handleClearExtraGeometry}>
             Clear Extra Geometry
           </button>

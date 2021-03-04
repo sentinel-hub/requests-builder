@@ -276,6 +276,10 @@ body {
     background-color: #c3d340; }
   .tertiary-button:active {
     background-color: #f7f9e6; }
+  .tertiary-button--wrapped {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis; }
   @media (max-width: 87.5em) {
     .tertiary-button {
       font-size: 1.2rem; } }
@@ -369,7 +373,7 @@ body {
     padding: 0.25rem 0.75rem;
     font-size: 1.4rem;
     display: block;
-    width: 90%; }
+    width: 80%; }
     .form__input::placeholder {
       font-style: italic; }
     .form__input:not(:last-child) {
@@ -492,7 +496,8 @@ body {
   /* stylelint-disable-line */
   font-size: 1.5rem;
   height: auto !important;
-  width: 100%; }
+  width: 100%;
+  z-index: 0; }
   @media (max-width: 75em) {
     .CodeMirror {
       font-size: 1rem; } }

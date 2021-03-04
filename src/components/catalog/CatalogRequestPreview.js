@@ -48,7 +48,7 @@ const CatalogRequestPreview = ({
 
 const mapStateToProps = (state) => ({
   catalogState: state.catalog,
-  geometry: state.request.geometry,
+  geometry: state.map.wgs84Geometry,
   timeRange: {
     timeTo: state.request.timeTo[0],
     timeFrom: state.request.timeFrom[0],

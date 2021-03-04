@@ -6,7 +6,6 @@ import bbox from '@turf/bbox';
 
 import Map from './Map';
 import store from '../../../store';
-import requestSlice from '../../../store/request';
 import {
   getAreaFromGeometry,
   isBbox,
@@ -15,10 +14,11 @@ import {
 } from './utils/crsTransform';
 import CRSSelection from './CRSSelection';
 import MapTextarea from './MapTextarea';
+import mapSlice from '../../../store/map';
+import ByocDataFinder from './ByocDataFinder';
 
-//from parsed geometry to leaflet polygon / layer.
-const getLayer = (parsedGeometry, layerConfig, currentLayers, mapRef) => {
-  // function that adds event listeners on a given layer.
+const getLeafletLayer = (wgs84Geometry, layerConfig, currentLayers, mapRef) => {
+  // add event listener to layer
   const addEditEventListener = (layer, layerConfig) => {
     if (layerConfig) {
       return;
@@ -27,9 +27,9 @@ const getLayer = (parsedGeometry, layerConfig, currentLayers, mapRef) => {
       const layer = e.layer;
       const type = currentLayers[0].type;
       if (type === 'rectangle') {
-        store.dispatch(requestSlice.actions.setGeometry(bbox(layer.toGeoJSON())));
+        store.dispatch(mapSlice.actions.setWgs84Geometry(bbox(layer.toGeoJSON())));
       } else if (type === 'polygon') {
-        store.dispatch(requestSlice.actions.setGeometry(layer.toGeoJSON().geometry));
+        store.dispatch(mapSlice.actions.setWgs84Geometry(layer.toGeoJSON().geometry));
       }
     });
 
@@ -39,21 +39,20 @@ const getLayer = (parsedGeometry, layerConfig, currentLayers, mapRef) => {
       let geo = e.layer.toGeoJSON().geometry;
       geo.type = 'MultiPolygon';
       geo.coordinates = [geo.coordinates];
-      store.dispatch(requestSlice.actions.setGeometry(geo));
+      store.dispatch(mapSlice.actions.setWgs84Geometry(geo));
     });
   };
   try {
-    if (parsedGeometry.type === 'Polygon') {
-      //coordinates need to be swapped in order to work.
-      const coords = parsedGeometry.coordinates[0].map((c) => [c[1], c[0]]);
+    if (wgs84Geometry.type === 'Polygon') {
+      const coords = wgs84Geometry.coordinates[0].map((c) => [c[1], c[0]]);
       const polygon = L.polygon(coords, layerConfig);
       addEditEventListener(polygon, layerConfig);
       return {
         layer: polygon,
         type: 'polygon',
       };
-    } else if (parsedGeometry.type === 'MultiPolygon') {
-      const coords = parsedGeometry.coordinates.map((a) =>
+    } else if (wgs84Geometry.type === 'MultiPolygon') {
+      const coords = wgs84Geometry.coordinates.map((a) =>
         a.map((coords) => coords).map((b) => b.map((c) => [c[1], c[0]])),
       );
       const layer = L.polygon(coords, layerConfig);
@@ -62,8 +61,8 @@ const getLayer = (parsedGeometry, layerConfig, currentLayers, mapRef) => {
         layer: layer,
         type: 'polygon',
       };
-    } else {
-      const coords = bboxPolygon(parsedGeometry).geometry.coordinates[0].map((c) => [c[1], c[0]]);
+    } else if (isBbox(wgs84Geometry)) {
+      const coords = bboxPolygon(wgs84Geometry).geometry.coordinates[0].map((c) => [c[1], c[0]]);
       const polygon = L.rectangle(coords, layerConfig);
       addEditEventListener(polygon, layerConfig);
       return {
@@ -77,51 +76,47 @@ const getLayer = (parsedGeometry, layerConfig, currentLayers, mapRef) => {
   }
 };
 
-export const convertToCRS84AndDispatch = (parsedGeo, selectedCrs) => {
-  const transformedGeo = transformGeometryToWGS84IfNeeded(selectedCrs, parsedGeo);
-  store.dispatch(requestSlice.actions.setGeometry(transformedGeo));
-};
-
-const MapContainer = ({ geometry, selectedCrs, extraMapGeometry }) => {
+const MapContainer = ({ wgs84Geometry, selectedCrs, textGeometry, extraGeometry }) => {
   const mapRef = useRef();
   const layersRef = useRef([]);
   const drawnItemsRef = useRef();
-  //reference to layers no-related to redux geometry (tpdi)
-  const extraLayersRef = useRef([]);
+  const [parsedError, setParsedError] = useState(false);
+  const [mapError, setMapError] = useState(false);
+  const [hasUsedMap, setHasUsedMap] = useState(false);
 
-  // Polygon saved from swapping between bbox<->polygon
-  const [polygonBeforeConversion, setPolygonBeforeConversion] = useState();
-
-  // Parses geometry on textarea to layers on leaflet.
-  // 1. Create leaflet layer based on geo 2. add it to drawn items 3. Fit Bounds to the new layer.
-  const parseProperGeometryToMap = useCallback((parsedGeometry) => {
-    const addDrawLayer = (layerWithType) => {
-      const { layer, type } = layerWithType;
-      if (layer && type) {
-        drawnItemsRef.current.addLayer(layer);
-        layersRef.current.push(layerWithType);
-      } else {
-        throw Error('Adding invalid layer');
-      }
-    };
-    const deleteLayerIfPossible = () => {
-      if (layersRef.current.length > 0) {
-        const layerToBeRemoved = layersRef.current.pop().layer;
-        drawnItemsRef.current.removeLayer(layerToBeRemoved);
-        mapRef.current.removeLayer(layerToBeRemoved);
-      }
-    };
-
-    try {
-      const leafletLayer = getLayer(parsedGeometry, undefined, layersRef.current, mapRef.current);
-      deleteLayerIfPossible();
-      addDrawLayer(leafletLayer);
-      mapRef.current.fitBounds(leafletLayer.layer.getBounds());
-    } catch (err) {
-      console.error('Parsing geometry failed', err);
+  useEffect(() => {
+    if (hasUsedMap && selectedCrs !== 'EPSG:4326') {
+      setMapError(true);
+      setParsedError(false);
     }
-  }, []);
+    // eslint-disable-next-line
+  }, [hasUsedMap]);
 
+  useEffect(() => {
+    if (parsedError && mapError) {
+      setMapError(false);
+      setHasUsedMap(false);
+    }
+    // eslint-disable-next-line
+  }, [parsedError]);
+
+  const addDrawLayer = (layerWithType, layersRef) => {
+    const { layer, type } = layerWithType;
+    if (layer && type) {
+      drawnItemsRef.current.addLayer(layer);
+      layersRef.push(layerWithType);
+    } else {
+      throw Error('Adding invalid layer');
+    }
+  };
+
+  const deleteLayerIfPossible = () => {
+    if (layersRef.current.length > 0) {
+      const layerToBeRemoved = layersRef.current.pop().layer;
+      drawnItemsRef.current.removeLayer(layerToBeRemoved);
+      mapRef.current.removeLayer(layerToBeRemoved);
+    }
+  };
   const deleteExtraLayerIfPossible = () => {
     if (extraLayersRef.current.length > 0) {
       const layerToBeRemoved = extraLayersRef.current.pop().layer;
@@ -130,57 +125,45 @@ const MapContainer = ({ geometry, selectedCrs, extraMapGeometry }) => {
     }
   };
 
-  const parseExtraGeometryToMap = useCallback((parsedGeometry) => {
-    const addExtraDrawLayer = (layerWithType) => {
-      const { layer, type } = layerWithType;
-      if (layer && type) {
-        drawnItemsRef.current.addLayer(layer);
-        extraLayersRef.current.push(layerWithType);
-      } else {
-        throw Error('Adding invalid layer');
-      }
-    };
-    try {
-      const leafletLayer = getLayer(
-        parsedGeometry,
-        { color: 'green' },
-        extraLayersRef.current,
-        mapRef.current,
-      );
-      deleteExtraLayerIfPossible();
-      addExtraDrawLayer(leafletLayer);
-      mapRef.current.fitBounds(leafletLayer.layer.getBounds());
-    } catch (err) {
-      console.error('Parsing extra geometry failed', err);
-    }
-  }, []);
+  //reference to layers no-related to redux geometry (tpdi)
+  const extraLayersRef = useRef([]);
+
+  // Polygon saved from swapping between bbox<->polygon
+  const [polygonBeforeConversion, setPolygonBeforeConversion] = useState();
 
   const fitToMainBounds = useCallback(() => {
     if (layersRef.current.length > 0) {
       mapRef.current.fitBounds(layersRef.current[0].layer.getBounds());
     }
   }, []);
+  const handleSwapToBbox = () => {
+    setPolygonBeforeConversion(textGeometry);
+    const bboxFromPoly = bbox(transformGeometryToWGS84IfNeeded(selectedCrs, textGeometry));
+    store.dispatch(mapSlice.actions.setWgs84Geometry(bboxFromPoly));
+  };
 
-  // Effect that converts internal geometry to Leaflet Layers visible on the Map.
   useEffect(() => {
-    parseProperGeometryToMap(geometry);
-    if (isPolygon(geometry)) {
-      setPolygonBeforeConversion(geometry);
-    }
-  }, [geometry, parseProperGeometryToMap]);
+    const leafletLayer = getLeafletLayer(wgs84Geometry, undefined, layersRef.current, mapRef.current);
+    deleteLayerIfPossible();
+    addDrawLayer(leafletLayer, layersRef.current);
+    mapRef.current.fitBounds(leafletLayer.layer.getBounds());
+  }, [wgs84Geometry]);
 
-  // Effect that converts internal extra-geometry to leaflet layers.
   useEffect(() => {
-    if (extraMapGeometry) {
-      parseExtraGeometryToMap(extraMapGeometry);
+    if (extraGeometry !== null) {
+      const extraLeafletLayer = getLeafletLayer(
+        extraGeometry,
+        { color: 'green' },
+        extraLayersRef.current,
+        mapRef.current,
+      );
+      deleteExtraLayerIfPossible();
+      addDrawLayer(extraLeafletLayer, extraLayersRef.current);
+      mapRef.current.fitBounds(extraLeafletLayer.layer.getBounds());
     } else {
       deleteExtraLayerIfPossible();
     }
-  }, [extraMapGeometry, parseExtraGeometryToMap]);
-
-  const handleSwapToBbox = () => {
-    store.dispatch(requestSlice.actions.setGeometry(bbox(geometry)));
-  };
+  }, [extraGeometry]);
 
   return (
     <div>
@@ -192,31 +175,58 @@ const MapContainer = ({ geometry, selectedCrs, extraMapGeometry }) => {
             className="text"
             style={{ margin: '0 2rem', height: '100%', display: 'flex', alignItems: 'center' }}
           >
-            <span>Area selected:</span> {(getAreaFromGeometry(geometry) / 1e6).toFixed(2)} km<sup>2</sup>
+            <span>Area selected:</span> {(getAreaFromGeometry(wgs84Geometry) / 1e6).toFixed(2)} km<sup>2</sup>
           </p>
-          {geometry.type === 'Polygon' && (
-            <button style={{ marginTop: '0' }} className="secondary-button" onClick={handleSwapToBbox}>
+          {isPolygon(textGeometry) && (
+            <button
+              style={{ marginTop: '0', marginRight: '1rem' }}
+              className="secondary-button"
+              onClick={handleSwapToBbox}
+            >
               Get bbox
             </button>
           )}
-          {isBbox(geometry) && polygonBeforeConversion && (
+          {isBbox(textGeometry) && polygonBeforeConversion && (
             <button
-              style={{ marginTop: '0' }}
+              style={{ marginTop: '0', marginRight: '1rem' }}
               className="secondary-button"
-              onClick={() => store.dispatch(requestSlice.actions.setGeometry(polygonBeforeConversion))}
+              onClick={() => store.dispatch(mapSlice.actions.setTextGeometry(polygonBeforeConversion))}
             >
               Undo
             </button>
           )}
+          <ByocDataFinder />
         </div>
+        {(parsedError || mapError) && (
+          <div style={{ marginBottom: '1rem' }}>
+            {parsedError && (
+              <p className="text text--warning" style={{ marginLeft: 'auto' }}>
+                When parsing, the displayed geometry on the map can have some minor errors due to
+                re-projection to EPSG:4326.
+              </p>
+            )}
+            {mapError && (
+              <p className="text text--warning">
+                When drawing geometries in CRSs other than WGS:84 the resulting text geometry can have some
+                minor errors due to re-projection to {selectedCrs}
+              </p>
+            )}
+          </div>
+        )}
         <div className="map-container" style={{ zIndex: '1' }}>
-          <Map mapRef={mapRef} drawnItemsRef={drawnItemsRef} layersRef={layersRef} />
+          <Map
+            mapRef={mapRef}
+            drawnItemsRef={drawnItemsRef}
+            layersRef={layersRef}
+            setHasUsedMap={setHasUsedMap}
+          />
 
           <MapTextarea
-            selectedCrs={selectedCrs}
             fitToMainBounds={fitToMainBounds}
-            geometry={geometry}
-            extraMapGeometry={extraMapGeometry}
+            geometry={textGeometry}
+            extraGeometry={extraGeometry}
+            setParsedError={setParsedError}
+            selectedCrs={selectedCrs}
           />
         </div>
       </div>
@@ -225,9 +235,10 @@ const MapContainer = ({ geometry, selectedCrs, extraMapGeometry }) => {
 };
 
 const mapStateToProps = (state) => ({
-  geometry: state.request.geometry,
-  selectedCrs: state.request.CRS,
-  extraMapGeometry: state.tpdi.extraMapGeometry,
+  wgs84Geometry: state.map.wgs84Geometry,
+  textGeometry: state.map.convertedGeometry,
+  selectedCrs: state.map.selectedCrs,
+  extraGeometry: state.map.extraGeometry,
 });
 
 export default connect(mapStateToProps)(MapContainer);

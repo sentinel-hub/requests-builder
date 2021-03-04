@@ -22,6 +22,7 @@ const TPDIPlaceOrderButton = ({
   airbus,
   planet,
   tpdi,
+  map,
   token,
   collectionId,
   setCreateQueryResponse,
@@ -35,6 +36,7 @@ const TPDIPlaceOrderButton = ({
     airbus,
     planet,
     tpdi,
+    map,
   };
   const { isUsingQuery } = tpdi;
 
@@ -113,6 +115,7 @@ const mapStateToProps = (state) => ({
   airbus: state.airbus,
   planet: state.planet,
   token: state.auth.user.access_token,
+  map: state.map,
   collectionId: state.tpdi.collectionId,
 });
 

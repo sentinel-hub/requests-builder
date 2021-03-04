@@ -1,0 +1,65 @@
+import { generateProcessCurlCommand, getJSONRequestBody } from '../process/requests';
+
+const DATAFILTER_KEYS = [
+  'mosaickingOrder',
+  'maxCloudCoverage',
+  'resolution',
+  'acquisitionMode',
+  'polarization',
+  'orbitDirection',
+];
+const PROCESSING_KEYS = [
+  'backCoeff',
+  'orthorectify',
+  'timeliness',
+  'demInstance',
+  'clampNegative',
+  'EGM',
+  'view',
+];
+
+const getDataFilterOptionsFromLayer = (layer) => {
+  const { otherDefaults } = layer;
+  const filtered = Object.entries(otherDefaults)
+    .filter(([key]) => DATAFILTER_KEYS.includes(key))
+    .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+  return filtered;
+};
+
+const getProcessingOptionsFromLayer = (layer) => {
+  const { otherDefaults } = layer;
+  const filtered = Object.entries(otherDefaults)
+    .filter(([key]) => PROCESSING_KEYS.includes(key))
+    .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+  return filtered;
+};
+
+const layerToRequestState = (layer, requestState) => {
+  const finalReqState = {
+    datasource: layer.datasource,
+    timeFrom: requestState.timeFrom,
+    timeTo: requestState.timeTo,
+    isTimeRangeDisabled: requestState.isTimeRangeDisabled,
+    responses: [requestState.responses[0]],
+    heightOrRes: requestState.heightOrRes,
+    width: requestState.width,
+    height: requestState.height,
+    isAutoRatio: requestState.isAutoRatio,
+    dataFilterOptions: [{ options: getDataFilterOptionsFromLayer(layer), idx: 0 }],
+    processingOptions: [{ options: getProcessingOptionsFromLayer(layer), idx: 0 }],
+    byocCollectionType: layer.otherDefaults?.subType ?? 'BYOC',
+    byocCollectionId: layer.otherDefaults?.collectionId,
+    evalscript: layer.styles[0]?.evalScript ?? '',
+  };
+  return finalReqState;
+};
+
+const wmsLayerToProcessRequest = (layer, requestState, mapState) => {
+  return getJSONRequestBody(layerToRequestState(layer, requestState), mapState, true);
+};
+
+export const wmsLayerToCurl = (layer, requestState, mapState, token) => {
+  return generateProcessCurlCommand(layerToRequestState(layer, requestState), mapState, token);
+};
+
+export default wmsLayerToProcessRequest;

@@ -3,6 +3,7 @@ import alertSlice from './alert';
 import authSlice from './auth';
 import batchSlice from './batch';
 import catalogSlice from './catalog';
+import mapSlice from './map';
 import paramsSlice from './params';
 import requestSlice from './request';
 import responsesSlice from './responses';
@@ -14,6 +15,7 @@ import wmsSlice from './wms';
 const reducers = combineReducers({
   auth: authSlice.reducer,
   request: requestSlice.reducer,
+  map: mapSlice.reducer,
   batch: batchSlice.reducer,
   tpdi: tpdiSlice.reducer,
   airbus: airbusSlice.reducer,

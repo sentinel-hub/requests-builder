@@ -5,10 +5,10 @@ import '@geoman-io/leaflet-geoman-free';
 import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
 import bbox from '@turf/bbox';
 import store from '../../../store';
-import requestSlice from '../../../store/request';
+import mapSlice from '../../../store/map';
 
 //Get as props the reference to the map, the created layers and the drawn items.
-const Map = ({ mapRef, layersRef, drawnItemsRef }) => {
+const Map = ({ mapRef, drawnItemsRef, setHasUsedMap }) => {
   //equivalent to ComponentDidMount
   //Creates a map and adds neccesary configuration
   useEffect(() => {
@@ -40,13 +40,15 @@ const Map = ({ mapRef, layersRef, drawnItemsRef }) => {
       layer.removeFrom(mapRef.current);
       const shape = e.shape;
       const geoJSONFeature = layer.toGeoJSON();
+      setHasUsedMap(true);
       if (shape === 'Rectangle') {
-        store.dispatch(requestSlice.actions.setGeometry(bbox(geoJSONFeature)));
+        store.dispatch(mapSlice.actions.setWgs84Geometry(bbox(geoJSONFeature)));
       } else if (shape === 'Polygon') {
-        store.dispatch(requestSlice.actions.setGeometry(geoJSONFeature.geometry));
+        store.dispatch(mapSlice.actions.setWgs84Geometry(geoJSONFeature.geometry));
       }
     });
-  }, [drawnItemsRef, layersRef, mapRef]);
+    // eslint-disable-next-line
+  }, []);
 
   return <div className="map" id="map"></div>;
 };

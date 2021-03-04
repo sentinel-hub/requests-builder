@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDoubleDown, faAngleDoubleUp } from '@fortawesome/free-solid-svg-icons';
 import store from '../../store';
-import tpdiSlice from '../../store/tpdi';
 import RequestButton from '../common/RequestButton';
 import { deleteTPDIOrder, confirmTPDIOrder } from './generateTPDIRequests';
 import { getTransformedGeometryFromBounds, focusMap } from '../common/Map/utils/crsTransform';
@@ -11,6 +10,7 @@ import { parseTPDIRequest } from './parse';
 import Tooltip from '../common/Tooltip/Tooltip';
 import { getFormattedDatetime } from './utils';
 import { formatNumber } from '../../utils/const';
+import mapSlice from '../../store/map';
 
 const getColorByStatus = (status) => {
   if (status === 'PARTIAL') {
@@ -62,7 +62,7 @@ const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder, expandO
   const [deliveries, setDeliveries] = useState([]);
   const handleSeeGeometry = () => {
     const transformedGeo = getTransformedGeometryFromBounds(order.input.bounds);
-    store.dispatch(tpdiSlice.actions.setExtraMapGeometry(transformedGeo));
+    store.dispatch(mapSlice.actions.setExtraGeometry(transformedGeo));
     focusMap();
   };
 

@@ -2,6 +2,7 @@ import { getRequestBody } from '../../process/requests/parseRequest';
 import store from '../../../store';
 import catalogSlice from '../../../store/catalog';
 import requestSlice from '../../../store/request';
+import mapSlice from '../../../store/map';
 
 export const parseCatalogBody = (str) => {
   let body = getRequestBody(str);
@@ -17,10 +18,10 @@ const dispatchCatalogChanges = (parsedJson) => {
     store.dispatch(catalogSlice.actions.setSelectedCollection(parsedJson.collections[0]));
   }
   if (parsedJson.bbox) {
-    store.dispatch(requestSlice.actions.setGeometry(parsedJson.bbox));
+    store.dispatch(mapSlice.actions.setTextGeometry(parsedJson.bbox));
   }
   if (parsedJson.intersects) {
-    store.dispatch(requestSlice.actions.setGeometry(parsedJson.intersects));
+    store.dispatch(mapSlice.actions.setTextGeometry(parsedJson.intersects));
   }
   if (typeof parsedJson.limit === 'number') {
     store.dispatch(catalogSlice.actions.setLimit(parsedJson.limit));

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import 'react-day-picker/lib/style.css';
 import moment from 'moment';
@@ -66,18 +66,6 @@ const TimeRange = ({ index, timeTo, timeFrom, isDisabled, datasource, geometry, 
     });
   };
 
-  useEffect(() => {
-    if (!shouldFetchCatalog) {
-      setFetchedMonths([]);
-      setAvailableDates([]);
-      return;
-    }
-    const fromMonth = getStartOfMonth(timeFrom);
-    const toMonth = getStartOfMonth(timeTo);
-    fetchAndSetMonths([fromMonth, toMonth], true);
-    // eslint-disable-next-line
-  }, [token, mode, datasource, geometry]);
-
   const handleTimeFromChange = async (d) => {
     if (d) {
       const startOfMonth = moment(d).utc().startOf('month').format();
@@ -107,6 +95,18 @@ const TimeRange = ({ index, timeTo, timeFrom, isDisabled, datasource, geometry, 
     }
   };
 
+  const handleDayPickerOpen = (isFrom) => () => {
+    if (!shouldFetchCatalog) {
+      setFetchedMonths([]);
+      setAvailableDates([]);
+      return;
+    }
+    const month = isFrom ? getStartOfMonth(timeFrom) : getStartOfMonth(timeTo);
+    if (!fetchedMonths.includes(month)) {
+      fetchAndSetMonths([month], true);
+    }
+  };
+
   return (
     <>
       <style>{highlightedStyle}</style>
@@ -124,6 +124,7 @@ const TimeRange = ({ index, timeTo, timeFrom, isDisabled, datasource, geometry, 
           onMonthChange: handleMonthChange,
           disabledDays: { after: new Date() },
         }}
+        onDayPickerShow={handleDayPickerOpen(true)}
         inputProps={{ disabled: isDisabled, required: true, className: 'form__input', id: 'timefrom' }}
       />
 
@@ -139,6 +140,7 @@ const TimeRange = ({ index, timeTo, timeFrom, isDisabled, datasource, geometry, 
           showOutsideDays: true,
           onMonthChange: handleMonthChange,
         }}
+        onDayPickerShow={handleDayPickerOpen(false)}
         onDayChange={handleTimeToChange}
         inputProps={{ disabled: isDisabled, required: true, className: 'form__input', id: 'timeto' }}
       />

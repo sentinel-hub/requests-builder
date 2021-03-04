@@ -1,9 +1,9 @@
 import omit from 'lodash.omit';
 import store from '../../../store';
+import mapSlice from '../../../store/map';
 import requestSlice from '../../../store/request';
 import { DATASOURCES_NAMES, CRS, OUTPUT_FORMATS, CUSTOM } from '../../../utils/const';
 import { calculateMaxMetersPerPixel } from '../../common/Map/utils/bboxRatio';
-import { transformGeometryToNewCrs } from '../../common/Map/utils/crsTransform';
 
 const dispatchEvalscript = (parsedBody) => {
   try {
@@ -25,28 +25,28 @@ export const dispatchBounds = (parsedBody) => {
     if (crs) {
       selectedCrs = Object.keys(CRS).find((key) => CRS[key].url === crs);
       if (selectedCrs) {
-        store.dispatch(requestSlice.actions.setCRS(selectedCrs));
+        // store.dispatch(requestSlice.actions.setCRS(selectedCrs));
       }
     } else {
       selectedCrs = 'EPSG:4326';
-      store.dispatch(requestSlice.actions.setCRS(selectedCrs));
+      // store.dispatch(requestSlice.actions.setCRS(selectedCrs));
     }
     //is bbox
     if (bounds.bbox) {
       let geometry = bounds.bbox;
       // if not wgs84 -> transform to it
-      if (selectedCrs !== 'EPSG:4326') {
-        geometry = transformGeometryToNewCrs(bounds.bbox, 'EPSG:4326', selectedCrs);
-      }
-      store.dispatch(requestSlice.actions.setGeometry(geometry));
+      // if (selectedCrs !== 'EPSG:4326') {
+      //   geometry = transformGeometryToNewCrs(bounds.bbox, 'EPSG:4326', selectedCrs);
+      // }
+      store.dispatch(mapSlice.actions.setConvertedGeometryWithCrs({ geometry, crs: selectedCrs }));
     }
     //polygon
     else if (bounds.geometry) {
       let geometry = bounds.geometry;
-      if (selectedCrs !== 'EPSG:4326') {
-        geometry = transformGeometryToNewCrs(geometry, 'EPSG:4326', selectedCrs);
-      }
-      store.dispatch(requestSlice.actions.setGeometry(geometry));
+      // if (selectedCrs !== 'EPSG:4326') {
+      //   geometry = transformGeometryToNewCrs(geometry, 'EPSG:4326', selectedCrs);
+      // }
+      store.dispatch(mapSlice.actions.setConvertedGeometryWithCrs({ geometry, crs: selectedCrs }));
     }
   } catch (err) {
     console.error('Error while parsing geometry', err);
@@ -185,7 +185,7 @@ const dispatchResponses = (parsedBody) => {
     if (responses && responses.length > 0) {
       const validResponses = responses
         .map((resp, idx) => {
-          if (resp.identifier && validFormat(resp.format.type)) {
+          if (validFormat(resp.format.type)) {
             return { identifier: resp.identifier, format: resp.format.type, idx: idx };
           } else {
             return undefined;
@@ -225,7 +225,7 @@ export const dispatchAdvancedOptions = (parsedBody) => {
 };
 
 export const dispatchChanges = (parsedBody) => {
-  store.dispatch(requestSlice.actions.resetAdvancedOptions());
+  store.dispatch(requestSlice.actions.resetState());
   dispatchEvalscript(parsedBody);
   dispatchBounds(parsedBody);
   dispatchTimeRange(parsedBody);

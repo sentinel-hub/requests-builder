@@ -322,12 +322,17 @@ export const CRS = {
   'EPSG:32633': {
     url: 'http://www.opengis.net/def/crs/EPSG/0/32633',
     projection: '+proj=utm +zone=33 +ellps=WGS84 +datum=WGS84 +units=m +no_defs',
-    internal: true,
+    internal: false,
   },
   'EPSG:32645': {
     url: 'http://www.opengis.net/def/crs/EPSG/0/32645',
     projection: '+proj=utm +zone=45 +ellps=WGS84 +datum=WGS84 +units=m +no_defs',
     internal: true,
+  },
+  'EPSG:3035': {
+    url: 'http://www.opengis.net/def/crs/EPSG/0/3035',
+    projection: '+proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +units=m +no_defs',
+    internal: false,
   },
 };
 
@@ -350,6 +355,32 @@ export const isEmptyDefault = (obj) => {
     }
   }
   return true;
+};
+
+export const datasourceToCustomRepoLink = (datasource) => {
+  const BASE_LINK = 'https://custom-scripts.sentinel-hub.com/';
+  switch (datasource) {
+    case S2L1C:
+    case S2L2A:
+      return `${BASE_LINK}#sentinel-2`;
+    case S1GRD:
+      return `${BASE_LINK}#sentinel-1`;
+    case S3OLCI:
+    case S3SLSTR:
+      return `${BASE_LINK}#sentinel-3`;
+    case S5PL2:
+      return `${BASE_LINK}#sentinel-5p`;
+    case L8L1C:
+      return `${BASE_LINK}#landsat-8`;
+    case MODIS:
+      return `${BASE_LINK}#modis`;
+    case DEM:
+      return `${BASE_LINK}#dem`;
+    case DATAFUSION:
+      return `${BASE_LINK}#data-fusion`;
+    default:
+      return BASE_LINK;
+  }
 };
 
 export const formatNumber = (n, roundedDigits, fixed = false) => {

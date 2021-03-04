@@ -42,12 +42,14 @@ const TPDISearchOptions = ({
   token,
   setSearchResponse,
   setFeaturesWithProvider,
+  map,
 }) => {
   const state = {
     tpdi,
     request,
     airbus,
     planet,
+    map,
   };
 
   const provider = tpdi.provider;
@@ -105,6 +107,7 @@ const mapStateToProps = (state) => ({
   request: state.request,
   airbus: state.airbus,
   planet: state.planet,
+  map: state.map,
   token: state.auth.user.access_token,
 });
 

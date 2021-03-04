@@ -233,7 +233,7 @@ const mapStateToProps = (state) => ({
   heightOrRes: state.request.heightOrRes,
   height: state.request.height,
   width: state.request.width,
-  geometry: state.request.geometry,
+  geometry: state.map.wgs84Geometry,
   isAutoRatio: state.request.isAutoRatio,
   isOnAutoRes: state.request.isOnAutoRes,
 });

@@ -14,11 +14,10 @@ const StatisticalRequestPreview = ({
   dataFilterOptions,
   processingOptions,
   evalscript,
-  geometry,
-  crs,
+  convertedGeometry,
+  selectedCrs,
   timeFrom,
   timeTo,
-  geometryType,
   heightOrRes,
   width,
   height,
@@ -29,9 +28,8 @@ const StatisticalRequestPreview = ({
   fisResponse,
 }) => {
   const bounds = {
-    geometry,
-    CRS: crs,
-    geometryType,
+    convertedGeometry,
+    selectedCrs,
   };
   const timeRange = {
     timeFrom,

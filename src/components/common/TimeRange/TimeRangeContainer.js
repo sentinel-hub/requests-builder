@@ -123,7 +123,7 @@ const mapStateToProps = (store) => ({
   mode: store.request.mode,
   datafusionSources: store.request.datafusionSources,
   token: store.auth.user.access_token,
-  geometry: store.request.geometry,
+  geometry: store.map.wgs84Geometry,
 });
 
 export default connect(mapStateToProps)(TimeRangeContainer);

@@ -31,9 +31,8 @@ const StatisticalSendRequestButton = ({
   evalscript,
   statisticalState,
   token,
-  geometry,
-  crs,
-  geometryType,
+  convertedGeometry,
+  selectedCrs,
   timeFrom,
   timeTo,
   heightOrRes,
@@ -41,9 +40,8 @@ const StatisticalSendRequestButton = ({
   width,
 }) => {
   const bounds = {
-    geometry,
-    CRS: crs,
-    geometryType,
+    convertedGeometry,
+    selectedCrs,
   };
   const timeRange = {
     timeFrom,

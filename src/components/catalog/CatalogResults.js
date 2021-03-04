@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkedAlt, faAngleDoubleDown, faAngleDoubleUp } from '@fortawesome/free-solid-svg-icons';
 import store from '../../store';
-import tpdiSlice from '../../store/tpdi';
 import { S1GRD_CATALOG_ID, S2L2A_CATALOG_ID, S2L1C_CATALOG_ID } from './const';
 import { focusMap } from '../common/Map/utils/crsTransform';
+import mapSlice from '../../store/map';
 
 const filterResults = (features, filterText) => {
   if (filterText === '') {
@@ -85,12 +85,12 @@ const renderFeatureByType = (results) => {
 
 const CommonFeatureInfo = ({ feature, isExpanded, setIsExpanded }) => {
   const showBbox = () => {
-    store.dispatch(tpdiSlice.actions.setExtraMapGeometry(feature.bbox));
+    store.dispatch(mapSlice.actions.setExtraGeometry(feature.bbox));
     focusMap();
   };
 
   const showGeometry = () => {
-    store.dispatch(tpdiSlice.actions.setExtraMapGeometry(feature.geometry));
+    store.dispatch(mapSlice.actions.setExtraGeometry(feature.geometry));
     focusMap();
   };
 

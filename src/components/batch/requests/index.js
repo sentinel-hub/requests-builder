@@ -6,14 +6,14 @@ import { isEmpty } from '../../../utils/const';
 
 const BASE_BATCH_URL = 'https://services.sentinel-hub.com/api/v1/batch/process/';
 
-export const createBatchRequest = (requestState, batchState, token) => {
+export const createBatchRequest = (requestState, batchState, mapState, token) => {
   const config = {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
   };
-  const body = JSON.stringify(generateBatchBodyRequest(requestState, batchState));
+  const body = JSON.stringify(generateBatchBodyRequest(requestState, batchState, mapState));
   return axios.post(BASE_BATCH_URL, body, config);
 };
 
@@ -90,8 +90,8 @@ export const fetchTilesBatchRequest = async (id, token) => {
   });
 };
 
-export const createLowResPreviewRequest = (requestState, token, reqConfig) => {
-  const request = getRequestObject(requestState);
+export const createLowResPreviewRequest = (requestState, mapState, token, reqConfig) => {
+  const request = getRequestObject(requestState, mapState);
   const body = JSON.stringify(request, null, 2);
   const config = getProcessRequestConfig(token, reqConfig, requestState);
   return axios.post(getUrl(requestState), body, config);
@@ -146,9 +146,9 @@ const handleAdvancedCogParams = (batchState) => {
   return cogParams;
 };
 
-export const generateBatchBodyRequest = (requestState, batchState) => {
+export const generateBatchBodyRequest = (requestState, batchState, mapState) => {
   const batchRequest = {};
-  const processBody = getRequestObject(requestState);
+  const processBody = getRequestObject(requestState, mapState);
   // omit width/height or resx/resy on batch create.
   processBody.output = { ...omit(processBody.output, ['resx', 'resy', 'width', 'height']) };
   batchRequest.processRequest = processBody;
@@ -213,8 +213,8 @@ export const restartPartialRequest = (requestId, token, reqConfig) => {
 
 //Curl commands
 
-export const createBatchRequestCurlCommand = (requestState, batchState, token) => {
-  const body = JSON.stringify(generateBatchBodyRequest(requestState, batchState), null, 2);
+export const createBatchRequestCurlCommand = (requestState, batchState, mapState, token) => {
+  const body = JSON.stringify(generateBatchBodyRequest(requestState, batchState, mapState), null, 2);
   const curlCommand = `curl -X POST ${BASE_BATCH_URL} \n -H 'Content-Type: application/json' \n -H 'Authorization: Bearer ${
     token ? token : '<your token here>'
   }' \n -d '${body}'`;

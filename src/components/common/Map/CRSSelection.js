@@ -1,6 +1,6 @@
 import React from 'react';
 import store from '../../../store';
-import requestSlice from '../../../store/request';
+import mapSlice from '../../../store/map';
 import { CRS } from '../../../utils/const';
 
 // Generate CRS JSX Options, skip those which have internal:true.
@@ -17,7 +17,7 @@ const generateCRSOptions = (crs) =>
 
 const CRSSelection = ({ selectedCrs }) => {
   const handleCRSChange = (e) => {
-    store.dispatch(requestSlice.actions.setCRS(e.target.value));
+    store.dispatch(mapSlice.actions.setSelectedCrs(e.target.value));
   };
 
   return (

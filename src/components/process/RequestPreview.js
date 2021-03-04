@@ -44,7 +44,7 @@ const handleParseRequest = (text) => {
   }
 };
 
-const RequestPreview = ({ requestState, token }) => {
+const RequestPreview = ({ requestState, token, mapState }) => {
   return (
     <>
       <h2 className="heading-secondary" style={{ marginBottom: '1.3rem' }}>
@@ -55,22 +55,22 @@ const RequestPreview = ({ requestState, token }) => {
           options={[
             {
               name: 'curl',
-              value: generateProcessCurlCommand(requestState, token),
+              value: generateProcessCurlCommand(requestState, mapState, token),
               nonToggle: true,
             },
             {
               name: 'body',
-              value: getJSONRequestBody(requestState),
+              value: getJSONRequestBody(requestState, mapState),
               nonToggle: true,
             },
             {
               name: 'sh-py',
-              value: getSHPYCode(requestState),
+              value: getSHPYCode(requestState, mapState),
               nonToggle: true,
             },
             {
               name: 'sh-js',
-              value: getSHJSCode(requestState, token),
+              value: getSHJSCode(requestState, mapState, token),
               nonToggle: true,
             },
           ]}
@@ -99,6 +99,7 @@ const RequestPreview = ({ requestState, token }) => {
 
 const mapStateToProps = (store) => ({
   requestState: store.request,
+  mapState: store.map,
   token: store.auth.user.access_token,
 });
 

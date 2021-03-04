@@ -25,71 +25,68 @@ const TPDIRequestForm = lazy(() => import('./forms/TPDIRequestForm'));
 const CatalogRequestForm = lazy(() => import('./forms/CatalogRequestForm'));
 const WMSRequestForm = lazy(() => import('./forms/WMSRequestForm'));
 
-const getForm = mode => {
-  switch(mode) {
-    case('PROCESS'):
-      return <ProcessRequestForm />
-    case('BATCH'):
-      return <BatchRequestForm />
-    case('TPDI'):
-      return <TPDIRequestForm />
-    case('WMS'):
-      return <WMSRequestForm />
-    case('CATALOG'): 
-      return <CatalogRequestForm />
-    case('STATISTICAL'):
-      return <StatisticalRequestForm />
+const getForm = (mode) => {
+  switch (mode) {
+    case 'PROCESS':
+      return <ProcessRequestForm />;
+    case 'BATCH':
+      return <BatchRequestForm />;
+    case 'TPDI':
+      return <TPDIRequestForm />;
+    case 'WMS':
+      return <WMSRequestForm />;
+    case 'CATALOG':
+      return <CatalogRequestForm />;
+    case 'STATISTICAL':
+      return <StatisticalRequestForm />;
     default:
       return null;
-    }
-}
+  }
+};
 
-const getHeaderButtons =  mode => {
+const getHeaderButtons = (mode) => {
   if (mode === 'PROCESS') {
-    return <ProcessHeaderButtons />
+    return <ProcessHeaderButtons />;
+  } else if (mode === 'BATCH' || mode === 'TPDI' || mode === 'CATALOG') {
+    return <BatchHeaderButtons />;
+  } else if (mode === 'WMS') {
+    return <WMSHeaderButtons />;
+  } else if (mode === 'STATISTICAL') {
+    return <StatisticalAuthHeader />;
   }
-  else if (mode === 'BATCH' || mode === 'TPDI' || mode === 'CATALOG') {
-    return <BatchHeaderButtons />
-  }
-  else if (mode === 'WMS') {
-    return <WMSHeaderButtons />
-  }
-  else if (mode === "STATISTICAL") {
-    return <StatisticalAuthHeader />
-  }
-}
+};
 
-const getInformativeBanner = mode => {
-  switch(mode) {
+const getInformativeBanner = (mode) => {
+  switch (mode) {
     case 'BATCH':
-      return <BatchBannerInfo />
+      return <BatchBannerInfo />;
     case 'TPDI':
-      return <TPDIBannerInfo />
-    default: 
+      return <TPDIBannerInfo />;
+    default:
       return null;
   }
-}
+};
 
-function App({mode}) {
-
+function App({ mode }) {
   useEffect(() => {
     const fetchTokenEdc = async () => {
       try {
         let res = await Axios.post('/token_sentinel_hub');
         if (res.data && res.data.access_token) {
-          store.dispatch(authSlice.actions.setUser({userdata: 'EDC User', access_token: res.data.access_token}));
+          store.dispatch(
+            authSlice.actions.setUser({ userdata: 'EDC User', access_token: res.data.access_token }),
+          );
           edcResponseInterceptor();
-        }
-        else {
-          throw new Error('Token not found');   
+        } else {
+          throw new Error('Token not found');
         }
       } catch (err) {
-        store.dispatch(authSlice.actions.setIsEDC(false));        
+        store.dispatch(authSlice.actions.setIsEDC(false));
       }
-    }
+    };
     const setParams = async () => {
       await configureParams(getUrlParams());
-    }
+    };
     fetchTokenEdc();
     configureAxios();
     setParams();
@@ -100,23 +97,21 @@ function App({mode}) {
       <Alert />
       <OverlayResponse />
       <SavedRequests />
-      <div className='header'>
-        <div className='header__title'>
+      <div className="header">
+        <div className="header__title">
           <HeaderLogo />
         </div>
         {getHeaderButtons(mode)}
       </div>
       {getInformativeBanner(mode)}
       <ModeSelector />
-      <Suspense fallback={<p className='text'>Loading...</p>}>
-        {getForm(mode)}
-      </Suspense>
+      <Suspense fallback={<p className="text">Loading...</p>}>{getForm(mode)}</Suspense>
     </div>
   );
 }
 
-const mapStateToProps = store => ({
-  mode: store.request.mode
+const mapStateToProps = (store) => ({
+  mode: store.request.mode,
 });
 
-export default connect(mapStateToProps, )(App);
+export default connect(mapStateToProps)(App);

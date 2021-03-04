@@ -1,24 +1,28 @@
 import store from '../../../store';
 import requestSlice from '../../../store/request';
 import tpdiSlice, { airbusSlice, planetSlice } from '../../../store/tpdi';
-import { transformGeometryToWGS84IfNeeded } from '../../common/Map/utils/crsTransform';
 import omit from 'lodash.omit';
 import { crsUrlToCrsKey } from '../../../utils/const';
 import { constellationToStateConstellation } from '../utils';
+import mapSlice from '../../../store/map';
 
 const dispatchBounds = (bounds) => {
   if (bounds.bbox) {
-    let bbox = bounds.bbox;
-    if (bounds.properties && bounds.properties.crs) {
-      bbox = transformGeometryToWGS84IfNeeded(crsUrlToCrsKey(bounds.properties.crs), bounds.bbox);
-    }
-    store.dispatch(requestSlice.actions.setGeometry(bbox));
+    const bbox = bounds.bbox;
+    store.dispatch(
+      mapSlice.actions.setConvertedGeometryWithCrs({
+        crs: bounds.properties?.crs ? crsUrlToCrsKey(bounds.properties.crs) : undefined,
+        geometry: bbox,
+      }),
+    );
   } else if (bounds.geometry) {
-    let geometry = bounds.geometry;
-    if (bounds.properties && bounds.properties.crs) {
-      geometry = transformGeometryToWGS84IfNeeded(crsUrlToCrsKey(bounds.properties.crs), bounds.geometry);
-    }
-    store.dispatch(requestSlice.actions.setGeometry(geometry));
+    const geometry = bounds.geometry;
+    store.dispatch(
+      mapSlice.actions.setConvertedGeometryWithCrs({
+        crs: bounds.properties?.crs ? crsUrlToCrsKey(bounds.properties.crs) : undefined,
+        geometry,
+      }),
+    );
   }
 };
 

@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { createLowResPreviewRequest } from './requests';
 import { validateRequestState } from '../../utils/validator';
 
-const GetLowResPreviewButton = ({ requestState, token }) => {
+const GetLowResPreviewButton = ({ requestState, mapState, token }) => {
   const isValid = validateRequestState(requestState);
 
   return (
@@ -13,15 +13,17 @@ const GetLowResPreviewButton = ({ requestState, token }) => {
       validation={Boolean(isValid && token)}
       buttonText={'Get Low Res Preview'}
       request={createLowResPreviewRequest}
-      args={[requestState, token]}
+      args={[requestState, mapState, token]}
       requestState={requestState}
       skipSaving={true}
+      wgs84Geometry={mapState.wgs84Geometry}
     />
   );
 };
 
 const mapStateToProps = (state) => ({
   requestState: state.request,
+  mapState: state.map,
   token: state.auth.user.access_token,
 });
 

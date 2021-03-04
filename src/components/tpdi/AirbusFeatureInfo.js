@@ -7,6 +7,7 @@ import { formatPercentage } from '../../utils/stringUtils';
 import { focusMap, getAreaCoverPercentage } from '../common/Map/utils/crsTransform';
 import { getFormattedDatetime } from './utils';
 import TPDIThumbnail from './TPDIThumbnail';
+import mapSlice from '../../store/map';
 
 const airbusConstellationToProvider = {
   PHR: 'AIRBUS_PLEIADES',
@@ -17,7 +18,7 @@ const AirbusFeatureInfo = ({ feature, geometry, isDisabled }) => {
   const [expandedInfo, setExpandedInfo] = useState(false);
 
   const handleParseGeometryToMap = () => {
-    store.dispatch(tpdiSlice.actions.setExtraMapGeometry(feature.geometry));
+    store.dispatch(mapSlice.actions.setExtraGeometry(feature.geometry));
     focusMap();
   };
 

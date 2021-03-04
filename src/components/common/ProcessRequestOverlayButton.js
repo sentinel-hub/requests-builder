@@ -15,6 +15,7 @@ const ProcessRequestOverlayButton = ({
   className,
   requestState,
   collectionRequestIdx,
+  wgs84Geometry,
   skipSaving = true,
 }) => {
   const readerRef = useRef();
@@ -31,7 +32,7 @@ const ProcessRequestOverlayButton = ({
     const responseUrl = URL.createObjectURL(response);
     let dimensions;
     if (shouldDisplayDimensions) {
-      dimensions = calculatePixelSize(requestState.geometry, [requestState.width, requestState.height]);
+      dimensions = calculatePixelSize(wgs84Geometry, [requestState.width, requestState.height]);
     }
     const isFromCollections = collectionRequestIdx !== undefined ? true : false;
     const saveRequestData = skipSaving ? {} : { request: stringRequest, mode: 'PROCESS', isFromCollections };

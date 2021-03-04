@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { isBbox, transformGeometryToNewCrs } from '../common/Map/utils/crsTransform';
+import { isBbox } from '../common/Map/utils/crsTransform';
 import BBox from '@turf/bbox';
 import { DATASOURCES } from '../../utils/const';
 
@@ -49,21 +49,20 @@ const crsToWMSCrs = {
   'EPSG:4326': 'CRS:84',
 };
 
-const getWMSBbox = (requestState, mode = 'WMS') => {
-  const geometry = requestState.geometry;
+const getWMSBbox = (mapState, mode = 'WMS') => {
+  const geometry = mapState.convertedGeometry;
   let geoString = '';
-  const transformedGeo = transformGeometryToNewCrs(geometry, requestState.CRS);
   if (isBbox(geometry)) {
-    geoString = `BBOX=${transformedGeo[0]},${transformedGeo[1]},${transformedGeo[2]},${transformedGeo[3]}`;
+    geoString = `BBOX=${geometry[0]},${geometry[1]},${geometry[2]},${geometry[3]}`;
   } else if (geometry.type === 'Polygon' || geometry.type === 'MultiPolygon') {
     // create bbox
-    const bbox = BBox(transformedGeo);
+    const bbox = BBox(geometry);
     const stringBbox = `BBOX=${bbox[0]},${bbox[1]},${bbox[2]},${bbox[3]}&`;
     if (mode === 'WMS') {
       geoString += stringBbox;
     }
     //add geometry
-    geoString += `GEOMETRY=${getPolygonWKT(transformedGeo)}`;
+    geoString += `GEOMETRY=${getPolygonWKT(geometry)}`;
   }
   return geoString;
 };
@@ -95,23 +94,23 @@ const getOGCAdvancedOptions = (wmsState) => {
   return advancedOptionsString;
 };
 
-const getWmsRequestParams = (requestState, wmsState, request = 'GetMap') => {
+const getWmsRequestParams = (requestState, wmsState, mapState, request = 'GetMap') => {
   let params = '';
   params += `REQUEST=${request}&`;
-  params += `CRS=${crsToWMSCrs[requestState.CRS]}&`;
-  params += `${getWMSBbox(requestState)}&`;
-  params += `LAYERS=${wmsState.layerId}&`;
+  params += `CRS=${crsToWMSCrs[mapState.selectedCrs]}&`;
+  params += `${getWMSBbox(mapState)}&`;
+  params += `LAYERS=${wmsState.layer.id}&`;
   params += `${getWidthOrResWms(requestState)}&`;
   params += `FORMAT=${requestState.responses[0].format}`;
   params += `${getWmsTime(requestState)}`;
   return params;
 };
 
-const getFisParams = (requestState, wmsState) => {
+const getFisParams = (requestState, wmsState, mapState) => {
   let params = '';
-  params += `LAYER=${wmsState.layerId}&`;
-  params += `CRS=${crsToWMSCrs[requestState.CRS]}&`;
-  params += `${getWMSBbox(requestState, 'FIS')}&`;
+  params += `LAYER=${wmsState.layer.id}&`;
+  params += `CRS=${crsToWMSCrs[mapState.selectedCrs]}&`;
+  params += `${getWMSBbox(mapState, 'FIS')}&`;
   params += `${getWidthOrResWms(requestState)}`;
   params += `${getWmsTime(requestState)}`;
   params += getOGCAdvancedOptions(wmsState);
@@ -119,47 +118,64 @@ const getFisParams = (requestState, wmsState) => {
 };
 
 const getWcsParams = (wmsState) => {
-  return `&COVERAGE=${wmsState.layerId}`;
+  return `&COVERAGE=${wmsState.layer.id}`;
 };
 
 const getServicesEndpoint = (datasource) => {
   return DATASOURCES[datasource] ? DATASOURCES[datasource].ogcUrl : 'https://services.sentinel-hub.com/ogc/';
 };
 
-export const getWmsUrl = (wmsState, requestState) => {
+export const getWmsUrl = (wmsState, requestState, mapState) => {
   return `${getServicesEndpoint(wmsState.datasource)}wms/${
     wmsState.instanceId ? wmsState.instanceId : '<your instance id>'
-  }?${getWmsRequestParams(requestState, wmsState)}`;
+  }?${getWmsRequestParams(requestState, wmsState, mapState)}`;
 };
 
-export const getFisUrl = (wmsState, requestState) => {
+export const getFisUrl = (wmsState, requestState, mapState) => {
   return `${getServicesEndpoint(wmsState.datasource)}fis/${
     wmsState.instanceId ? wmsState.instanceId : '<your instance id>'
-  }?${getFisParams(requestState, wmsState)}`;
+  }?${getFisParams(requestState, wmsState, mapState)}`;
 };
 
-export const getWcsUrl = (wmsState, requestState) => {
+export const getWcsUrl = (wmsState, requestState, mapState) => {
   return `${getServicesEndpoint(wmsState.datasource)}wcs/${
     wmsState.instanceId ?? '<your instance id>'
-  }?${getWmsRequestParams(requestState, wmsState, 'GetCoverage')}${getWcsParams(wmsState)}`;
+  }?${getWmsRequestParams(requestState, wmsState, mapState, 'GetCoverage')}${getWcsParams(wmsState)}`;
 };
 
-export const getMapWms = (wmsState, requestState, token, reqConfig) => {
-  const url = getWmsUrl(wmsState, requestState);
+export const getMapWms = (wmsState, requestState, mapState, token, reqConfig) => {
+  const url = getWmsUrl(wmsState, requestState, mapState);
   const config = getConfigHelper(token, reqConfig);
   config.responseType = 'blob';
   return axios.get(url, config);
 };
 
-export const getFisStats = (wmsState, requestState, token, reqConfig) => {
-  const url = getFisUrl(wmsState, requestState);
+export const getFisStats = (wmsState, requestState, mapState, token, reqConfig) => {
+  const url = getFisUrl(wmsState, requestState, mapState);
   const config = getConfigHelper(token, reqConfig);
   return axios.get(url, config);
 };
 
-export const getCoverageWcs = (wmsState, requestState, token, reqConfig) => {
-  const url = getWcsUrl(wmsState, requestState);
+export const getCoverageWcs = (wmsState, requestState, mapState, token, reqConfig) => {
+  const url = getWcsUrl(wmsState, requestState, mapState);
   const config = getConfigHelper(token, reqConfig);
   config.responseType = 'blob';
   return axios.get(url, config);
+};
+
+const fetchEvalscript = (dataProductUrl, token) => {
+  const config = getConfigHelper(token);
+  return axios.get(dataProductUrl, config);
+};
+//evalScript should be present
+export const fetchEvalscripts = async (layers, token) => {
+  return Promise.all(
+    layers.map(async (layer) => {
+      if (layer.styles[0]?.dataProduct) {
+        const res = await fetchEvalscript(layer.styles[0].dataProduct['@id'], token);
+        return { ...layer, styles: [{ ...layer.styles, evalScript: res.data.evalScript }] };
+      }
+      return layer;
+    }),
+  );
 };

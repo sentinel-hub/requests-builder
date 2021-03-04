@@ -13,7 +13,7 @@ import {
   CUSTOM,
   DATAFUSION,
 } from '../../../utils/const';
-import { isBbox, transformGeometryToNewCrs } from '../../common/Map/utils/crsTransform';
+import { isBbox, isPolygon } from '../../common/Map/utils/crsTransform';
 
 const datasourceToSHJSLayer = {
   [S2L2A]: 'S2L2ALayer',
@@ -46,9 +46,9 @@ const locationToSHJSLocation = {
   'aws-us-west-2': 'awsUsWest2',
 };
 
-const getSHJSImports = (reqState) => {
+const getSHJSImports = (reqState, selectedCrs) => {
   const layer = datasourceToSHJSLayer[reqState.datasource];
-  let imports = layer + `, setAuthToken, ApiType, MimeTypes, ${crsToSHJSCrs[reqState.CRS]}, BBox`;
+  let imports = layer + `, setAuthToken, ApiType, MimeTypes, ${crsToSHJSCrs[selectedCrs]}, BBox`;
 
   //If Byoc, location is needed
   if (reqState.datasource === 'CUSTOM') {
@@ -66,19 +66,15 @@ const getSHJSImports = (reqState) => {
 };
 
 // [[],[],[]] -> 'num,num,num,num'
-export const generateSHBbox = (geometry, selectedCrs) => {
-  if (!geometry) {
+export const generateSHBbox = (convertedGeometry) => {
+  if (!convertedGeometry) {
     return null;
   }
-  let geo = geometry;
-  if (selectedCrs !== 'EPSG:4326') {
-    geo = transformGeometryToNewCrs(geometry, selectedCrs);
-  }
-  if (isBbox(geo)) {
-    const b = `${geo[0]}, ${geo[1]}, ${geo[2]}, ${geo[3]}`;
+  if (isBbox(convertedGeometry)) {
+    const b = `${convertedGeometry[0]}, ${convertedGeometry[1]}, ${convertedGeometry[2]}, ${convertedGeometry[3]}`;
     return b;
   } else {
-    const b = bbox(geo);
+    const b = bbox(convertedGeometry);
     return `${b[0]}, ${b[1]}, ${b[2]}, ${b[3]}`;
   }
 };
@@ -211,35 +207,33 @@ const getTimeToHelper = (requestState) => {
   return requestState.timeTo[0];
 };
 
-const generateGetMapParams = (requestState) => {
+const generateGetMapParams = (requestState, mapState) => {
   return `const getMapParams = {
-      bbox: new BBox(${crsToSHJSCrs[requestState.CRS]}, ${generateSHBbox(
-    requestState.geometry,
-    requestState.CRS,
-  )}),
+      bbox: new BBox(${crsToSHJSCrs[mapState.selectedCrs]}, ${generateSHBbox(mapState.convertedGeometry)}),
       fromTime: new Date('${getTimeFromHelper(requestState)}'),
       toTime: new Date('${getTimeToHelper(requestState)}'),
       width: ${requestState.width},
       height: ${requestState.height},
-      format: ${formatToSHJS[requestState.responses[0].format]},\
+      format: ${formatToSHJS[requestState.responses[0]?.format]},\
       ${
-        requestState.geometry.type === 'Polygon'
-          ? `\n    geometry: ${JSON.stringify(
-              transformGeometryToNewCrs(requestState.geometry, requestState.CRS),
-            )}`
+        isPolygon(mapState.convertedGeometry)
+          ? `\n      geometry: ${JSON.stringify(mapState.convertedGeometry)}`
           : ''
       }
   }`;
 };
 
-export const getSHJSCode = (requestState, token) => {
+export const getSHJSCode = (requestState, mapState, token) => {
   //Multiresponse not supported.
   if (requestState.responses.length > 1) {
     return '// Multi-part response is not supported. See curl mode';
   }
   const evalscript = requestState.evalscript;
 
-  let shjsCode = `import { ${getSHJSImports(requestState)} } from '@sentinel-hub/sentinelhub-js';\n\n`;
+  let shjsCode = `import { ${getSHJSImports(
+    requestState,
+    mapState.selectedCrs,
+  )} } from '@sentinel-hub/sentinelhub-js';\n\n`;
 
   shjsCode += `${token ? `setAuthToken('${token}');\n\n` : ''}`;
 
@@ -247,7 +241,7 @@ export const getSHJSCode = (requestState, token) => {
 
   shjsCode += `${getShJSLayers(requestState)}\n\n`;
 
-  shjsCode += generateGetMapParams(requestState);
+  shjsCode += generateGetMapParams(requestState, mapState);
 
   shjsCode += `\n\nlayer.getMap(getMapParams, ApiType.PROCESSING).then(response => {
         //

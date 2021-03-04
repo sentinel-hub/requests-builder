@@ -13,7 +13,7 @@ import {
   DATAFUSION,
 } from '../../../utils/const';
 import { generateSHBbox } from './generateShjsRequest';
-import { transformGeometryToNewCrs } from '../../common/Map/utils/crsTransform';
+import { isPolygon } from '../../common/Map/utils/crsTransform';
 
 const formatToSHPY = {
   // JPEG not supported on shpy
@@ -126,16 +126,15 @@ else:
 `;
 };
 
-const getSHPYBounds = (reqState) => {
+const getSHPYBounds = (mapState) => {
   let boundsString = '';
-  const bbox = generateSHBbox(reqState.geometry, reqState.CRS);
+  const bbox = generateSHBbox(mapState.convertedGeometry);
 
-  boundsString += `bbox = BBox(bbox=[${bbox}], crs=${crsToSHPYCrs[reqState.CRS]})\n`;
+  boundsString += `bbox = BBox(bbox=[${bbox}], crs=${crsToSHPYCrs[mapState.selectedCrs]})\n`;
 
-  if (reqState.geometry.type === 'Polygon') {
-    const transformedGeo = transformGeometryToNewCrs(reqState.geometry, reqState.CRS);
-    boundsString += `geometry = Geometry(geometry=${JSON.stringify(transformedGeo)}, crs=${
-      crsToSHPYCrs[reqState.CRS]
+  if (isPolygon(mapState.convertedGeometry)) {
+    boundsString += `geometry = Geometry(geometry=${JSON.stringify(mapState.convertedGeometry)}, crs=${
+      crsToSHPYCrs[mapState.selectedCrs]
     })\n`;
   }
   return boundsString;
@@ -239,7 +238,7 @@ const booleanToPyBoolean = {
   false: 'False',
 };
 
-export const getSHPYCode = (requestState) => {
+export const getSHPYCode = (requestState, mapState) => {
   //add imports
   let shpyCode = `${getSHPYImports()}`;
   //Credentials
@@ -247,7 +246,7 @@ export const getSHPYCode = (requestState) => {
   // add evalscript
   shpyCode += `\nevalscript = """\n${requestState.evalscript}\n"""\n`;
   //add geometry/bounds
-  shpyCode += getSHPYBounds(requestState);
+  shpyCode += getSHPYBounds(mapState);
 
   shpyCode += `\nrequest = SentinelHubRequest(
   evalscript=evalscript,
@@ -258,7 +257,7 @@ export const getSHPYCode = (requestState) => {
     ${getSHPYResponses(requestState)}
   ],
   bbox=bbox,\
-  ${requestState.geometry.type === 'Polygon' ? '\n  geometry=geometry,' : ''}
+  ${isPolygon(mapState.convertedGeometry) === 'Polygon' ? '\n  geometry=geometry,' : ''}
   ${getDimensionsSHPY(requestState)}
   config=config
 )`;

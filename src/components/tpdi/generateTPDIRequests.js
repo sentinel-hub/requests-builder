@@ -50,7 +50,7 @@ const getAirbusSearchRequestBody = (state) => {
   const request = {
     provider: 'AIRBUS',
     bounds: {
-      ...generateBounds(state.request),
+      ...generateBounds(state.map),
     },
     data: [
       {
@@ -71,7 +71,7 @@ const getPlanetSearchRequestBody = (state) => {
     provider: state.tpdi.provider,
     planetApiKey: state.planet.planetApiKey,
     bounds: {
-      ...generateBounds(state.request),
+      ...generateBounds(state.map),
     },
     data: [
       {

@@ -33,7 +33,7 @@ export const createFileReader = () => {
   return fr;
 };
 
-const SendRequest = ({ token, requestState }) => {
+const SendRequest = ({ token, requestState, mapState }) => {
   const isValid = validateRequestState(requestState);
 
   return (
@@ -41,10 +41,11 @@ const SendRequest = ({ token, requestState }) => {
       className="button"
       buttonText="Send Request"
       request={processApiRequest}
-      args={[requestState, token]}
+      args={[requestState, mapState, token]}
       validation={Boolean(isValid && token)}
       requestState={requestState}
       skipSaving={false}
+      wgs84Geometry={mapState.wgs84Geometry}
     />
   );
 };
@@ -52,6 +53,7 @@ const SendRequest = ({ token, requestState }) => {
 const mapStateToProps = (store) => ({
   token: store.auth.user.access_token,
   requestState: store.request,
+  mapState: store.map,
 });
 
 export default connect(mapStateToProps)(SendRequest);

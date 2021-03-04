@@ -7,12 +7,13 @@ import { formatPercentage } from '../../utils/stringUtils';
 import { focusMap, getAreaCoverPercentage } from '../common/Map/utils/crsTransform';
 import { getFormattedDatetime } from './utils';
 import TPDIThumbnail from './TPDIThumbnail';
+import mapSlice from '../../store/map';
 
 const PlanetFeatureInfo = ({ feature, geometry, isDisabled }) => {
   const [expandedInfo, setExpandedInfo] = useState(false);
 
   const handleParseGeometryToMap = () => {
-    store.dispatch(tpdiSlice.actions.setExtraMapGeometry(feature.geometry));
+    store.dispatch(mapSlice.actions.setExtraGeometry(feature.geometry));
     focusMap();
   };
 
@@ -40,7 +41,7 @@ const PlanetFeatureInfo = ({ feature, geometry, isDisabled }) => {
         >
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <p className="text">
-              <span>{getFormattedDatetime(feature.properties.acquired)}</span>
+              <span>{getFormattedDatetime(feature.properties?.acquired)}</span>
             </p>
             <p className="text">
               <span>ID: </span>
@@ -73,28 +74,36 @@ const PlanetFeatureInfo = ({ feature, geometry, isDisabled }) => {
           <div className="tpdi-feature-extra-info u-margin-bottom-tiny">
             <p className="text">
               <span>Acquisition Date: </span>
-              {feature.properties.acquired}
+              {feature.properties?.acquired}
             </p>
             <p className="text">
               <span>Product geometry coverage: </span>
               {formatPercentage(getAreaCoverPercentage(geometry, feature.geometry))}
             </p>
-            <p className="text">
-              <span>Cloud Cover: </span>
-              {formatPercentage(feature.properties.cloud_cover)}
-            </p>
-            <p className="text">
-              <span>Snow Cover: </span>
-              {feature.properties.snow_ice_percent.toFixed(2) + '%'}
-            </p>
-            <p className="text">
-              <span>Shadow Percent: </span>
-              {feature.properties.shadow_percent.toFixed(2) + '%'}
-            </p>
-            <p className="text">
-              <span>Pixel Resolution: </span>
-              {feature.properties.pixel_resolution}
-            </p>
+            {feature.properties?.cloud_cover !== undefined && (
+              <p className="text">
+                <span>Cloud Cover: </span>
+                {formatPercentage(feature.properties?.cloud_cover)}
+              </p>
+            )}
+            {feature.properties?.snow_ice_percent !== undefined && (
+              <p className="text">
+                <span>Snow Cover: </span>
+                {feature.properties?.snow_ice_percent.toFixed(2) + '%'}
+              </p>
+            )}
+            {feature.properties?.shadow_percent !== undefined && (
+              <p className="text">
+                <span>Shadow Percent: </span>
+                {feature.properties?.shadow_percent.toFixed(2) + '%'}
+              </p>
+            )}
+            {feature.properties?.pixel_resolution !== undefined && (
+              <p className="text">
+                <span>Pixel Resolution: </span>
+                {feature.properties?.pixel_resolution}
+              </p>
+            )}
           </div>
           <TPDIThumbnail collectionId="PLANET_SCOPE" productId={feature.id} />
         </div>

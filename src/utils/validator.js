@@ -11,9 +11,9 @@ const validateDatasource = (requestState) => {
 
 export const validateRequestState = (requestState) => {
   try {
-    const { width, height, evalscript, CRS, geometry } = requestState;
+    const { width, height, evalscript } = requestState;
     const isDatasourceValid = validateDatasource(requestState);
-    return !!(isDatasourceValid && width && height && evalscript && CRS && geometry);
+    return !!(isDatasourceValid && width && height && evalscript);
   } catch (err) {
     return false;
   }

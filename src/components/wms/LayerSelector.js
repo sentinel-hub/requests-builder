@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { getLayersByInstanceId } from './wmsRequests';
+import { fetchEvalscripts, getLayersByInstanceId } from './wmsRequests';
 import store from '../../store';
 import wmsSlice from '../../store/wms';
+import { useDidMountEffect } from '../../utils/hooks';
 
 const generateLayersOptions = (layers) => {
   return layers.map((lay) => (
@@ -14,6 +15,7 @@ const generateLayersOptions = (layers) => {
 
 const LayerSelector = ({ layerId, instanceId, token }) => {
   const [layers, setLayers] = useState([]);
+  const [layerIdInput, setLayerIdInput] = useState(layerId);
 
   useEffect(() => {
     const loadLayers = async () => {
@@ -23,13 +25,16 @@ const LayerSelector = ({ layerId, instanceId, token }) => {
       try {
         const res = await getLayersByInstanceId(token, instanceId);
         if (res.data) {
+          // run through layers and fetch evalscripts if needed (dataproduct);
+          const layersWithEvalscripts = await fetchEvalscripts(res.data, token);
           setLayers(
-            res.data.map((lay) => ({
+            layersWithEvalscripts.map((lay) => ({
               id: lay.id,
               description: lay.description,
               title: lay.title,
               datasource: lay.datasourceDefaults.type,
               otherDefaults: lay.datasourceDefaults,
+              styles: lay.styles,
             })),
           );
         }
@@ -40,15 +45,24 @@ const LayerSelector = ({ layerId, instanceId, token }) => {
     loadLayers();
   }, [instanceId, token]);
 
+  useDidMountEffect(() => {
+    setLayerIdInput('');
+    store.dispatch(wmsSlice.actions.setLayer({}));
+  }, [instanceId]);
+
   const handleLayerIdChange = (e) => {
-    store.dispatch(wmsSlice.actions.setLayerId(e.target.value));
+    setLayerIdInput(e.target.value);
+    const foundLayer = layers.find((lay) => lay.id === e.target.value);
+    if (foundLayer !== undefined) {
+      store.dispatch(wmsSlice.actions.setLayer(foundLayer));
+    }
   };
 
   const handleSelectLayerChange = (e) => {
-    store.dispatch(wmsSlice.actions.setLayerId(e.target.value));
-    store.dispatch(
-      wmsSlice.actions.setDatasource(layers.find((lay) => lay.id === e.target.value).datasource),
-    );
+    setLayerIdInput(e.target.value);
+    const layer = layers.find((lay) => lay.id === e.target.value);
+    store.dispatch(wmsSlice.actions.setDatasource(layer.datasource));
+    store.dispatch(wmsSlice.actions.setLayer(layer));
   };
 
   return (
@@ -61,7 +75,7 @@ const LayerSelector = ({ layerId, instanceId, token }) => {
         type="text"
         className="form__input"
         placeholder="Layer id"
-        value={layerId}
+        value={layerIdInput}
         onChange={handleLayerIdChange}
       />
       {layers.length > 0 ? (
@@ -82,7 +96,7 @@ const LayerSelector = ({ layerId, instanceId, token }) => {
 const mapStateToProps = (state) => ({
   instanceId: state.wms.instanceId,
   token: state.auth.user.access_token,
-  layerId: state.wms.layerId,
+  layerId: state.wms.layer.id ?? '',
 });
 
 export default connect(mapStateToProps)(LayerSelector);

@@ -4,6 +4,24 @@ import PlanetFeatureInfo from './PlanetFeatureInfo';
 import AirbusFeatureInfo from './AirbusFeatureInfo';
 import { isAirbus } from './utils';
 
+const sortTpdiFeatures = (featuresWithProvider) => {
+  if (isAirbus(featuresWithProvider.provider)) {
+    return {
+      ...featuresWithProvider,
+      features: featuresWithProvider.features.sort(
+        (a, b) => new Date(a.properties?.acquisitionDate) > new Date(b.properties?.acquisitionDate),
+      ),
+    };
+  } else if (featuresWithProvider.provider === 'PLANET') {
+    return {
+      ...featuresWithProvider,
+      features: featuresWithProvider.features.sort(
+        (a, b) => new Date(a.properties?.acquired) > new Date(b.properties?.acquired),
+      ),
+    };
+  }
+};
+
 const generateFeatures = (featuresWithProvider, geometry, productIds) => {
   if (isAirbus(featuresWithProvider.provider)) {
     return featuresWithProvider.features.map((feature) => (
@@ -33,7 +51,7 @@ const SearchResultsContainer = ({ featuresWithProvider, geometry, products }) =>
       <h2 className="heading-secondary">Search Results (Products Found)</h2>
       <div className="form" style={{ overflowY: 'scroll', maxHeight: '450px' }}>
         {featuresWithProvider.features.length > 0 ? (
-          generateFeatures(featuresWithProvider, geometry, productIds)
+          generateFeatures(sortTpdiFeatures(featuresWithProvider), geometry, productIds)
         ) : (
           <p className="text">No results found</p>
         )}
@@ -43,7 +61,7 @@ const SearchResultsContainer = ({ featuresWithProvider, geometry, products }) =>
 };
 
 const mapStateToProps = (state) => ({
-  geometry: state.request.geometry,
+  geometry: state.map.wgs84Geometry,
   products: state.tpdi.products,
 });
 

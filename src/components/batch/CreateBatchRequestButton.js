@@ -17,6 +17,7 @@ const isCreatePossible = (batchState, requestState, token) => {
 const CreateBatchRequestButton = ({
   batchState,
   requestState,
+  mapState,
   token,
   setFetchedRequests,
   setCreateResponse,
@@ -33,7 +34,7 @@ const CreateBatchRequestButton = ({
         className="secondary-button"
         buttonText="Create"
         request={createBatchRequest}
-        args={[requestState, batchState, token]}
+        args={[requestState, batchState, mapState, token]}
         responseHandler={createResponseHandler}
         errorHandler={addAlertOnError}
       />
@@ -44,6 +45,7 @@ const CreateBatchRequestButton = ({
 const mapStateToProps = (state) => ({
   batchState: state.batch,
   requestState: state.request,
+  mapState: state.map,
   token: state.auth.user.access_token,
 });
 export default connect(mapStateToProps)(CreateBatchRequestButton);

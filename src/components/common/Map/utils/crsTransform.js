@@ -1,9 +1,9 @@
 import bboxPolygon from '@turf/bbox-polygon';
 import proj4 from 'proj4';
-import bbox from '@turf/bbox';
 import area from '@turf/area';
 import intersect from '@turf/intersect';
 import { CRS } from '../../../../utils/const';
+import { addWarningAlert } from '../../../../store/alert';
 
 export const getAreaFromGeometry = (geometry) => {
   if (isBbox(geometry)) {
@@ -55,6 +55,7 @@ export const transformGeometryToNewCrs = (geometry, toCrs, fromCrs) => {
       return transformMultiPolygonToNewCrs(geometry, CRS[toCrs].projection, CRS[fromCrs].projection);
     }
   } catch (err) {
+    addWarningAlert("Couldn't transform geometry, check the console for more details");
     console.error('Invalid geometry', err);
   }
 };
@@ -80,14 +81,16 @@ const transformArrayOfCoordinatesToNewCrs = (coords, toProj, fromProj) => {
   ];
 };
 
+const getBboxFromCoords = (coords) => {
+  const actualCoords = coords[0];
+  //bbox = min Longitude , min Latitude , max Longitude , max Latitude
+  return [actualCoords[0][0], actualCoords[0][1], actualCoords[1][0], actualCoords[2][1]];
+};
+
 export const transformBboxToNewCrs = (bboxToTransform, toProj, fromProj) => {
   const bboxCoords = getCoordsFromBbox(bboxToTransform);
   const transformedCoords = transformArrayOfCoordinatesToNewCrs(bboxCoords, toProj, fromProj);
-  const polygon = {
-    type: 'Polygon',
-    coordinates: transformedCoords,
-  };
-  return bbox(polygon);
+  return getBboxFromCoords(transformedCoords);
 };
 
 export const transformPolygonToNewCrs = (polygonToTransform, toProj, fromProj) => {
@@ -142,4 +145,5 @@ export const transformGeometryToWGS84IfNeeded = (selectedCRS, geometry) => {
 };
 
 export const isPolygon = (geometry) => geometry?.type === 'Polygon' ?? false;
+export const isMultiPolygon = (geometry) => geometry?.type === 'MultiPolygon' ?? false;
 export const isBbox = (geometry) => geometry.length === 4;

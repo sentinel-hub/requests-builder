@@ -127,7 +127,6 @@ export const sendCatalogEditedRequest = (text, token, reqConfig) => {
   }
 };
 
-//
 export const fetchAvailableDatesWithCatalog = async (datasource, timerange, geometry, token, reqConfig) => {
   const url = CATALOG_BASE_URL + 'search';
   const body = {};
@@ -148,4 +147,10 @@ export const fetchAvailableDatesWithCatalog = async (datasource, timerange, geom
       resolve({ data: { features: [] } });
     });
   }
+};
+
+export const fetchBoundsWithCatalog = (collectionId, collectionType, token, reqConfig) => {
+  const url = `${CATALOG_BASE_URL}search?bbox=-180,-90,180,90&collections=${collectionType.toLowerCase()}-${collectionId}`;
+  const config = getConfigHelper(token, reqConfig);
+  return Axios.get(url, config);
 };

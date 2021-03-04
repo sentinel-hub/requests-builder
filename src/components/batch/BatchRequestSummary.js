@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import store from '../../store';
 import alertSlice from '../../store/alert';
-import tpdiSlice from '../../store/tpdi';
 import batchSlice from '../../store/batch';
-import requestSlice from '../../store/request';
 import { getTransformedGeometryFromBounds, focusMap } from '../common/Map/utils/crsTransform';
 import RequestButton from '../common/RequestButton';
 import { dispatchChanges } from '../process/requests/parseRequest';
 import { parseBatchRequest, getBucketName } from './parse';
 import { deleteBatchRequest, fetchTilesBatchRequest } from './requests';
+import mapSlice from '../../store/map';
 
 const tillingGridIdToName = (id) => {
   return ['S2GM Grid', '10km Grid', '100,08km Grid', 'WGS84'][id];
@@ -104,13 +103,13 @@ const BatchRequestSummary = ({ props, token, setTilesResponse, handleDeleteBatch
 
   const handleSeeGeometry = () => {
     const transformedGeo = getTransformedGeometryFromBounds(props.processRequest.input.bounds);
-    store.dispatch(tpdiSlice.actions.setExtraMapGeometry(transformedGeo));
+    store.dispatch(mapSlice.actions.setExtraGeometry(transformedGeo));
     focusMap();
   };
 
   const handleSetGeometry = () => {
     const transformedGeo = getTransformedGeometryFromBounds(props.processRequest.input.bounds);
-    store.dispatch(requestSlice.actions.setGeometry(transformedGeo));
+    store.dispatch(mapSlice.actions.setWgs84Geometry(transformedGeo));
     focusMap();
   };
 

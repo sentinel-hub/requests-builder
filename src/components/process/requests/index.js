@@ -1,6 +1,6 @@
 import Axios from 'axios';
 import { CRS, DATASOURCES, isEmpty } from '../../../utils/const';
-import { transformGeometryToNewCrs } from '../../common/Map/utils/crsTransform';
+import { isBbox, isMultiPolygon, isPolygon } from '../../common/Map/utils/crsTransform';
 import { getUrlFromCurl, getRequestBody } from './parseRequest';
 
 const byocLocationToBaseUrl = (location) => {
@@ -22,19 +22,19 @@ export const getUrl = (requestState) => {
   }
 };
 
-export const getJSONRequestBody = (reqState, formated = true) => {
-  const requestBody = getRequestObject(reqState);
+export const getJSONRequestBody = (reqState, mapState, formated = true) => {
+  const requestBody = getRequestObject(reqState, mapState);
   if (formated) {
     return JSON.stringify(requestBody, null, 2);
   }
   return JSON.stringify(requestBody);
 };
 
-export const getRequestObject = (reqState) => {
+export const getRequestObject = (reqState, mapState) => {
   const requestBody = {
     input: {
       bounds: {
-        ...generateBounds(reqState),
+        ...generateBounds(mapState),
       },
       data: getRequestData(reqState),
     },
@@ -160,18 +160,19 @@ const getBoundsProperties = (crs) => {
   };
 };
 
-export const generateBounds = (requestState) => {
-  if (requestState.geometryType === 'BBOX') {
+export const generateBounds = (mapState) => {
+  if (isPolygon(mapState.convertedGeometry) || isMultiPolygon(mapState.convertedGeometry)) {
     return {
-      bbox: transformGeometryToNewCrs(requestState.geometry, requestState.CRS),
-      ...getBoundsProperties(requestState.CRS),
+      geometry: mapState.convertedGeometry,
+      ...getBoundsProperties(mapState.selectedCrs),
     };
-  } else if (requestState.geometryType === 'POLYGON') {
+  } else if (isBbox(mapState.convertedGeometry)) {
     return {
-      geometry: transformGeometryToNewCrs(requestState.geometry, requestState.CRS),
-      ...getBoundsProperties(requestState.CRS),
+      bbox: mapState.convertedGeometry,
+      ...getBoundsProperties(mapState.selectedCrs),
     };
   }
+  return {};
 };
 
 const generateOutput = (state) => {
@@ -251,17 +252,17 @@ const getToken = (token) => {
   }
 };
 
-export const generateProcessCurlCommand = (reqState, token) => {
-  const body = getJSONRequestBody(reqState);
+export const generateProcessCurlCommand = (reqState, mapState, token) => {
+  const body = getJSONRequestBody(reqState, mapState);
   const curlCommand = `curl -X POST ${getUrl(
     reqState,
   )} \n -H 'Content-Type: application/json' \n -H 'Authorization: Bearer ${getToken(token)}' \n -d '${body}'`;
   return curlCommand;
 };
 
-export const processApiRequest = (requestState, token, reqConfig) => {
+export const processApiRequest = (requestState, mapState, token, reqConfig) => {
   try {
-    const body = getJSONRequestBody(requestState);
+    const body = getJSONRequestBody(requestState, mapState);
     const config = getProcessRequestConfig(token, reqConfig, requestState);
     const url = getUrl(requestState);
     return Axios.post(url, body, config);
@@ -307,7 +308,7 @@ export const sendProcessBody = (token, body, url, reqConfig) => {
     responseType: 'blob',
     ...reqConfig,
   };
-  if (body.output.responses.length > 1) {
+  if (body.output?.responses?.length > 1) {
     config.headers.Accept = 'application/tar';
   }
   return Axios.post(url, body, config);

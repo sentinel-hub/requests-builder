@@ -4,7 +4,7 @@ const wmsSlice = createSlice({
   name: 'wms',
   initialState: {
     instanceId: '',
-    layerId: '',
+    layer: {},
     datasource: '',
     mode: 'WMS',
     advancedOptions: {},
@@ -13,8 +13,8 @@ const wmsSlice = createSlice({
     setInstanceId: (state, action) => {
       state.instanceId = action.payload;
     },
-    setLayerId: (state, action) => {
-      state.layerId = action.payload;
+    setLayer: (state, action) => {
+      state.layer = action.payload;
     },
     setDatasource: (state, action) => {
       state.datasource = action.payload;

@@ -37,6 +37,7 @@ const handleParseRequest = (text) => {
 const BatchRequestPreview = ({
   token,
   requestState,
+  mapState,
   batchState,
   setFetchedRequests,
   createResponse,
@@ -52,7 +53,7 @@ const BatchRequestPreview = ({
           options={[
             {
               name: 'create',
-              value: createBatchRequestCurlCommand(requestState, batchState, token),
+              value: createBatchRequestCurlCommand(requestState, batchState, mapState, token),
               toggledValue: createResponse,
             },
             {
@@ -108,6 +109,7 @@ const debouncedComponent = debounceRender(BatchRequestPreview, 500);
 const mapStateToProps = (store) => ({
   token: store.auth.user.access_token,
   requestState: store.request,
+  mapState: store.map,
   batchState: store.batch,
 });
 

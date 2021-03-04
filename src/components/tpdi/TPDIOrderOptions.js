@@ -273,7 +273,7 @@ const TPDIOrderOptions = ({
 const mapStateToProps = (state) => ({
   products: state.tpdi.products,
   name: state.tpdi.name,
-  geometry: state.request.geometry,
+  geometry: state.map.wgs84Geometry,
   provider: state.tpdi.provider,
   isParsing: state.tpdi.isParsing,
   isUsingQuery: state.tpdi.isUsingQuery,

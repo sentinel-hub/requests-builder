@@ -64,6 +64,7 @@
   font-size: 1.5rem;
   height: auto !important;
   width: 100%;
+  z-index: 0;
 
   @include respond(tab-land) {
     font-size: 1rem;

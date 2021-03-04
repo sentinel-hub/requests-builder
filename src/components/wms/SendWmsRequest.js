@@ -5,9 +5,9 @@ import RequestButton from '../common/RequestButton';
 import store from '../../store';
 import responsesSlice from '../../store/responses';
 
-const SendWmsRequest = ({ wmsState, requestState, token, mode }) => {
+const SendWmsRequest = ({ wmsState, requestState, mapState, token, mode }) => {
   const validateWmsSendRequest = () => {
-    return Boolean(token && wmsState.instanceId && wmsState.layerId);
+    return Boolean(token && wmsState.instanceId && wmsState.layer.id);
   };
 
   const responseHandler = (response) => {
@@ -45,24 +45,23 @@ const SendWmsRequest = ({ wmsState, requestState, token, mode }) => {
   })();
 
   return (
-    <div>
-      <RequestButton
-        buttonText="Send Request"
-        className="button"
-        request={request}
-        args={[wmsState, requestState, token]}
-        validation={validateWmsSendRequest()}
-        responseHandler={mode === 'WMS' || mode === 'WCS' ? responseHandler : responseHandlerFis}
-        errorHandler={errorHandler}
-        useShortcut={true}
-      />
-    </div>
+    <RequestButton
+      buttonText="Send Request"
+      className="button"
+      request={request}
+      args={[wmsState, requestState, mapState, token]}
+      validation={validateWmsSendRequest()}
+      responseHandler={mode === 'WMS' || mode === 'WCS' ? responseHandler : responseHandlerFis}
+      errorHandler={errorHandler}
+      useShortcut={true}
+    />
   );
 };
 
 const mapStateToProps = (state) => ({
   wmsState: state.wms,
   requestState: state.request,
+  mapState: state.map,
   token: state.auth.user.access_token,
   mode: state.wms.mode,
 });

@@ -7,63 +7,61 @@ import {
   DEFAULT_STATISTICAL_EVALSCRIPT,
 } from '../utils/const';
 import moment from 'moment';
-import { isBbox } from '../components/common/Map/utils/crsTransform';
+
+const PROCESS_INITIAL_STATE = {
+  mode: 'PROCESS',
+  datasource: 'S2L2A',
+  //default times: today and one month ago.
+  timeFrom: [moment.utc().subtract(1, 'month').startOf('day').format()],
+  timeTo: [moment.utc().endOf('day').format()],
+  isTimeRangeDisabled: false,
+  heightOrRes: 'HEIGHT',
+  isOnAutoRes: true,
+  width: 512,
+  height: 512,
+  isAutoRatio: true,
+  evalscript: DEFAULT_EVALSCRIPTS['S2L2A'],
+  // Array with options and index to individually modify certain options on datafusion
+  dataFilterOptions: [
+    {
+      options: {},
+      idx: 0,
+    },
+    {
+      options: {},
+      idx: 1,
+    },
+  ],
+  processingOptions: [
+    {
+      options: {},
+      idx: 0,
+    },
+    {
+      options: {},
+      idx: 1,
+    },
+  ],
+  datafusionSources: [
+    { datasource: S1GRD, id: 's1' },
+    { datasource: S2L2A, id: 'l2a' },
+  ],
+  responses: [
+    {
+      identifier: 'default',
+      format: 'image/jpeg',
+      idx: 0,
+    },
+  ],
+  byocLocation: 'aws-eu-central-1',
+  byocCollectionType: '',
+  byocCollectionId: '',
+  consoleValue: '',
+};
 
 const requestSlice = createSlice({
   name: 'request',
-  initialState: {
-    mode: 'PROCESS',
-    datasource: 'S2L2A',
-    //default times: today and one month ago.
-    timeFrom: [moment.utc().subtract(1, 'month').startOf('day').format()],
-    timeTo: [moment.utc().endOf('day').format()],
-    isTimeRangeDisabled: false,
-    heightOrRes: 'HEIGHT',
-    isOnAutoRes: true,
-    width: 512,
-    height: 512,
-    isAutoRatio: true,
-    evalscript: DEFAULT_EVALSCRIPTS['S2L2A'],
-    CRS: 'EPSG:4326',
-    geometryType: 'BBOX',
-    geometry: [12.44693, 41.870072, 12.541001, 41.917096],
-    // Array with options and index to individually modify certain options on datafusion
-    dataFilterOptions: [
-      {
-        options: {},
-        idx: 0,
-      },
-      {
-        options: {},
-        idx: 1,
-      },
-    ],
-    processingOptions: [
-      {
-        options: {},
-        idx: 0,
-      },
-      {
-        options: {},
-        idx: 1,
-      },
-    ],
-    datafusionSources: [
-      { datasource: S1GRD, id: 's1' },
-      { datasource: S2L2A, id: 'l2a' },
-    ],
-    responses: [
-      {
-        identifier: 'default',
-        format: 'image/jpeg',
-        idx: 0,
-      },
-    ],
-    byocLocation: 'aws-eu-central-1',
-    byocCollectionType: '',
-    byocCollectionId: '',
-    consoleValue: '',
-  },
+  initialState: PROCESS_INITIAL_STATE,
   reducers: {
     setDatasource: (state, action) => {
       state.datasource = action.payload;
@@ -140,22 +138,6 @@ const requestSlice = createSlice({
     setEvalscript: (state, action) => {
       state.evalscript = action.payload;
     },
-    setCRS: (state, action) => {
-      state.CRS = action.payload;
-    },
-    setGeometry: (state, action) => {
-      state.geometry = action.payload;
-
-      if (isBbox(action.payload)) {
-        state.geometryType = 'BBOX';
-      } else if (action.payload.type === 'Polygon' || action.payload.type === 'MultiPolygon') {
-        state.geometryType = 'POLYGON';
-      }
-    },
-    resetGeometry: (state) => {
-      state.geometryType = '';
-      state.geometry = '';
-    },
     setDataFilterOptions: (state, action) => {
       let idx = (action.payload && action.payload.idx) || 0;
       delete action.payload.idx;
@@ -199,7 +181,6 @@ const requestSlice = createSlice({
           mosaickingOrder: 'leastCC',
           ...state.dataFilterOptions[0].options,
         };
-        state.CRS = 'EPSG:3857';
       }
     },
     setDatafusionSource: (state, action) => {
@@ -307,6 +288,7 @@ const requestSlice = createSlice({
     setByocCollectionId: (state, action) => {
       state.byocCollectionId = action.payload;
     },
+    resetState: (state) => ({ ...PROCESS_INITIAL_STATE, mode: state.mode }),
   },
 });
 
