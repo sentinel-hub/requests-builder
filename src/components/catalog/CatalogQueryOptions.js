@@ -1,37 +1,43 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import CatalogSentinel1Options from './CatalogSentinel1Options';
+import CatalogOptions from './CatalogOptions';
 import store from '../../store';
 import catalogSlice from '../../store/catalog';
-import CatalogSentinel2Options from './CatalogSentinel2Options';
-import { S2L2A_CATALOG_ID, S2L1C_CATALOG_ID, S1GRD_CATALOG_ID, S1OPTIONS } from './const';
+import {
+  S2L2A_CATALOG_ID,
+  S2L1C_CATALOG_ID,
+  S1GRD_CATALOG_ID,
+  S1OPTIONS,
+  LANDSAT_8_CATALOG_ID,
+  S5PL2_CATALOG_ID,
+  S5Options,
+  CatalogCloudOptions,
+  collectionToOptions,
+  S3SLSTR_CATALOG_ID,
+  S3SLSTR_CATALOG_OPTIONS,
+} from './const';
 
 const generateOptionsByCollectionId = (collectionId, idx) => {
   switch (collectionId) {
     case S2L2A_CATALOG_ID:
     case S2L1C_CATALOG_ID:
-      return <CatalogSentinel2Options idx={idx} />;
+    case LANDSAT_8_CATALOG_ID:
+      return <CatalogOptions options={CatalogCloudOptions} idx={idx} />;
     case S1GRD_CATALOG_ID:
-      return <CatalogSentinel1Options idx={idx} />;
+      return <CatalogOptions options={S1OPTIONS} idx={idx} />;
+    case S5PL2_CATALOG_ID:
+      return <CatalogOptions options={S5Options} idx={idx} />;
+    case S3SLSTR_CATALOG_ID:
+      return <CatalogOptions options={S3SLSTR_CATALOG_OPTIONS} idx={idx} />;
     default:
       return null;
   }
 };
 
-const areQueriesLeft = (selectedCollection, selectedQueriesLength) => {
-  if (selectedCollection === S1GRD_CATALOG_ID && selectedQueriesLength < S1OPTIONS.length) {
-    return true;
-  } else if (
-    (selectedCollection === S2L1C_CATALOG_ID || selectedCollection === S2L2A_CATALOG_ID) &&
-    selectedQueriesLength < 1
-  ) {
-    return true;
-  }
-  return false;
-};
+const areQueriesLeft = (selectedCollection, selectedQueriesLength) =>
+  collectionToOptions[selectedCollection].length > selectedQueriesLength;
 
-export const hasProperties = (collectionId) =>
-  collectionId === S2L2A_CATALOG_ID || collectionId === S2L1C_CATALOG_ID || collectionId === S1GRD_CATALOG_ID;
+export const hasProperties = (collectionId) => collectionToOptions[collectionId]?.length > 0;
 
 const CatalogQueryOptions = ({ selectedCollection, queryProperties }) => {
   const generateQueryOptions = () => {

@@ -7,6 +7,7 @@ const wmsSlice = createSlice({
     layer: {},
     datasource: '',
     mode: 'WMS',
+    shouldFetchLayers: false,
     advancedOptions: {},
   },
   reducers: {
@@ -27,6 +28,9 @@ const wmsSlice = createSlice({
     },
     resetAdvancedOptions: (state) => {
       state.advancedOptions = {};
+    },
+    setShouldFetchLayers: (state, action) => {
+      state.shouldFetchLayers = action.payload;
     },
   },
 });

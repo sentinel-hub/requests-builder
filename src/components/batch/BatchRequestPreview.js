@@ -16,8 +16,8 @@ import { getRequestBody, dispatchChanges } from '../process/requests/parseReques
 import { parseBatchRequest } from './parse';
 import store from '../../store';
 import alertSlice from '../../store/alert';
-import batchSlice from '../../store/batch';
 import CommonRequestPreview from '../common/CommonRequestPreview';
+import { generateProcessCurlCommand } from '../process/requests';
 
 const handleParseRequest = (text) => {
   try {
@@ -86,6 +86,11 @@ const BatchRequestPreview = ({
               value: getTileStatusBatchRequestCurlCommand(token, batchState.selectedBatchId),
               toggledValue: tilesResponse,
             },
+            {
+              name: 'low res preview',
+              value: generateProcessCurlCommand(requestState, mapState, token),
+              nonToggle: true,
+            },
           ]}
           canCopy
           className="process-editor"
@@ -94,7 +99,6 @@ const BatchRequestPreview = ({
           sendEditedRequest={(text, reqConfig) => sendEditedBatchRequest(token, text, reqConfig)}
           onSendEdited={(response) => {
             setFetchedRequests([response]);
-            store.dispatch(batchSlice.actions.setSelectedBatchId(response['id']));
           }}
           supportedSendEditedNames={['create']}
           id="batch-req-preview"

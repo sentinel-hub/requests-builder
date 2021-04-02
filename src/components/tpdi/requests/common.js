@@ -1,35 +1,13 @@
-import axios from 'axios';
 import moment from 'moment';
-import { generateBounds } from '../process/requests';
-import { dataFilterDefaultValues } from './const';
-import { isAirbus, stateConstellationToConstellation } from './utils';
+import axios from 'axios';
+import { getAirbusOrderBody, getAirbusSearchRequestBody } from './airbus';
+import { getMaxarOrderBody, getMaxarSearchRequestBody } from './maxar';
+import { getPlanetOrderBody, getPlanetSearchRequestBody } from './planet';
+import { isAirbus } from '../utils';
 
 const BASE_TPDI_URL = 'https://services.sentinel-hub.com/api/v1/dataimport';
 
-//helpers
-const getReqConfig = (token, reqConfig) => {
-  const config = {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    ...reqConfig,
-  };
-  return config;
-};
-
-const getAirbusDataFilterOptions = (dataFilterOptions) => {
-  let options = {};
-  for (let key in dataFilterOptions) {
-    // check if the property is not default or have the default value
-    if (dataFilterOptions[key] !== 'DEFAULT' && dataFilterDefaultValues[key] !== dataFilterOptions[key]) {
-      options[key] = dataFilterOptions[key];
-    }
-  }
-  return options;
-};
-
-const getTimeRange = (requestState, isSingleDate) => {
+export const getTimeRange = (requestState, isSingleDate) => {
   if (isSingleDate) {
     return {
       timeRange: {
@@ -46,81 +24,25 @@ const getTimeRange = (requestState, isSingleDate) => {
   };
 };
 
-const getAirbusSearchRequestBody = (state) => {
-  const request = {
-    provider: 'AIRBUS',
-    bounds: {
-      ...generateBounds(state.map),
+const getReqConfig = (token, reqConfig) => {
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     },
-    data: [
-      {
-        constellation: stateConstellationToConstellation[state.tpdi.provider],
-        dataFilter: {
-          ...getAirbusDataFilterOptions(state.airbus.dataFilterOptions),
-          ...getTimeRange(state.request, state.tpdi.isSingleDate),
-        },
-      },
-    ],
+    ...reqConfig,
   };
-
-  return request;
+  return config;
 };
 
-const getPlanetSearchRequestBody = (state) => {
-  const request = {
-    provider: state.tpdi.provider,
-    planetApiKey: state.planet.planetApiKey,
-    bounds: {
-      ...generateBounds(state.map),
-    },
-    data: [
-      {
-        itemType: 'PSScene4Band',
-        productBundle: 'analytic',
-        dataFilter: {
-          ...getTimeRange(state.request, state.tpdi.isSingleDate),
-          maxCloudCoverage: state.planet.maxCloudCoverage,
-        },
-      },
-    ],
-  };
-  return request;
-};
-
-const getAirbusOrderBody = (state) => {
-  const requestBody = {};
-  requestBody.input = getAirbusSearchRequestBody(state);
-  requestBody.name = state.tpdi.name;
-  requestBody.collectionId = state.tpdi.collectionId;
-  delete requestBody.input.data[0].dataFilter;
-  requestBody.input.data[0].products = state.tpdi.products.map((product) => ({
-    id: product.id,
-  }));
-
-  return requestBody;
-};
-
-const getPlanetOrderBody = (state) => {
-  const requestBody = {};
-  requestBody.input = getPlanetSearchRequestBody(state);
-  requestBody.name = state.tpdi.name;
-  requestBody.collectionId = state.tpdi.collectionId;
-  delete requestBody.input.data[0].dataFilter;
-  requestBody.input.data[0].productBundle = 'analytic';
-  requestBody.input.data[0].itemIds = state.tpdi.products.map((product) => product.id);
-  requestBody.input.data[0].harmonizeTo = state.planet.harmonizeTo;
-  return requestBody;
-};
-
-//SEARCH
-const getSearchTpdiBody = (state) => {
-  let requestBody;
+export const getSearchTpdiBody = (state) => {
   if (isAirbus(state.tpdi.provider)) {
-    requestBody = getAirbusSearchRequestBody(state);
+    return getAirbusSearchRequestBody(state);
   } else if (state.tpdi.provider === 'PLANET') {
-    requestBody = getPlanetSearchRequestBody(state);
+    return getPlanetSearchRequestBody(state);
+  } else if (state.tpdi.provider === 'MAXAR') {
+    return getMaxarSearchRequestBody(state);
   }
-  return requestBody;
 };
 
 const getTPDISearchHelper = (requestBody, config, next = undefined) => {
@@ -134,26 +56,28 @@ export const getTPDISearchRequest = async (state, token, reqConfig, next = undef
 
   let res = await getTPDISearchHelper(requestBody, config);
   const results = res.data.features;
-  while (res.data.links.next) {
+  while (res.data.links?.next) {
     res = await getTPDISearchHelper(requestBody, config, res.data.links.next);
     results.push(...res.data.features);
   }
   return Promise.resolve({ data: { features: results } });
 };
 
-//ORDER
 export const tpdiCreateOrderBodyViaProducts = (state) => {
   let requestBody;
   if (isAirbus(state.tpdi.provider)) {
     requestBody = getAirbusOrderBody(state);
   } else if (state.tpdi.provider === 'PLANET') {
     requestBody = getPlanetOrderBody(state);
+  } else if (state.tpdi.provider === 'MAXAR') {
+    requestBody = getMaxarOrderBody(state);
   }
   return requestBody;
 };
 
 export const createTPDIOrder = (state, token, reqConfig) => {
   const requestBody = tpdiCreateOrderBodyViaProducts(state);
+  console.log('here', requestBody);
   const url = BASE_TPDI_URL + '/orders';
   const config = getReqConfig(token, reqConfig);
   return axios.post(url, JSON.stringify(requestBody), config);
@@ -166,6 +90,8 @@ export const tpdiCreateOrderBodyViaDataFilter = (state) => {
   } else if (state.tpdi.provider === 'PLANET') {
     requestBody.input = getPlanetSearchRequestBody(state);
     requestBody.input.data[0].harmonizeTo = state.planet.harmonizeTo;
+  } else if (state.tpdi.provider === 'MAXAR') {
+    requestBody.input = getMaxarSearchRequestBody(state);
   }
   requestBody.name = state.tpdi.name;
   requestBody.collectionId = state.tpdi.collectionId;

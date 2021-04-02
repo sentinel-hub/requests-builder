@@ -1,5 +1,5 @@
 import React from 'react';
-import { createTPDIOrder, createTPDIDataFilterOrder } from './generateTPDIRequests';
+import { createTPDIOrder, createTPDIDataFilterOrder } from './requests/common';
 import { connect } from 'react-redux';
 import RequestButton from '../common/RequestButton';
 import { errorHandlerTPDI } from './TPDIOrderOptions';
@@ -21,6 +21,7 @@ const TPDIPlaceOrderButton = ({
   request,
   airbus,
   planet,
+  maxar,
   tpdi,
   map,
   token,
@@ -36,6 +37,7 @@ const TPDIPlaceOrderButton = ({
     airbus,
     planet,
     tpdi,
+    maxar,
     map,
   };
   const { isUsingQuery } = tpdi;
@@ -114,6 +116,7 @@ const mapStateToProps = (state) => ({
   request: state.request,
   airbus: state.airbus,
   planet: state.planet,
+  maxar: state.maxar,
   token: state.auth.user.access_token,
   map: state.map,
   collectionId: state.tpdi.collectionId,

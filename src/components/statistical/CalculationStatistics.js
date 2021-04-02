@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import store from '../../store';
 import statisticalSlice from '../../store/statistical';
+import { inputArrayChangeHandler } from './utils/utils';
 
 const CalculationStatistics = ({ idx, statistics, statIdx }) => {
   const [isSpecifyingBand, setIsSpecifyingBandName] = useState(statistics.statisticsBandName !== 'default');
@@ -24,15 +25,17 @@ const CalculationStatistics = ({ idx, statistics, statIdx }) => {
 
   const handlePercentilesArrayChange = (e) => {
     try {
-      const array = e.target.value.split(',').map((n) => Number(n));
-      store.dispatch(
-        statisticalSlice.actions.setStatisticsParam({
-          param: 'k',
-          value: array,
-          idx,
-          statIdx,
-        }),
-      );
+      const dispatchedValue = inputArrayChangeHandler(e);
+      if (dispatchedValue !== undefined) {
+        store.dispatch(
+          statisticalSlice.actions.setStatisticsParam({
+            param: 'k',
+            value: dispatchedValue,
+            idx,
+            statIdx,
+          }),
+        );
+      }
     } catch (err) {
       console.error("Can't parse array", err);
     }

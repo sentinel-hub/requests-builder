@@ -2,15 +2,10 @@ import Axios from 'axios';
 import store from './store';
 import alertSlice from './store/alert';
 import paramsSlice from './store/params';
-import requestSlice from './store/request';
 import savedRequestsSlice from './store/savedRequests';
 import { setBaseUrlAxiosInterpector } from './utils/configureAxios';
 
 export const configureParams = async (params) => {
-  if (params['enable-statistics'] !== undefined) {
-    store.dispatch(paramsSlice.actions.setEnableStatisticsApi(true));
-    store.dispatch(requestSlice.actions.setMode('STATISTICAL'));
-  }
   if (params['set-url']) {
     store.dispatch(paramsSlice.actions.setCustomUrl(params['set-url']));
     setBaseUrlAxiosInterpector(params['set-url']);

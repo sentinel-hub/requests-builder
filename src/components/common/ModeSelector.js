@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import store from '../../store';
 import requestSlice from '../../store/request';
 
-const ModeSelector = ({ mode, enableStatisticsApi }) => {
+const ModeSelector = ({ mode }) => {
   const handleModeChange = (e) => {
     store.dispatch(requestSlice.actions.setMode(e.target.value));
   };
@@ -71,6 +71,20 @@ const ModeSelector = ({ mode, enableStatisticsApi }) => {
         <div className="u-flex-aligned">
           <input
             className="mode-selector mode-selector--input"
+            checked={mode === 'STATISTICAL'}
+            onChange={handleModeChange}
+            type="radio"
+            id="statistical"
+            value="STATISTICAL"
+          />
+          <label className="mode-selector mode-selector--label" htmlFor="statistical">
+            STATISTICAL
+          </label>
+        </div>
+
+        <div className="u-flex-aligned">
+          <input
+            className="mode-selector mode-selector--input"
             checked={mode === 'WMS'}
             onChange={handleModeChange}
             type="radio"
@@ -81,22 +95,6 @@ const ModeSelector = ({ mode, enableStatisticsApi }) => {
             OGC
           </label>
         </div>
-
-        {enableStatisticsApi && (
-          <div className="u-flex-aligned">
-            <input
-              className="mode-selector mode-selector--input"
-              checked={mode === 'STATISTICAL'}
-              onChange={handleModeChange}
-              type="radio"
-              id="statistical"
-              value="STATISTICAL"
-            />
-            <label className="mode-selector mode-selector--label" htmlFor="statistical">
-              STATISTICAL
-            </label>
-          </div>
-        )}
       </div>
     </div>
   );
@@ -104,6 +102,5 @@ const ModeSelector = ({ mode, enableStatisticsApi }) => {
 
 const mapStateToProps = (store) => ({
   mode: store.request.mode,
-  enableStatisticsApi: store.params.enableStatisticsApi,
 });
 export default connect(mapStateToProps)(ModeSelector);

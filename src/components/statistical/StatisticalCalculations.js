@@ -1,6 +1,6 @@
+import React, { useEffect, useRef, useState } from 'react';
 import { faAngleDoubleDown, faAngleDoubleUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useEffect, useRef, useState } from 'react';
 import { connect } from 'react-redux';
 import store from '../../store';
 import statisticalSlice from '../../store/statistical';

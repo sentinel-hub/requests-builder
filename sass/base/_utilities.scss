@@ -34,6 +34,21 @@
   }
 }
 
+.u-flex-centered {
+  display: flex;
+  justify-content: center;
+
+  & > * {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+}
+
+.u-flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
 .u-flex-column-centered {
   display: flex;
   flex-direction: column;

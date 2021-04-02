@@ -81,6 +81,9 @@ export const setBaseUrlAxiosInterpector = (url) => {
       } else {
         newUrl = url + originalUrl.pathname;
       }
+      if (originalUrl.search) {
+        newUrl = newUrl + originalUrl.search;
+      }
       config.url = newUrl;
       return config;
     },

@@ -1,39 +1,31 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import RequestButton from '../common/RequestButton';
 import { analyseBatchRequest } from './requests';
-import { addAlertOnError, batchIdValidation } from './BatchActions';
+import { addAlertOnError, batchIdValidation } from './utils';
 import store from '../../store';
 import batchSlice from '../../store/batch';
 
-const AnalyseBatchRequestButton = ({ selectedBatchId, token }) => {
+const AnalyseBatchRequestButton = ({ requestId, token, analyseRequest, setOpenedContainers }) => {
   const analyseResponseHandler = () => {
     store.dispatch(
-      batchSlice.actions.setExtraInfo(
-        'Analysis of request with id: ' + selectedBatchId + ' successfully started.',
-      ),
+      batchSlice.actions.setExtraInfo('Analysis of request with id: ' + requestId + ' successfully started.'),
     );
+    analyseRequest(requestId);
+    setOpenedContainers([true, false, false]);
   };
 
   return (
-    <div>
-      <RequestButton
-        validation={batchIdValidation(token, selectedBatchId)}
-        disabledTitle="Log in and set a batch request to use this"
-        className="secondary-button"
-        buttonText="Analyse"
-        responseHandler={analyseResponseHandler}
-        errorHandler={addAlertOnError}
-        request={analyseBatchRequest}
-        args={[token, selectedBatchId]}
-      />
-    </div>
+    <RequestButton
+      validation={batchIdValidation(token, requestId)}
+      disabledTitle="Log in and set a batch request to use this"
+      className="secondary-button"
+      buttonText="Analyse"
+      responseHandler={analyseResponseHandler}
+      errorHandler={addAlertOnError}
+      request={analyseBatchRequest}
+      args={[token, requestId]}
+    />
   );
 };
 
-const mapStateToProps = (state) => ({
-  selectedBatchId: state.batch.selectedBatchId,
-  token: state.auth.user.access_token,
-});
-
-export default connect(mapStateToProps)(AnalyseBatchRequestButton);
+export default AnalyseBatchRequestButton;

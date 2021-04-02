@@ -44,23 +44,18 @@ export const parseBatchRequest = (props) => {
       store.dispatch(batchSlice.actions.setSpecifyingCogParams(true));
       const cogParams = props.output.cogParameters;
       if (cogParams.overviewLevels) {
-        store.dispatch(batchSlice.actions.setOverviewLevels(cogParams.overviewLevels.join(',')));
+        cogParams.overviewLevels = cogParams.overviewLevels.join(',');
       }
-      if (cogParams.overviewMinSize) {
-        store.dispatch(batchSlice.actions.setOverviewMinSize(cogParams.overviewMinSize));
-      }
-      if (cogParams.blockxsize) {
-        store.dispatch(batchSlice.actions.setBlockxsize(cogParams.blockxsize));
-      }
-      if (cogParams.blockysize) {
-        store.dispatch(batchSlice.actions.setBlockysize(cogParams.blockysize));
-      }
+      store.dispatch(batchSlice.actions.setCogParametersAbsolute(cogParams));
     }
     if (props.output.createCollection) {
       store.dispatch(batchSlice.actions.setCreateCollection(true));
     }
     if (props.output.collectionId) {
       store.dispatch(batchSlice.actions.setCollectionId(props.output.collectionId));
+    }
+    if (props.output.overwrite) {
+      store.dispatch(batchSlice.actions.setOverwrite(true));
     }
   }
 };

@@ -18,8 +18,8 @@ const savedRequestsSlice = createSlice({
       state.expandedSidebar = action.payload;
     },
     setResponse: (state, action) => {
-      const { idx, responseUrl } = action.payload;
-      state.savedRequests[idx].response = responseUrl;
+      const { idx, response } = action.payload;
+      state.savedRequests[idx].response = response;
     },
   },
 });

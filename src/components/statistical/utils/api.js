@@ -4,7 +4,7 @@ import { isEmpty } from '../../../utils/const';
 import { generateBounds, getNonDefaultOptions } from '../../process/requests';
 import { getRequestBody, getUrlFromCurl } from '../../process/requests/parseRequest';
 
-const getAuthConfig = (token, reqConfig) => {
+export const getStatisticalAuthConfig = (token, reqConfig) => {
   return {
     ...reqConfig,
     headers: {
@@ -15,7 +15,7 @@ const getAuthConfig = (token, reqConfig) => {
   };
 };
 
-const STATISTICAL_BASE_URL = 'https://test.hq.sentinel-hub.com/api/v1/statistics';
+export const STATISTICAL_BASE_URL = 'https://services.sentinel-hub.com/api/v1/statistics';
 
 export const getStatisticalRequest = (
   token,
@@ -32,7 +32,7 @@ export const getStatisticalRequest = (
   statisticalState,
   reqConfig,
 ) => {
-  const config = getAuthConfig(token, reqConfig);
+  const config = getStatisticalAuthConfig(token, reqConfig);
   const body = getStatisticalRequestBody(
     datasource,
     datafusionSources,
@@ -122,7 +122,7 @@ export const getStatisticalCurlCommand = (
 export const sendEditedStatisticalRequest = (token, text, reqConfig) => {
   try {
     const url = getUrlFromCurl(text);
-    const config = getAuthConfig(token, reqConfig);
+    const config = getStatisticalAuthConfig(token, reqConfig);
     const parsed = JSON.parse(getRequestBody(text));
     return Axios.post(url, parsed, config);
   } catch (err) {
@@ -134,9 +134,9 @@ const getStatisticalBounds = (bounds) => {
   return generateBounds(bounds);
 };
 
-const getOptions = (options, name) => {
+const getOptions = (options, name, getEmpty = false) => {
   const nonDefaultOptions = getNonDefaultOptions(options);
-  if (Object.keys(nonDefaultOptions).length > 0) {
+  if (getEmpty || Object.keys(nonDefaultOptions).length > 0) {
     return {
       [name]: nonDefaultOptions,
     };
@@ -154,7 +154,7 @@ const getStatisticalDataArray = (
 ) => {
   if (datasource === 'DATAFUSION') {
     return datafusionSources.map((ds, idx) => {
-      const dataFilter = getOptions(dataFilterOptions[idx].options, 'dataFilter');
+      const dataFilter = getOptions(dataFilterOptions[idx].options, 'dataFilter', true);
       const processing = getOptions(processingOptions[idx].options, 'processing');
       return {
         type: ds.datasource,
@@ -164,9 +164,10 @@ const getStatisticalDataArray = (
       };
     });
   }
+  const dataFilter = getOptions(dataFilterOptions[0].options, 'dataFilter', true);
+  const processing = getOptions(processingOptions[0].options, 'processing');
+
   if (datasource === 'CUSTOM') {
-    const dataFilter = getOptions(dataFilterOptions[0].options, 'dataFilter');
-    const processing = getOptions(processingOptions[0].options, 'processing');
     return [
       {
         type: `${byocCollectionType.toLowerCase()}-${byocCollectionId}`,
@@ -175,8 +176,6 @@ const getStatisticalDataArray = (
       },
     ];
   } else {
-    const dataFilter = getOptions(dataFilterOptions[0].options, 'dataFilter');
-    const processing = getOptions(processingOptions[0].options, 'processing');
     return [
       {
         type: datasource,

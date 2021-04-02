@@ -14,6 +14,9 @@ const catalogSlice = createSlice({
     disableExclude: true,
     excludeFields: [''],
     distinct: '',
+    deploymentUrl: '',
+    isSearchingByIds: false,
+    ids: [''],
   },
   reducers: {
     openTimeFrom: (state, action) => {
@@ -25,6 +28,9 @@ const catalogSlice = createSlice({
     setSelectedCollection: (state, action) => {
       state.selectedCollection = action.payload;
       state.queryProperties = [];
+    },
+    setDeploymentUrl: (state, action) => {
+      state.deploymentUrl = action.payload;
     },
     addQueryProperty: (state, action) => {
       state.queryProperties.push({
@@ -48,7 +54,7 @@ const catalogSlice = createSlice({
           operator: '',
         };
       }
-      if (action.payload.propertyValue) {
+      if (action.payload.propertyValue !== undefined) {
         state.queryProperties[idx].propertyValue = action.payload.propertyValue;
       }
       if (action.payload.operator) {
@@ -91,6 +97,12 @@ const catalogSlice = createSlice({
     },
     setNext: (state, action) => {
       state.next = action.payload;
+    },
+    setIds: (state, action) => {
+      state.ids = action.payload;
+    },
+    setIsSearchingByIds: (state, action) => {
+      state.isSearchingByIds = action.payload;
     },
     // addSelectedCollection: (state, action) => {
     //   state.selectedCollections.push(action.payload);

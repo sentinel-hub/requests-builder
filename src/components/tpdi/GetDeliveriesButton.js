@@ -1,6 +1,6 @@
 import React from 'react';
 import RequestButton from '../common/RequestButton';
-import { getAllDeliveries } from './generateTPDIRequests';
+import { getAllDeliveries } from './requests/common';
 
 const GetDeliveriesButton = ({ id, token, status, setDeliveries, updateToFinished }) => {
   const handleGetDeliveries = (response) => {

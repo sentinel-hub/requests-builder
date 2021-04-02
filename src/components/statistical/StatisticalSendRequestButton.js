@@ -7,13 +7,13 @@ import RequestButton from '../common/RequestButton';
 import { getStatisticalRequest } from './utils/api';
 import { statisticalRequestStateSelector } from './utils/utils';
 
-export const statisticsResponseHandler = (response) => {
+export const statisticsResponseHandler = (response, stringRequest) => {
   if (response === '') {
     store.dispatch(responsesSlice.actions.setError('No content returned, 204'));
   } else {
-    store.dispatch(responsesSlice.actions.setFisResponse(JSON.stringify(response, null, 2)));
+    store.dispatch(responsesSlice.actions.setFisResponse(response));
   }
-  store.dispatch(responsesSlice.actions.setShow(true));
+  store.dispatch(responsesSlice.actions.setResponse({ request: stringRequest, mode: 'STATISTICAL' }));
 };
 
 const statisticsErrorHandler = (err) => {

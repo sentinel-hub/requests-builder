@@ -138,4 +138,24 @@ export const planetSlice = createSlice({
   },
 });
 
+export const maxarInitialState = {
+  maxCloudCoverage: 100,
+  minOffNadir: 0,
+  maxOffNadir: 45,
+  minSunElevation: 0,
+  maxSunElevation: 90,
+  sensor: null,
+};
+
+export const maxarSlice = createSlice({
+  name: 'maxar',
+  initialState: maxarInitialState,
+  reducers: {
+    setMaxarParam: (state, action) => {
+      const { key, value } = action.payload;
+      state[key] = value;
+    },
+  },
+});
+
 export default tpdiSlice;

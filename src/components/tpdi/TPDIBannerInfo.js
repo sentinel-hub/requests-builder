@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import store from '../../store';
 import alertSlice from '../../store/alert';
 import { parseTPDIRequest } from './parse';
-import { airbusOrderDemo } from './const';
+import { airbusOrderDemo } from './utils/const';
 import { connect } from 'react-redux';
-import { getTPDIQuota } from './generateTPDIRequests';
+import { getTPDIQuota } from './requests/common';
 import Axios from 'axios';
 
 const checkIfHasNonZeroQuota = (res) => {

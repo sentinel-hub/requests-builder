@@ -252,11 +252,20 @@ const getToken = (token) => {
   }
 };
 
+const generateHeadersForCurl = (reqState, token) => {
+  let headers = `-H 'Content-Type: application/json' \n -H 'Authorization: Bearer ${getToken(token)}'`;
+  if (reqState.responses.length > 1) {
+    headers = headers + "\n -H 'Accept: application/tar'";
+  }
+  return headers;
+};
+
 export const generateProcessCurlCommand = (reqState, mapState, token) => {
   const body = getJSONRequestBody(reqState, mapState);
-  const curlCommand = `curl -X POST ${getUrl(
+  const curlCommand = `curl -X POST ${getUrl(reqState)} \n ${generateHeadersForCurl(
     reqState,
-  )} \n -H 'Content-Type: application/json' \n -H 'Authorization: Bearer ${getToken(token)}' \n -d '${body}'`;
+    token,
+  )} \n -d '${body}'`;
   return curlCommand;
 };
 

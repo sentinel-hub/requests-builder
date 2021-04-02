@@ -4,7 +4,8 @@ import store from '../../store';
 import tpdiSlice from '../../store/tpdi';
 import RequestButton from '../common/RequestButton';
 import AirbusOptions from './AirbusOptions';
-import { getTPDISearchRequest } from './generateTPDIRequests';
+import MaxarOptions from './MaxarOptions';
+import { getTPDISearchRequest } from './requests/common';
 import PlanetOptions from './PlanetOptions';
 import { errorHandlerTPDI } from './TPDIOrderOptions';
 import { isAirbus } from './utils';
@@ -14,6 +15,8 @@ const generateProviderRelatedOptions = (provider) => {
     return <AirbusOptions />;
   } else if (provider === 'PLANET') {
     return <PlanetOptions />;
+  } else if (provider === 'MAXAR') {
+    return <MaxarOptions />;
   }
 };
 
@@ -39,6 +42,7 @@ const TPDISearchOptions = ({
   request,
   airbus,
   planet,
+  maxar,
   token,
   setSearchResponse,
   setFeaturesWithProvider,
@@ -50,6 +54,7 @@ const TPDISearchOptions = ({
     airbus,
     planet,
     map,
+    maxar,
   };
 
   const provider = tpdi.provider;
@@ -85,6 +90,7 @@ const TPDISearchOptions = ({
           <option value="AIRBUS_SPOT">Airbus (SPOT)</option>
           <option value="AIRBUS_PHR">Airbus (Pleaides)</option>
           <option value="PLANET">Planet Scope</option>
+          <option value="MAXAR">MAXAR</option>
         </select>
         {generateProviderRelatedOptions(provider)}
         <RequestButton
@@ -107,6 +113,7 @@ const mapStateToProps = (state) => ({
   request: state.request,
   airbus: state.airbus,
   planet: state.planet,
+  maxar: state.maxar,
   map: state.map,
   token: state.auth.user.access_token,
 });

@@ -1,8 +1,13 @@
 import Axios from 'axios';
 import bbox from '@turf/bbox';
 import { getUrlFromCurl, getRequestBody } from '../../process/requests/parseRequest';
-import { S2L1C, S1GRD, S2L2A } from '../../../utils/const';
-import { datasourceToCollection } from '../const';
+import {
+  CATALOG_BASE_URL,
+  CATALOG_CREO_URL,
+  CATALOG_WEST_URL,
+  collectionIdToUrl,
+  datasourceToCollection,
+} from '../const';
 import { isBbox } from '../../common/Map/utils/crsTransform';
 
 const getConfigHelper = (token, reqConfig) => {
@@ -14,11 +19,15 @@ const getConfigHelper = (token, reqConfig) => {
   };
 };
 
-const CATALOG_BASE_URL = 'https://services.sentinel-hub.com/api/v1/catalog/';
+export const CATALOG_OPTIONS = [
+  { url: CATALOG_BASE_URL, name: 'EU' },
+  { url: CATALOG_CREO_URL, name: 'CREO' },
+  { url: CATALOG_WEST_URL, name: 'US-WEST' },
+];
 
-export const getCatalogCollections = (token, reqConfig) => {
+export const getCatalogCollections = (deploymentUrl, token, reqConfig) => {
   const config = getConfigHelper(token, reqConfig);
-  const url = CATALOG_BASE_URL + 'collections';
+  const url = deploymentUrl + 'collections';
   return Axios.get(url, config);
 };
 
@@ -66,8 +75,23 @@ const getCatalogFields = (catalogState) => {
   return fields;
 };
 
+const getCatalogSearchByIdsBody = (catalogState) => {
+  const body = {};
+  body.collections = [catalogState.selectedCollection];
+  body.ids = catalogState.ids;
+  if (!catalogState.disableInclude || !catalogState.disableExclude) {
+    body.fields = {
+      ...getCatalogFields(catalogState),
+    };
+  }
+  return body;
+};
+
 export const getCatalogRequestBody = (catalogState, geometry, timeRange) => {
   const body = {};
+  if (catalogState.isSearchingByIds) {
+    return getCatalogSearchByIdsBody(catalogState);
+  }
   body.collections = [catalogState.selectedCollection];
   body.datetime = getDateTime(catalogState, timeRange);
   if (shouldIntersect(geometry)) {
@@ -98,7 +122,7 @@ export const getCatalogRequestBody = (catalogState, geometry, timeRange) => {
 export const generateCatalogRequest = (catalogState, geometry, timeRange, token, next = 0, reqConfig) => {
   const body = getCatalogRequestBody(catalogState, geometry, timeRange);
   const config = getConfigHelper(token, reqConfig);
-  const url = CATALOG_BASE_URL + 'search';
+  const url = catalogState.deploymentUrl + 'search';
 
   if (next) {
     body.next = next;
@@ -108,7 +132,7 @@ export const generateCatalogRequest = (catalogState, geometry, timeRange, token,
 };
 
 export const generateCatalogCurlCommand = (catalogState, geometry, timeRange, token) => {
-  const url = CATALOG_BASE_URL + 'search';
+  const url = catalogState.deploymentUrl + 'search';
   const body = JSON.stringify(getCatalogRequestBody(catalogState, geometry, timeRange), null, 2);
   const curlCommand = `curl -X POST ${url} \n -H 'Content-Type: application/json' \n -H 'Authorization: Bearer ${
     token ? token : '<your token here>'
@@ -128,25 +152,21 @@ export const sendCatalogEditedRequest = (text, token, reqConfig) => {
 };
 
 export const fetchAvailableDatesWithCatalog = async (datasource, timerange, geometry, token, reqConfig) => {
-  const url = CATALOG_BASE_URL + 'search';
+  const collection = datasourceToCollection[datasource];
+  const baseUrl = collectionIdToUrl[collection];
+  const url = baseUrl + 'search';
   const body = {};
   const config = getConfigHelper(token, reqConfig);
-  if (datasource === S2L1C || datasource === S2L2A || datasource === S1GRD) {
-    body.collections = [datasourceToCollection[datasource]];
-    body.datetime = timerange.timeFrom + '/' + timerange.timeTo;
-    body.distinct = 'date';
-    body.limit = 100;
-    if (shouldIntersect(geometry)) {
-      body.intersects = geometry;
-    } else {
-      body.bbox = getBbox(geometry);
-    }
-    return Axios.post(url, body, config);
+  body.collections = [collection];
+  body.datetime = timerange.timeFrom + '/' + timerange.timeTo;
+  body.distinct = 'date';
+  body.limit = 100;
+  if (shouldIntersect(geometry)) {
+    body.intersects = geometry;
   } else {
-    return new Promise((resolve, reject) => {
-      resolve({ data: { features: [] } });
-    });
+    body.bbox = getBbox(geometry);
   }
+  return Axios.post(url, body, config);
 };
 
 export const fetchBoundsWithCatalog = (collectionId, collectionType, token, reqConfig) => {

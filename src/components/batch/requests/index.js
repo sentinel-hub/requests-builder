@@ -110,9 +110,10 @@ const getConfigHelper = (token, reqConfig) => {
 
 const handleAdvancedCogParams = (batchState) => {
   const cogParams = {};
-  if (batchState.overviewLevels) {
+  const stateCogParameters = batchState.cogParameters;
+  if (stateCogParameters.overviewLevels) {
     try {
-      const overviewLevels = batchState.overviewLevels
+      const overviewLevels = stateCogParameters.overviewLevels
         .split(',')
         .map((n) => parseInt(n))
         .filter((n) => n);
@@ -122,25 +123,33 @@ const handleAdvancedCogParams = (batchState) => {
     } catch (err) {}
   }
 
-  if (batchState.overviewMinSize) {
-    const overviewMinSize = parseInt(batchState.overviewMinSize);
+  if (stateCogParameters.overviewMinSize) {
+    const overviewMinSize = parseInt(stateCogParameters.overviewMinSize);
     if (overviewMinSize) {
       cogParams.overviewMinSize = overviewMinSize;
     }
   }
 
-  if (batchState.blockxsize) {
-    const blockxsize = parseInt(batchState.blockxsize);
+  if (stateCogParameters.blockxsize) {
+    const blockxsize = parseInt(stateCogParameters.blockxsize);
     if (blockxsize) {
       cogParams.blockxsize = blockxsize;
     }
   }
 
-  if (batchState.blockysize) {
-    const blockysize = parseInt(batchState.blockysize);
+  if (stateCogParameters.blockysize) {
+    const blockysize = parseInt(stateCogParameters.blockysize);
     if (blockysize) {
       cogParams.blockysize = blockysize;
     }
+  }
+
+  if (stateCogParameters.usePredictor !== undefined) {
+    cogParams.usePredictor = stateCogParameters.usePredictor;
+  }
+
+  if (stateCogParameters.resamplingAlgorithm) {
+    cogParams.resamplingAlgorithm = stateCogParameters.resamplingAlgorithm;
   }
 
   return cogParams;
@@ -173,6 +182,13 @@ export const generateBatchBodyRequest = (requestState, batchState, mapState) => 
     };
   }
 
+  if (batchState.overwrite) {
+    batchRequest.output = {
+      ...batchRequest.output,
+      overwrite: true,
+    };
+  }
+
   if (batchState.description) {
     batchRequest.description = batchState.description;
   }
@@ -180,7 +196,7 @@ export const generateBatchBodyRequest = (requestState, batchState, mapState) => 
   if (batchState.cogOutput && !batchState.createCollection) {
     const cogParams = handleAdvancedCogParams(batchState);
     if (!isEmpty(cogParams)) {
-      batchRequest.output.cogParameters = handleAdvancedCogParams(batchState);
+      batchRequest.output.cogParameters = cogParams;
     }
   }
 

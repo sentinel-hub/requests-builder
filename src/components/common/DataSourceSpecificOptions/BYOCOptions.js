@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import store from '../../../store';
 import requestSlice from '../../../store/request';
 import { connect } from 'react-redux';
 import { getCustomCollections } from '../../process/requests';
+import Axios from 'axios';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSync } from '@fortawesome/free-solid-svg-icons';
 
 const generateCollectionOptions = (collections) => {
   return collections.map((collection) => (
@@ -14,30 +17,36 @@ const generateCollectionOptions = (collections) => {
 
 const BYOCOptions = ({ token, byocLocation, byocCollectionType, byocCollectionId }) => {
   const [collections, setCollections] = useState([]);
+  const sourceRef = useRef();
 
   const handleCollectionIdChange = (e) => {
     store.dispatch(requestSlice.actions.setByocCollectionId(e.target.value));
   };
 
-  useEffect(() => {
-    const loadCustomCollections = async () => {
-      if (!token) {
-        return;
+  const loadCustomCollections = useCallback(async () => {
+    sourceRef.current = Axios.CancelToken.source();
+    try {
+      const res = await getCustomCollections(token, { cancelToken: sourceRef.current.token });
+      if (res.data) {
+        setCollections(
+          res.data.data.map((d) => ({ name: d.name, id: d.id, type: d.type, location: d.location })),
+        );
       }
-      try {
-        const res = await getCustomCollections(token);
-        if (res.data) {
-          setCollections(
-            res.data.data.map((d) => ({ name: d.name, id: d.id, type: d.type, location: d.location })),
-          );
-        }
-      } catch (err) {
-        console.error('Unable to load custom collections', err);
+    } catch (err) {
+      console.error('Unable to load custom collections', err);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    if (token) {
+      loadCustomCollections();
+    }
+    return () => {
+      if (sourceRef.current) {
+        sourceRef.current.cancel();
       }
     };
-
-    loadCustomCollections();
-  }, [token]);
+  }, [token, loadCustomCollections]);
 
   const handleByocLocationChange = (e) => {
     store.dispatch(requestSlice.actions.setByocLocation(e.target.value));
@@ -59,6 +68,11 @@ const BYOCOptions = ({ token, byocLocation, byocCollectionType, byocCollectionId
     store.dispatch(requestSlice.actions.setByocCollectionId(e.target.value));
   };
 
+  const handleRefreshCollections = () => {
+    loadCustomCollections();
+    store.dispatch(requestSlice.actions.setByocCollectionId(''));
+  };
+
   return (
     <div className="form byoc-options">
       {collections.length > 0 ? (
@@ -66,12 +80,20 @@ const BYOCOptions = ({ token, byocLocation, byocCollectionType, byocCollectionId
           <label htmlFor="personal-collections" className="form__label">
             Personal collections
           </label>
-          <select id="personal-collections" onChange={handleDropdownIdChange} className="form__input">
-            <option value="">Select a custom collection</option>
-            {generateCollectionOptions(collections)}
-          </select>
+          <div className="u-flex-aligned u-margin-bottom-tiny">
+            <select id="personal-collections" onChange={handleDropdownIdChange} className="form__input">
+              <option value="">Select a custom collection</option>
+              {generateCollectionOptions(collections)}
+            </select>
+            {token && (
+              <button className="secondary-button u-margin-left-tiny" onClick={handleRefreshCollections}>
+                <FontAwesomeIcon icon={faSync} />
+              </button>
+            )}
+          </div>
         </>
       ) : null}
+
       <label htmlFor="collection-id" className="form__label">
         Collection Id
       </label>

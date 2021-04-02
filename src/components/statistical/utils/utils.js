@@ -7,6 +7,7 @@ import {
   dispatchDatasource,
   dispatchAdvancedOptions,
 } from '../../process/requests/parseRequest';
+import { isWritingDecimal } from '../../../utils/stringUtils';
 
 export const statisticalRequestStateSelector = (state) => ({
   token: state.auth.user.access_token,
@@ -117,4 +118,30 @@ const dispatchInput = (input) => {
   dispatchBounds({ input });
   dispatchDatasource({ input });
   dispatchAdvancedOptions({ input });
+};
+
+export const inputToNumber = (value) => {
+  if (value === '' || Number.isNaN(Number(value))) {
+    return '';
+  }
+  if (isWritingDecimal(value)) {
+    return value;
+  }
+  return Number(value);
+};
+
+export const inputArrayChangeHandler = (e) => {
+  const lastChar = e.target.value.slice(-1);
+  let dispatchedValue;
+  // clear input
+  if (e.target.value === '') {
+    dispatchedValue = '';
+    // allow only using [0-9] , and .
+  } else if (/[0-9]|[,]|(?<!\.)\.(?!\.)/.test(lastChar) === false) {
+    return;
+  } else {
+    dispatchedValue = e.target.value.split(',').map(inputToNumber);
+  }
+
+  return dispatchedValue;
 };

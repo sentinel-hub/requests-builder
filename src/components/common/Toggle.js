@@ -1,8 +1,8 @@
 import React from 'react';
 
-const Toggle = ({ onChange, className, id, checked, name, defaultChecked }) => {
+const Toggle = ({ onChange, className, id, checked, name, defaultChecked, style }) => {
   return (
-    <div className={className ? className : ''}>
+    <div className={className ? className : ''} style={style}>
       <label className="switch">
         <input
           defaultChecked={defaultChecked}

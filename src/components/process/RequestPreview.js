@@ -60,17 +60,17 @@ const RequestPreview = ({ requestState, token, mapState }) => {
             },
             {
               name: 'body',
-              value: getJSONRequestBody(requestState, mapState),
+              value: () => getJSONRequestBody(requestState, mapState),
               nonToggle: true,
             },
             {
               name: 'sh-py',
-              value: getSHPYCode(requestState, mapState),
+              value: () => getSHPYCode(requestState, mapState),
               nonToggle: true,
             },
             {
               name: 'sh-js',
-              value: getSHJSCode(requestState, mapState, token),
+              value: () => getSHJSCode(requestState, mapState, token),
               nonToggle: true,
             },
           ]}

@@ -2,9 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import RequestButton from '../common/RequestButton';
 import { createBatchRequest } from './requests';
-import store from '../../store';
-import batchSlice from '../../store/batch';
-import { addAlertOnError } from './BatchActions';
+import { addAlertOnError } from './utils';
 import { validateRequestState } from '../../utils/validator';
 
 const isCreatePossible = (batchState, requestState, token) => {
@@ -21,24 +19,27 @@ const CreateBatchRequestButton = ({
   token,
   setFetchedRequests,
   setCreateResponse,
+  openOnlyCreateContainer,
 }) => {
   const createResponseHandler = (response) => {
     setCreateResponse(JSON.stringify(response, null, 2));
-    setFetchedRequests([response]);
-    store.dispatch(batchSlice.actions.setSelectedBatchId(response['id']));
+    // open new one and close rest.
+    setFetchedRequests((prev) => [
+      { ...response, isExpanded: true },
+      ...prev.map((req) => ({ ...req, isExpanded: false })),
+    ]);
+    openOnlyCreateContainer();
   };
   return (
-    <div>
-      <RequestButton
-        validation={isCreatePossible(batchState, requestState, token)}
-        className="secondary-button"
-        buttonText="Create"
-        request={createBatchRequest}
-        args={[requestState, batchState, mapState, token]}
-        responseHandler={createResponseHandler}
-        errorHandler={addAlertOnError}
-      />
-    </div>
+    <RequestButton
+      validation={isCreatePossible(batchState, requestState, token)}
+      className="secondary-button"
+      buttonText="Create"
+      request={createBatchRequest}
+      args={[requestState, batchState, mapState, token]}
+      responseHandler={createResponseHandler}
+      errorHandler={addAlertOnError}
+    />
   );
 };
 

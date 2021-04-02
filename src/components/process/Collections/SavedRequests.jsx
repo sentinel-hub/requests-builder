@@ -5,15 +5,18 @@ import { faAngleDoubleLeft, faAngleDoubleRight } from '@fortawesome/free-solid-s
 import store from '../../../store';
 import savedRequestsSlice from '../../../store/savedRequests';
 import alertSlice from '../../../store/alert';
-import SavedRequestEntry from './SavedRequestEntry';
 import ExportCollection from './ExportCollection';
+import ProcessSavedRequestEntry from './ProcessSavedRequestEntry';
+import StatisticalSavedRequestEntry from './StatisticalSavedRequestEntry';
+
+const doesModeSupportSaving = (mode) => mode === 'PROCESS' || mode === 'STATISTICAL';
 
 const SavedRequests = ({ savedRequests, mode, expandedSidebar, token }) => {
   const handleExpand = () => {
     store.dispatch(savedRequestsSlice.actions.setExpandedSidebar(!expandedSidebar));
   };
 
-  if (mode !== 'PROCESS') {
+  if (!doesModeSupportSaving(mode)) {
     return null;
   }
 
@@ -56,18 +59,37 @@ const SavedRequests = ({ savedRequests, mode, expandedSidebar, token }) => {
         </div>
         {expandedSidebar && (
           <div className="saved-requests-body">
-            {savedRequests.map((savedReq, idx) => (
-              <SavedRequestEntry
-                key={idx}
-                request={savedReq.request}
-                mode={savedReq.mode}
-                name={savedReq.name}
-                response={savedReq.response}
-                creationTime={savedReq.creationTime}
-                token={token}
-                idx={idx}
-              />
-            ))}
+            {savedRequests.map((savedReq, idx) => {
+              if (savedReq.mode === 'STATISTICAL') {
+                return (
+                  <StatisticalSavedRequestEntry
+                    creationTime={savedReq.creationTime}
+                    key={idx}
+                    mode={savedReq.mode}
+                    name={savedReq.name}
+                    request={savedReq.request}
+                    response={savedReq.response}
+                    token={token}
+                    idx={idx}
+                  />
+                );
+              }
+              if (savedReq.mode === 'PROCESS') {
+                return (
+                  <ProcessSavedRequestEntry
+                    creationTime={savedReq.creationTime}
+                    key={idx}
+                    mode={savedReq.mode}
+                    name={savedReq.name}
+                    request={savedReq.request}
+                    response={savedReq.response}
+                    idx={idx}
+                    token={token}
+                  />
+                );
+              }
+              return null;
+            })}
             {savedRequests.length === 0 && (
               <p className="text">
                 <span>Save a request to see it here!</span>

@@ -10,3 +10,7 @@ export const formatText = (text) => {
     })
     .join(' ');
 };
+
+export const isWritingDecimal = (input) => /^\d*(\.|,)0*$/.test(input);
+
+export const isFloatString = (input) => /[+-]?([0-9]*[.])?[0-9]+/.test(input);

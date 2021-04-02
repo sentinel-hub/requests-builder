@@ -19,23 +19,24 @@ const OGCAdvancedOptions = ({ mode, advancedOptions }) => {
   const handleStyleChange = (e) => {
     store.dispatch(wmsSlice.actions.setAdvancedOptions({ STYLE: e.target.value }));
   };
+
+  if (mode !== 'FIS') {
+    return null;
+  }
+
   return (
     <>
-      {mode === 'FIS' ? (
-        <>
-          <label className="form__label">Bins</label>
-          <input onChange={handleBinsChange} value={BINS} className="form__input" type="number" />
-          <label className="form__label">Style</label>
-          <select className="form__input" onChange={handleStyleChange}>
-            <option value="">No style</option>
-            <option value="INDEX">Index</option>
-            <option value="GRAYSCALE">Grayscale</option>
-            <option value="COLORMAP">Colormap</option>
-            <option value="SENSOR">Sensor</option>
-            <option value="REFLECTANCE">Reflectance</option>
-          </select>
-        </>
-      ) : null}
+      <label className="form__label">Bins</label>
+      <input onChange={handleBinsChange} value={BINS} className="form__input" type="number" />
+      <label className="form__label">Style</label>
+      <select className="form__input" onChange={handleStyleChange}>
+        <option value="">No style</option>
+        <option value="INDEX">Index</option>
+        <option value="GRAYSCALE">Grayscale</option>
+        <option value="COLORMAP">Colormap</option>
+        <option value="SENSOR">Sensor</option>
+        <option value="REFLECTANCE">Reflectance</option>
+      </select>
     </>
   );
 };

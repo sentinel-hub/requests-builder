@@ -9,7 +9,7 @@ import requestSlice from './request';
 import responsesSlice from './responses';
 import savedRequestsSlice from './savedRequests';
 import statisticalSlice from './statistical';
-import tpdiSlice, { airbusSlice, planetSlice } from './tpdi';
+import tpdiSlice, { airbusSlice, maxarSlice, planetSlice } from './tpdi';
 import wmsSlice from './wms';
 
 const reducers = combineReducers({
@@ -20,6 +20,7 @@ const reducers = combineReducers({
   tpdi: tpdiSlice.reducer,
   airbus: airbusSlice.reducer,
   planet: planetSlice.reducer,
+  maxar: maxarSlice.reducer,
   alert: alertSlice.reducer,
   wms: wmsSlice.reducer,
   response: responsesSlice.reducer,

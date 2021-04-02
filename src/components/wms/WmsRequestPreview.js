@@ -20,7 +20,7 @@ const WmsRequestPreview = ({ wmsState, requestState, mapState, mode, token }) =>
   })();
 
   const handleSeeOnProcess = () => {
-    dispatchChanges(JSON.parse(wmsLayerToProcessRequest(wmsState.layer, requestState, mapState)));
+    dispatchChanges(JSON.parse(wmsLayerToProcessRequest(wmsState.layer, requestState, mapState)), true);
   };
 
   const generateRequestPreviewOptions = () => {
@@ -33,23 +33,23 @@ const WmsRequestPreview = ({ wmsState, requestState, mapState, mode, token }) =>
         },
         {
           name: 'PROCESS',
-          value: wmsState.layer.id
-            ? wmsLayerToProcessRequest(wmsState.layer, requestState, mapState)
-            : "Select a layer to see it's process request",
+          value: wmsState.layer.otherDefaults
+            ? () => wmsLayerToProcessRequest(wmsState.layer, requestState, mapState)
+            : "Select a personal layer to see it's process request",
           nonToggle: true,
         },
         {
           name: 'PROCESS - Curl',
-          value: wmsState.layer.id
-            ? wmsLayerToCurl(wmsState.layer, requestState, mapState, token)
-            : "Select a layer to see it's process request",
+          value: wmsState.layer.otherDefaults
+            ? () => wmsLayerToCurl(wmsState.layer, requestState, mapState, token)
+            : "Select a personal layer to see it's process request",
           nonToggle: true,
         },
       ];
     } else {
       return [
         {
-          name: 'OGC - GetMap',
+          name: 'Ogc Request',
           value: url,
           nonToggle: true,
         },

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import 'react-day-picker/lib/style.css';
 import moment from 'moment';
@@ -6,7 +6,7 @@ import store from '../../../store';
 import requestSlice from '../../../store/request';
 import Axios from 'axios';
 import { fetchAvailableDatesWithCatalog } from '../../catalog/requests';
-import { S1GRD, S2L2A, S2L1C } from '../../../utils/const';
+import { S1GRD, S2L2A, S2L1C, L8L1C, S3OLCI, S3SLSTR, S5PL2 } from '../../../utils/const';
 
 const highlightedStyle = `.DayPicker-Day--highlighted {
   background-color: #b2c22d;
@@ -17,12 +17,14 @@ const highlightedStyle = `.DayPicker-Day--highlighted {
 export const utcDateToYYYYMMDDFormat = (utcDate) => utcDate.split('T')[0];
 
 const shouldFetchDates = (datasource, mode) =>
-  (datasource === S1GRD || datasource === S2L2A || datasource === S2L1C) &&
+  [S1GRD, S2L2A, S2L1C, L8L1C, S3OLCI, S3SLSTR, S5PL2].includes(datasource) &&
   (mode === 'BATCH' || mode === 'PROCESS');
 
 const getStartOfMonth = (dateString) => {
   return moment(dateString).utc().startOf('month').format();
 };
+
+const validStringDate = (s) => /^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/gm.test(s);
 
 const TimeRange = ({ index, timeTo, timeFrom, isDisabled, datasource, geometry, token, mode }) => {
   const [availableDates, setAvailableDates] = useState([]);
@@ -48,26 +50,19 @@ const TimeRange = ({ index, timeTo, timeFrom, isDisabled, datasource, geometry, 
     return newDates.map((d) => new Date(d));
   };
 
-  const fetchAndSetMonths = async (months, override = false) => {
+  const fetchAndSetMonths = async (months) => {
     const newMonths = await fetchMonths(months);
     setAvailableDates((prev) => {
-      if (override) {
-        return newMonths;
-      } else {
-        return [...prev, ...newMonths];
-      }
+      return [...prev, ...newMonths];
     });
     setFetchedMonths((prev) => {
-      if (override) {
-        return months;
-      } else {
-        return [...prev, ...months];
-      }
+      return [...prev, ...months];
     });
   };
 
-  const handleTimeFromChange = async (d) => {
-    if (d) {
+  const handleTimeFromChange = async (d, _, inputComponent) => {
+    const stringInputState = inputComponent?.state?.value;
+    if (d && validStringDate(stringInputState)) {
       const startOfMonth = moment(d).utc().startOf('month').format();
       const date = moment(d).utc().startOf('day').format();
       if (shouldFetchCatalog && !fetchedMonths.includes(startOfMonth)) {
@@ -77,8 +72,9 @@ const TimeRange = ({ index, timeTo, timeFrom, isDisabled, datasource, geometry, 
     }
   };
 
-  const handleTimeToChange = async (d) => {
-    if (d) {
+  const handleTimeToChange = async (d, _, inputComponent) => {
+    const stringInputState = inputComponent?.state?.value;
+    if (d && validStringDate(stringInputState)) {
       const startOfMonth = moment(d).utc().startOf('month').format();
       const date = moment(d).utc().endOf('day').format();
       if (shouldFetchCatalog && !fetchedMonths.includes(startOfMonth)) {
@@ -103,9 +99,14 @@ const TimeRange = ({ index, timeTo, timeFrom, isDisabled, datasource, geometry, 
     }
     const month = isFrom ? getStartOfMonth(timeFrom) : getStartOfMonth(timeTo);
     if (!fetchedMonths.includes(month)) {
-      fetchAndSetMonths([month], true);
+      fetchAndSetMonths([month]);
     }
   };
+
+  useEffect(() => {
+    setAvailableDates([]);
+    setFetchedMonths([]);
+  }, [datasource]);
 
   return (
     <>

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import RequestButton from '../common/RequestButton';
-import { getAllTPDIOrders } from './generateTPDIRequests';
+import { getAllTPDIOrders } from './requests/common';
 import { errorHandlerTPDI } from './TPDIOrderOptions';
 import OrderInfo, { OrdersTooltip } from './OrderInfo';
 

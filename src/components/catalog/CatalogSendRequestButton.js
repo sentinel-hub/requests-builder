@@ -27,6 +27,7 @@ const CatalogSendRequestButton = ({
   token,
   setResults,
   setCatalogSearchResponse,
+  setUsedCollection,
 }) => {
   let type = catalogState.selectedCollection;
 
@@ -41,22 +42,21 @@ const CatalogSendRequestButton = ({
       type: type,
     }));
     setCatalogSearchResponse(JSON.stringify(response, null, 2));
+    setUsedCollection(catalogState.selectedCollection);
   };
 
   return (
-    <>
-      <RequestButton
-        request={generateCatalogRequest}
-        args={[catalogState, geometry, timeRange, token, undefined]}
-        validation={Boolean(token)}
-        className="secondary-button"
-        disabledTitle="Log in to use this"
-        buttonText="Send Request"
-        responseHandler={responseHandler}
-        errorHandler={catalogErrorHandler}
-        useShortcut={catalogState.next ? false : true}
-      />
-    </>
+    <RequestButton
+      request={generateCatalogRequest}
+      args={[catalogState, geometry, timeRange, token, undefined]}
+      validation={Boolean(token && catalogState.deploymentUrl)}
+      className="secondary-button"
+      disabledTitle="Log in to use this"
+      buttonText="Send Request"
+      responseHandler={responseHandler}
+      errorHandler={catalogErrorHandler}
+      useShortcut={catalogState.next ? false : true}
+    />
   );
 };
 

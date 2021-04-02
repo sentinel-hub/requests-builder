@@ -5,19 +5,16 @@ const batchInitialState = {
   resolution: 10,
   description: '',
   bucketName: '',
-  selectedBatchId: '',
   cogOutput: false,
   defaultTilePath: '',
   // bucketName -> true, if defaultTilePath -> false
   specifyingBucketName: true,
   extraInfo: '',
   specifyingCogParams: false,
-  overviewLevels: '',
-  overviewMinSize: '',
-  blockxsize: '',
-  blockysize: '',
   createCollection: false,
   collectionId: '',
+  cogParameters: {},
+  overwrite: false,
 };
 
 const batchSlice = createSlice({
@@ -36,9 +33,6 @@ const batchSlice = createSlice({
     setBucketName: (state, action) => {
       state.bucketName = action.payload;
     },
-    setSelectedBatchId: (state, action) => {
-      state.selectedBatchId = action.payload;
-    },
     setCogOutput: (state, action) => {
       state.cogOutput = action.payload;
     },
@@ -51,18 +45,6 @@ const batchSlice = createSlice({
     setExtraInfo: (state, action) => {
       state.extraInfo = action.payload;
     },
-    setOverviewLevels: (state, action) => {
-      state.overviewLevels = action.payload;
-    },
-    setOverviewMinSize: (state, action) => {
-      state.overviewMinSize = action.payload;
-    },
-    setBlockxsize: (state, action) => {
-      state.blockxsize = action.payload;
-    },
-    setBlockysize: (state, action) => {
-      state.blockysize = action.payload;
-    },
     setCreateCollection: (state, action) => {
       state.createCollection = action.payload;
     },
@@ -74,6 +56,16 @@ const batchSlice = createSlice({
     },
     resetBatchState: (state) => {
       state = batchInitialState;
+    },
+    setCogParameter: (state, action) => {
+      const { key, value } = action.payload;
+      state.cogParameters[key] = value;
+    },
+    setCogParametersAbsolute: (state, action) => {
+      state.cogParameters = action.payload;
+    },
+    setOverwrite: (state, action) => {
+      state.overwrite = action.payload;
     },
   },
 });

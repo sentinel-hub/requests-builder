@@ -1,13 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useLayoutEffect, useRef } from 'react';
 import store from '../../store';
 import alertSlice from '../../store/alert';
-import batchSlice from '../../store/batch';
 import { getTransformedGeometryFromBounds, focusMap } from '../common/Map/utils/crsTransform';
 import RequestButton from '../common/RequestButton';
 import { dispatchChanges } from '../process/requests/parseRequest';
 import { parseBatchRequest, getBucketName } from './parse';
 import { deleteBatchRequest, fetchTilesBatchRequest } from './requests';
 import mapSlice from '../../store/map';
+import BatchActions from './BatchActions';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faAngleDoubleDown, faAngleDoubleUp } from '@fortawesome/free-solid-svg-icons';
+import CopyIcon from '../common/CopyIcon';
 
 const tillingGridIdToName = (id) => {
   return ['S2GM Grid', '10km Grid', '100,08km Grid', 'WGS84'][id];
@@ -53,11 +56,21 @@ const isValidDeleteStatus = (status) => {
   return ['FAILED', 'CREATED', 'ANALYSIS_DONE'].includes(status);
 };
 
-const BatchRequestSummary = ({ props, token, setTilesResponse, handleDeleteBatchRequest }) => {
-  const { id, status, description, tileCount, valueEstimate, created, processRequest } = props;
+const BatchRequestSummary = ({
+  props,
+  token,
+  setTilesResponse,
+  handleDeleteBatchRequest,
+  setSingleResponse,
+  setFetchedRequests,
+  handleExpand,
+  setOpenedContainers,
+}) => {
+  const { id, status, description, tileCount, valueEstimate, created, processRequest, isExpanded } = props;
   const bucketName = getBucketName(props);
+  const requestRef = useRef();
 
-  const [showAllInfo, setShowAllInfo] = useState(false);
+  // const [showAllInfo, setShowAllInfo] = useState(false);
   const [isFetchingTiles, setIsFetchingTiles] = useState(false);
   const [fetchedTiles, setFetchedTiles] = useState({
     processedTiles: 0,
@@ -77,10 +90,16 @@ const BatchRequestSummary = ({ props, token, setTilesResponse, handleDeleteBatch
   }, [id, token, setTilesResponse]);
 
   useEffect(() => {
-    if (showAllInfo && validStatus(status)) {
+    if (isExpanded && validStatus(status)) {
       fetchTiles();
     }
-  }, [fetchTiles, showAllInfo, status]);
+  }, [fetchTiles, isExpanded, status]);
+
+  useLayoutEffect(() => {
+    if (isExpanded && requestRef.current) {
+      requestRef.current.scrollIntoView();
+    }
+  }, [isExpanded]);
 
   const generateCopyCommand = useCallback(() => {
     //if tilePath
@@ -90,16 +109,6 @@ const BatchRequestSummary = ({ props, token, setTilesResponse, handleDeleteBatch
     }
     return `aws s3 sync s3://${bucketName}/${id}/ ./`;
   }, [bucketName, props.output, id]);
-
-  const handleSelectId = () => {
-    store.dispatch(batchSlice.actions.setSelectedBatchId(id));
-  };
-
-  const handleShowInfoClick = () => {
-    if (!props.singleBatch) {
-      setShowAllInfo(!showAllInfo);
-    }
-  };
 
   const handleSeeGeometry = () => {
     const transformedGeo = getTransformedGeometryFromBounds(props.processRequest.input.bounds);
@@ -147,75 +156,86 @@ const BatchRequestSummary = ({ props, token, setTilesResponse, handleDeleteBatch
   };
 
   return (
-    <div className="u-margin-bottom-small">
-      <div className="batch-request-summary">
-        <div
-          title="Click to show information about the request"
-          onClick={handleShowInfoClick}
-          className="batch-request-summary-header"
-        >
-          <p className="text" style={{ display: 'inline-block' }}>
+    <div className="batch-request-summary" ref={requestRef}>
+      <div
+        title="Click to show information about the request"
+        onClick={() => handleExpand(id)}
+        className="batch-request-summary-header"
+      >
+        <div style={{ display: 'flex' }}>
+          <p className="text" style={{ width: '280px', marginRight: '1rem' }}>
             {id}
           </p>
-          <p className="text">{status}</p>
+          <CopyIcon className="batch-request-summary-header-icon" style={{ marginRight: '2rem' }} item={id} />
         </div>
-
-        <div className="batch-request-summary-button">
-          <button onClick={handleSelectId} className="secondary-button">
-            Select Request
-          </button>
-        </div>
+        <FontAwesomeIcon
+          className="batch-request-summary-header-icon"
+          icon={isExpanded ? faAngleDoubleUp : faAngleDoubleDown}
+        />
+        <p className="text" style={{ marginRight: '2rem' }}>
+          {status}
+        </p>
       </div>
 
-      <div className="batch-request-summary-info">
-        {showAllInfo ? (
-          <>
-            <p className="text">
-              <span>Status:</span> {status}
-            </p>
-            {props.error !== undefined ? (
-              <p className="text" style={{ color: 'red' }}>
-                <span>Error:</span> {props.error}
-              </p>
-            ) : null}
-            {description ? (
+      {isExpanded && (
+        <div className="batch-request-summary-container">
+          <div className="batch-request-summary-info">
+            <>
               <p className="text">
-                <span>Description:</span> {description}
+                <span>Status:</span> {status}
               </p>
-            ) : null}
-            <p className="text">
-              <span>Created At:</span> {created}
-            </p>
-            <p className="text">
-              <span>Number of tiles:</span> {tileCount}
-            </p>
-            <p className="text">
-              <span>Bucket Name:</span> {bucketName}
-            </p>
-            {valueEstimate ? (
+              {props.error !== undefined ? (
+                <p className="text" style={{ color: 'red' }}>
+                  <span>Error:</span> {props.error}
+                </p>
+              ) : null}
+              {description ? (
+                <p className="text">
+                  <span>Description:</span> {description}
+                </p>
+              ) : null}
               <p className="text">
-                <span>Estimated Value (in PU):</span> {Math.round(valueEstimate / 3)}
+                <span>Created At:</span> {created}
               </p>
-            ) : null}
-            {/* {fetchedTiles.consumedPu ? (
               <p className="text">
-                <span>Consumed PU:</span> {Math.round(fetchedTiles.consumedPu)}
+                <span>Number of tiles:</span> {tileCount}
               </p>
-            ) : null} */}
-            <p className="text">
-              <span>Tilling Grid:</span> {tillingGridIdToName(props.tilingGrid.id)}
-            </p>
-            <p className="text">
-              <span>Resolution:</span> {props.tilingGrid.resolution}
-            </p>
-            <p className="text">
-              <span>Last user Action:</span> {props.userAction}
-            </p>
-          </>
-        ) : null}
-      </div>
+              <p className="text">
+                <span>Bucket Name:</span> {bucketName}
+              </p>
+              {valueEstimate ? (
+                <p className="text">
+                  <span>Estimated Value (in PU):</span> {Math.round(valueEstimate / 3)}
+                </p>
+              ) : null}
+              {/* {fetchedTiles.consumedPu ? (
+                <p className="text">
+                  <span>Consumed PU:</span> {Math.round(fetchedTiles.consumedPu)}
+                </p>
+              ) : null} */}
+              <p className="text">
+                <span>Tilling Grid:</span> {tillingGridIdToName(props.tilingGrid.id)}
+              </p>
+              <p className="text">
+                <span>Resolution:</span> {props.tilingGrid.resolution}
+              </p>
+              <p className="text">
+                <span>Last user Action:</span> {props.userAction}
+              </p>
+            </>
+          </div>
 
-      {showAllInfo ? (
+          <BatchActions
+            requestId={id}
+            token={token}
+            setSingleResponse={setSingleResponse}
+            setFetchedRequests={setFetchedRequests}
+            setOpenedContainers={setOpenedContainers}
+          />
+        </div>
+      )}
+
+      {isExpanded ? (
         <>
           {!validStatus(status) ? null : isFetchingTiles ? (
             <p className="text u-margin-bottom-small">Loading...</p>
@@ -260,7 +280,7 @@ const BatchRequestSummary = ({ props, token, setTilesResponse, handleDeleteBatch
         </>
       ) : null}
 
-      {showAllInfo ? (
+      {isExpanded ? (
         <div>
           <button
             onClick={handleSeeGeometry}

@@ -107,7 +107,7 @@ const TimeRangeContainer = ({
             </button>
 
             <p className="text u-margin-top-small">
-              <i>Note: Datasources that don't have a timerange defined will use the first one</i>
+              <i>Note: Data collections that don't have a timerange defined will use the first one</i>
             </p>
           </>
         ) : null}

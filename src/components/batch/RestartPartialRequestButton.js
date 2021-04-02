@@ -1,15 +1,14 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import RequestButton from '../common/RequestButton';
-import { addAlertOnError, batchIdValidation } from './BatchActions';
+import { addAlertOnError, batchIdValidation } from './utils';
 import { restartPartialRequest } from './requests';
 import store from '../../store';
 import batchSlice from '../../store/batch';
 
-const RestartPartialRequestButton = ({ selectedBatchId, token }) => {
+const RestartPartialRequestButton = ({ requestId, token }) => {
   const responseHandler = () => {
     store.dispatch(
-      batchSlice.actions.setExtraInfo('Request with id ' + selectedBatchId + ' successfully restarted'),
+      batchSlice.actions.setExtraInfo('Request with id ' + requestId + ' successfully restarted'),
     );
   };
 
@@ -18,24 +17,17 @@ const RestartPartialRequestButton = ({ selectedBatchId, token }) => {
   };
 
   return (
-    <div>
-      <RequestButton
-        buttonText="Restart Partial Request"
-        responseHandler={responseHandler}
-        errorHandler={errorHandler}
-        validation={batchIdValidation(token, selectedBatchId)}
-        disabledTitle="Log in and set a batch request id to use this"
-        request={restartPartialRequest}
-        args={[selectedBatchId, token]}
-        className="secondary-button"
-      />
-    </div>
+    <RequestButton
+      buttonText="Restart Partial Request"
+      responseHandler={responseHandler}
+      errorHandler={errorHandler}
+      validation={batchIdValidation(token, requestId)}
+      disabledTitle="Log in and set a batch request id to use this"
+      request={restartPartialRequest}
+      args={[requestId, token]}
+      className="secondary-button"
+    />
   );
 };
 
-const mapStateToProps = (state) => ({
-  selectedBatchId: state.batch.selectedBatchId,
-  token: state.auth.user.access_token,
-});
-
-export default connect(mapStateToProps)(RestartPartialRequestButton);
+export default RestartPartialRequestButton;

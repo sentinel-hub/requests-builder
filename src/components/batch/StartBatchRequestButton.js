@@ -1,37 +1,30 @@
 import React from 'react';
 import RequestButton from '../common/RequestButton';
-import { addAlertOnError, batchIdValidation } from './BatchActions';
+import { addAlertOnError, batchIdValidation } from './utils';
 import { startBatchRequest } from './requests';
 
-import { connect } from 'react-redux';
 import store from '../../store';
 import batchSlice from '../../store/batch';
 
-const StartBatchRequestButton = ({ selectedBatchId, token }) => {
+const StartBatchRequestButton = ({ requestId, token, startRequest, setOpenedContainers }) => {
   const startResponseHandler = () => {
-    store.dispatch(
-      batchSlice.actions.setExtraInfo('Successfully Started request with Id: ' + selectedBatchId),
-    );
+    store.dispatch(batchSlice.actions.setExtraInfo('Successfully Started request with Id: ' + requestId));
+    startRequest(requestId);
+    // Only open running container
+    setOpenedContainers([true, false, false]);
   };
   return (
-    <div>
-      <RequestButton
-        validation={batchIdValidation(token, selectedBatchId)}
-        disabledTitle="Log in and set a batch request to use this"
-        className="secondary-button"
-        buttonText="Start"
-        responseHandler={startResponseHandler}
-        errorHandler={addAlertOnError}
-        request={startBatchRequest}
-        args={[token, selectedBatchId]}
-      />
-    </div>
+    <RequestButton
+      validation={batchIdValidation(token, requestId)}
+      disabledTitle="Log in and set a batch request to use this"
+      className="secondary-button"
+      buttonText="Start"
+      responseHandler={startResponseHandler}
+      errorHandler={addAlertOnError}
+      request={startBatchRequest}
+      args={[token, requestId]}
+    />
   );
 };
 
-const mapStateToProps = (state) => ({
-  selectedBatchId: state.batch.selectedBatchId,
-  token: state.auth.user.access_token,
-});
-
-export default connect(mapStateToProps)(StartBatchRequestButton);
+export default StartBatchRequestButton;

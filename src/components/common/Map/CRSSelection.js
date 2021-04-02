@@ -1,19 +1,39 @@
 import React from 'react';
 import store from '../../../store';
 import mapSlice from '../../../store/map';
-import { CRS } from '../../../utils/const';
+import { CRS, groupBy } from '../../../utils/const';
 
 // Generate CRS JSX Options, skip those which have internal:true.
-const generateCRSOptions = (crs) =>
-  Object.keys(crs)
-    .map((key) =>
-      !crs[key].internal ? (
-        <option key={key} value={key}>
-          {key}
-        </option>
-      ) : undefined,
-    )
-    .filter((o) => o);
+const optionsForGroup = (entries) => {
+  return entries
+    .filter((_, val) => !val.internal)
+    .map((epsg, val) => <option key={epsg[0]}>{epsg[0]}</option>);
+};
+
+const crsAggregator = (key) => {
+  if (/326../gm.test(key[0])) {
+    return 'UTM Northern';
+  }
+  if (/327../gm.test(key[0])) {
+    return 'UTM Southern';
+  }
+  return 'DEFAULT';
+};
+
+const generateCRSOptions = (crs) => {
+  const entries = Object.entries(crs);
+  const grouped = groupBy(entries, crsAggregator);
+  return Object.keys(grouped).map((group) => {
+    if (group === 'DEFAULT') {
+      return optionsForGroup(grouped[group]);
+    }
+    return (
+      <optgroup label={group} key={group}>
+        {optionsForGroup(grouped[group])}
+      </optgroup>
+    );
+  });
+};
 
 const CRSSelection = ({ selectedCrs }) => {
   const handleCRSChange = (e) => {

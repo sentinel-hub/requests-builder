@@ -7,6 +7,8 @@ import {
   S2L2A,
   S2L1C,
   L8L1C,
+  LOTL1,
+  LOTL2,
   MODIS,
   S3OLCI,
   S3SLSTR,
@@ -28,12 +30,17 @@ import DataFusionOptions from './DataSourceSpecificOptions/DataFusionOptions';
 import Toggle from './Toggle';
 import OverlayButton from './OverlayButton';
 
-export const generateDatasourcesOptions = () =>
-  Object.keys(DATASOURCES).map((key) => (
+export const generateDatasourcesOptions = (appMode) => {
+  let filteredDatasourcesKeys = Object.keys(DATASOURCES);
+  if (appMode === 'BATCH') {
+    filteredDatasourcesKeys = filteredDatasourcesKeys.filter((key) => DATASOURCES[key].isBatchSupported);
+  }
+  return filteredDatasourcesKeys.map((key) => (
     <option key={key} value={key}>
       {DATASOURCES[key].selectName ?? key}
     </option>
   ));
+};
 
 //idx is to reference different datasource options (in case of datafusion)
 export const generateDataSourceRelatedOptions = (datasource, idx = 0) => {
@@ -43,6 +50,8 @@ export const generateDataSourceRelatedOptions = (datasource, idx = 0) => {
     case S2L1C:
       return <S2L1COptions idx={idx} />;
     case L8L1C:
+    case LOTL1:
+    case LOTL2:
       return <BasicOptions idx={idx} />;
     case MODIS:
       return <BaseOptionsNoCC idx={idx} />;
@@ -65,7 +74,7 @@ export const generateDataSourceRelatedOptions = (datasource, idx = 0) => {
   }
 };
 
-const DataSourceSelect = ({ datasource }) => {
+const DataSourceSelect = ({ datasource, appMode }) => {
   const overlayRef = useRef();
   const [showAdvanced, setShowAdvanced] = useState(false);
 
@@ -86,13 +95,13 @@ const DataSourceSelect = ({ datasource }) => {
     <>
       <h2 className="heading-secondary">
         <div className="u-expand-title">
-          Data source
+          Data Collection
           <OverlayButton elementRef={overlayRef} />
         </div>
       </h2>
       <div className="form" ref={overlayRef}>
         <label htmlFor="datasource-select" className="form__label">
-          Datasource
+          Data Collection
         </label>
         <select
           id="datasource-select"
@@ -101,7 +110,7 @@ const DataSourceSelect = ({ datasource }) => {
           className="form__input"
           onChange={handleChange}
         >
-          {generateDatasourcesOptions()}
+          {generateDatasourcesOptions(appMode)}
         </select>
         {datasource !== 'CUSTOM' && datasource !== 'DATAFUSION' ? (
           <div style={{ whiteSpace: 'nowrap' }}>
@@ -135,6 +144,7 @@ const DataSourceSelect = ({ datasource }) => {
 
 const mapStateToProps = (store) => ({
   datasource: store.request.datasource,
+  appMode: store.request.mode,
 });
 
 export default connect(mapStateToProps, null)(DataSourceSelect);

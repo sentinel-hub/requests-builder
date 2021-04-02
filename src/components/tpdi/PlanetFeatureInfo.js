@@ -1,74 +1,21 @@
 import React, { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGlobeEurope, faAngleDoubleDown, faAngleDoubleUp } from '@fortawesome/free-solid-svg-icons';
-import store from '../../store';
-import tpdiSlice from '../../store/tpdi';
 import { formatPercentage } from '../../utils/stringUtils';
-import { focusMap, getAreaCoverPercentage } from '../common/Map/utils/crsTransform';
-import { getFormattedDatetime } from './utils';
+import { getAreaCoverPercentage } from '../common/Map/utils/crsTransform';
 import TPDIThumbnail from './TPDIThumbnail';
-import mapSlice from '../../store/map';
+import TpdiSearchResultHeader from './TpdiSearchResultHeader';
 
 const PlanetFeatureInfo = ({ feature, geometry, isDisabled }) => {
   const [expandedInfo, setExpandedInfo] = useState(false);
-
-  const handleParseGeometryToMap = () => {
-    store.dispatch(mapSlice.actions.setExtraGeometry(feature.geometry));
-    focusMap();
-  };
-
-  const handleAddToOrder = () => {
-    store.dispatch(tpdiSlice.actions.addProduct({ id: feature.id, geometry: feature.geometry }));
-  };
-
-  const handleSetExpandedInfo = () => {
-    setExpandedInfo(!expandedInfo);
-  };
-
   return (
     <div className="tpdi-feature">
-      <div className="tpdi-feature-title">
-        <div
-          onClick={handleSetExpandedInfo}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginRight: '2rem',
-            cursor: 'pointer',
-            width: '45%',
-          }}
-        >
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <p className="text">
-              <span>{getFormattedDatetime(feature.properties?.acquired)}</span>
-            </p>
-            <p className="text">
-              <span>ID: </span>
-              {feature.id}
-            </p>
-          </div>
-          {expandedInfo ? (
-            <FontAwesomeIcon className="icon" icon={faAngleDoubleUp} />
-          ) : (
-            <FontAwesomeIcon className="icon" icon={faAngleDoubleDown} />
-          )}
-        </div>
-        <div className="u-flex-aligned" style={{ justifyContent: 'space-between', width: '40%' }}>
-          <button
-            disabled={isDisabled}
-            onClick={handleAddToOrder}
-            className={`secondary-button secondary-button--wrapped ${
-              isDisabled ? 'secondary-button--disabled' : ''
-            }`}
-          >
-            {isDisabled ? 'Added to orders' : 'Add to order'}
-          </button>
-          <button className="secondary-button" onClick={handleParseGeometryToMap}>
-            <FontAwesomeIcon icon={faGlobeEurope} />
-          </button>
-        </div>
-      </div>
+      <TpdiSearchResultHeader
+        date={feature.properties?.acquired}
+        id={feature.id}
+        isDisabled={isDisabled}
+        featureGeometry={feature.geometry}
+        setExpandedInfo={setExpandedInfo}
+        expandedInfo={expandedInfo}
+      />
       {expandedInfo ? (
         <div className="u-flex-aligned">
           <div className="tpdi-feature-extra-info u-margin-bottom-tiny">

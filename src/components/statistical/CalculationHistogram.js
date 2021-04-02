@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import store from '../../store';
 import statisticalSlice from '../../store/statistical';
+import { isFloatString, isWritingDecimal } from '../../utils/stringUtils';
+import { inputArrayChangeHandler, inputToNumber } from './utils/utils';
 
 const CalculationHistogram = ({ histogram, histIdx, idx }) => {
   const [isSpecifyingBand, setIsSpecifyingBandName] = useState(histogram.histogramBandName !== 'default');
@@ -40,20 +42,27 @@ const CalculationHistogram = ({ histogram, histIdx, idx }) => {
   };
   const handleChangeBinsArray = (e) => {
     try {
-      const array = e.target.value.split(',').map((n) => Number(n));
-      store.dispatch(
-        statisticalSlice.actions.setHistogramParam({ param: 'bins', value: array, idx, histIdx }),
-      );
+      const dispatchedValue = inputArrayChangeHandler(e);
+      if (dispatchedValue !== undefined) {
+        store.dispatch(
+          statisticalSlice.actions.setHistogramParam({ param: 'bins', value: dispatchedValue, idx, histIdx }),
+        );
+      }
     } catch (err) {
       console.error("Can't parse array");
     }
   };
 
   const handleHistogramNumberParamChange = (e) => {
+    const { value } = e.target;
+    if (!isWritingDecimal(value) && !isFloatString(value) && value !== '') {
+      return;
+    }
+    const dispatchedValue = inputToNumber(value);
     store.dispatch(
       statisticalSlice.actions.setHistogramParam({
         param: e.target.name,
-        value: Number(e.target.value),
+        value: dispatchedValue,
         idx,
         histIdx,
       }),
@@ -127,7 +136,7 @@ const CalculationHistogram = ({ histogram, histIdx, idx }) => {
             className="form__input"
             value={histogram.nBins}
             name="nBins"
-            type="number"
+            type="text"
             placeholder="Specify number of bins"
             onChange={handleHistogramNumberParamChange}
           />
@@ -139,7 +148,7 @@ const CalculationHistogram = ({ histogram, histIdx, idx }) => {
           <input
             className="form__input"
             value={histogram.binWidth}
-            type="number"
+            type="text"
             name="binWidth"
             placeholder="e.g: 3"
             onChange={handleHistogramNumberParamChange}
@@ -152,7 +161,7 @@ const CalculationHistogram = ({ histogram, histIdx, idx }) => {
           <input
             className="form__input"
             value={histogram.lowEdge}
-            type="number"
+            type="text"
             name="lowEdge"
             placeholder="e.g: 0.2"
             onChange={handleHistogramNumberParamChange}
@@ -161,7 +170,7 @@ const CalculationHistogram = ({ histogram, histIdx, idx }) => {
           <input
             className="form__input"
             value={histogram.highEdge}
-            type="number"
+            type="text"
             name="highEdge"
             placeholder="e.g: 0.3"
             onChange={handleHistogramNumberParamChange}

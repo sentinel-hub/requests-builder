@@ -7,7 +7,7 @@ import BatchHeaderButtons from './components/batch/BatchHeaderButtons';
 import WMSHeaderButtons from './components/wms/WMSHeaderButtons';
 import Alert from './components/common/Alert';
 import HeaderLogo from './components/common/HeaderLogo';
-import OverlayResponse from './components/common/OverlayResponse';
+import OverlayResponse from './components/common/responses/OverlayResponse';
 import ProcessRequestForm from './forms/RequestForm';
 import '@fortawesome/free-solid-svg-icons/index';
 import Axios from 'axios';

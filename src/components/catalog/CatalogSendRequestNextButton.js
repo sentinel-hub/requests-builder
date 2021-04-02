@@ -30,19 +30,17 @@ const CatalogSendRequestNextButton = ({
   };
 
   return (
-    <>
-      <RequestButton
-        request={generateCatalogRequest}
-        args={[catalogState, geometry, timeRange, token, next]}
-        className="secondary-button"
-        validation={Boolean(next && token)}
-        buttonText="Get Next"
-        disabledTitle="Log in to use this"
-        responseHandler={responseHandler}
-        errorHandler={catalogErrorHandler}
-        useShortcut={true}
-      />
-    </>
+    <RequestButton
+      request={generateCatalogRequest}
+      args={[catalogState, geometry, timeRange, token, next]}
+      className="secondary-button"
+      validation={Boolean(next && token)}
+      buttonText="Get Next"
+      disabledTitle="Log in to use this"
+      responseHandler={responseHandler}
+      errorHandler={catalogErrorHandler}
+      useShortcut={true}
+    />
   );
 };
 

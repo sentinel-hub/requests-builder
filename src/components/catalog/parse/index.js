@@ -3,11 +3,18 @@ import store from '../../../store';
 import catalogSlice from '../../../store/catalog';
 import requestSlice from '../../../store/request';
 import mapSlice from '../../../store/map';
+import { addSuccessAlert, addWarningAlert } from '../../../store/alert';
 
 export const parseCatalogBody = (str) => {
   let body = getRequestBody(str);
-  const parsedJson = JSON.parse(body);
-  dispatchCatalogChanges(parsedJson);
+  try {
+    const parsedJson = JSON.parse(body);
+    dispatchCatalogChanges(parsedJson);
+    addSuccessAlert('Request parsed successfully!');
+  } catch (err) {
+    addWarningAlert('Something went wrong, check the console for more details!');
+    console.error(err);
+  }
 };
 
 const dispatchCatalogChanges = (parsedJson) => {
@@ -37,6 +44,10 @@ const dispatchCatalogChanges = (parsedJson) => {
   }
   if (parsedJson.fields) {
     dispatchFields(parsedJson.fields);
+  }
+  if (parsedJson.ids && parsedJson.ids.length > 0) {
+    store.dispatch(catalogSlice.actions.setIsSearchingByIds(true));
+    store.dispatch(catalogSlice.actions.setIds(parsedJson.ids));
   }
 };
 

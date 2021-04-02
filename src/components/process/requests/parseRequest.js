@@ -224,8 +224,8 @@ export const dispatchAdvancedOptions = (parsedBody) => {
   }
 };
 
-export const dispatchChanges = (parsedBody) => {
-  store.dispatch(requestSlice.actions.resetState());
+export const dispatchChanges = (parsedBody, resetMode = false) => {
+  store.dispatch(requestSlice.actions.resetState({ resetMode }));
   dispatchEvalscript(parsedBody);
   dispatchBounds(parsedBody);
   dispatchTimeRange(parsedBody);

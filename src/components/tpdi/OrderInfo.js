@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDoubleDown, faAngleDoubleUp } from '@fortawesome/free-solid-svg-icons';
 import store from '../../store';
 import RequestButton from '../common/RequestButton';
-import { deleteTPDIOrder, confirmTPDIOrder } from './generateTPDIRequests';
+import { deleteTPDIOrder, confirmTPDIOrder } from './requests/common';
 import { getTransformedGeometryFromBounds, focusMap } from '../common/Map/utils/crsTransform';
 import GetDeliveriesButton from './GetDeliveriesButton';
 import { parseTPDIRequest } from './parse';
@@ -11,6 +11,10 @@ import Tooltip from '../common/Tooltip/Tooltip';
 import { getFormattedDatetime } from './utils';
 import { formatNumber } from '../../utils/const';
 import mapSlice from '../../store/map';
+import requestSlice from '../../store/request';
+import { dispatchBounds } from '../process/requests/parseRequest';
+import { addSuccessAlert, addWarningAlert } from '../../store/alert';
+import CopyIcon from '../common/CopyIcon';
 
 const getColorByStatus = (status) => {
   if (status === 'PARTIAL') {
@@ -82,6 +86,22 @@ const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder, expandO
     parseTPDIRequest(order);
   };
 
+  const handleRequestProcess = () => {
+    try {
+      store.dispatch(requestSlice.actions.resetState({ resetMode: true }));
+      store.dispatch(requestSlice.actions.setDatasource('CUSTOM'));
+      store.dispatch(requestSlice.actions.setByocCollectionId(order.collectionId));
+      store.dispatch(requestSlice.actions.setByocCollectionType('BYOC'));
+      store.dispatch(requestSlice.actions.disableTimerange(true));
+      store.dispatch(requestSlice.actions.setEvalscript(''));
+      dispatchBounds(order);
+      addSuccessAlert('Order successfully parsed.\nRemember to set an appropiate evalscript!');
+    } catch (err) {
+      addWarningAlert('Something went wrong, check the console to see more details');
+      console.error(err);
+    }
+  };
+
   return (
     <div className="order-info">
       <div className="tpdi-feature-title">
@@ -118,6 +138,7 @@ const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder, expandO
           <p className="text">
             <span>Id: </span>
             {order.id}
+            <CopyIcon style={{ marginLeft: '1rem' }} item={order.id} />
           </p>
           <p className="text">
             <span>Provider: </span>
@@ -159,7 +180,7 @@ const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder, expandO
               style={{
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr',
-                width: '50%',
+                width: '60%',
                 columnGap: '1rem',
                 marginRight: '1rem',
               }}
@@ -201,6 +222,11 @@ const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder, expandO
                 setDeliveries={setDeliveries}
                 updateToFinished={updateToFinished}
               />
+              {order.status === 'DONE' && (
+                <button className="secondary-button secondary-button--wrapped" onClick={handleRequestProcess}>
+                  Request on Process API
+                </button>
+              )}
             </div>
 
             <OrdersTooltip />

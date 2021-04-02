@@ -21,7 +21,11 @@ const Tooltip = (props) => {
   useOnClickOutside(ref, handleHide);
   return (
     <div className="Tooltip-Wrapper" onClick={handleShow}>
-      {props.children || <span className="info">&#8505;</span>}
+      {props.children || (
+        <span className="info" style={{ ...props.infoStyles }}>
+          &#8505;
+        </span>
+      )}
       {active && (
         <div
           ref={ref}

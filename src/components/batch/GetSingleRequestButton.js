@@ -1,36 +1,42 @@
 import React from 'react';
 import RequestButton from '../common/RequestButton';
-import { connect } from 'react-redux';
-import { addAlertOnError, batchIdValidation } from './BatchActions';
+import { addAlertOnError, batchIdValidation } from './utils';
 import { getSingleBatchRequest } from './requests';
 import store from '../../store';
+import { groupBatchAggregator } from './BatchInformation';
 import batchSlice from '../../store/batch';
 
-const GetSingleRequestButton = ({ token, selectedBatchId, setFetchedRequests, setSingleResponse }) => {
+const GetSingleRequestButton = ({
+  token,
+  requestId,
+  setSingleResponse,
+  curriyedUpdater,
+  setOpenedContainers,
+}) => {
   const getSingleBatchHandler = (response) => {
     setSingleResponse(JSON.stringify(response, null, 2));
+    curriyedUpdater(response)(requestId);
     store.dispatch(batchSlice.actions.setExtraInfo(''));
-    setFetchedRequests([response]);
+    const newContainerStatus = groupBatchAggregator(response);
+    setOpenedContainers([
+      newContainerStatus === 'CREATED',
+      newContainerStatus === 'RUNNING',
+      newContainerStatus === 'FINISHED',
+    ]);
   };
+
   return (
-    <div>
-      <RequestButton
-        validation={batchIdValidation(token, selectedBatchId)}
-        disabledTitle="Log in and set a batch request to use this"
-        className="secondary-button"
-        buttonText="Get batch request by id"
-        responseHandler={getSingleBatchHandler}
-        errorHandler={addAlertOnError}
-        request={getSingleBatchRequest}
-        args={[token, selectedBatchId]}
-      />
-    </div>
+    <RequestButton
+      validation={batchIdValidation(token, requestId)}
+      disabledTitle="Log in and set a batch request to use this"
+      className="secondary-button"
+      buttonText="Refresh request"
+      responseHandler={getSingleBatchHandler}
+      errorHandler={addAlertOnError}
+      request={getSingleBatchRequest}
+      args={[token, requestId]}
+    />
   );
 };
 
-const mapStateToProps = (state) => ({
-  token: state.auth.user.access_token,
-  selectedBatchId: state.batch.selectedBatchId,
-});
-
-export default connect(mapStateToProps)(GetSingleRequestButton);
+export default GetSingleRequestButton;

@@ -1,0 +1,12 @@
+.statistical-response {
+  height: 700px;
+  overflow-y: scroll;
+  padding: 0.5rem 1rem;
+  width: 700px;
+
+  @include respond(tab-port) {
+    height: 400px;
+    min-width: 500px;
+    padding: 0.5rem 1rem;
+  }
+}

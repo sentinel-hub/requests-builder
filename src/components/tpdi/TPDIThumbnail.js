@@ -4,8 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExpandArrowsAlt } from '@fortawesome/free-solid-svg-icons';
 import { connect } from 'react-redux';
 import BaseModal from './BaseModal';
-
-import { getProductThumbnail } from './generateTPDIRequests';
+import { getProductThumbnail } from './requests/common';
 
 const TPDIThumbnail = ({ collectionId, productId, token }) => {
   const [isFetchingThumbnail, setIsFetchingThumbnail] = useState(true);

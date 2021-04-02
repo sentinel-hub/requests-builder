@@ -13,8 +13,8 @@ options:
 [
   {
     name: "search",
-    value: "some text",
-    toggledValue?: "some text"
+    value: () => "some text",
+    toggledValue?: () =>  "some text"
     nonToggle?: boolean,
   }
 ]
@@ -23,6 +23,11 @@ canCopy: shows copy to clipboard button
 supportedSendEditedNames: names of options that can be edited and send.
 this requires to pass token as props.
 */
+
+const isFunction = (arg) => {
+  return typeof arg === 'function';
+};
+
 const CommonRequestPreview = ({
   options,
   className,
@@ -37,7 +42,9 @@ const CommonRequestPreview = ({
 }) => {
   const [toggled, setToggled] = useState(false);
   const [selectedOption, setSelectedOption] = useState(options ? options[0] : {});
-  const [text, setText] = useState(selectedOption.value);
+  const [text, setText] = useState(() => {
+    return isFunction(selectedOption.value) ? selectedOption.value() : selectedOption.value;
+  });
   const [hasTextChanged, setHasTextChanged] = useState(false);
 
   useEffect(() => {
@@ -52,9 +59,13 @@ const CommonRequestPreview = ({
   useEffect(() => {
     if (selectedOption) {
       if (toggled) {
-        setText(selectedOption.toggledValue ?? 'Please send the request to see the response.');
+        setText(
+          isFunction(selectedOption.toggledValue)
+            ? selectedOption.toggledValue()
+            : selectedOption.toggledValue ?? 'Please send the request to see the response.',
+        );
       } else {
-        setText(selectedOption.value);
+        setText(isFunction(selectedOption.value) ? selectedOption.value() : selectedOption.value);
       }
     }
     setHasTextChanged(false);
@@ -62,14 +73,13 @@ const CommonRequestPreview = ({
 
   const handleSelectedOptionChange = (e) => {
     const newOption = options.find((opt) => opt.name === e.target.value);
-    if (newOption.nonToggle) {
+    if (newOption.nonToggle && toggled) {
       setToggled(false);
     }
     setSelectedOption(newOption);
   };
 
   const handleCopy = () => {
-    const text = toggled ? selectedOption.toggledValue : selectedOption.value;
     navigator.clipboard.writeText(text.replace(/(\r\n|\n|\r)/gm, ''));
   };
 
@@ -140,7 +150,6 @@ const CommonRequestPreview = ({
             errorHandler={() =>
               store.dispatch(alertSlice.actions.addAlert({ type: 'WARNING', text: 'Something went wrong' }))
             }
-            style={{ margin: '0 1rem' }}
           />
         )}
       </div>

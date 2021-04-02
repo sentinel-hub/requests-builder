@@ -171,16 +171,17 @@ const requestSlice = createSlice({
     setMode: (state, action) => {
       state.mode = action.payload;
 
-      if (action.payload === 'BATCH' && state.responses[0].format === 'image/jpeg') {
-        state.responses[0].format = 'image/png';
+      if (action.payload === 'BATCH') {
+        if (state.responses[0].format === 'image/jpeg') {
+          state.responses[0].format = 'image/png';
+        }
+        if (!DATASOURCES[state.datasource].isBatchSupported) {
+          state.datasource = 'S2L2A';
+        }
       }
       // Todo: remove once normal defaults work.
       if (action.payload === 'STATISTICAL') {
         state.evalscript = DEFAULT_STATISTICAL_EVALSCRIPT;
-        state.dataFilterOptions[0].options = {
-          mosaickingOrder: 'leastCC',
-          ...state.dataFilterOptions[0].options,
-        };
       }
     },
     setDatafusionSource: (state, action) => {
@@ -288,7 +289,13 @@ const requestSlice = createSlice({
     setByocCollectionId: (state, action) => {
       state.byocCollectionId = action.payload;
     },
-    resetState: (state) => ({ ...PROCESS_INITIAL_STATE, mode: state.mode }),
+    resetState: (state, action) => {
+      const { resetMode } = action.payload;
+      if (resetMode) {
+        return PROCESS_INITIAL_STATE;
+      }
+      return { ...PROCESS_INITIAL_STATE, mode: state.mode };
+    },
   },
 });
 

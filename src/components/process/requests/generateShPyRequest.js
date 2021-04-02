@@ -8,6 +8,8 @@ import {
   MODIS,
   DEM,
   L8L1C,
+  LOTL1,
+  LOTL2,
   isEmpty,
   CUSTOM,
   DATAFUSION,
@@ -88,6 +90,9 @@ const datasourceToSHPYDatasource = (datasource, requestState) => {
       return 'DataCollection.DEM';
     case L8L1C:
       return 'DataCollection.LANDSAT8';
+    case LOTL1:
+    case LOTL2:
+      return 'Not yet supported on the library';
     case S5PL2:
       return 'DataCollection.SENTINEL5P';
     case CUSTOM:

@@ -5,6 +5,7 @@ import { calculateAutoDimensions, calculatePixelSize } from '../Map/utils/bboxRa
 import Toggle from '../Toggle';
 
 import { connect } from 'react-redux';
+import { isWritingDecimal } from '../../../utils/stringUtils';
 
 const generatePlaceholder = (heightOrRes, input) => {
   if (heightOrRes === 'HEIGHT') {
@@ -24,8 +25,6 @@ const generatePlaceholder = (heightOrRes, input) => {
   }
 };
 
-const isWritingDecimal = (input) => /^\d*(\.|,)0*$/.test(input);
-
 const dispatchNewDimensions = (newDimensions) => {
   if (newDimensions) {
     const newWidth = newDimensions[0];
@@ -41,6 +40,7 @@ const OutputDimensions = ({
   width,
   isAutoRatio,
   isOnAutoRes,
+  appMode,
   useAutoResMode = true,
 }) => {
   const handleSetAutoRatio = () => {
@@ -78,7 +78,6 @@ const OutputDimensions = ({
     store.dispatch(requestSlice.actions.setHeightOrRes(e.target.value));
     if (e.target.value === 'RES') {
       store.dispatch(requestSlice.actions.setIsAutoRatio(false));
-      store.dispatch(requestSlice.actions.setWidthOrHeight({ x: 100, y: 100 }));
     } else {
       store.dispatch(requestSlice.actions.setIsAutoRatio(true));
     }
@@ -148,7 +147,7 @@ const OutputDimensions = ({
       )}
 
       {shouldDisplayAutoRes ? (
-        <AutoResFields geometry={geometry} />
+        <AutoResFields geometry={geometry} appMode={appMode} height={height} width={width} />
       ) : (
         <>
           <label htmlFor="width-input" className="form__label">
@@ -194,14 +193,24 @@ const OutputDimensions = ({
   );
 };
 
-const AutoResFields = ({ geometry }) => {
-  const [resX, setResX] = useState(20);
-  const [resY, setResY] = useState(20);
+const AutoResFields = ({ geometry, width, height, appMode }) => {
+  const [resX, setResX] = useState(() => {
+    const [x] = calculatePixelSize(geometry, [width, height]);
+    return x;
+  });
+  const [resY, setResY] = useState(() => {
+    const [, y] = calculatePixelSize(geometry, [width, height]);
+    return y;
+  });
 
   useEffect(() => {
-    const newDimensions = calculatePixelSize(geometry, [resX, resY]);
-    dispatchNewDimensions(newDimensions);
-  }, [resX, resY, geometry]);
+    if (appMode === 'WMS') {
+      dispatchNewDimensions([resX, resY]);
+    } else {
+      const newDimensions = calculatePixelSize(geometry, [resX, resY]);
+      dispatchNewDimensions(newDimensions);
+    }
+  }, [resX, resY, geometry, appMode]);
 
   return (
     <>
@@ -236,6 +245,7 @@ const mapStateToProps = (state) => ({
   geometry: state.map.wgs84Geometry,
   isAutoRatio: state.request.isAutoRatio,
   isOnAutoRes: state.request.isOnAutoRes,
+  appMode: state.request.mode,
 });
 
 export default connect(mapStateToProps)(OutputDimensions);

@@ -45,7 +45,9 @@ const ProcessRequestOverlayButton = ({
       }),
     );
     if (isFromCollections) {
-      store.dispatch(savedRequestsSlice.actions.setResponse({ idx: collectionRequestIdx, responseUrl }));
+      store.dispatch(
+        savedRequestsSlice.actions.setResponse({ idx: collectionRequestIdx, response: responseUrl }),
+      );
     }
   };
 

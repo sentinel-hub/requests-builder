@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { errorHandlerTPDI } from './TPDIOrderOptions';
 import RequestButton from '../common/RequestButton';
-import { getQuotaCurlCommand, getTPDIQuota } from './generateTPDIRequests';
+import { getQuotaCurlCommand, getTPDIQuota } from './requests/common';
 import { connect } from 'react-redux';
 import { formatNumber } from '../../utils/const';
 import CommonRequestPreview from '../common/CommonRequestPreview';

@@ -67,7 +67,7 @@ const DataFusionOptions = ({ datafusionSources }) => {
     return datafusionSources.map((source, idx) => (
       <div className="form" style={{ paddingTop: '0', paddingBottom: '0' }} key={idx}>
         <label htmlFor={`datasource-${idx}`} className="form__label">
-          Datasource {idx + 1}
+          Data Collection {idx + 1}
         </label>
         <select
           id={`datasource-${idx}`}

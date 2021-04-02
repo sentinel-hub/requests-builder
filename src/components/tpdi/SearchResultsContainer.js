@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PlanetFeatureInfo from './PlanetFeatureInfo';
 import AirbusFeatureInfo from './AirbusFeatureInfo';
+import MaxarFeatureInfo from './MaxarFeatureInfo';
 import { isAirbus } from './utils';
 
 const sortTpdiFeatures = (featuresWithProvider) => {
@@ -17,6 +18,13 @@ const sortTpdiFeatures = (featuresWithProvider) => {
       ...featuresWithProvider,
       features: featuresWithProvider.features.sort(
         (a, b) => new Date(a.properties?.acquired) > new Date(b.properties?.acquired),
+      ),
+    };
+  } else if (featuresWithProvider.provider === 'MAXAR') {
+    return {
+      ...featuresWithProvider,
+      features: featuresWithProvider.features.sort(
+        (a, b) => new Date(a.acquisitionDateStart) > new Date(b.acquisitionDateStart),
       ),
     };
   }
@@ -39,6 +47,14 @@ const generateFeatures = (featuresWithProvider, geometry, productIds) => {
         key={feature.id}
         feature={feature}
         isDisabled={productIds.find((id) => id === feature.id)}
+      />
+    ));
+  } else if (featuresWithProvider.provider === 'MAXAR') {
+    return featuresWithProvider.features.map((feature) => (
+      <MaxarFeatureInfo
+        key={feature.catalogID}
+        feature={feature}
+        isDisabled={productIds.find((id) => id === feature.catalogID)}
       />
     ));
   }

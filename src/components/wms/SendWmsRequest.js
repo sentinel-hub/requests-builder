@@ -20,8 +20,7 @@ const SendWmsRequest = ({ wmsState, requestState, mapState, token, mode }) => {
   };
 
   const responseHandlerFis = (response) => {
-    const s = JSON.stringify(response, null, 2);
-    store.dispatch(responsesSlice.actions.setFisResponse(s));
+    store.dispatch(responsesSlice.actions.setFisResponse(response));
     store.dispatch(responsesSlice.actions.setShow(true));
   };
 

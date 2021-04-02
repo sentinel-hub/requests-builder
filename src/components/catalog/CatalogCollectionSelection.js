@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { getCatalogCollections } from './requests';
+import { CATALOG_OPTIONS, getCatalogCollections } from './requests';
 
 import { connect } from 'react-redux';
 import store from '../../store';
 import catalogSlice from '../../store/catalog';
 import Axios from 'axios';
+import { addWarningAlert } from '../../store/alert';
 
 const generateCollectionsOptions = (collections) =>
   collections.map((collection) => (
@@ -13,7 +14,7 @@ const generateCollectionsOptions = (collections) =>
     </option>
   ));
 
-const CatalogCollectionSelection = ({ token, selectedCollection }) => {
+const CatalogCollectionSelection = ({ token, selectedCollection, deploymentUrl }) => {
   const [collections, setCollections] = useState([]);
   const [isFetchingCollections, setIsFetchingCollections] = useState(false);
 
@@ -22,7 +23,7 @@ const CatalogCollectionSelection = ({ token, selectedCollection }) => {
     const fetchCollections = async () => {
       setIsFetchingCollections(true);
       try {
-        const resp = await getCatalogCollections(token, {
+        const resp = await getCatalogCollections(deploymentUrl, token, {
           cancelToken: source.token,
         });
         if (resp.data.collections) {
@@ -38,10 +39,12 @@ const CatalogCollectionSelection = ({ token, selectedCollection }) => {
         if (!Axios.isCancel(err)) {
           console.error(err);
         }
+        setIsFetchingCollections(false);
+        addWarningAlert('Something went wrong');
       }
     };
 
-    if (token) {
+    if (token && deploymentUrl) {
       fetchCollections();
     }
 
@@ -50,25 +53,46 @@ const CatalogCollectionSelection = ({ token, selectedCollection }) => {
         source.cancel();
       }
     };
-  }, [token]);
+  }, [token, deploymentUrl]);
 
   const handleSelectedCollectionChange = (e) => {
     store.dispatch(catalogSlice.actions.setSelectedCollection(e.target.value));
   };
 
+  const handleDeploymentChange = (e) => {
+    store.dispatch(catalogSlice.actions.setDeploymentUrl(e.target.value));
+  };
+
+  if (!token) {
+    return (
+      <>
+        <h2 className="heading-secondary">Collections</h2>
+        <div className="form">
+          <p className="text">Log in to use this!</p>;
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
-      <h2 className="heading-secondary">Collection</h2>
+      <h2 className="heading-secondary">Collections</h2>
       <div className="form">
-        {!token ? (
-          <p className="text">Log in to use this</p>
-        ) : isFetchingCollections ? (
-          <p className="text">Loading...</p>
-        ) : (
-          <>
-            <label htmlFor="catalog-collection" className="form__label">
-              Selected Collection
-            </label>
+        <label className="form__label">Deployment</label>
+        <select className="form__input" value={deploymentUrl} onChange={handleDeploymentChange}>
+          <option value="">Select a deployment</option>
+          {CATALOG_OPTIONS.map((opt) => (
+            <option value={opt.url} key={opt.url}>
+              {opt.name}
+            </option>
+          ))}
+        </select>
+
+        <label className="form__label">Collection</label>
+        {deploymentUrl !== '' ? (
+          isFetchingCollections ? (
+            <p className="text">Fetching collections...</p>
+          ) : (
             <select
               id="catalog-collection"
               value={selectedCollection}
@@ -78,7 +102,9 @@ const CatalogCollectionSelection = ({ token, selectedCollection }) => {
               <option value="">Select a Collection</option>
               {generateCollectionsOptions(collections)}
             </select>
-          </>
+          )
+        ) : (
+          <p className="text">Select a deployment to see the collections</p>
         )}
       </div>
     </>
@@ -88,5 +114,7 @@ const CatalogCollectionSelection = ({ token, selectedCollection }) => {
 const mapStateToProps = (state) => ({
   token: state.auth.user.access_token,
   selectedCollection: state.catalog.selectedCollection,
+  deploymentUrl: state.catalog.deploymentUrl,
 });
+
 export default connect(mapStateToProps)(CatalogCollectionSelection);

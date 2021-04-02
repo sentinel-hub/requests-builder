@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import BatchRequestPreview from '../components/batch/BatchRequestPreview';
 import DataSourceSelect from '../components/common/DataSourceSelect';
 import EvalscriptEditor from '../components/common/Evalscript/EvalscriptEditor';
 import BatchOptions from '../components/batch/BatchOptions';
-import BatchActions from '../components/batch/BatchActions';
 import MapContainer from '../components/common/Map/MapContainer';
 import BatchInformation from '../components/batch/BatchInformation';
 import TimeRangeContainer from '../components/common/TimeRange/TimeRangeContainer';
@@ -15,6 +14,13 @@ const BatchRequestForm = () => {
   const [getAllResponse, setGetAllResponse] = useState();
   const [singleResponse, setSingleResponse] = useState();
   const [tilesResponse, setTilesResponse] = useState();
+  // createdContainer, runningContainer, finishedContainer
+  const [openedContainers, setOpenedContainers] = useState([true, true, false]);
+
+  // open container callbacks
+  const openOnlyCreateContainer = useCallback(() => {
+    setOpenedContainers([true, false, false]);
+  }, []);
 
   return (
     <div>
@@ -48,8 +54,11 @@ const BatchRequestForm = () => {
 
       <div className="batch-third-row">
         <div className="batch-third-row-first-item">
-          <BatchOptions setFetchedRequests={setFetchedRequests} setCreateResponse={setCreateResponse} />
-          <BatchActions setFetchedRequests={setFetchedRequests} setSingleResponse={setSingleResponse} />
+          <BatchOptions
+            openOnlyCreateContainer={openOnlyCreateContainer}
+            setFetchedRequests={setFetchedRequests}
+            setCreateResponse={setCreateResponse}
+          />
         </div>
         <div className="batch-third-row-second-item">
           <BatchInformation
@@ -57,6 +66,9 @@ const BatchRequestForm = () => {
             fetchedRequests={fetchedRequests}
             setGetAllResponse={setGetAllResponse}
             setTilesResponse={setTilesResponse}
+            setSingleResponse={setSingleResponse}
+            openedContainers={openedContainers}
+            setOpenedContainers={setOpenedContainers}
           />
         </div>
       </div>
