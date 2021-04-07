@@ -1042,6 +1042,11 @@ input:checked + .slider::before {
       min-width: 500px;
       padding: 0.5rem 1rem; } }
 
+.timerange-input--invalid {
+  border: 2px solid red; }
+  .timerange-input--invalid:focus {
+    outline-color: red; }
+
 .App {
   /* stylelint-disable-line */
   padding: 2rem; }

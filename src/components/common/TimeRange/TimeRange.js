@@ -31,6 +31,8 @@ const TimeRange = ({ index, timeTo, timeFrom, isDisabled, datasource, geometry, 
   const [fetchedMonths, setFetchedMonths] = useState([]);
   const sourceRef = useRef(Axios.CancelToken.source());
   const shouldFetchCatalog = token && shouldFetchDates(datasource, mode);
+  const [isValidTimeFrom, setIsValidTimeFrom] = useState(true);
+  const [isValidTimeTo, setIsValidTimeTo] = useState(true);
 
   const fetchMonths = async (months) => {
     const fetchHelper = async () => {
@@ -69,6 +71,11 @@ const TimeRange = ({ index, timeTo, timeFrom, isDisabled, datasource, geometry, 
         fetchAndSetMonths([startOfMonth]);
       }
       store.dispatch(requestSlice.actions.setTimeFrom({ timeFrom: date, idx: index }));
+      if (!isValidTimeFrom) {
+        setIsValidTimeFrom(true);
+      }
+    } else {
+      setIsValidTimeFrom(false);
     }
   };
 
@@ -81,6 +88,11 @@ const TimeRange = ({ index, timeTo, timeFrom, isDisabled, datasource, geometry, 
         fetchAndSetMonths([startOfMonth]);
       }
       store.dispatch(requestSlice.actions.setTimeTo({ timeTo: date, idx: index }));
+      if (!isValidTimeTo) {
+        setIsValidTimeTo(true);
+      }
+    } else {
+      setIsValidTimeTo(false);
     }
   };
 
@@ -89,6 +101,11 @@ const TimeRange = ({ index, timeTo, timeFrom, isDisabled, datasource, geometry, 
     if (shouldFetchCatalog && !fetchedMonths.includes(newMonth)) {
       fetchAndSetMonths([newMonth]);
     }
+  };
+
+  const handleFormatDate = (date) => {
+    const d = moment(date).utc().startOf('day').format();
+    return d.split('T')[0];
   };
 
   const handleDayPickerOpen = (isFrom) => () => {
@@ -125,8 +142,14 @@ const TimeRange = ({ index, timeTo, timeFrom, isDisabled, datasource, geometry, 
           onMonthChange: handleMonthChange,
           disabledDays: { after: new Date() },
         }}
+        formatDate={handleFormatDate}
         onDayPickerShow={handleDayPickerOpen(true)}
-        inputProps={{ disabled: isDisabled, required: true, className: 'form__input', id: 'timefrom' }}
+        inputProps={{
+          disabled: isDisabled,
+          required: true,
+          className: `form__input ${!isValidTimeFrom ? 'timerange-input--invalid' : ''}`,
+          id: 'timefrom',
+        }}
       />
 
       <label htmlFor="timeto" className="form__label u-margin-top-small">
@@ -142,8 +165,14 @@ const TimeRange = ({ index, timeTo, timeFrom, isDisabled, datasource, geometry, 
           onMonthChange: handleMonthChange,
         }}
         onDayPickerShow={handleDayPickerOpen(false)}
+        formatDate={handleFormatDate}
         onDayChange={handleTimeToChange}
-        inputProps={{ disabled: isDisabled, required: true, className: 'form__input', id: 'timeto' }}
+        inputProps={{
+          disabled: isDisabled,
+          required: true,
+          className: `form__input ${!isValidTimeTo ? 'timerange-input--invalid' : ''}`,
+          id: 'timeto',
+        }}
       />
     </>
   );

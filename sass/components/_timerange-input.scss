@@ -1,0 +1,9 @@
+.timerange-input {
+  &--invalid {
+    border: 2px solid red;
+
+    &:focus {
+      outline-color: red;
+    }
+  }
+}
