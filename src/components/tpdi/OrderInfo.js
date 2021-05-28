@@ -3,18 +3,18 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDoubleDown, faAngleDoubleUp } from '@fortawesome/free-solid-svg-icons';
 import store from '../../store';
 import RequestButton from '../common/RequestButton';
-import { deleteTPDIOrder, confirmTPDIOrder } from './requests/common';
 import { getTransformedGeometryFromBounds, focusMap } from '../common/Map/utils/crsTransform';
 import GetDeliveriesButton from './GetDeliveriesButton';
 import { parseTPDIRequest } from './parse';
 import Tooltip from '../common/Tooltip/Tooltip';
 import { getFormattedDatetime } from './utils';
-import { formatNumber } from '../../utils/const';
+import { CUSTOM, formatNumber } from '../../utils/const';
 import mapSlice from '../../store/map';
 import requestSlice from '../../store/request';
 import { dispatchBounds } from '../process/requests/parseRequest';
 import { addSuccessAlert, addWarningAlert } from '../../store/alert';
 import CopyIcon from '../common/CopyIcon';
+import TpdiResource from '../../api/tpdi/TpdiResource';
 
 const getColorByStatus = (status) => {
   if (status === 'PARTIAL') {
@@ -89,7 +89,7 @@ const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder, expandO
   const handleRequestProcess = () => {
     try {
       store.dispatch(requestSlice.actions.resetState({ resetMode: true }));
-      store.dispatch(requestSlice.actions.setDatasource('CUSTOM'));
+      store.dispatch(requestSlice.actions.setDatasource(CUSTOM));
       store.dispatch(requestSlice.actions.setByocCollectionId(order.collectionId));
       store.dispatch(requestSlice.actions.setByocCollectionType('BYOC'));
       store.dispatch(requestSlice.actions.disableTimerange(true));
@@ -187,8 +187,8 @@ const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder, expandO
             >
               {order.status !== 'DONE' && order.status !== 'RUNNING' && (
                 <RequestButton
-                  request={confirmTPDIOrder}
-                  args={[token, order.id]}
+                  request={TpdiResource.confirmOrder}
+                  args={[{ orderId: order.id }]}
                   buttonText="Confirm Order"
                   className="secondary-button"
                   validation={Boolean(token)}
@@ -202,8 +202,8 @@ const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder, expandO
               </button>
               {order.status !== 'RUNNING' && (
                 <RequestButton
-                  request={deleteTPDIOrder}
-                  args={[token, order.id]}
+                  request={TpdiResource.deleteOrder}
+                  args={[{ orderId: order.id }]}
                   buttonText="Delete order"
                   className="secondary-button secondary-button--cancel"
                   responseHandler={handleDelete}

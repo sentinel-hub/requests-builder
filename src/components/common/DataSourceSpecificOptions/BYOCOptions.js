@@ -2,10 +2,10 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import store from '../../../store';
 import requestSlice from '../../../store/request';
 import { connect } from 'react-redux';
-import { getCustomCollections } from '../../process/requests';
 import Axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSync } from '@fortawesome/free-solid-svg-icons';
+import ByocResource from '../../../api/byoc/ByocResource';
 
 const generateCollectionOptions = (collections) => {
   return collections.map((collection) => (
@@ -26,7 +26,7 @@ const BYOCOptions = ({ token, byocLocation, byocCollectionType, byocCollectionId
   const loadCustomCollections = useCallback(async () => {
     sourceRef.current = Axios.CancelToken.source();
     try {
-      const res = await getCustomCollections(token, { cancelToken: sourceRef.current.token });
+      const res = await ByocResource.getCollections(null, { cancelToken: sourceRef.current.token });
       if (res.data) {
         setCollections(
           res.data.data.map((d) => ({ name: d.name, id: d.id, type: d.type, location: d.location })),
@@ -35,7 +35,7 @@ const BYOCOptions = ({ token, byocLocation, byocCollectionType, byocCollectionId
     } catch (err) {
       console.error('Unable to load custom collections', err);
     }
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     if (token) {
@@ -104,6 +104,7 @@ const BYOCOptions = ({ token, byocLocation, byocCollectionType, byocCollectionId
         onChange={handleCollectionIdChange}
         type="text"
         className="form__input"
+        placeholder="Write your collection Id"
       />
 
       <label htmlFor="byoc-location" className="form__label">

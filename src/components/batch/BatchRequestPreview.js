@@ -1,7 +1,9 @@
 import React from 'react';
+import axios from 'axios';
 import debounceRender from 'react-debounce-render';
 import { connect } from 'react-redux';
 import omit from 'lodash.omit';
+
 import {
   createBatchRequestCurlCommand,
   analyseBatchRequestCurlCommand,
@@ -10,14 +12,35 @@ import {
   getAllBatchRequestsCurlCommand,
   getSingleBatchRequestCurlCommand,
   getTileStatusBatchRequestCurlCommand,
-  sendEditedBatchRequest,
-} from './requests';
-import { getRequestBody, dispatchChanges } from '../process/requests/parseRequest';
+} from './lib/curls';
+import { getRequestBody, dispatchChanges, getUrlFromCurl } from '../process/requests/parseRequest';
 import { parseBatchRequest } from './parse';
 import store from '../../store';
 import alertSlice from '../../store/alert';
 import CommonRequestPreview from '../common/CommonRequestPreview';
-import { generateProcessCurlCommand } from '../process/requests';
+import { generateProcessCurlCommand } from '../process/lib/curls';
+
+export const sendEditedBatchRequest = (token, text, reqConfig) => {
+  const getConfigHelper = (token, reqConfig) => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      ...reqConfig,
+    };
+    return config;
+  };
+
+  try {
+    const url = getUrlFromCurl(text);
+    const config = getConfigHelper(token, reqConfig);
+    const parsed = JSON.parse(getRequestBody(text));
+    return axios.post(url, parsed, config);
+  } catch (error) {
+    return Promise.reject('Cannot parse the request');
+  }
+};
 
 const handleParseRequest = (text) => {
   try {

@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import store from '../../../store';
 import requestSlice from '../../../store/request';
-import { DATASOURCES } from '../../../utils/const';
+import { CUSTOM, DATAFUSION, DATASOURCES } from '../../../utils/const';
 import { generateDataSourceRelatedOptions } from '../DataSourceSelect';
 import Toggle from '../Toggle';
 
 // Get all datasources except from CUSTOM and Datafusion
 const generateDataFusionSourcesOptions = () => {
   return Object.keys(DATASOURCES)
-    .filter((ds) => ds !== 'CUSTOM' && ds !== 'DATAFUSION')
+    .filter((ds) => ds !== CUSTOM && ds !== DATAFUSION)
     .map((key) => (
       <option key={key} value={key}>
         {key}

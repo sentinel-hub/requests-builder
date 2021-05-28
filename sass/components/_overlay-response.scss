@@ -56,14 +56,15 @@
 
 .overlay-image-container {
   display: flex;
-  justify-content: center;
   align-items: center;
   background-color: var(--grey);
-  height: fit-content;
+  min-height: 200px;
+  max-height: 80%;
+  overflow-y: scroll;
   border-radius: 10px;
   cursor: default;
   flex-direction: column;
-  padding: 5rem;
+  padding: 2rem;
   position: relative;
 
   a {
@@ -93,8 +94,22 @@
 .overlay-close {
   position: absolute;
   top: 20px;
-  right: 20px;
+  right: 0;
   cursor: pointer;
   font-size: 2rem;
   font-weight: bold;
+}
+
+.save-request-form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 600px;
+  padding-bottom: 2rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid black;
+
+  @include respond(tab-port) {
+    flex-direction: column;
+  }
 }

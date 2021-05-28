@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import store from '../../store';
 import statisticalSlice from '../../store/statistical';
-import { isFloatString, isWritingDecimal } from '../../utils/stringUtils';
+import { isWritingDecimal, validFloatInput } from '../../utils/stringUtils';
 import { inputArrayChangeHandler, inputToNumber } from './utils/utils';
 
 const CalculationHistogram = ({ histogram, histIdx, idx }) => {
@@ -55,7 +55,7 @@ const CalculationHistogram = ({ histogram, histIdx, idx }) => {
 
   const handleHistogramNumberParamChange = (e) => {
     const { value } = e.target;
-    if (!isWritingDecimal(value) && !isFloatString(value) && value !== '') {
+    if (!isWritingDecimal(value) && !validFloatInput(value) && value !== '') {
       return;
     }
     const dispatchedValue = inputToNumber(value);

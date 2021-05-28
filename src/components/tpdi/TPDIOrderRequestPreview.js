@@ -6,7 +6,7 @@ import {
   getCreateViaDataFilterTpdiCurlCommand,
   getAllOrdersTpdiCurlCommand,
   getConfirmOrderTpdiCurlCommand,
-} from './requests/common';
+} from './utils/curls';
 import debounceRender from 'react-debounce-render';
 import CommonRequestPreview from '../common/CommonRequestPreview';
 import { getRequestBody } from '../process/requests/parseRequest';

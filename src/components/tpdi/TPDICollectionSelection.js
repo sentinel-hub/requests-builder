@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { getCustomCollections } from '../process/requests';
 import { connect } from 'react-redux';
 import store from '../../store';
 import tpdiSlice from '../../store/tpdi';
 import Axios from 'axios';
+import ByocResource from '../../api/byoc/ByocResource';
 
 const TPDICollectionSelection = ({ token, collectionId }) => {
   const [tpdiCollections, setTpdiCollections] = useState([]);
@@ -13,7 +13,7 @@ const TPDICollectionSelection = ({ token, collectionId }) => {
     let source = Axios.CancelToken.source();
     const fetchTpdiCollections = async () => {
       try {
-        let res = await getCustomCollections(token, { cancelToken: source.token });
+        let res = await ByocResource.getCollections(null, { cancelToken: source.token });
         if (res.data) {
           let collections = res.data.data.filter((col) => col.s3Bucket === 'sh.tpdi.byoc.eu-central-1');
           if (collections.length > 0) {

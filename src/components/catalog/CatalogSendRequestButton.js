@@ -1,10 +1,11 @@
 import React from 'react';
 import RequestButton from '../common/RequestButton';
 import { connect } from 'react-redux';
-import { generateCatalogRequest } from './requests';
 import store from '../../store';
 import catalogSlice from '../../store/catalog';
 import alertSlice from '../../store/alert';
+import CatalogResource from '../../api/catalog/CatalogResource';
+import { getCatalogRequestBody } from '../../api/catalog/utils';
 
 export const catalogErrorHandler = (error) => {
   if (error.response && error.response.data) {
@@ -47,8 +48,8 @@ const CatalogSendRequestButton = ({
 
   return (
     <RequestButton
-      request={generateCatalogRequest}
-      args={[catalogState, geometry, timeRange, token, undefined]}
+      request={CatalogResource.search(catalogState.deploymentUrl)}
+      args={[getCatalogRequestBody(catalogState, geometry, timeRange)]}
       validation={Boolean(token && catalogState.deploymentUrl)}
       className="secondary-button"
       disabledTitle="Log in to use this"

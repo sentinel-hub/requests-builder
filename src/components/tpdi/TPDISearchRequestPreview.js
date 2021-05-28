@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import CommonRequestPreview from '../common/CommonRequestPreview';
 import { getRequestBody } from '../process/requests/parseRequest';
-import { getSearchTpdiCurlCommand } from './requests/common';
+import { getSearchTpdiCurlCommand } from './utils/curls';
 import { parseSearchRequest } from './parse';
 
 const TPDISearchRequestPreview = ({ state, searchResponse }) => {

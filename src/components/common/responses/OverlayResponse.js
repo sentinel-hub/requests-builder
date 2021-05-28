@@ -7,31 +7,38 @@ import StatisticalResponseContainer from './StatisticalResponseContainer';
 import SaveRequestForm from '../../process/Collections/SaveRequestForm';
 import ImageResponse from './ImageResponse';
 
+const SUPPORTED_SAVE_MODES = ['PROCESS', 'STATISTICAL'];
+
+const shouldDisplaySaveRequestForm = (stringRequest, mode, isFromCollections) =>
+  stringRequest !== undefined && SUPPORTED_SAVE_MODES.includes(mode) && !isFromCollections;
+
 const OverlayResponse = ({
-  show,
-  src,
-  dimensions,
+  displayResponse,
   error,
+  imageResponse,
   fisResponse,
-  isTar,
-  request,
+  stringRequest,
   mode,
   isFromCollections,
 }) => {
   const ref = useRef();
-  const displaySaveRequestForm = request !== undefined && mode !== undefined && !isFromCollections;
+
   const [hasSavedRequest, setHasSavedRequest] = useState(false);
+  const [hasBeenAddedToMap, setHasBeenAddedToMap] = useState(false);
+
+  const { src } = imageResponse;
 
   const closeHandler = useCallback(() => {
-    store.dispatch(responsesSlice.actions.setShow(false));
-    if (src && hasSavedRequest === false && !isFromCollections) {
+    store.dispatch(responsesSlice.actions.setDisplayResponse(false));
+    if (src && hasSavedRequest === false && !isFromCollections && hasBeenAddedToMap === false) {
       URL.revokeObjectURL(src);
     }
     setHasSavedRequest(false);
-  }, [hasSavedRequest, src, isFromCollections]);
+    setHasBeenAddedToMap(false);
+  }, [hasSavedRequest, src, isFromCollections, hasBeenAddedToMap]);
 
-  useBind('escape', closeHandler, show);
-  useScrollBlock(show);
+  useBind('escape', closeHandler, displayResponse);
+  useScrollBlock(displayResponse);
   useOnClickOutside(ref, closeHandler);
 
   const handleCloseClick = () => closeHandler();
@@ -46,29 +53,35 @@ const OverlayResponse = ({
       );
     }
     if (fisResponse) {
-      return <StatisticalResponseContainer statisticalResponse={fisResponse} request={request} />;
+      return <StatisticalResponseContainer statisticalResponse={fisResponse} stringRequest={stringRequest} />;
     }
-    return <ImageResponse dimensions={dimensions} isTar={isTar} src={src} />;
+    return (
+      <ImageResponse
+        imageResponse={imageResponse}
+        hasBeenAddedToMap={hasBeenAddedToMap}
+        setHasBeenAddedToMap={setHasBeenAddedToMap}
+      />
+    );
   };
 
   return (
     <>
-      {show ? (
+      {displayResponse ? (
         <div className="overlay-response">
           <div ref={ref} className="overlay-image-container">
             <span className="overlay-close" onClick={handleCloseClick}>
               &#x2715;
             </span>
-            {generateOverlayContents()}
-            {displaySaveRequestForm && (
+            {shouldDisplaySaveRequestForm(stringRequest, mode, isFromCollections) && (
               <SaveRequestForm
                 mode={mode}
-                request={request}
+                stringRequest={stringRequest}
                 response={mode === 'PROCESS' ? src : fisResponse}
                 hasSavedRequest={hasSavedRequest}
                 setHasSavedRequest={setHasSavedRequest}
               />
             )}
+            {generateOverlayContents()}
           </div>
         </div>
       ) : null}
@@ -76,16 +89,14 @@ const OverlayResponse = ({
   );
 };
 
-const mapStateToProps = (state) => ({
-  show: state.response.show,
-  src: state.response.src,
-  dimensions: state.response.dimensions,
-  error: state.response.error,
-  fisResponse: state.response.fisResponse,
-  isTar: state.response.isTar,
-  request: state.response.request,
-  mode: state.response.mode,
-  isFromCollections: state.response.isFromCollections,
+const mapStateToProps = ({ response }) => ({
+  displayResponse: response.displayResponse,
+  error: response.error,
+  imageResponse: response.imageResponse,
+  fisResponse: response.fisResponse,
+  stringRequest: response.stringRequest,
+  mode: response.mode,
+  isFromCollections: response.isFromCollections,
 });
 
 export default connect(mapStateToProps)(OverlayResponse);

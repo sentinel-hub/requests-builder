@@ -147,3 +147,10 @@ export const transformGeometryToWGS84IfNeeded = (selectedCRS, geometry) => {
 export const isPolygon = (geometry) => geometry?.type === 'Polygon' ?? false;
 export const isMultiPolygon = (geometry) => geometry?.type === 'MultiPolygon' ?? false;
 export const isBbox = (geometry) => geometry.length === 4;
+export const getLatLngFromBbox = (bbox) => {
+  const [minX, minY, maxX, maxY] = bbox;
+  return [
+    [minY, minX],
+    [maxY, maxX],
+  ];
+};

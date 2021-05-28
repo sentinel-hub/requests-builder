@@ -1,17 +1,42 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { generateCatalogCurlCommand, sendCatalogEditedRequest } from './requests';
+import axios from 'axios';
+
+import { generateCatalogCurlCommand } from './utils/curls';
+import { generateShPyCatalogRequest } from './utils/shpy';
 import { parseCatalogBody } from './parse';
 import CommonRequestPreview from '../common/CommonRequestPreview';
+import { getRequestBody, getUrlFromCurl } from '../process/requests/parseRequest';
+
+const getConfigHelper = (token, reqConfig) => {
+  return {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    ...reqConfig,
+  };
+};
+
+const sendCatalogEditedRequest = (text, token, reqConfig) => {
+  try {
+    const url = getUrlFromCurl(text);
+    const parsed = JSON.parse(getRequestBody(text));
+    const config = getConfigHelper(token, reqConfig);
+    return axios.post(url, parsed, config);
+  } catch (err) {
+    return Promise.reject(err);
+  }
+};
 
 const CatalogRequestPreview = ({
   catalogState,
-  geometry,
+  mapState,
   timeRange,
   token,
   setResults,
   catalogSearchResponse,
 }) => {
+  const geometry = mapState.wgs84Geometry;
   const handleParse = (text) => {
     parseCatalogBody(text);
   };
@@ -25,6 +50,11 @@ const CatalogRequestPreview = ({
               name: 'search',
               value: generateCatalogCurlCommand(catalogState, geometry, timeRange, token),
               toggledValue: catalogSearchResponse,
+            },
+            {
+              name: 'sh-py search',
+              value: () => generateShPyCatalogRequest(catalogState, mapState, timeRange),
+              nonToggle: true,
             },
           ]}
           canCopy
@@ -48,7 +78,7 @@ const CatalogRequestPreview = ({
 
 const mapStateToProps = (state) => ({
   catalogState: state.catalog,
-  geometry: state.map.wgs84Geometry,
+  mapState: state.map,
   timeRange: {
     timeTo: state.request.timeTo[0],
     timeFrom: state.request.timeFrom[0],

@@ -1,10 +1,10 @@
 import React from 'react';
 import RequestButton from '../common/RequestButton';
-import { addAlertOnError, batchIdValidation } from './utils';
-import { cancelBatchRequest } from './requests';
+import { addAlertOnError, batchIdValidation } from './lib/utils';
 
 import store from '../../store';
 import batchSlice from '../../store/batch';
+import BatchResource from '../../api/batch/BatchResource';
 
 const CancelBatchRequestButton = ({ requestId, token, cancelRequest }) => {
   const cancelResponseHandler = () => {
@@ -19,8 +19,8 @@ const CancelBatchRequestButton = ({ requestId, token, cancelRequest }) => {
       buttonText="Cancel"
       responseHandler={cancelResponseHandler}
       errorHandler={addAlertOnError}
-      request={cancelBatchRequest}
-      args={[token, requestId]}
+      request={BatchResource.cancelOrder}
+      args={[{ orderId: requestId }]}
     />
   );
 };

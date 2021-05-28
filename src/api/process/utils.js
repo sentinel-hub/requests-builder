@@ -1,9 +1,9 @@
-import Axios from 'axios';
-import { CRS, DATASOURCES, isEmpty } from '../../../utils/const';
-import { isBbox, isMultiPolygon, isPolygon } from '../../common/Map/utils/crsTransform';
-import { getUrlFromCurl, getRequestBody } from './parseRequest';
+import axios from 'axios';
+import { isBbox, isMultiPolygon, isPolygon } from '../../components/common/Map/utils/crsTransform';
+import { getRequestBody, getUrlFromCurl } from '../../components/process/requests/parseRequest';
+import { CRS, CUSTOM, DATAFUSION, DATASOURCES, isEmpty } from '../../utils/const';
 
-const byocLocationToBaseUrl = (location) => {
+export const byocLocationToBaseUrl = (location) => {
   if (location === 'EU-CENTRAL-1') {
     return 'https://services.sentinel-hub.com/';
   } else if (location === 'US-WEST-2') {
@@ -12,10 +12,8 @@ const byocLocationToBaseUrl = (location) => {
   return 'https://services.sentinel-hub.com/';
 };
 
-const GLOBAL_BYOC_ENDPOINT = 'https://services.sentinel-hub.com/api/v1/byoc/global';
-
 export const getUrl = (requestState) => {
-  if (requestState.datasource === 'CUSTOM') {
+  if (requestState.datasource === CUSTOM) {
     return byocLocationToBaseUrl(requestState.byocLocation) + 'api/v1/process';
   } else {
     return DATASOURCES[requestState.datasource].url;
@@ -84,7 +82,7 @@ const processConsoleLogContents = (contents) => {
 };
 
 //looks for console.log and changes it with throw new Error() for debug purposes.
-const getEvalscriptDebuggerHelper = (evalscript) => {
+export const getEvalscriptDebuggerHelper = (evalscript) => {
   if (!evalscript.includes('console.log(')) {
     return evalscript;
   } else {
@@ -96,7 +94,7 @@ const getEvalscriptDebuggerHelper = (evalscript) => {
 };
 
 const getRequestData = (reqState) => {
-  if (reqState.datasource === 'DATAFUSION') {
+  if (reqState.datasource === DATAFUSION) {
     return reqState.datafusionSources.map((source, idx) => ({
       type: source.datasource,
       id: source.id,
@@ -104,7 +102,7 @@ const getRequestData = (reqState) => {
       ...getProcessingOptions(reqState, idx),
     }));
   }
-  if (reqState.datasource === 'CUSTOM') {
+  if (reqState.datasource === CUSTOM) {
     return [
       {
         type: `${reqState.byocCollectionType.toLowerCase()}-${reqState.byocCollectionId}`,
@@ -244,40 +242,26 @@ const getDataFilterOptions = (reqState, idx = 0) => {
   return resObject;
 };
 
-const getToken = (token) => {
-  if (token) {
-    return token;
-  } else {
-    return '<YOU NEED TO LOGIN TO GET A TOKEN>';
+export const sendProcessBody = (token, body, url, reqConfig) => {
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    responseType: 'blob',
+    ...reqConfig,
+  };
+  if (body.output?.responses?.length > 1) {
+    config.headers.Accept = 'application/tar';
   }
+  return axios.post(url, body, config);
 };
 
-const generateHeadersForCurl = (reqState, token) => {
-  let headers = `-H 'Content-Type: application/json' \n -H 'Authorization: Bearer ${getToken(token)}'`;
-  if (reqState.responses.length > 1) {
-    headers = headers + "\n -H 'Accept: application/tar'";
-  }
-  return headers;
-};
-
-export const generateProcessCurlCommand = (reqState, mapState, token) => {
-  const body = getJSONRequestBody(reqState, mapState);
-  const curlCommand = `curl -X POST ${getUrl(reqState)} \n ${generateHeadersForCurl(
-    reqState,
-    token,
-  )} \n -d '${body}'`;
-  return curlCommand;
-};
-
-export const processApiRequest = (requestState, mapState, token, reqConfig) => {
-  try {
-    const body = getJSONRequestBody(requestState, mapState);
-    const config = getProcessRequestConfig(token, reqConfig, requestState);
-    const url = getUrl(requestState);
-    return Axios.post(url, body, config);
-  } catch (err) {
-    return null;
-  }
+export const sendEditedRequest = (token, text, reqConfig) => {
+  const url = getUrlFromCurl(text);
+  const body = getRequestBody(text);
+  const parsed = JSON.parse(body);
+  return sendProcessBody(token, parsed, url, reqConfig);
 };
 
 export const getProcessRequestConfig = (token, reqConfig, reqState) => {
@@ -295,37 +279,4 @@ export const getProcessRequestConfig = (token, reqConfig, reqState) => {
     config.headers.Accept = 'application/tar';
   }
   return config;
-};
-
-export const getCustomCollections = (token, reqConfig) => {
-  const config = {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    ...reqConfig,
-  };
-  return Axios.get(GLOBAL_BYOC_ENDPOINT, config);
-};
-
-export const sendProcessBody = (token, body, url, reqConfig) => {
-  const config = {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    responseType: 'blob',
-    ...reqConfig,
-  };
-  if (body.output?.responses?.length > 1) {
-    config.headers.Accept = 'application/tar';
-  }
-  return Axios.post(url, body, config);
-};
-
-export const sendEditedRequest = (token, text, reqConfig) => {
-  const url = getUrlFromCurl(text);
-  const body = getRequestBody(text);
-  const parsed = JSON.parse(body);
-  return sendProcessBody(token, parsed, url, reqConfig);
 };

@@ -1,10 +1,10 @@
 import React, { useRef, useEffect } from 'react';
 import { createFileReader } from '../process/SendRequest';
 import RequestButton from './RequestButton';
-import { calculatePixelSize } from './Map/utils/bboxRatio';
 import store from '../../store';
 import responsesSlice from '../../store/responses';
 import savedRequestsSlice from '../../store/savedRequests';
+import { calculatePixelSize } from './Map/utils/bboxRatio';
 
 //Abstraction of Request Button.
 const ProcessRequestOverlayButton = ({
@@ -20,28 +20,35 @@ const ProcessRequestOverlayButton = ({
 }) => {
   const readerRef = useRef();
   const shouldDisplayDimensions =
-    requestState &&
-    (requestState.heightOrRes === 'HEIGHT' ||
-      (requestState.heightOrRes === 'RES' && requestState.isOnAutoRes));
+    requestState?.heightOrRes === 'HEIGHT' ||
+    (requestState?.heightOrRes === 'RES' && requestState?.isOnAutoRes);
 
   useEffect(() => {
     readerRef.current = createFileReader();
   }, []);
 
-  const responseHandler = (response, stringRequest) => {
+  const responseHandler = async (response, stringRequest) => {
     const responseUrl = URL.createObjectURL(response);
     let dimensions;
     if (shouldDisplayDimensions) {
       dimensions = calculatePixelSize(wgs84Geometry, [requestState.width, requestState.height]);
     }
     const isFromCollections = collectionRequestIdx !== undefined ? true : false;
-    const saveRequestData = skipSaving ? {} : { request: stringRequest, mode: 'PROCESS', isFromCollections };
+    let arrayBuffer;
+    if (response.type.includes('tif')) {
+      arrayBuffer = await response.arrayBuffer();
+    }
     store.dispatch(
-      responsesSlice.actions.setResponse({
+      responsesSlice.actions.setImageResponse({
         src: responseUrl,
-        dimensions: dimensions,
-        isTar: !response.type.includes('image'),
-        ...saveRequestData,
+        format: response.type,
+        wgs84Geometry,
+        stringRequest,
+        mode: 'PROCESS',
+        displayResponse: true,
+        dimensions,
+        isFromCollections,
+        arrayBuffer,
       }),
     );
     if (isFromCollections) {

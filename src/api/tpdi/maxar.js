@@ -1,5 +1,5 @@
-import { maxarInitialState } from '../../../store/tpdi';
-import { generateBounds } from '../../process/requests';
+import { maxarInitialState } from '../../store/tpdi';
+import { generateBounds } from '../process/utils';
 import { getTimeRange } from './common';
 
 const nonDefaultProperties = (dict, initialState) =>

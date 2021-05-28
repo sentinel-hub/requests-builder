@@ -1,61 +1,82 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+const iniImageResponse = {
+  src: undefined,
+  format: undefined,
+  wgs84Geometry: undefined,
+  width: undefined,
+  height: undefined,
+  shouldDisplayDimensions: undefined,
+  arrayBuffer: undefined,
+};
+
 const responsesSlice = createSlice({
   name: 'response',
   initialState: {
-    src: '',
-    show: false,
-    dimensions: [],
+    displayResponse: false,
     error: '',
+    imageResponse: iniImageResponse,
     fisResponse: '',
-    isTar: false,
-    request: undefined,
+    stringRequest: undefined,
     mode: undefined,
     isFromCollections: undefined,
   },
   reducers: {
-    setResponseUrl: (state, action) => {
-      state.src = action.payload;
-    },
-    setShow: (state, action) => {
+    setDisplayResponse: (state, action) => {
       // reset state when close modal.
-      if (!action.payload) {
-        state.src = '';
-        state.dimensions = [];
+      if (action.payload === false) {
         state.error = '';
         state.fisResponse = '';
-        state.isTar = false;
-        state.mode = undefined;
-        state.request = undefined;
+        state.stringRequest = undefined;
         state.isFromCollections = undefined;
+        state.imageResponse = iniImageResponse;
+        state.mode = undefined;
       }
-      state.show = action.payload;
+      state.displayResponse = action.payload;
     },
-    setDimensions: (state, action) => {
-      state.dimensions = action.payload;
-    },
-    setResponse: (state, action) => {
-      state.src = action.payload.src;
-      state.show = true;
-      state.isTar = action.payload.isTar;
-      if (action.payload.dimensions) {
-        state.dimensions = action.payload.dimensions;
+    setImageResponse: (state, action) => {
+      const {
+        src,
+        format,
+        wgs84Geometry,
+        isFromCollections,
+        mode,
+        stringRequest,
+        displayResponse,
+        dimensions,
+        arrayBuffer,
+      } = action.payload;
+      state.imageResponse = {
+        src,
+        format,
+        wgs84Geometry,
+        dimensions,
+        arrayBuffer,
+      };
+      if (isFromCollections !== undefined) {
+        state.isFromCollections = isFromCollections;
       }
-      if (action.payload.request) {
-        state.request = action.payload.request;
+      if (mode !== undefined) {
+        state.mode = mode;
       }
-      if (action.payload.mode) {
-        state.mode = action.payload.mode;
+      if (stringRequest !== undefined) {
+        state.stringRequest = stringRequest;
       }
-      if (action.payload.isFromCollections !== undefined) {
-        state.isFromCollections = action.payload.isFromCollections;
+      if (displayResponse !== undefined) {
+        state.displayResponse = displayResponse;
       }
     },
     setError: (state, action) => {
       state.error = action.payload;
+      state.displayResponse = true;
     },
     setFisResponse: (state, action) => {
-      state.fisResponse = action.payload;
+      const { response, stringRequest, mode, displayResponse, isFromCollections } = action.payload;
+      state.fisResponse = response;
+      state.stringRequest = stringRequest;
+      state.mode = mode;
+      state.displayResponse = displayResponse;
+      state.isFromCollections = isFromCollections;
     },
   },
 });

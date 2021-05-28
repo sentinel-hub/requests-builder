@@ -14,7 +14,8 @@ const filterRequestsResults = (searchText, requests) => {
         return (
           req.description.toLowerCase().includes(lowerCasedSearchText) ||
           req.id.includes(searchText) ||
-          req.status.toLowerCase().includes(lowerCasedSearchText)
+          req.status.toLowerCase().includes(lowerCasedSearchText) ||
+          req.output?.collectionId?.includes(lowerCasedSearchText)
         );
       } else {
         return req.id.includes(searchText) || req.status.toLowerCase().includes(lowerCasedSearchText);
@@ -109,7 +110,7 @@ const BatchInformation = ({
             onChange={handleSearchTextChange}
             type="text"
             className="form__input"
-            placeholder="Search Requests by description, id or status"
+            placeholder="Search Requests by description, id, status or collection id."
             style={{ width: '30%' }}
           />
         </div>

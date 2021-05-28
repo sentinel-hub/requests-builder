@@ -1,6 +1,6 @@
-import { generateBounds } from '../../process/requests';
-import { dataFilterDefaultValues } from '../utils/const';
-import { stateConstellationToConstellation } from '../utils';
+import { stateConstellationToConstellation } from '../../components/tpdi/utils';
+import { dataFilterDefaultValues } from '../../components/tpdi/utils/const';
+import { generateBounds } from '../process/utils';
 import { getTimeRange } from './common';
 
 export const getAirbusDataFilterOptions = (dataFilterOptions) => {

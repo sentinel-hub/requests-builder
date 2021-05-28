@@ -5,10 +5,11 @@ import tpdiSlice from '../../store/tpdi';
 import RequestButton from '../common/RequestButton';
 import AirbusOptions from './AirbusOptions';
 import MaxarOptions from './MaxarOptions';
-import { getTPDISearchRequest } from './requests/common';
 import PlanetOptions from './PlanetOptions';
 import { errorHandlerTPDI } from './TPDIOrderOptions';
 import { isAirbus } from './utils';
+import { getSearchTpdiBody } from '../../api/tpdi/common';
+import TpdiResource from '../../api/tpdi/TpdiResource';
 
 const generateProviderRelatedOptions = (provider) => {
   if (isAirbus(provider)) {
@@ -35,6 +36,17 @@ const getDisabledTitle = (token, state) => {
   if (state.tpdi.provider === 'PLANET') {
     return 'You need an API Key to use this.';
   }
+};
+
+const searchAllOrders = async (state, reqConfig) => {
+  const body = getSearchTpdiBody(state);
+  let res = await TpdiResource.search(body, reqConfig);
+  const results = res.data.features;
+  while (res.data.links?.next) {
+    res = await TpdiResource.searchRest(res.data.links.next)(body, reqConfig);
+    results.push(...res.data.features);
+  }
+  return Promise.resolve({ data: { features: results } });
 };
 
 const TPDISearchOptions = ({
@@ -88,14 +100,14 @@ const TPDISearchOptions = ({
         </label>
         <select id="tpdi-provider" className="form__input" value={provider} onChange={handleChange}>
           <option value="AIRBUS_SPOT">Airbus (SPOT)</option>
-          <option value="AIRBUS_PHR">Airbus (Pleaides)</option>
+          <option value="AIRBUS_PHR">Airbus (Pleiades)</option>
           <option value="PLANET">Planet Scope</option>
           <option value="MAXAR">MAXAR</option>
         </select>
         {generateProviderRelatedOptions(provider)}
         <RequestButton
-          request={getTPDISearchRequest}
-          args={[state, token]}
+          request={searchAllOrders}
+          args={[state]}
           buttonText="Search for data"
           validation={validateSearch(token, state)}
           className="secondary-button"

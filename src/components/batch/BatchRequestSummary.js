@@ -5,12 +5,25 @@ import { getTransformedGeometryFromBounds, focusMap } from '../common/Map/utils/
 import RequestButton from '../common/RequestButton';
 import { dispatchChanges } from '../process/requests/parseRequest';
 import { parseBatchRequest, getBucketName } from './parse';
-import { deleteBatchRequest, fetchTilesBatchRequest } from './requests';
 import mapSlice from '../../store/map';
 import BatchActions from './BatchActions';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDoubleDown, faAngleDoubleUp } from '@fortawesome/free-solid-svg-icons';
 import CopyIcon from '../common/CopyIcon';
+import BatchResource from '../../api/batch/BatchResource';
+import TileResource from '../../api/batch/TileResource';
+
+export const fetchTilesBatchRequest = async (id) => {
+  let res = await TileResource.getTiles({ orderId: id });
+  let tiles = res.data.data;
+  while (res.data.links.next) {
+    res = await TileResource.getNextTiles(res.links.next)();
+    tiles = tiles.concat(res.data.data);
+  }
+  return new Promise((resolve, reject) => {
+    resolve(tiles);
+  });
+};
 
 const tillingGridIdToName = (id) => {
   return ['S2GM Grid', '10km Grid', '100,08km Grid', 'WGS84'][id];
@@ -83,11 +96,11 @@ const BatchRequestSummary = ({
   });
   const fetchTiles = useCallback(async () => {
     setIsFetchingTiles(true);
-    const res = await fetchTilesBatchRequest(id, token);
+    const res = await fetchTilesBatchRequest(id);
     setFetchedTiles(updateTileInfo(res));
     setTilesResponse(JSON.stringify(res, null, 2));
     setIsFetchingTiles(false);
-  }, [id, token, setTilesResponse]);
+  }, [id, setTilesResponse]);
 
   useEffect(() => {
     if (isExpanded && validStatus(status)) {
@@ -162,17 +175,29 @@ const BatchRequestSummary = ({
         onClick={() => handleExpand(id)}
         className="batch-request-summary-header"
       >
-        <div style={{ display: 'flex' }}>
-          <p className="text" style={{ width: '280px', marginRight: '1rem' }}>
-            {id}
-          </p>
-          <CopyIcon className="batch-request-summary-header-icon" style={{ marginRight: '2rem' }} item={id} />
+        <div className="batch-request-summary-header-title">
+          <div style={{ display: 'flex', marginBottom: '1rem' }}>
+            <p className="text" style={{ width: '280px', marginRight: '1rem', fontWeight: '700' }}>
+              {id}
+            </p>
+            <CopyIcon
+              className="batch-request-summary-header-icon"
+              style={{ marginRight: '2rem' }}
+              item={id}
+            />
+          </div>
+          {description !== undefined && (
+            <p className="text" style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+              {description}
+            </p>
+          )}
         </div>
         <FontAwesomeIcon
           className="batch-request-summary-header-icon"
+          style={{ marginLeft: '2rem' }}
           icon={isExpanded ? faAngleDoubleUp : faAngleDoubleDown}
         />
-        <p className="text" style={{ marginRight: '2rem' }}>
+        <p className="text" style={{ marginRight: '2rem', fontWeight: '700' }}>
           {status}
         </p>
       </div>
@@ -301,8 +326,8 @@ const BatchRequestSummary = ({
           </button>
           {isValidDeleteStatus(status) && (
             <RequestButton
-              request={deleteBatchRequest}
-              args={[token, id]}
+              request={BatchResource.deleteOrder}
+              args={[{ orderId: id }]}
               buttonText="Delete Batch Request"
               className="secondary-button secondary-button--cancel"
               validation={true}

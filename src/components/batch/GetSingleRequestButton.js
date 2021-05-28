@@ -1,10 +1,10 @@
 import React from 'react';
 import RequestButton from '../common/RequestButton';
-import { addAlertOnError, batchIdValidation } from './utils';
-import { getSingleBatchRequest } from './requests';
+import { addAlertOnError, batchIdValidation } from './lib/utils';
 import store from '../../store';
 import { groupBatchAggregator } from './BatchInformation';
 import batchSlice from '../../store/batch';
+import BatchResource from '../../api/batch/BatchResource';
 
 const GetSingleRequestButton = ({
   token,
@@ -33,8 +33,8 @@ const GetSingleRequestButton = ({
       buttonText="Refresh request"
       responseHandler={getSingleBatchHandler}
       errorHandler={addAlertOnError}
-      request={getSingleBatchRequest}
-      args={[token, requestId]}
+      request={BatchResource.getSingleOrder}
+      args={[{ orderId: requestId }]}
     />
   );
 };

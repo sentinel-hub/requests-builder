@@ -112,7 +112,7 @@ const DataSourceSelect = ({ datasource, appMode }) => {
         >
           {generateDatasourcesOptions(appMode)}
         </select>
-        {datasource !== 'CUSTOM' && datasource !== 'DATAFUSION' ? (
+        {datasource !== CUSTOM && datasource !== DATAFUSION ? (
           <div style={{ whiteSpace: 'nowrap' }}>
             <div className="toggle-with-label">
               <label className="form__label" htmlFor="advanced-options">
@@ -123,7 +123,7 @@ const DataSourceSelect = ({ datasource, appMode }) => {
           </div>
         ) : null}
         <div style={{ paddingTop: 0 }}>
-          {datasource === 'CUSTOM' || datasource === 'DATAFUSION' ? (
+          {datasource === CUSTOM || datasource === DATAFUSION ? (
             generateDataSourceRelatedOptions(datasource)
           ) : showAdvanced ? (
             <>

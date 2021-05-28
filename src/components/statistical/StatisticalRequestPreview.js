@@ -1,10 +1,24 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
+import Axios from 'axios';
 import debounceRender from 'react-debounce-render';
 import CommonRequestPreview from '../common/CommonRequestPreview';
 import { statisticsResponseHandler } from './StatisticalSendRequestButton';
-import { getStatisticalCurlCommand, sendEditedStatisticalRequest } from './utils/api';
+import { getStatisticalCurlCommand } from './utils/curls';
 import { handleStatisticalParse, statisticalRequestStateSelector } from './utils/utils';
+import { getRequestBody, getUrlFromCurl } from '../process/requests/parseRequest';
+import { getStatisticalAuthConfig } from '../../api/statistical/utils';
+
+const sendEditedStatisticalRequest = (token, text, reqConfig) => {
+  try {
+    const url = getUrlFromCurl(text);
+    const config = getStatisticalAuthConfig(token, reqConfig);
+    const parsed = JSON.parse(getRequestBody(text));
+    return Axios.post(url, parsed, config);
+  } catch (err) {
+    return Promise.reject('Cannot parse the request');
+  }
+};
 
 const StatisticalRequestPreview = ({
   datasource,

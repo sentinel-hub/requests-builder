@@ -34,6 +34,10 @@ const StatisticalResponseContainer = ({ statisticalResponse, request }) => {
     return <OgcFisResponse statisticalResponse={statisticalResponse} url={downloadUrl} />;
   }
 
+  if (statisticalResponse.status === 'FAILED') {
+    return <p className="text text--warning">Something went wrong.</p>;
+  }
+
   return (
     <div className="statistical-response" ref={containerRef}>
       <div className="u-flex-aligned">

@@ -1,10 +1,11 @@
 import React from 'react';
 import RequestButton from '../common/RequestButton';
-import { generateCatalogRequest } from './requests';
 import { connect } from 'react-redux';
 import store from '../../store';
 import catalogSlice from '../../store/catalog';
 import { catalogErrorHandler } from './CatalogSendRequestButton';
+import CatalogResource from '../../api/catalog/CatalogResource';
+import { getCatalogRequestBody } from '../../api/catalog/utils';
 
 const CatalogSendRequestNextButton = ({
   catalogState,
@@ -31,8 +32,8 @@ const CatalogSendRequestNextButton = ({
 
   return (
     <RequestButton
-      request={generateCatalogRequest}
-      args={[catalogState, geometry, timeRange, token, next]}
+      request={CatalogResource.search(catalogState.deploymentUrl)}
+      args={[getCatalogRequestBody(catalogState, geometry, timeRange, next)]}
       className="secondary-button"
       validation={Boolean(next && token)}
       buttonText="Get Next"

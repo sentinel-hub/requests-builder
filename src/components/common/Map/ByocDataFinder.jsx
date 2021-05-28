@@ -5,8 +5,9 @@ import omit from 'lodash.omit';
 import store from '../../../store';
 import { addWarningAlert } from '../../../store/alert';
 import mapSlice from '../../../store/map';
-import { fetchBoundsWithCatalog } from '../../catalog/requests';
 import RequestButton from '../RequestButton';
+import CatalogResource from '../../../api/catalog/CatalogResource';
+import { CUSTOM } from '../../../utils/const';
 
 const ByocDataFinder = ({
   datasource,
@@ -28,7 +29,7 @@ const ByocDataFinder = ({
     setSelectedFeatureIndex(null);
   }, [processCollectionId, wmsCollectionId]);
 
-  if (!((appMode === 'PROCESS' || appMode === 'BATCH') && datasource === 'CUSTOM') && !(appMode === 'WMS')) {
+  if (!((appMode === 'PROCESS' || appMode === 'BATCH') && datasource === CUSTOM) && !(appMode === 'WMS')) {
     return null;
   }
 
@@ -71,9 +72,9 @@ const ByocDataFinder = ({
       {selectedFeatureIndex === null ? (
         <RequestButton
           buttonText="Find BYOC Data"
-          args={[collectionId, collectionType, token]}
+          request={CatalogResource.fetchBounds}
+          args={[{ collectionType: collectionType.toLowerCase(), collectionId }]}
           className="secondary-button"
-          request={fetchBoundsWithCatalog}
           validation={Boolean(collectionId, collectionType, token)}
           disabledTitle="Log in and set a collection to use this"
           style={{ marginTop: '0' }}

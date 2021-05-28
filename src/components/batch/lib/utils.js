@@ -1,5 +1,6 @@
-import store from '../../store';
-import alertSlice from '../../store/alert';
+import store from '../../../store';
+import alertSlice from '../../../store/alert';
+import { checkValidUuid } from '../../../utils/stringUtils';
 
 export const addAlertOnError = (error, message) => {
   if (error.response?.status === 403) {
@@ -27,8 +28,4 @@ export const addAlertOnError = (error, message) => {
   }
 };
 
-//check if valid uuid.
-const checkValidId = (id) =>
-  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(id);
-
-export const batchIdValidation = (token, batchId) => token && checkValidId(batchId);
+export const batchIdValidation = (token, batchId) => token && checkValidUuid(batchId);

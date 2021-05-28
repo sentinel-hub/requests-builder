@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExpandArrowsAlt } from '@fortawesome/free-solid-svg-icons';
 import { connect } from 'react-redux';
 import BaseModal from './BaseModal';
-import { getProductThumbnail } from './requests/common';
+import TpdiResource from '../../api/tpdi/TpdiResource';
 
 const TPDIThumbnail = ({ collectionId, productId, token }) => {
   const [isFetchingThumbnail, setIsFetchingThumbnail] = useState(true);
@@ -15,9 +15,10 @@ const TPDIThumbnail = ({ collectionId, productId, token }) => {
     const fetchThumbnail = async () => {
       try {
         setIsFetchingThumbnail(true);
-        const res = await getProductThumbnail(productId, collectionId, token, {
-          cancelToken: axiosSource.token,
-        });
+        const res = await TpdiResource.getThumbnail(
+          { productId, collectionId },
+          { cancelToken: axiosSource.token, responseType: 'blob' },
+        );
         const source = URL.createObjectURL(res.data);
         setSrcUrl(source);
         setIsFetchingThumbnail(false);

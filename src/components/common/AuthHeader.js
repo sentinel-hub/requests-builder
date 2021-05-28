@@ -11,6 +11,7 @@ import {
 import store from '../../store';
 import alertSlice from '../../store/alert';
 import authSlice from '../../store/auth';
+import Api from '../../api';
 
 export const doLogin = (customUrl) => {
   const AUTH_BASE_URL = customUrl ?? process.env.REACT_APP_AUTH_BASEURL;
@@ -34,6 +35,7 @@ export const doLogin = (customUrl) => {
           expires_in: token.expires_in,
         }),
       );
+      Api.setAuthHeader(token.access_token);
       return token.access_token;
     } else {
       store.dispatch(
@@ -48,7 +50,7 @@ export const doLogin = (customUrl) => {
 
 export const doLogout = () => {
   axios
-    .get(process.env.REACT_APP_AUTH_BASEURL + 'oauth/logout', {
+    .get(`${process.env.REACT_APP_AUTH_BASEURL}oauth/logout?client_id=${process.env.REACT_APP_CLIENTID}`, {
       withCredentials: true,
     })
     .catch((e) => {
@@ -79,6 +81,7 @@ const AuthHeader = ({ user, isEdcUser, customUrl }) => {
             expires_in: token.expires_in,
           }),
         );
+        Api.setAuthHeader(token.access_token);
       }
     } catch (err) {
       console.error(err);

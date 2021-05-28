@@ -1,6 +1,6 @@
 import React from 'react';
+import TpdiResource from '../../api/tpdi/TpdiResource';
 import RequestButton from '../common/RequestButton';
-import { getAllDeliveries } from './requests/common';
 
 const GetDeliveriesButton = ({ id, token, status, setDeliveries, updateToFinished }) => {
   const handleGetDeliveries = (response) => {
@@ -16,8 +16,8 @@ const GetDeliveriesButton = ({ id, token, status, setDeliveries, updateToFinishe
     <>
       {canGetDeliveries ? (
         <RequestButton
-          request={getAllDeliveries}
-          args={[token, id]}
+          request={TpdiResource.getDeliveries}
+          args={[{ orderId: id }]}
           buttonText="Get deliveries"
           validation={Boolean(token)}
           className="secondary-button"

@@ -5,7 +5,7 @@ import { calculateAutoDimensions, calculatePixelSize } from '../Map/utils/bboxRa
 import Toggle from '../Toggle';
 
 import { connect } from 'react-redux';
-import { isWritingDecimal } from '../../../utils/stringUtils';
+import { isWritingDecimal, validFloatInput } from '../../../utils/stringUtils';
 
 const generatePlaceholder = (heightOrRes, input) => {
   if (heightOrRes === 'HEIGHT') {
@@ -57,20 +57,28 @@ const OutputDimensions = ({
   const shouldDisplayAutoRes = heightOrRes === 'RES' && isOnAutoRes && useAutoResMode;
 
   const handleTextChange = (e) => {
-    if (isWritingDecimal(e.target.value)) {
-      store.dispatch(requestSlice.actions.setWidthOrHeight({ [e.target.name]: e.target.value }));
+    const { value, name } = e.target;
+    if (isWritingDecimal(value)) {
+      store.dispatch(requestSlice.actions.setWidthOrHeight({ [name]: value }));
       return;
     }
-    if (isAutoRatio && e.target.value !== '') {
-      if (e.target.name === 'x') {
-        const newDimensions = calculateAutoDimensions(geometry, Number(e.target.value), undefined);
+    if (value === '') {
+      store.dispatch(requestSlice.actions.setWidthOrHeight({ [name]: '' }));
+      return;
+    }
+    if (!validFloatInput(value)) {
+      return;
+    }
+    if (isAutoRatio && value !== '') {
+      if (name === 'x') {
+        const newDimensions = calculateAutoDimensions(geometry, Number(value), undefined);
         dispatchNewDimensions(newDimensions);
-      } else if (e.target.name === 'y') {
-        const newDimensions = calculateAutoDimensions(geometry, undefined, Number(e.target.value));
+      } else if (name === 'y') {
+        const newDimensions = calculateAutoDimensions(geometry, undefined, Number(value));
         dispatchNewDimensions(newDimensions);
       }
     } else {
-      store.dispatch(requestSlice.actions.setWidthOrHeight({ [e.target.name]: e.target.value }));
+      store.dispatch(requestSlice.actions.setWidthOrHeight({ [name]: value }));
     }
   };
 

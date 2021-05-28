@@ -69,6 +69,9 @@ const dispatchAggregation = (aggregation) => {
     store.dispatch(requestSlice.actions.setWidth(aggregation.width));
     store.dispatch(requestSlice.actions.setHeight(aggregation.height));
   }
+
+  // evalscript
+  store.dispatch(requestSlice.actions.setEvalscript(aggregation.evalscript ?? ''));
 };
 
 const dispatchCalculations = (calculations) => {

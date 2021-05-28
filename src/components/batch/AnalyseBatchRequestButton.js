@@ -1,9 +1,9 @@
 import React from 'react';
 import RequestButton from '../common/RequestButton';
-import { analyseBatchRequest } from './requests';
-import { addAlertOnError, batchIdValidation } from './utils';
+import { addAlertOnError, batchIdValidation } from './lib/utils';
 import store from '../../store';
 import batchSlice from '../../store/batch';
+import BatchResource from '../../api/batch/BatchResource';
 
 const AnalyseBatchRequestButton = ({ requestId, token, analyseRequest, setOpenedContainers }) => {
   const analyseResponseHandler = () => {
@@ -22,8 +22,8 @@ const AnalyseBatchRequestButton = ({ requestId, token, analyseRequest, setOpened
       buttonText="Analyse"
       responseHandler={analyseResponseHandler}
       errorHandler={addAlertOnError}
-      request={analyseBatchRequest}
-      args={[token, requestId]}
+      request={BatchResource.analyseOrder}
+      args={[{ orderId: requestId }]}
     />
   );
 };

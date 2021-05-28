@@ -4,16 +4,23 @@ import store from '../../store';
 import responsesSlice from '../../store/responses';
 import alertSlice from '../../store/alert';
 import RequestButton from '../common/RequestButton';
-import { getStatisticalRequest } from './utils/api';
 import { statisticalRequestStateSelector } from './utils/utils';
+import StatisticalResource from '../../api/statistical/StatisticalResource';
+import { getStatisticalRequestBody } from '../../api/statistical/utils';
 
 export const statisticsResponseHandler = (response, stringRequest) => {
   if (response === '') {
     store.dispatch(responsesSlice.actions.setError('No content returned, 204'));
-  } else {
-    store.dispatch(responsesSlice.actions.setFisResponse(response));
+    return;
   }
-  store.dispatch(responsesSlice.actions.setResponse({ request: stringRequest, mode: 'STATISTICAL' }));
+  store.dispatch(
+    responsesSlice.actions.setFisResponse({
+      response,
+      stringRequest,
+      mode: 'STATISTICAL',
+      displayResponse: true,
+    }),
+  );
 };
 
 const statisticsErrorHandler = (err) => {
@@ -57,20 +64,21 @@ const StatisticalSendRequestButton = ({
     <RequestButton
       className="button"
       buttonText="Send Request"
-      request={getStatisticalRequest}
+      request={StatisticalResource.statisticalRequest}
       args={[
-        token,
-        datasource,
-        datafusionSources,
-        byocCollectionType,
-        byocCollectionId,
-        dataFilterOptions,
-        processingOptions,
-        bounds,
-        dimensions,
-        evalscript,
-        timeRange,
-        statisticalState,
+        getStatisticalRequestBody(
+          datasource,
+          datafusionSources,
+          byocCollectionType,
+          byocCollectionId,
+          dataFilterOptions,
+          processingOptions,
+          bounds,
+          dimensions,
+          evalscript,
+          timeRange,
+          statisticalState,
+        ),
       ]}
       validation={Boolean(token)}
       responseHandler={statisticsResponseHandler}

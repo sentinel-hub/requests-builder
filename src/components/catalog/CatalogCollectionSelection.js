@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { CATALOG_OPTIONS, getCatalogCollections } from './requests';
-
 import { connect } from 'react-redux';
 import store from '../../store';
 import catalogSlice from '../../store/catalog';
 import Axios from 'axios';
 import { addWarningAlert } from '../../store/alert';
+import CatalogResource from '../../api/catalog/CatalogResource';
+import { CATALOG_OPTIONS } from './const';
 
 const generateCollectionsOptions = (collections) =>
   collections.map((collection) => (
@@ -23,7 +23,7 @@ const CatalogCollectionSelection = ({ token, selectedCollection, deploymentUrl }
     const fetchCollections = async () => {
       setIsFetchingCollections(true);
       try {
-        const resp = await getCatalogCollections(deploymentUrl, token, {
+        const resp = await CatalogResource.getCollections(deploymentUrl)(null, {
           cancelToken: source.token,
         });
         if (resp.data.collections) {
@@ -38,9 +38,10 @@ const CatalogCollectionSelection = ({ token, selectedCollection, deploymentUrl }
       } catch (err) {
         if (!Axios.isCancel(err)) {
           console.error(err);
+        } else {
+          addWarningAlert('Something went wrong');
         }
         setIsFetchingCollections(false);
-        addWarningAlert('Something went wrong');
       }
     };
 

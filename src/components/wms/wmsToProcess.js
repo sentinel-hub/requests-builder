@@ -1,4 +1,5 @@
-import { generateProcessCurlCommand, getJSONRequestBody } from '../process/requests';
+import { getJSONRequestBody } from '../../api/process/utils';
+import { generateProcessCurlCommand } from '../process/lib/curls';
 
 const DATAFILTER_KEYS = [
   'mosaickingOrder',

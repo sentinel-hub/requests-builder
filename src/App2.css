@@ -431,6 +431,9 @@ body {
       height: 390px;
       margin-bottom: 1.5rem; } }
 
+.overlayed-map {
+  width: 90% !important; }
+
 .textarea-aoi-container {
   display: flex;
   flex-direction: column;
@@ -870,14 +873,15 @@ input:checked + .slider::before {
 
 .overlay-image-container {
   display: flex;
-  justify-content: center;
   align-items: center;
   background-color: var(--grey);
-  height: fit-content;
+  min-height: 200px;
+  max-height: 80%;
+  overflow-y: scroll;
   border-radius: 10px;
   cursor: default;
   flex-direction: column;
-  padding: 5rem;
+  padding: 2rem;
   position: relative; }
   .overlay-image-container a {
     color: black;
@@ -900,10 +904,22 @@ input:checked + .slider::before {
 .overlay-close {
   position: absolute;
   top: 20px;
-  right: 20px;
+  right: 0;
   cursor: pointer;
   font-size: 2rem;
   font-weight: bold; }
+
+.save-request-form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 600px;
+  padding-bottom: 2rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid black; }
+  @media (max-width: 62.5em) {
+    .save-request-form {
+      flex-direction: column; } }
 
 .input-with-item {
   display: flex;
@@ -1032,15 +1048,9 @@ input:checked + .slider::before {
   font-size: 0.7rem; }
 
 .statistical-response {
-  height: 700px;
-  overflow-y: scroll;
-  padding: 0.5rem 1rem;
-  width: 700px; }
-  @media (max-width: 62.5em) {
-    .statistical-response {
-      height: 400px;
-      min-width: 500px;
-      padding: 0.5rem 1rem; } }
+  padding: 1rem;
+  width: 100%;
+  height: 100%; }
 
 .timerange-input--invalid {
   border: 2px solid red; }
@@ -1284,20 +1294,18 @@ input:checked + .slider::before {
   .batch-request-summary-header {
     width: 100%;
     height: 100%;
-    display: flex;
-    align-items: center;
     cursor: pointer;
+    align-items: center;
+    display: flex;
     margin-bottom: 1rem; }
+    .batch-request-summary-header-title {
+      display: flex;
+      flex-direction: column; }
     .batch-request-summary-header-icon {
       font-size: 2rem;
       margin-right: auto; }
     .batch-request-summary-header p {
-      font-weight: 700;
       width: 30%; }
-      .batch-request-summary-header p:last-child {
-        width: auto;
-        display: flex;
-        justify-content: flex-end; }
 
 .tile-info {
   margin-bottom: 1.5rem; }

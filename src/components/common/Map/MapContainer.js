@@ -3,11 +3,15 @@ import { connect } from 'react-redux';
 import L from 'leaflet';
 import bboxPolygon from '@turf/bbox-polygon';
 import bbox from '@turf/bbox';
+import parseGeoraster from 'georaster';
+import GeoRasterLayer from 'georaster-layer-for-leaflet';
+import proj4 from 'proj4';
 
 import Map from './Map';
 import store from '../../../store';
 import {
   getAreaFromGeometry,
+  getLatLngFromBbox,
   isBbox,
   isPolygon,
   transformGeometryToWGS84IfNeeded,
@@ -16,6 +20,9 @@ import CRSSelection from './CRSSelection';
 import MapTextarea from './MapTextarea';
 import mapSlice from '../../../store/map';
 import ByocDataFinder from './ByocDataFinder';
+import { useDidMountEffect, useOverlayComponent } from '../../../utils/hooks';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faExpandArrowsAlt } from '@fortawesome/free-solid-svg-icons';
 
 const getLeafletLayer = (wgs84Geometry, layerConfig, currentLayers, mapRef) => {
   // add event listener to layer
@@ -76,13 +83,36 @@ const getLeafletLayer = (wgs84Geometry, layerConfig, currentLayers, mapRef) => {
   }
 };
 
-const MapContainer = ({ wgs84Geometry, selectedCrs, textGeometry, extraGeometry }) => {
+const getBoundsForAdditionalLayer = (geometry) => {
+  if (isBbox(geometry)) {
+    return getLatLngFromBbox(geometry);
+  } else if (isPolygon(geometry) || isPolygon(geometry)) {
+    return L.geoJson(geometry).getBounds();
+  }
+};
+
+const getDeleteLayerButton = (onClick) => {
+  const deleteLayerBtn = document.createElement('button');
+  deleteLayerBtn.classList.add('secondary-button');
+  deleteLayerBtn.innerText = 'Delete Layer';
+  deleteLayerBtn.onclick = onClick;
+  return deleteLayerBtn;
+};
+
+if (!window.proj4) {
+  window.proj4 = proj4;
+}
+
+const MapContainer = ({ wgs84Geometry, selectedCrs, textGeometry, extraGeometry, additionalLayers }) => {
   const mapRef = useRef();
   const layersRef = useRef([]);
   const drawnItemsRef = useRef();
+  const tiffLayersRef = useRef([]);
+  const mapContainerRef = useRef();
   const [parsedError, setParsedError] = useState(false);
   const [mapError, setMapError] = useState(false);
   const [hasUsedMap, setHasUsedMap] = useState(false);
+  const { isOverlayExpanded, openOverlay } = useOverlayComponent(mapContainerRef, 'overlayed-map');
 
   useEffect(() => {
     if (hasUsedMap && selectedCrs !== 'EPSG:4326') {
@@ -143,7 +173,12 @@ const MapContainer = ({ wgs84Geometry, selectedCrs, textGeometry, extraGeometry 
   };
 
   useEffect(() => {
-    const leafletLayer = getLeafletLayer(wgs84Geometry, undefined, layersRef.current, mapRef.current);
+    const leafletLayer = getLeafletLayer(
+      wgs84Geometry,
+      { interactive: false },
+      layersRef.current,
+      mapRef.current,
+    );
     deleteLayerIfPossible();
     addDrawLayer(leafletLayer, layersRef.current);
     mapRef.current.fitBounds(leafletLayer.layer.getBounds());
@@ -157,6 +192,11 @@ const MapContainer = ({ wgs84Geometry, selectedCrs, textGeometry, extraGeometry 
         extraLayersRef.current,
         mapRef.current,
       );
+      const btn = getDeleteLayerButton(() => {
+        drawnItemsRef.current.removeLayer(extraLeafletLayer.layer);
+        store.dispatch(mapSlice.actions.setExtraGeometry(null));
+      });
+      extraLeafletLayer.layer.bindPopup(btn);
       deleteExtraLayerIfPossible();
       addDrawLayer(extraLeafletLayer, extraLayersRef.current);
       mapRef.current.fitBounds(extraLeafletLayer.layer.getBounds());
@@ -165,10 +205,88 @@ const MapContainer = ({ wgs84Geometry, selectedCrs, textGeometry, extraGeometry 
     }
   }, [extraGeometry]);
 
+  const addImageAdditionalLayer = useCallback((additionalLayer, index) => {
+    const { url, geometry, arrayBuffer, uuid } = additionalLayer;
+
+    const options = {
+      interactive: true,
+    };
+    if (!arrayBuffer) {
+      const bounds = getBoundsForAdditionalLayer(geometry);
+      const newLayer = L.imageOverlay(url, bounds, options);
+      const btn = getDeleteLayerButton(() => {
+        drawnItemsRef.current.removeLayer(newLayer);
+        store.dispatch(mapSlice.actions.removeAdditionalLayer(uuid));
+      });
+      newLayer.bindPopup(btn);
+      drawnItemsRef.current.addLayer(newLayer);
+    } else {
+      parseGeoraster(arrayBuffer).then((georaster) => {
+        const layer = new GeoRasterLayer({
+          georaster,
+          opacity: 1,
+          resolution: 256,
+        });
+        const bounds = getBoundsForAdditionalLayer(geometry);
+        const overlayLayer = L.rectangle(bounds, { opacity: 0.0, fillOpacity: 0.0, interactive: true });
+        const btn = getDeleteLayerButton(() => {
+          drawnItemsRef.current.removeLayer(layer);
+          drawnItemsRef.current.removeLayer(overlayLayer);
+          store.dispatch(mapSlice.actions.removeAdditionalLayer(uuid));
+        });
+        overlayLayer.bindPopup(btn);
+        drawnItemsRef.current.addLayer(overlayLayer);
+        drawnItemsRef.current.addLayer(layer);
+        tiffLayersRef.current.push({ layer, index, overlayLayer });
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (additionalLayers.length > 0) {
+      additionalLayers.forEach((additionalLayer, idx) => {
+        addImageAdditionalLayer(additionalLayer, idx);
+      });
+    }
+    // eslint-disable-next-line
+  }, []);
+
+  // should only handle addition, i.e: latest layer on the stack
+  useDidMountEffect(() => {
+    if (additionalLayers.length !== 0) {
+      const idx = additionalLayers.length - 1;
+      addImageAdditionalLayer(additionalLayers[idx], idx);
+    }
+  }, [additionalLayers, addImageAdditionalLayer]);
+
+  // cleanup of tiff layers
+  useEffect(() => {
+    return () => {
+      // eslint-disable-next-line
+      const layersWithIdx = tiffLayersRef.current;
+      if (layersWithIdx.length > 0) {
+        layersWithIdx.forEach((layerWithIdx) => {
+          // eslint-disable-next-line
+          drawnItemsRef.current?.removeLayer(layerWithIdx.layer);
+          // eslint-disable-next-line
+          drawnItemsRef.current?.removeLayer(layerWithIdx.overlayLayer);
+        });
+        store.dispatch(mapSlice.actions.removeTiffLayers());
+      }
+    };
+  }, []);
+
   return (
     <div>
-      <h2 className="heading-secondary">Area of interest</h2>
-      <div className="form">
+      <div className="u-flex-aligned">
+        <h2 className="heading-secondary" style={{ marginRight: '2rem' }}>
+          Area of interest
+        </h2>
+        <i className="clickable-icon" onClick={openOverlay}>
+          <FontAwesomeIcon icon={faExpandArrowsAlt} />
+        </i>
+      </div>
+      <div className="form" ref={mapContainerRef}>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
           <CRSSelection selectedCrs={selectedCrs} />
           <p
@@ -219,6 +337,7 @@ const MapContainer = ({ wgs84Geometry, selectedCrs, textGeometry, extraGeometry 
             drawnItemsRef={drawnItemsRef}
             layersRef={layersRef}
             setHasUsedMap={setHasUsedMap}
+            mapOverrideStyles={isOverlayExpanded ? { height: '100%' } : undefined}
           />
 
           <MapTextarea
@@ -239,6 +358,7 @@ const mapStateToProps = (state) => ({
   textGeometry: state.map.convertedGeometry,
   selectedCrs: state.map.selectedCrs,
   extraGeometry: state.map.extraGeometry,
+  additionalLayers: state.map.additionalLayers,
 });
 
 export default connect(mapStateToProps)(MapContainer);

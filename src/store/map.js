@@ -6,6 +6,7 @@ import {
 
 const isWgs84 = (crs) => crs === 'EPSG:4326';
 
+// mapLayer: { url, bounds };
 const mapSlice = createSlice({
   name: 'map',
   initialState: {
@@ -14,6 +15,7 @@ const mapSlice = createSlice({
     convertedGeometry: [12.44693, 41.870072, 12.541001, 41.917096],
     selectedCrs: 'EPSG:4326',
     extraGeometry: null,
+    additionalLayers: [],
   },
   reducers: {
     setWgs84Geometry: (state, action) => {
@@ -55,6 +57,16 @@ const mapSlice = createSlice({
         state.wgs84Geometry = wgs84Geo;
       }
       state.convertedGeometry = geometry;
+    },
+    addAdditionalLayer: (state, action) => {
+      state.additionalLayers.push(action.payload);
+    },
+    removeTiffLayers: (state) => {
+      state.additionalLayers = state.additionalLayers.filter((lay) => !lay.arrayBuffer);
+    },
+    removeAdditionalLayer: (state, action) => {
+      const uuidToDelete = action.payload;
+      state.additionalLayers = state.additionalLayers.filter((lay) => lay.uuid !== uuidToDelete);
     },
   },
 });

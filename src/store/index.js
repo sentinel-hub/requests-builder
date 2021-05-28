@@ -1,4 +1,4 @@
-import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import { configureStore, combineReducers, getDefaultMiddleware } from '@reduxjs/toolkit';
 import alertSlice from './alert';
 import authSlice from './auth';
 import batchSlice from './batch';
@@ -33,6 +33,12 @@ const reducers = combineReducers({
 const store = configureStore({
   reducer: reducers,
   devTools: process.env.NODE_ENV !== 'production',
+  middleware: getDefaultMiddleware({
+    serializableCheck: {
+      ignoredPaths: ['map.additionalLayers', 'response.imageResponse'],
+      ignoredActionPaths: ['payload.arrayBuffer'],
+    },
+  }),
 });
 
 export default store;

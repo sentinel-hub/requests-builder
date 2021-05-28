@@ -1,10 +1,10 @@
 import React from 'react';
 import RequestButton from '../common/RequestButton';
-import { addAlertOnError, batchIdValidation } from './utils';
-import { startBatchRequest } from './requests';
+import { addAlertOnError, batchIdValidation } from './lib/utils';
 
 import store from '../../store';
 import batchSlice from '../../store/batch';
+import BatchResource from '../../api/batch/BatchResource';
 
 const StartBatchRequestButton = ({ requestId, token, startRequest, setOpenedContainers }) => {
   const startResponseHandler = () => {
@@ -21,8 +21,8 @@ const StartBatchRequestButton = ({ requestId, token, startRequest, setOpenedCont
       buttonText="Start"
       responseHandler={startResponseHandler}
       errorHandler={addAlertOnError}
-      request={startBatchRequest}
-      args={[token, requestId]}
+      request={BatchResource.startOrder}
+      args={[{ orderId: requestId }]}
     />
   );
 };

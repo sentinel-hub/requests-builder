@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { errorHandlerTPDI } from './TPDIOrderOptions';
 import RequestButton from '../common/RequestButton';
-import { getQuotaCurlCommand, getTPDIQuota } from './requests/common';
+import { getQuotaCurlCommand } from './utils/curls';
 import { connect } from 'react-redux';
 import { formatNumber } from '../../utils/const';
 import CommonRequestPreview from '../common/CommonRequestPreview';
 import { formatText } from '../../utils/stringUtils';
+import TpdiResource from '../../api/tpdi/TpdiResource';
 
 const QuotaContainer = ({ token }) => {
   const [quotas, setQuotas] = useState([]);
@@ -47,8 +48,8 @@ const QuotaContainer = ({ token }) => {
               <p className="text">Fetch your quotas to see them</p>
             )}
             <RequestButton
-              request={getTPDIQuota}
-              args={[token]}
+              request={TpdiResource.getQuota}
+              args={[]}
               buttonText={quotas.length > 0 ? 'Refresh Quotas' : 'Get Quotas'}
               validation={Boolean(token)}
               className="secondary-button"

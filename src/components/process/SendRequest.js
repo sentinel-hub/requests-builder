@@ -1,11 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { processApiRequest } from './requests';
 import ProcessRequestOverlayButton from '../common/ProcessRequestOverlayButton';
 import store from '../../store';
 import responsesSlice from '../../store/responses';
 import requestSlice from '../../store/request';
 import { validateRequestState } from '../../utils/validator';
+import ProcessResource from '../../api/process/ProcessResource';
+import { getRequestObject } from '../../api/process/utils';
 
 const debugError = (responseString) => {
   return responseString.includes('Failed to evaluate script!') && responseString.includes(' Error: ');
@@ -27,7 +28,7 @@ export const createFileReader = () => {
       store.dispatch(requestSlice.actions.setConsoleValue(getDebugError(resultString)));
     } else {
       store.dispatch(responsesSlice.actions.setError(parsed.error.message));
-      store.dispatch(responsesSlice.actions.setShow(true));
+      store.dispatch(responsesSlice.actions.setDisplayResponse(true));
     }
   };
   return fr;
@@ -40,8 +41,8 @@ const SendRequest = ({ token, requestState, mapState }) => {
     <ProcessRequestOverlayButton
       className="button"
       buttonText="Send Request"
-      request={processApiRequest}
-      args={[requestState, mapState, token]}
+      request={ProcessResource.stateRequest(requestState)}
+      args={[getRequestObject(requestState, mapState), { responseType: 'blob' }]}
       validation={Boolean(isValid && token)}
       requestState={requestState}
       skipSaving={false}

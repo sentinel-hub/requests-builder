@@ -1,5 +1,5 @@
 import React from 'react';
-import { generateProcessCurlCommand, getJSONRequestBody, sendEditedRequest } from './requests';
+import { generateProcessCurlCommand, generateProcessMultipartCurl } from './lib/curls';
 import { connect } from 'react-redux';
 
 import debounceRender from 'react-debounce-render';
@@ -7,10 +7,11 @@ import { dispatchChanges, getRequestBody, getEvalscript } from './requests/parse
 import store from '../../store';
 import responsesSlice from '../../store/responses';
 import requestSlice from '../../store/request';
-import { getSHJSCode } from './requests/generateShjsRequest';
-import { getSHPYCode } from './requests/generateShPyRequest';
+import { getSHJSCode } from './lib/generateShjsRequest';
+import { getSHPYCode } from './lib/generateShPyRequest';
 
 import CommonRequestPreview from '../common/CommonRequestPreview';
+import { getJSONRequestBody, sendEditedRequest } from '../../api/process/utils';
 
 const handleParseRequest = (text) => {
   try {
@@ -59,6 +60,12 @@ const RequestPreview = ({ requestState, token, mapState }) => {
               nonToggle: true,
             },
             {
+              name: 'curl/multipart',
+              value: () => generateProcessMultipartCurl(requestState, mapState, token),
+              nonToggle: true,
+              customCopyFunction: (text) => navigator.clipboard.writeText(text),
+            },
+            {
               name: 'body',
               value: () => getJSONRequestBody(requestState, mapState),
               nonToggle: true,
@@ -77,15 +84,18 @@ const RequestPreview = ({ requestState, token, mapState }) => {
           canCopy
           className="process-editor"
           onParse={handleParseRequest}
-          supportedParseNames={['curl', 'body']}
+          supportedParseNames={['curl', 'curl/multipart', 'body']}
           supportedSendEditedNames={['curl']}
           sendEditedRequest={(text, args) => sendEditedRequest(token, text, args)}
-          onSendEdited={(response) => {
+          onSendEdited={(response, stringRequest) => {
             const responseUrl = URL.createObjectURL(response);
             store.dispatch(
-              responsesSlice.actions.setResponse({
+              responsesSlice.actions.setImageResponse({
                 src: responseUrl,
-                isTar: !response.type.includes('image'),
+                format: response.type,
+                stringRequest,
+                mode: 'PROCESS',
+                displayResponse: true,
               }),
             );
           }}

@@ -10,7 +10,7 @@ import moment from 'moment';
 
 const PROCESS_INITIAL_STATE = {
   mode: 'PROCESS',
-  datasource: 'S2L2A',
+  datasource: S2L2A,
   //default times: today and one month ago.
   timeFrom: [moment.utc().subtract(1, 'month').startOf('day').format()],
   timeTo: [moment.utc().endOf('day').format()],
@@ -20,7 +20,7 @@ const PROCESS_INITIAL_STATE = {
   width: 512,
   height: 512,
   isAutoRatio: true,
-  evalscript: DEFAULT_EVALSCRIPTS['S2L2A'],
+  evalscript: DEFAULT_EVALSCRIPTS[S2L2A],
   // Array with options and index to individually modify certain options on datafusion
   dataFilterOptions: [
     {
@@ -176,7 +176,7 @@ const requestSlice = createSlice({
           state.responses[0].format = 'image/png';
         }
         if (!DATASOURCES[state.datasource].isBatchSupported) {
-          state.datasource = 'S2L2A';
+          state.datasource = S2L2A;
         }
       }
       // Todo: remove once normal defaults work.

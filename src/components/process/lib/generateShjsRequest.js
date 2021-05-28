@@ -38,6 +38,13 @@ const crsToSHJSCrs = {
   'EPSG:3857': 'CRS_EPSG3857',
 };
 
+const getShjsCrs = (crs) => {
+  const res = crsToSHJSCrs[crs];
+  if (res === undefined) {
+    return '<CRS-NOT-SUPPORTED>';
+  }
+};
+
 const formatToSHJS = {
   'image/jpeg': 'MimeTypes.JPEG',
   'image/png': 'MimeTypes.PNG',
@@ -52,15 +59,15 @@ const locationToSHJSLocation = {
 
 const getSHJSImports = (reqState, selectedCrs) => {
   const layer = datasourceToSHJSLayer[reqState.datasource];
-  let imports = layer + `, setAuthToken, ApiType, MimeTypes, ${crsToSHJSCrs[selectedCrs]}, BBox`;
+  let imports = layer + `, setAuthToken, ApiType, MimeTypes, ${getShjsCrs(selectedCrs)}, BBox`;
 
   //If Byoc, location is needed
-  if (reqState.datasource === 'CUSTOM') {
+  if (reqState.datasource === CUSTOM) {
     imports += ', LocationIdSHv3';
   }
 
   //If datafusion, need to import other layers too.
-  if (reqState.datasource === 'DATAFUSION') {
+  if (reqState.datasource === DATAFUSION) {
     imports += `, ${datasourceToSHJSLayer[reqState.datafusionSources[0].datasource]}, ${
       datasourceToSHJSLayer[reqState.datafusionSources[1].datasource]
     }`;
@@ -137,7 +144,7 @@ const getShJSLayers = (reqState) => {
   let stringLayer = '';
 
   //if datafusion need to create previous layers and layers array.
-  if (reqState.datasource === 'DATAFUSION') {
+  if (reqState.datasource === DATAFUSION) {
     reqState.datafusionSources.forEach((source, idx) => {
       const datafusionLayer = datasourceToSHJSLayer[source.datasource];
       stringLayer =

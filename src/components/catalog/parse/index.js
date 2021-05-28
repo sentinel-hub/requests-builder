@@ -1,9 +1,9 @@
-import { getRequestBody } from '../../process/requests/parseRequest';
 import store from '../../../store';
 import catalogSlice from '../../../store/catalog';
 import requestSlice from '../../../store/request';
 import mapSlice from '../../../store/map';
 import { addSuccessAlert, addWarningAlert } from '../../../store/alert';
+import { getRequestBody } from '../../process/requests/parseRequest';
 
 export const parseCatalogBody = (str) => {
   let body = getRequestBody(str);

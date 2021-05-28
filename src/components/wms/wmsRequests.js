@@ -69,7 +69,7 @@ const getWMSBbox = (mapState, mode = 'WMS') => {
 
 const getWidthOrResWms = (requestState) => {
   // OGC supports res in meters (e.g: RESX=20m)
-  if (requestState.isOnAutoRes) {
+  if (requestState.heightOrRes === 'RES' && requestState.isOnAutoRes) {
     return `RESX=${requestState.width}m&RESY=${requestState.height}m`;
   }
   if (requestState.heightOrRes === 'HEIGHT') {

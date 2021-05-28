@@ -1,6 +1,5 @@
 import React from 'react';
 import axios from 'axios';
-import { getStatisticalAuthConfig, STATISTICAL_BASE_URL } from '../../statistical/utils/api';
 import { addWarningAlert } from '../../../store/alert';
 import store from '../../../store';
 import responsesSlice from '../../../store/responses';
@@ -10,6 +9,8 @@ import RequestButton from '../../common/RequestButton';
 import requestSlice from '../../../store/request';
 import { statisticsResponseHandler } from '../../statistical/StatisticalSendRequestButton';
 import savedRequestsSlice from '../../../store/savedRequests';
+import { STATISTICAL_BASE_URL } from '../../../api/statistical/StatisticalResource';
+import { getStatisticalAuthConfig } from '../../../api/statistical/utils';
 
 const sendStatisticalRequest = (request, token, reqConfig) => {
   try {
@@ -30,8 +31,15 @@ const responseHandler = (response, request, idx) => {
 
 const StatisticalSavedRequestEntry = ({ request, response, creationTime, mode, name, token, idx }) => {
   const handleDisplay = () => {
-    store.dispatch(responsesSlice.actions.setFisResponse(response));
-    store.dispatch(responsesSlice.actions.setShow(true));
+    store.dispatch(
+      responsesSlice.actions.setFisResponse({
+        response,
+        stringRequest: request,
+        mode,
+        displayResponse: true,
+        isFromCollections: true,
+      }),
+    );
   };
   const handleParse = () => {
     store.dispatch(requestSlice.actions.setMode('STATISTICAL'));

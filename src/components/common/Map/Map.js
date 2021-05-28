@@ -8,7 +8,7 @@ import store from '../../../store';
 import mapSlice from '../../../store/map';
 
 //Get as props the reference to the map, the created layers and the drawn items.
-const Map = ({ mapRef, drawnItemsRef, setHasUsedMap }) => {
+const Map = ({ mapRef, drawnItemsRef, setHasUsedMap, mapOverrideStyles }) => {
   //equivalent to ComponentDidMount
   //Creates a map and adds neccesary configuration
   useEffect(() => {
@@ -50,7 +50,7 @@ const Map = ({ mapRef, drawnItemsRef, setHasUsedMap }) => {
     // eslint-disable-next-line
   }, []);
 
-  return <div className="map" id="map"></div>;
+  return <div className="map" id="map" style={mapOverrideStyles}></div>;
 };
 
 export default Map;

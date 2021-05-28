@@ -174,7 +174,10 @@ const Chart = ({ histogram, percentiles, onEnter, onLeave, onMove, bandName }) =
           <g ref={yAxisRef} transform={`translate(${margin.left}, 0)`} />
         </g>
       </svg>
-      <button className="secondary-button secondary-button--fit" onClick={() => handleDownloadSvg(true)}>
+      <button
+        className="secondary-button secondary-button--fit u-margin-bottom-small"
+        onClick={() => handleDownloadSvg(true)}
+      >
         <FontAwesomeIcon icon={faSave} style={{ marginRight: '1rem' }} />
         Download SVG as PNG
       </button>

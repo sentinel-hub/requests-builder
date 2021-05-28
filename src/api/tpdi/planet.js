@@ -1,4 +1,4 @@
-import { generateBounds } from '../../process/requests';
+import { generateBounds } from '../process/utils';
 import { getTimeRange } from './common';
 
 export const getPlanetSearchRequestBody = (state) => {

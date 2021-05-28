@@ -17,6 +17,7 @@ import { addSuccessAlert, addWarningAlert } from '../../store/alert';
 import { collectionToDatasource } from './const';
 import CopyIcon from '../common/CopyIcon';
 import DisplayableProperties from '../common/DisplayableProperties';
+import { CUSTOM } from '../../utils/const';
 
 const CatalogResultEntry = ({ feature, usedCollection, skippedProperties = [] }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -60,7 +61,7 @@ const CatalogResultEntry = ({ feature, usedCollection, skippedProperties = [] })
       }
       let datasource = collectionToDatasource[usedCollection];
       if (!datasource) {
-        datasource = 'CUSTOM';
+        datasource = CUSTOM;
         const [type, ...collection] = usedCollection.split('-');
         store.dispatch(requestSlice.actions.setByocCollectionId(collection.join('-')));
         store.dispatch(requestSlice.actions.setByocCollectionType(type.toUpperCase()));

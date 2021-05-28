@@ -15,7 +15,7 @@ import {
   DATAFUSION,
 } from '../../../utils/const';
 import { generateSHBbox } from './generateShjsRequest';
-import { isPolygon } from '../../common/Map/utils/crsTransform';
+import { isBbox, isPolygon } from '../../common/Map/utils/crsTransform';
 
 const formatToSHPY = {
   // JPEG not supported on shpy
@@ -110,12 +110,30 @@ const getDimensionsSHPY = (requestState) => {
   }
 };
 
-const crsToSHPYCrs = {
-  'EPSG:4326': 'CRS.WGS84',
-  'EPSG:3857': 'CRS.POP_WEB',
+const utmCrsToPyCrs = (crs) => {
+  const isInvalidCode = (code) => {
+    return !code || code?.length !== 5 || !(code[2] === '6' || code[2] === '7');
+  };
+  const code = crs.split(':')[1];
+  if (isInvalidCode(code)) {
+    return '<CRS NOT FOUND>';
+  }
+  const direction = code[2] === '6' ? 'N' : 'S';
+  const zone = code.slice(3);
+  return `UTM_${zone}${direction}`;
 };
 
-const getSHPYCredentials = () => {
+const crsToSHPYCrs = (crs) => {
+  if (crs === 'EPSG:4326') {
+    return 'CRS.WGS84';
+  }
+  if (crs === 'EPSG:3857') {
+    return 'CRS.POP_WEB';
+  }
+  return utmCrsToPyCrs(crs);
+};
+
+export const getSHPYCredentials = () => {
   return `
 #Credentials
 
@@ -131,23 +149,31 @@ else:
 `;
 };
 
-const getSHPYBounds = (mapState) => {
+export const getSHPYBounds = (mapState, oneOrTheOther = false) => {
   let boundsString = '';
   const bbox = generateSHBbox(mapState.convertedGeometry);
 
-  boundsString += `bbox = BBox(bbox=[${bbox}], crs=${crsToSHPYCrs[mapState.selectedCrs]})\n`;
+  boundsString += `bbox = BBox(bbox=[${bbox}], crs=${crsToSHPYCrs(mapState.selectedCrs)})\n`;
+
+  if (isBbox(mapState.convertedGeometry) && oneOrTheOther) {
+    return boundsString;
+  }
 
   if (isPolygon(mapState.convertedGeometry)) {
-    boundsString += `geometry = Geometry(geometry=${JSON.stringify(mapState.convertedGeometry)}, crs=${
-      crsToSHPYCrs[mapState.selectedCrs]
-    })\n`;
+    const geoString = `geometry = Geometry(geometry=${JSON.stringify(
+      mapState.convertedGeometry,
+    )}, crs=${crsToSHPYCrs(mapState.selectedCrs)})\n`;
+    if (oneOrTheOther) {
+      return geoString;
+    }
+    boundsString += geoString;
   }
   return boundsString;
 };
 
 const generateSHPYInputs = (reqState) => {
   // Datafusion
-  if (reqState.datasource === 'DATAFUSION') {
+  if (reqState.datasource === DATAFUSION) {
     let datafusionString = '';
     reqState.datafusionSources.forEach((source, idx) => {
       datafusionString += `SentinelHubRequest.input_data(
@@ -201,7 +227,7 @@ const getSHPYAdvancedOptions = (reqState, idx = 0) => {
   }
 
   //If S1, delete acqMode, polarization and orbitDir since they're specified via Datasource.
-  if (reqState.datasource === 'S1GRD') {
+  if (reqState.datasource === S1GRD) {
     delete dataFilterOptions['acquisitionMode'];
     delete dataFilterOptions['polarization'];
     delete dataFilterOptions['orbitDirection'];

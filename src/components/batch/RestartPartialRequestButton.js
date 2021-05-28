@@ -1,9 +1,9 @@
 import React from 'react';
 import RequestButton from '../common/RequestButton';
-import { addAlertOnError, batchIdValidation } from './utils';
-import { restartPartialRequest } from './requests';
+import { addAlertOnError, batchIdValidation } from './lib/utils';
 import store from '../../store';
 import batchSlice from '../../store/batch';
+import BatchResource from '../../api/batch/BatchResource';
 
 const RestartPartialRequestButton = ({ requestId, token }) => {
   const responseHandler = () => {
@@ -23,8 +23,8 @@ const RestartPartialRequestButton = ({ requestId, token }) => {
       errorHandler={errorHandler}
       validation={batchIdValidation(token, requestId)}
       disabledTitle="Log in and set a batch request id to use this"
-      request={restartPartialRequest}
-      args={[requestId, token]}
+      request={BatchResource.restartOrder}
+      args={[{ orderId: requestId }]}
       className="secondary-button"
     />
   );

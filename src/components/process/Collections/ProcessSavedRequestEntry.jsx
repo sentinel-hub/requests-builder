@@ -1,12 +1,28 @@
 import React from 'react';
+import Axios from 'axios';
+
 import store from '../../../store';
 import alertSlice from '../../../store/alert';
 import requestSlice from '../../../store/request';
 import { DATASOURCES } from '../../../utils/const';
 import ProcessRequestOverlayButton from '../../common/ProcessRequestOverlayButton';
-import { sendProcessBody } from '../requests';
 import { dispatchChanges } from '../requests/parseRequest';
 import { CommonSavedRequestEntryFields } from './CommonSavedRequestEntry';
+
+const sendProcessBody = (token, body, url, reqConfig) => {
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    responseType: 'blob',
+    ...reqConfig,
+  };
+  if (body.output?.responses?.length > 1) {
+    config.headers.Accept = 'application/tar';
+  }
+  return Axios.post(url, body, config);
+};
 
 const sendRequest = (request, token) => {
   let parsed;

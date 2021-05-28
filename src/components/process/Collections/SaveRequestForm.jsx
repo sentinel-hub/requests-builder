@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import store from '../../../store';
 import savedRequestsSlice from '../../../store/savedRequests';
 
-const SaveRequestForm = ({ request, response, mode, hasSavedRequest, setHasSavedRequest }) => {
+const SaveRequestForm = ({ stringRequest, response, mode, hasSavedRequest, setHasSavedRequest }) => {
   const [requestName, setRequestName] = useState('');
 
   const handleSaveRequest = (e) => {
@@ -11,7 +11,7 @@ const SaveRequestForm = ({ request, response, mode, hasSavedRequest, setHasSaved
     store.dispatch(
       savedRequestsSlice.actions.appendRequest({
         name: requestName,
-        request,
+        request: stringRequest,
         response,
         mode,
       }),
@@ -21,9 +21,8 @@ const SaveRequestForm = ({ request, response, mode, hasSavedRequest, setHasSaved
   const handleNameRequestChange = (e) => {
     setRequestName(e.target.value);
   };
-
   return (
-    <div className="u-flex-aligned" style={{ maxWidth: '700px' }}>
+    <div className="save-request-form">
       <form className="u-flex-column-centered" style={{ width: '70%' }} onSubmit={handleSaveRequest}>
         <label className="form__label u-margin-top-small" htmlFor="name-request-input">
           Request name (optional)

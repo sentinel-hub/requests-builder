@@ -5,8 +5,9 @@ import moment from 'moment';
 import store from '../../../store';
 import requestSlice from '../../../store/request';
 import Axios from 'axios';
-import { fetchAvailableDatesWithCatalog } from '../../catalog/requests';
 import { S1GRD, S2L2A, S2L1C, L8L1C, S3OLCI, S3SLSTR, S5PL2 } from '../../../utils/const';
+import { getFetchDatesBody } from '../../../api/catalog/utils';
+import CatalogResource from '../../../api/catalog/CatalogResource';
 
 const highlightedStyle = `.DayPicker-Day--highlighted {
   background-color: #b2c22d;
@@ -38,7 +39,8 @@ const TimeRange = ({ index, timeTo, timeFrom, isDisabled, datasource, geometry, 
     const fetchHelper = async () => {
       const promises = months.map((month) => {
         const timeRange = { timeFrom: month, timeTo: moment.utc(month).endOf('month').format() };
-        return fetchAvailableDatesWithCatalog(datasource, timeRange, geometry, token, {
+        const body = getFetchDatesBody(datasource, timeRange, geometry);
+        return CatalogResource.fetchDates(datasource)(body, {
           cancelToken: sourceRef.current.token,
         });
       });

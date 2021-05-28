@@ -4,29 +4,47 @@ import { getMapWms, getFisStats, getCoverageWcs } from './wmsRequests';
 import RequestButton from '../common/RequestButton';
 import store from '../../store';
 import responsesSlice from '../../store/responses';
+import { calculatePixelSize } from '../common/Map/utils/bboxRatio';
 
 const SendWmsRequest = ({ wmsState, requestState, mapState, token, mode }) => {
   const validateWmsSendRequest = () => {
     return Boolean(token && wmsState.instanceId && wmsState.layer.id);
   };
 
-  const responseHandler = (response) => {
+  const responseHandler = async (response) => {
     const responseUrl = URL.createObjectURL(response);
+    let dimensions;
+    if (requestState.heightOrRes === 'HEIGHT') {
+      dimensions = calculatePixelSize(mapState.wgs84Geometry, [requestState.width, requestState.height]);
+    } else if (requestState.isOnAutoRes) {
+      dimensions = [requestState.width, requestState.height];
+    }
+    let arrayBuffer;
+    if (response.type.includes('tif')) {
+      arrayBuffer = await response.arrayBuffer();
+    }
     store.dispatch(
-      responsesSlice.actions.setResponse({
+      responsesSlice.actions.setImageResponse({
         src: responseUrl,
+        format: response.type,
+        wgs84Geometry: mapState.wgs84Geometry,
+        stringRequest: undefined,
+        displayResponse: true,
+        mode: 'WMS',
+        dimensions,
+        arrayBuffer,
       }),
     );
   };
 
-  const responseHandlerFis = (response) => {
-    store.dispatch(responsesSlice.actions.setFisResponse(response));
-    store.dispatch(responsesSlice.actions.setShow(true));
+  const responseHandlerFis = (response, stringRequest) => {
+    store.dispatch(responsesSlice.actions.setFisResponse({ response, stringRequest, displayResponse: true }));
+    store.dispatch(responsesSlice.actions.setDisplayResponse(true));
   };
 
   const errorHandler = (err) => {
     store.dispatch(responsesSlice.actions.setError('Something went wrong'));
-    store.dispatch(responsesSlice.actions.setShow(true));
+    store.dispatch(responsesSlice.actions.setDisplayResponse(true));
     console.error('Something went wrong', err);
   };
 

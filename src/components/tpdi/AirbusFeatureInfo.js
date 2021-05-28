@@ -11,6 +11,14 @@ const airbusConstellationToProvider = {
 
 const AirbusFeatureInfo = ({ feature, geometry, isDisabled }) => {
   const [expandedInfo, setExpandedInfo] = useState(false);
+  const {
+    cloudCover,
+    snowCover,
+    incidenceAngle,
+    constellation,
+    resolution,
+    processingLevel,
+  } = feature.properties;
   return (
     <div className="tpdi-feature">
       <TpdiSearchResultHeader
@@ -32,30 +40,42 @@ const AirbusFeatureInfo = ({ feature, geometry, isDisabled }) => {
               <span>Product geometry coverage: </span>
               {formatPercentage(getAreaCoverPercentage(geometry, feature.geometry))}
             </p>
-            <p className="text">
-              <span>Cloud Cover: </span>
-              {feature.properties.cloudCover.toFixed(2) + '%'}
-            </p>
-            <p className="text">
-              <span>Snow Cover: </span>
-              {feature.properties.snowCover.toFixed(2) + '%'}
-            </p>
-            <p className="text">
-              <span>Constellation: </span>
-              {feature.properties.constellation}
-            </p>
-            <p className="text">
-              <span>Resolution: </span>
-              {feature.properties.resolution}
-            </p>
-            <p className="text">
-              <span>Incidence Angle: </span>
-              {feature.properties.incidenceAngle.toFixed(3)}
-            </p>
-            <p className="text">
-              <span>Processing Level: </span>
-              {feature.properties.processingLevel}
-            </p>
+            {cloudCover !== undefined && (
+              <p className="text">
+                <span>Cloud Cover: </span>
+                {cloudCover.toFixed(2) + '%'}
+              </p>
+            )}
+            {snowCover !== undefined && (
+              <p className="text">
+                <span>Snow Cover: </span>
+                {snowCover.toFixed(2) + '%'}
+              </p>
+            )}
+            {constellation !== undefined && (
+              <p className="text">
+                <span>Constellation: </span>
+                {constellation}
+              </p>
+            )}
+            {resolution !== undefined && (
+              <p className="text">
+                <span>Resolution: </span>
+                {resolution}
+              </p>
+            )}
+            {incidenceAngle !== undefined && (
+              <p className="text">
+                <span>Incidence Angle: </span>
+                {incidenceAngle.toFixed(3)}
+              </p>
+            )}
+            {processingLevel !== undefined && (
+              <p className="text">
+                <span>Processing Level: </span>
+                {processingLevel}
+              </p>
+            )}
           </div>
           <TPDIThumbnail
             collectionId={airbusConstellationToProvider[feature.properties.constellation]}

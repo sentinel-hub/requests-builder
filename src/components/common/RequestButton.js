@@ -40,6 +40,7 @@ const RequestButton = ({
     } else if (useConfirmation && !openedConfirmDialog) {
       setOpenedConfirmDialog(true);
     } else {
+      const usedArgs = args.length === 0 ? [null] : args;
       try {
         if (useConfirmation && openedConfirmDialog) {
           setOpenedConfirmDialog(false);
@@ -49,10 +50,10 @@ const RequestButton = ({
         const reqConfig = {
           cancelToken: sourceRef.current.token,
         };
-        const res = await request(...args, reqConfig);
+        const res = await request(...usedArgs, reqConfig);
         if (res.data || res.status === 204) {
           setIsFetching(false);
-          responseHandler(res.data, res.config?.data);
+          await responseHandler(res.data, res.config?.data);
         }
       } catch (err) {
         if (!Axios.isCancel(err)) {

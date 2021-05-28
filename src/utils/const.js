@@ -14,6 +14,20 @@ export const S5PL2 = 'S5PL2';
 export const CUSTOM = 'CUSTOM';
 export const DATAFUSION = 'DATAFUSION';
 
+// export const S2L1C = 'sentinel-2-l1c';
+// export const S2L2A = 'sentinel-2-l2a';
+// export const L8L1C = 'landsat-8-l1c';
+// export const LOTL1 = 'landsat-ot-l1';
+// export const LOTL2 = 'landsat-ot-l2';
+// export const MODIS = 'modis';
+// export const DEM = 'dem';
+// export const S1GRD = 'sentinel-1-grd';
+// export const S3OLCI = 'sentinel-3-olci';
+// export const S3SLSTR = 'sentinel-3-slstr';
+// export const S5PL2 = 'sentinel-5p-l2';
+// export const CUSTOM = 'custom';
+// export const DATAFUSION = 'DATAFUSION';
+
 export const DATASOURCES_NAMES = [
   S2L1C,
   S2L2A,
@@ -28,80 +42,93 @@ export const DATASOURCES_NAMES = [
   DATAFUSION,
 ];
 
+export const OLD_DATASOURCES_TO_NEW_MAP = {
+  S2L1C: S2L1C,
+  S2L2A: S2L2A,
+  L8L1C: L8L1C,
+  MODIS: MODIS,
+  DEM: DEM,
+  S1GRD: S1GRD,
+  S3OLCI: S3OLCI,
+  S3SLSTR: S3SLSTR,
+  S5PL2: S5PL2,
+  CUSTOM: CUSTOM,
+};
+
 export const DATASOURCES = {
-  S2L1C: {
+  [S2L1C]: {
     url: 'https://services.sentinel-hub.com/api/v1/process',
     ogcUrl: 'https://services.sentinel-hub.com/ogc/',
     defaultDatafusionId: 'l1c',
     isBatchSupported: true,
   },
-  S2L2A: {
+  [S2L2A]: {
     url: 'https://services.sentinel-hub.com/api/v1/process',
     ogcUrl: 'https://services.sentinel-hub.com/ogc/',
     defaultDatafusionId: 'l2a',
     isBatchSupported: true,
   },
-  L8L1C: {
+  [L8L1C]: {
     url: 'https://services-uswest2.sentinel-hub.com/api/v1/process',
     ogcUrl: 'https://services-uswest2.sentinel-hub.com/ogc/',
     defaultDatafusionId: 'l8l1c',
     isBatchSupported: false,
   },
-  LOTL1: {
+  [LOTL1]: {
     url: 'https://services-uswest2.sentinel-hub.com/api/v1/process',
     ogcUrl: 'https://services-uswest2.sentinel-hub.com/ogc/',
     defaultDatafusionId: 'lotl1',
     isBatchSupported: false,
   },
-  LOTL2: {
+  [LOTL2]: {
     url: 'https://services-uswest2.sentinel-hub.com/api/v1/process',
     ogcUrl: 'https://services-uswest2.sentinel-hub.com/ogc/',
     defaultDatafusionId: 'lotl2',
     isBatchSupported: false,
   },
-  MODIS: {
+  [MODIS]: {
     url: 'https://services-uswest2.sentinel-hub.com/api/v1/process',
     ogcUrl: 'https://services-uswest2.sentinel-hub.com/ogc/',
     defaultDatafusionId: 'modis',
     isBatchSupported: false,
   },
-  DEM: {
+  [DEM]: {
     url: 'https://services.sentinel-hub.com/api/v1/process',
     ogcUrl: 'https://services.sentinel-hub.com/ogc/',
     defaultDatafusionId: 'dem',
     isBatchSupported: true,
   },
-  S1GRD: {
+  [S1GRD]: {
     url: 'https://services.sentinel-hub.com/api/v1/process',
     ogcUrl: 'https://services.sentinel-hub.com/ogc/',
     defaultDatafusionId: 's1',
     isBatchSupported: true,
   },
-  S3OLCI: {
+  [S3OLCI]: {
     url: 'https://creodias.sentinel-hub.com/api/v1/process',
     ogcUrl: 'https://creodias.sentinel-hub.com/ogc/',
     defaultDatafusionId: 'olci',
     isBatchSupported: false,
   },
-  S3SLSTR: {
+  [S3SLSTR]: {
     url: 'https://creodias.sentinel-hub.com/api/v1/process',
     ogcUrl: 'https://creodias.sentinel-hub.com/ogc/',
     defaultDatafusionId: 'slstr',
     isBatchSupported: false,
   },
-  S5PL2: {
+  [S5PL2]: {
     url: 'https://creodias.sentinel-hub.com/api/v1/process',
     ogcUrl: 'https://creodias.sentinel-hub.com/ogc/',
     defaultDatafusionId: 's5pl2',
     isBatchSupported: false,
   },
-  CUSTOM: {
+  [CUSTOM]: {
     url: 'https://services.sentinel-hub.com/api/v1/process',
     ogcUrl: 'https://services.sentinel-hub.com/ogc/',
     selectName: 'Bring your own COG',
     isBatchSupported: true,
   },
-  DATAFUSION: {
+  [DATAFUSION]: {
     url: 'https://services.sentinel-hub.com/api/v1/process',
     isBatchSupported: true,
   },
@@ -155,7 +182,7 @@ function evaluatePixel(samples) {
 `;
 
 export const DEFAULT_EVALSCRIPTS = {
-  S2L2A: `//VERSION=3
+  [S2L2A]: `//VERSION=3
 
 function setup() {
   return {
@@ -167,7 +194,7 @@ function setup() {
 function evaluatePixel(sample) {
   return [2.5 * sample.B04, 2.5 * sample.B03, 2.5 * sample.B02];
 }`,
-  S2L1C: `//VERSION=3
+  [S2L1C]: `//VERSION=3
 
 function setup() {
   return {
@@ -179,10 +206,10 @@ function setup() {
 function evaluatePixel(sample) {
   return [2.5 * sample.B04, 2.5 * sample.B03, 2.5 * sample.B02];
 }`,
-  L8L1C: DEFAULT_LANDSAT_EVALSCRIPT,
-  LOTL1: DEFAULT_LANDSAT_EVALSCRIPT,
-  LOTL2: DEFAULT_LANDSAT_EVALSCRIPT,
-  MODIS: `//VERSION=3 (auto-converted from 1)
+  [L8L1C]: DEFAULT_LANDSAT_EVALSCRIPT,
+  [LOTL1]: DEFAULT_LANDSAT_EVALSCRIPT,
+  [LOTL2]: DEFAULT_LANDSAT_EVALSCRIPT,
+  [MODIS]: `//VERSION=3 (auto-converted from 1)
 
 let minVal = 0.0;
 let maxVal = 0.4;
@@ -210,9 +237,9 @@ function evaluatePixel(samples) {
 }
 
     `,
-  DEM: `return [DEM];`,
-  S1GRD: `return [VH*2];`,
-  S3OLCI: `//VERSION=3 (auto-converted from 1)
+  [DEM]: `return [DEM];`,
+  [S1GRD]: `return [VH*2];`,
+  [S3OLCI]: `//VERSION=3 (auto-converted from 1)
     
 let minVal = 0.0;
 let maxVal = 0.4;
@@ -239,7 +266,7 @@ function evaluatePixel(samples) {
     return viz.processList(val);
 }
 `,
-  S3SLSTR: `//VERSION=3 (auto-converted from 1)
+  [S3SLSTR]: `//VERSION=3 (auto-converted from 1)
 
 let minVal = 0.0;
 let maxVal = 0.8;
@@ -267,9 +294,9 @@ function evaluatePixel(samples) {
 }
 
     `,
-  S5PL2: `return [O3];`,
-  CUSTOM: `//Write here your evalscript`,
-  DATAFUSION: `//VERSION=3
+  [S5PL2]: `return [O3];`,
+  [CUSTOM]: `//Write here your evalscript`,
+  [DATAFUSION]: `//VERSION=3
   function setup (){
     return {
       input: [

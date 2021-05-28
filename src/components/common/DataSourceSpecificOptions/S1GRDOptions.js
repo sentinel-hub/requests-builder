@@ -59,7 +59,7 @@ const S1GRDOptions = ({
   return (
     <>
       <BaseOptionsNoCC idx={idx} />
-      <label htmlFor={`s1-resolution-${idx}`} className="form__label u-margin-top-tiny">
+      <label htmlFor={`s1-resolution-${idx}`} className="form__label">
         Resolution
       </label>
       <select

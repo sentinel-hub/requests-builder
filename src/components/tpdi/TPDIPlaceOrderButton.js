@@ -1,9 +1,10 @@
 import React from 'react';
-import { createTPDIOrder, createTPDIDataFilterOrder } from './requests/common';
 import { connect } from 'react-redux';
 import RequestButton from '../common/RequestButton';
 import { errorHandlerTPDI } from './TPDIOrderOptions';
 import Tooltip from '../common/Tooltip/Tooltip';
+import TpdiResource from '../../api/tpdi/TpdiResource';
+import { tpdiCreateOrderBodyViaDataFilter, tpdiCreateOrderBodyViaProducts } from '../../api/tpdi/common';
 
 const validateCreateOrderWithProducts = (products) => {
   for (let prod of products) {
@@ -14,6 +15,8 @@ const validateCreateOrderWithProducts = (products) => {
 
 const DIALOG_TEXT =
   'Are you sure you want to create an order without a Collection ID?\nWhen you confirm your order a new collection will be created automatically.';
+
+const ORDER_BY_QUERY_LIMIT = 250;
 
 const TPDIPlaceOrderButton = ({
   areaSelected,
@@ -59,8 +62,8 @@ const TPDIPlaceOrderButton = ({
     if (areaSelected > limit) {
       return 'Increase the order limit to proceed';
     }
-    if (amountOfFoundProducts > 10) {
-      return "Order by query can only be used when there's less than 10 products returned by the search.";
+    if (amountOfFoundProducts > ORDER_BY_QUERY_LIMIT) {
+      return `Order by query can only be used when there's less than ${ORDER_BY_QUERY_LIMIT} products returned by the search.`;
     }
     return undefined;
   };
@@ -69,10 +72,12 @@ const TPDIPlaceOrderButton = ({
     if (isUsingQuery) {
       return (
         <RequestButton
-          request={createTPDIDataFilterOrder}
-          args={[state, token]}
+          request={TpdiResource.createOrder}
+          args={[tpdiCreateOrderBodyViaDataFilter(state)]}
           buttonText="Prepare Order"
-          validation={Boolean(token) && areaSelected <= limit && amountOfFoundProducts <= 10}
+          validation={
+            Boolean(token) && areaSelected <= limit && amountOfFoundProducts <= ORDER_BY_QUERY_LIMIT
+          }
           className="secondary-button"
           responseHandler={handleCreateOrderSuccess}
           errorHandler={errorHandlerTPDI}
@@ -84,8 +89,8 @@ const TPDIPlaceOrderButton = ({
     }
     return (
       <RequestButton
-        request={createTPDIOrder}
-        args={[state, token]}
+        request={TpdiResource.createOrder}
+        args={[tpdiCreateOrderBodyViaProducts(state)]}
         buttonText="Prepare Order"
         validation={validateCreateOrderWithProducts(products) && areaSelected <= limit && Boolean(token)}
         className="secondary-button"

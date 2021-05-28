@@ -1,12 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 import RequestButton from '../common/RequestButton';
-import { getAllTPDIOrders } from './requests/common';
 import { errorHandlerTPDI } from './TPDIOrderOptions';
 import OrderInfo, { OrdersTooltip } from './OrderInfo';
 
 import { connect } from 'react-redux';
 import { groupBy } from '../../utils/const';
 import OverlayButton from '../common/OverlayButton';
+import TpdiResource from '../../api/tpdi/TpdiResource';
 
 const groupAggregator = (el) => {
   if (el.status === 'PARTIAL' || el.status === 'DONE' || el.status === 'FAILED') {
@@ -99,8 +99,8 @@ const TPDIOrdersContainer = ({ token, setGetOrdersResponse, orders, setOrders })
       <div className="form" style={{ overflowY: 'scroll', maxHeight: '500px' }} ref={containerRef}>
         <div className="u-margin-bottom-small">
           <RequestButton
-            request={getAllTPDIOrders}
-            args={[token]}
+            request={TpdiResource.getOrders}
+            args={[null]}
             buttonText={orders.length > 0 ? 'Refresh your orders' : 'Get your orders'}
             validation={Boolean(token)}
             className={'secondary-button'}

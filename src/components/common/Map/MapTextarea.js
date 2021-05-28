@@ -101,7 +101,7 @@ const MapTextarea = ({ fitToMainBounds, extraGeometry, geometry, setParsedError,
           &#8505;
         </span>
         {extraGeometry ? (
-          <button className="secondary-button" onClick={handleClearExtraGeometry}>
+          <button className="secondary-button secondary-button--wrapped" onClick={handleClearExtraGeometry}>
             Clear Extra Geometry
           </button>
         ) : null}

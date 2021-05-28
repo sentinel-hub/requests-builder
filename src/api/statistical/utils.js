@@ -1,53 +1,6 @@
-import Axios from 'axios';
 import omit from 'lodash.omit';
-import { isEmpty } from '../../../utils/const';
-import { generateBounds, getNonDefaultOptions } from '../../process/requests';
-import { getRequestBody, getUrlFromCurl } from '../../process/requests/parseRequest';
-
-export const getStatisticalAuthConfig = (token, reqConfig) => {
-  return {
-    ...reqConfig,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-  };
-};
-
-export const STATISTICAL_BASE_URL = 'https://services.sentinel-hub.com/api/v1/statistics';
-
-export const getStatisticalRequest = (
-  token,
-  datasource,
-  datafusionSources,
-  byocCollectionType,
-  byocCollectionId,
-  dataFilterOptions,
-  processingOptions,
-  bounds,
-  dimensions,
-  evalscript,
-  timeRange,
-  statisticalState,
-  reqConfig,
-) => {
-  const config = getStatisticalAuthConfig(token, reqConfig);
-  const body = getStatisticalRequestBody(
-    datasource,
-    datafusionSources,
-    byocCollectionType,
-    byocCollectionId,
-    dataFilterOptions,
-    processingOptions,
-    bounds,
-    dimensions,
-    evalscript,
-    timeRange,
-    statisticalState,
-  );
-  return Axios.post(STATISTICAL_BASE_URL, body, config);
-};
+import { CUSTOM, DATAFUSION, isEmpty } from '../../utils/const';
+import { generateBounds, getNonDefaultOptions } from '../process/utils';
 
 export const getStatisticalRequestBody = (
   datasource,
@@ -86,50 +39,6 @@ export const getStatisticalRequestBody = (
   return requestBody;
 };
 
-export const getStatisticalCurlCommand = (
-  token,
-  datasource,
-  datafusionSources,
-  byocCollectionType,
-  byocCollectionId,
-  dataFilterOptions,
-  processingOptions,
-  bounds,
-  dimensions,
-  evalscript,
-  timeRange,
-  statisticalState,
-) => {
-  const body = getStatisticalRequestBody(
-    datasource,
-    datafusionSources,
-    byocCollectionType,
-    byocCollectionId,
-    dataFilterOptions,
-    processingOptions,
-    bounds,
-    dimensions,
-    evalscript,
-    timeRange,
-    statisticalState,
-  );
-  const curlCommand = `curl -X POST ${STATISTICAL_BASE_URL} \n -H 'Content-Type: application/json' \n -H 'Authorization: Bearer ${
-    token ?? '<your token here>'
-  }' \n -d '${JSON.stringify(body, null, 2)}'`;
-  return curlCommand;
-};
-
-export const sendEditedStatisticalRequest = (token, text, reqConfig) => {
-  try {
-    const url = getUrlFromCurl(text);
-    const config = getStatisticalAuthConfig(token, reqConfig);
-    const parsed = JSON.parse(getRequestBody(text));
-    return Axios.post(url, parsed, config);
-  } catch (err) {
-    return Promise.reject('Cannot parse the request');
-  }
-};
-
 const getStatisticalBounds = (bounds) => {
   return generateBounds(bounds);
 };
@@ -152,7 +61,7 @@ const getStatisticalDataArray = (
   dataFilterOptions,
   processingOptions,
 ) => {
-  if (datasource === 'DATAFUSION') {
+  if (datasource === DATAFUSION) {
     return datafusionSources.map((ds, idx) => {
       const dataFilter = getOptions(dataFilterOptions[idx].options, 'dataFilter', true);
       const processing = getOptions(processingOptions[idx].options, 'processing');
@@ -167,7 +76,7 @@ const getStatisticalDataArray = (
   const dataFilter = getOptions(dataFilterOptions[0].options, 'dataFilter', true);
   const processing = getOptions(processingOptions[0].options, 'processing');
 
-  if (datasource === 'CUSTOM') {
+  if (datasource === CUSTOM) {
     return [
       {
         type: `${byocCollectionType.toLowerCase()}-${byocCollectionId}`,
@@ -271,5 +180,16 @@ const getStatisticalCalculations = (statisticalState) => {
         },
       };
     }, {}),
+  };
+};
+
+export const getStatisticalAuthConfig = (token, reqConfig) => {
+  return {
+    ...reqConfig,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
   };
 };

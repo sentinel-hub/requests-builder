@@ -16,6 +16,7 @@ options:
     value: () => "some text",
     toggledValue?: () =>  "some text"
     nonToggle?: boolean,
+    customCopyFunction?: (text) => void;
   }
 ]
 supportedParseNames: names of options that can be parsed using onParse function.
@@ -80,7 +81,11 @@ const CommonRequestPreview = ({
   };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(text.replace(/(\r\n|\n|\r)/gm, ''));
+    if (selectedOption.customCopyFunction !== undefined) {
+      selectedOption.customCopyFunction(text);
+    } else {
+      navigator.clipboard.writeText(text.replace(/(\r\n|\n|\r)/gm, ''));
+    }
   };
 
   const handleToggleChange = () => {

@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import store from '.';
 
-function uuidv4() {
+export function uuidv4() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     //eslint-disable-next-line
     var r = (Math.random() * 16) | 0,

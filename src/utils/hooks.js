@@ -92,7 +92,7 @@ export const useDidMountEffect = (func, deps) => {
   }, deps);
 };
 
-export const useOverlayComponent = (ref) => {
+export const useOverlayComponent = (ref, overlayedClassName = undefined) => {
   const [isOverlayExpanded, setIsOverlayExpanded] = useState(false);
   const overlayRef = useRef();
   const closeOverlay = () => setIsOverlayExpanded(false);
@@ -111,18 +111,24 @@ export const useOverlayComponent = (ref) => {
         parent.replaceChild(wrapper, ref.current);
         wrapper.appendChild(ref.current);
         ref.current.classList.add('overlayed-element');
+        if (overlayedClassName !== undefined) {
+          ref.current.classList.add(overlayedClassName);
+        }
       }
     } else {
       if (overlayRef.current) {
         const childNodes = overlayRef.current.childNodes;
         ref.current.classList.remove('overlayed-element');
         overlayRef.current.replaceWith(...childNodes);
+        if (overlayedClassName !== undefined) {
+          ref.current.classList.remove(overlayedClassName);
+        }
       }
     }
     // eslint-disable-next-line
   }, [isOverlayExpanded]);
 
-  return { openOverlay };
+  return { openOverlay, isOverlayExpanded };
 };
 
 export const useScrollBlock = (condition) => {

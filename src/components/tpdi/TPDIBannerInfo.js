@@ -4,8 +4,8 @@ import alertSlice from '../../store/alert';
 import { parseTPDIRequest } from './parse';
 import { airbusOrderDemo } from './utils/const';
 import { connect } from 'react-redux';
-import { getTPDIQuota } from './requests/common';
 import Axios from 'axios';
+import TpdiResource from '../../api/tpdi/TpdiResource';
 
 const checkIfHasNonZeroQuota = (res) => {
   if (res.data && res.data.data && res.data.data.length > 0) {
@@ -23,7 +23,7 @@ const TPDIBannerInfo = ({ token }) => {
     const source = Axios.CancelToken.source();
     const fetchQuota = async () => {
       try {
-        const res = await getTPDIQuota(token, { cancelToken: source.token });
+        const res = await TpdiResource.getQuota(null, { cancelToken: source.token });
         const hasNonZero = checkIfHasNonZeroQuota(res);
         if (!hasNonZero) {
           setHasQuota(false);

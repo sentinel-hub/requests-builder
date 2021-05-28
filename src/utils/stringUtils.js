@@ -13,4 +13,7 @@ export const formatText = (text) => {
 
 export const isWritingDecimal = (input) => /^\d*(\.|,)0*$/.test(input);
 
-export const isFloatString = (input) => /[+-]?([0-9]*[.])?[0-9]+/.test(input);
+export const validFloatInput = (text) => /^([0-9]*[.])?[0-9]+$/.test(text);
+
+export const checkValidUuid = (id) =>
+  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(id);

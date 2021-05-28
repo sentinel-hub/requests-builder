@@ -2,7 +2,14 @@ import omit from 'lodash.omit';
 import store from '../../../store';
 import mapSlice from '../../../store/map';
 import requestSlice from '../../../store/request';
-import { DATASOURCES_NAMES, CRS, OUTPUT_FORMATS, CUSTOM } from '../../../utils/const';
+import {
+  DATASOURCES_NAMES,
+  CRS,
+  OUTPUT_FORMATS,
+  CUSTOM,
+  DATAFUSION,
+  OLD_DATASOURCES_TO_NEW_MAP,
+} from '../../../utils/const';
 import { calculateMaxMetersPerPixel } from '../../common/Map/utils/bboxRatio';
 
 const dispatchEvalscript = (parsedBody) => {
@@ -77,10 +84,12 @@ const dispatchTimeRange = (parsedBody) => {
 };
 
 const handleDatafusionParsing = (parsedBody) => {
-  store.dispatch(requestSlice.actions.setDatasource('DATAFUSION'));
+  store.dispatch(requestSlice.actions.setDatasource(DATAFUSION));
   let dataFusionSources = [];
   parsedBody.input.data.forEach((data) => {
-    dataFusionSources.push({ datasource: data.type, id: data.id ? data.id : '' });
+    let datasource = data.type;
+    datasource = getDataCollection(datasource);
+    dataFusionSources.push({ datasource, id: data.id ? data.id : '' });
   });
   store.dispatch(requestSlice.actions.setDatafusionSourcesAbs(dataFusionSources));
 };
@@ -103,6 +112,18 @@ const handleByocParsing = (datasource) => {
   store.dispatch(requestSlice.actions.setByocCollectionType(type.toUpperCase()));
 };
 
+const getDataCollection = (datasource) => {
+  const validDatasource = DATASOURCES_NAMES.find((d) => d === datasource);
+  if (validDatasource !== undefined) {
+    return validDatasource;
+  }
+  const oldDatasource = Object.keys(OLD_DATASOURCES_TO_NEW_MAP).find((d) => d === datasource);
+  if (oldDatasource !== undefined) {
+    return OLD_DATASOURCES_TO_NEW_MAP[oldDatasource];
+  }
+  return undefined;
+};
+
 export const dispatchDatasource = (parsedBody) => {
   try {
     if (parsedBody.input.data.length > 1) {
@@ -110,13 +131,11 @@ export const dispatchDatasource = (parsedBody) => {
       return;
     }
     const datasource = parsedBody.input.data[0].type;
-    const validDatasource = DATASOURCES_NAMES.find((d) => d === datasource);
-    if (validDatasource) {
-      store.dispatch(requestSlice.actions.setDatasource(validDatasource));
-      if (validDatasource === CUSTOM) {
-        handleOldByocParsing(parsedBody);
-        return;
-      }
+    const usedDataCollection = getDataCollection(datasource);
+    store.dispatch(requestSlice.actions.setDatasource(usedDataCollection));
+    if (usedDataCollection === CUSTOM) {
+      handleOldByocParsing(parsedBody);
+      return;
     }
     if (datasource.includes('byoc-') || datasource.includes('batch-')) {
       handleByocParsing(datasource);

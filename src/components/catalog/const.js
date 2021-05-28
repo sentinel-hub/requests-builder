@@ -115,6 +115,12 @@ export const CATALOG_BASE_URL = 'https://services.sentinel-hub.com/api/v1/catalo
 export const CATALOG_CREO_URL = 'https://creodias.sentinel-hub.com/api/v1/catalog/';
 export const CATALOG_WEST_URL = 'https://services-uswest2.sentinel-hub.com/api/v1/catalog/';
 
+export const CATALOG_OPTIONS = [
+  { url: CATALOG_BASE_URL, name: 'EU' },
+  { url: CATALOG_CREO_URL, name: 'CREO' },
+  { url: CATALOG_WEST_URL, name: 'US-WEST' },
+];
+
 export const collectionIdToUrl = {
   [S2L1C_CATALOG_ID]: CATALOG_BASE_URL,
   [S2L2A_CATALOG_ID]: CATALOG_BASE_URL,

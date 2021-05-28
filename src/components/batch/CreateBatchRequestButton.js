@@ -1,9 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import RequestButton from '../common/RequestButton';
-import { createBatchRequest } from './requests';
-import { addAlertOnError } from './utils';
+import { addAlertOnError } from './lib/utils';
 import { validateRequestState } from '../../utils/validator';
+import BatchResource from '../../api/batch/BatchResource';
+import { generateBatchBodyRequest } from '../../api/batch/utils';
 
 const isCreatePossible = (batchState, requestState, token) => {
   const { tillingGrid, resolution, bucketName } = batchState;
@@ -35,8 +36,8 @@ const CreateBatchRequestButton = ({
       validation={isCreatePossible(batchState, requestState, token)}
       className="secondary-button"
       buttonText="Create"
-      request={createBatchRequest}
-      args={[requestState, batchState, mapState, token]}
+      request={BatchResource.createOrder}
+      args={[generateBatchBodyRequest(requestState, batchState, mapState)]}
       responseHandler={createResponseHandler}
       errorHandler={addAlertOnError}
     />
