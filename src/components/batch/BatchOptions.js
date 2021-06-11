@@ -19,9 +19,22 @@ const generateResolutions = (tillingGridId) => {
       return [60.0, 120.0, 240.0, 360.0];
     case 3:
       return [0.0001, 0.0002];
+    case 4:
+      return [0.0001, 0.0002];
+    case 5:
+      return [10.0, 20.0, 60.0];
     default:
       return [];
   }
+};
+
+const generateAdditionalGrids = () => {
+  return (
+    <optgroup label="Internal grids">
+      <option value={4}>0.25 WGS84</option>
+      <option value={5}>New Zealand Topo50</option>
+    </optgroup>
+  );
 };
 
 const BatchOptions = ({
@@ -31,13 +44,13 @@ const BatchOptions = ({
   bucketName,
   cogOutput,
   tilePath,
-  specifyingBucketName,
   setFetchedRequests,
   createCollection,
   collectionId,
   setCreateResponse,
   openOnlyCreateContainer,
   batchOverwrite,
+  extendedSettings,
 }) => {
   const handleGridChange = (e) => {
     store.dispatch(batchSlice.actions.setTillingGrid(Number(e.target.value)));
@@ -61,16 +74,7 @@ const BatchOptions = ({
   };
 
   const handleCogOutputChange = () => {
-    if (!cogOutput) {
-      store.dispatch(batchSlice.actions.setSpecifyingBucketName(false));
-    }
     store.dispatch(batchSlice.actions.setCogOutput(!cogOutput));
-  };
-
-  const handleSpecifyingBucketNameChange = () => {
-    if (!cogOutput) {
-      store.dispatch(batchSlice.actions.setSpecifyingBucketName(!specifyingBucketName));
-    }
   };
 
   const handleTilePathChange = (e) => {
@@ -113,6 +117,7 @@ const BatchOptions = ({
           <option value={1}>10km grid</option>
           <option value={2}>100.08km grid</option>
           <option value={3}>WGS84 1 degree grid</option>
+          {extendedSettings && generateAdditionalGrids()}
         </select>
 
         <label htmlFor="resolution" className="form__label">
@@ -138,6 +143,31 @@ const BatchOptions = ({
           type="text"
           onChange={handleBucketNameChange}
           value={bucketName}
+        />
+
+        <div className="label-with-info">
+          <label htmlFor="tile-path" className="form__label" style={{ marginRight: 'auto' }}>
+            Tile Path {cogOutput ? '(Required)' : ''}
+          </label>
+          <Tooltip
+            direction="right"
+            content={
+              <p>
+                Specify an optional tile path where tiles will be ingested on your s3 bucket. <br />
+                Use this to input to specify the files path on your bucket. Input follows:
+                's3://your-bucket/input-text-here'
+              </p>
+            }
+            infoStyles={{ marginRight: '1rem' }}
+          />
+        </div>
+        <input
+          id="tile-path"
+          className="form__input"
+          type="text"
+          onChange={handleTilePathChange}
+          value={tilePath}
+          placeholder={!cogOutput ? '(Optional): Specify tile path' : '(Required): Specify tile path'}
         />
 
         <label htmlFor="batch-description" className="form__label">
@@ -208,46 +238,6 @@ const BatchOptions = ({
           placeholder="(Optional) Write your collection id"
         />
 
-        <div className="toggle-with-label">
-          <label htmlFor="specify-bucket" className="form__label">
-            {!specifyingBucketName ? 'Specifying Tile Path' : 'Specifying bucket name'}
-          </label>
-          <Toggle
-            checked={specifyingBucketName}
-            onChange={handleSpecifyingBucketNameChange}
-            id="specify-bucket"
-            style={{ marginRight: 'auto' }}
-          />
-          <Tooltip
-            direction="right"
-            content="Select if you want to specify the bucket name or the tile path where tiles will be ingested on your s3 bucket."
-            infoStyles={{ marginRight: '1rem' }}
-          />
-        </div>
-
-        {!specifyingBucketName ? (
-          <>
-            <div className="label-with-info">
-              <label htmlFor="tile-path" className="form__label" style={{ marginRight: 'auto' }}>
-                Tile Path
-              </label>
-              <Tooltip
-                direction="right"
-                content="Use this to specify the path on your bucket. Input text comes after: 's3://<your-bucket>/<input-text-here>'"
-                infoStyles={{ marginRight: '1rem' }}
-              />
-            </div>
-            <input
-              id="tile-path"
-              className="form__input"
-              type="text"
-              onChange={handleTilePathChange}
-              value={tilePath}
-              placeholder="Specify tile path"
-            />
-          </>
-        ) : null}
-
         <div className="label-with-info">
           <label htmlFor="batch-overwrite" className="form__label">
             Overwrite
@@ -255,7 +245,7 @@ const BatchOptions = ({
           <Toggle
             id="batch-overwrite"
             onChange={handleOverwriteChange}
-            value={batchOverwrite}
+            checked={batchOverwrite}
             style={{ marginRight: 'auto' }}
           />
           <Tooltip
@@ -284,11 +274,12 @@ const mapStateToProps = (store) => ({
   description: store.batch.description,
   bucketName: store.batch.bucketName,
   cogOutput: store.batch.cogOutput,
-  specifyingBucketName: store.batch.specifyingBucketName,
   tilePath: store.batch.defaultTilePath,
   createCollection: store.batch.createCollection,
   collectionId: store.batch.collectionId,
   batchOverwrite: store.batch.overwrite,
+  //additional grids
+  extendedSettings: store.params.extendedSettings,
 });
 
 export default connect(mapStateToProps)(BatchOptions);

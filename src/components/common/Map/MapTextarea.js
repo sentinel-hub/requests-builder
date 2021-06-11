@@ -3,6 +3,14 @@ import { kml } from '@tmcw/togeojson';
 import store from '../../../store';
 import mapSlice from '../../../store/map';
 import { addWarningAlert } from '../../../store/alert';
+import { crsByUrl } from '../../process/requests/parseRequest';
+
+const isFeatureCollection = (parsedGeometry) => parsedGeometry.type === 'FeatureCollection';
+const isFeature = (parsedGeometry) => parsedGeometry.type === 'Feature';
+const isGeojson = (parsedGeometry) =>
+  isFeatureCollection(parsedGeometry) || isFeature(parsedGeometry) === 'Feature';
+const containsCrs = (parsedGeometry) => parsedGeometry.properties?.crs !== undefined;
+const getCrsUrl = (parsedGeometry) => parsedGeometry.properties.crs;
 
 const MapTextarea = ({ fitToMainBounds, extraGeometry, geometry, setParsedError, selectedCrs }) => {
   const [geometryText, setGeometryText] = useState('');
@@ -15,8 +23,21 @@ const MapTextarea = ({ fitToMainBounds, extraGeometry, geometry, setParsedError,
     try {
       let parsedGeo = JSON.parse(text);
       // Geojson
-      if (parsedGeo.type === 'FeatureCollection') {
-        parsedGeo = parsedGeo.features[0].geometry;
+      if (isGeojson) {
+        if (containsCrs(parsedGeo)) {
+          const selectedCrs = crsByUrl(getCrsUrl(parsedGeo));
+          if (selectedCrs) {
+            store.dispatch(mapSlice.actions.setSelectedCrs(selectedCrs));
+          } else {
+            throw Error('CRS not supported');
+          }
+        }
+        if (isFeatureCollection(parsedGeo)) {
+          parsedGeo = parsedGeo.features[0].geometry;
+        }
+        if (isFeature(parsedGeo)) {
+          parsedGeo = parsedGeo.geometry;
+        }
       }
       store.dispatch(mapSlice.actions.setTextGeometry(parsedGeo));
     } catch (err) {

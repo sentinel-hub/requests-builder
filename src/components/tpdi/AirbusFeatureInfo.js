@@ -80,6 +80,7 @@ const AirbusFeatureInfo = ({ feature, geometry, isDisabled }) => {
           <TPDIThumbnail
             collectionId={airbusConstellationToProvider[feature.properties.constellation]}
             productId={feature.properties.id}
+            geometry={feature.geometry}
           />
         </div>
       ) : null}

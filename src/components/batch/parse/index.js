@@ -35,7 +35,6 @@ export const parseBatchRequest = (props) => {
       store.dispatch(batchSlice.actions.setCogOutput(true));
     }
     if (props.output.defaultTilePath) {
-      store.dispatch(batchSlice.actions.setSpecifyingBucketName(false));
       store.dispatch(
         batchSlice.actions.setDefaultTilePath(props.output.defaultTilePath.split(bucketName + '/')[1]),
       );

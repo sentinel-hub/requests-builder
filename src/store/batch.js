@@ -8,7 +8,6 @@ const batchInitialState = {
   cogOutput: false,
   defaultTilePath: '',
   // bucketName -> true, if defaultTilePath -> false
-  specifyingBucketName: true,
   extraInfo: '',
   specifyingCogParams: false,
   createCollection: false,
@@ -38,9 +37,6 @@ const batchSlice = createSlice({
     },
     setDefaultTilePath: (state, action) => {
       state.defaultTilePath = action.payload;
-    },
-    setSpecifyingBucketName: (state, action) => {
-      state.specifyingBucketName = action.payload;
     },
     setExtraInfo: (state, action) => {
       state.extraInfo = action.payload;

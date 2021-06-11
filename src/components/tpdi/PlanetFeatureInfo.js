@@ -52,7 +52,7 @@ const PlanetFeatureInfo = ({ feature, geometry, isDisabled }) => {
               </p>
             )}
           </div>
-          <TPDIThumbnail collectionId="PLANET_SCOPE" productId={feature.id} />
+          <TPDIThumbnail collectionId="PLANET_SCOPE" productId={feature.id} geometry={feature.geometry} />
         </div>
       ) : null}
       <hr />

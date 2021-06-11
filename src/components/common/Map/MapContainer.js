@@ -13,6 +13,7 @@ import {
   getAreaFromGeometry,
   getLatLngFromBbox,
   isBbox,
+  isMultiPolygon,
   isPolygon,
   transformGeometryToWGS84IfNeeded,
 } from './utils/crsTransform';
@@ -26,10 +27,7 @@ import { faExpandArrowsAlt } from '@fortawesome/free-solid-svg-icons';
 
 const getLeafletLayer = (wgs84Geometry, layerConfig, currentLayers, mapRef) => {
   // add event listener to layer
-  const addEditEventListener = (layer, layerConfig) => {
-    if (layerConfig) {
-      return;
-    }
+  const addEditEventListener = (layer) => {
     layer.on('pm:edit', (e) => {
       const layer = e.layer;
       const type = currentLayers[0].type;
@@ -53,7 +51,7 @@ const getLeafletLayer = (wgs84Geometry, layerConfig, currentLayers, mapRef) => {
     if (wgs84Geometry.type === 'Polygon') {
       const coords = wgs84Geometry.coordinates[0].map((c) => [c[1], c[0]]);
       const polygon = L.polygon(coords, layerConfig);
-      addEditEventListener(polygon, layerConfig);
+      addEditEventListener(polygon);
       return {
         layer: polygon,
         type: 'polygon',
@@ -63,7 +61,7 @@ const getLeafletLayer = (wgs84Geometry, layerConfig, currentLayers, mapRef) => {
         a.map((coords) => coords).map((b) => b.map((c) => [c[1], c[0]])),
       );
       const layer = L.polygon(coords, layerConfig);
-      addEditEventListener(layer, layerConfig);
+      addEditEventListener(layer);
       return {
         layer: layer,
         type: 'polygon',
@@ -71,7 +69,7 @@ const getLeafletLayer = (wgs84Geometry, layerConfig, currentLayers, mapRef) => {
     } else if (isBbox(wgs84Geometry)) {
       const coords = bboxPolygon(wgs84Geometry).geometry.coordinates[0].map((c) => [c[1], c[0]]);
       const polygon = L.rectangle(coords, layerConfig);
-      addEditEventListener(polygon, layerConfig);
+      addEditEventListener(polygon);
       return {
         layer: polygon,
         type: 'rectangle',
@@ -86,7 +84,7 @@ const getLeafletLayer = (wgs84Geometry, layerConfig, currentLayers, mapRef) => {
 const getBoundsForAdditionalLayer = (geometry) => {
   if (isBbox(geometry)) {
     return getLatLngFromBbox(geometry);
-  } else if (isPolygon(geometry) || isPolygon(geometry)) {
+  } else if (isPolygon(geometry) || isMultiPolygon(geometry)) {
     return L.geoJson(geometry).getBounds();
   }
 };

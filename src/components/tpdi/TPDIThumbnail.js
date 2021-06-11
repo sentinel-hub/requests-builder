@@ -2,13 +2,19 @@ import Axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExpandArrowsAlt } from '@fortawesome/free-solid-svg-icons';
-import { connect } from 'react-redux';
 import BaseModal from './BaseModal';
 import TpdiResource from '../../api/tpdi/TpdiResource';
+import { uuidv4 } from '../../store/alert';
+import store from '../../store';
+import mapSlice from '../../store/map';
 
-const TPDIThumbnail = ({ collectionId, productId, token }) => {
+const TPDIThumbnail = ({ collectionId, productId, geometry }) => {
   const [isFetchingThumbnail, setIsFetchingThumbnail] = useState(true);
   const [srcUrl, setSrcUrl] = useState();
+  const handleAddToMap = () => {
+    const uuid = uuidv4();
+    store.dispatch(mapSlice.actions.addAdditionalLayer({ url: srcUrl, geometry: geometry, uuid }));
+  };
 
   useEffect(() => {
     let axiosSource = Axios.CancelToken.source();
@@ -57,7 +63,18 @@ const TPDIThumbnail = ({ collectionId, productId, token }) => {
                 <FontAwesomeIcon icon={faExpandArrowsAlt} style={{ marginLeft: '1rem', fontSize: '2rem' }} />
               </div>
             }
-            content={<img src={srcUrl} style={{ maxHeight: '70vh' }} alt={`${productId}-thumbnail`} />}
+            content={
+              <div className="u-flex-column-centered">
+                <img src={srcUrl} style={{ maxHeight: '70vh' }} alt={`${productId}-thumbnail`} />
+                <button className="secondary-button" onClick={handleAddToMap}>
+                  Add to map
+                </button>
+                <p className="text text--warning u-margin-top-tiny">
+                  Thumbnail is not georeferenced so the resulting map layer is just an approximation. <br />
+                  Check the product geometry to see the exact polygon that will be ordered.
+                </p>
+              </div>
+            }
           />
         </>
       )}
@@ -65,8 +82,4 @@ const TPDIThumbnail = ({ collectionId, productId, token }) => {
   );
 };
 
-const mapStateToProps = (state) => ({
-  token: state.auth.user.access_token,
-});
-
-export default connect(mapStateToProps)(TPDIThumbnail);
+export default TPDIThumbnail;

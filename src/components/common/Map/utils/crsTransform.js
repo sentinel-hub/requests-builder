@@ -106,9 +106,10 @@ export const transformPolygonToNewCrs = (polygonToTransform, toProj, fromProj) =
   return polygon;
 };
 
-const transformCoordMultiPolygon = (coords, toProj, fromProj) => {
-  return [coords[0].map((listOfPairs) => listOfPairs.map((c) => proj4(fromProj, toProj, c)))];
-};
+const transformCoordMultiPolygon = (coords, toProj, fromProj) =>
+  coords.map((polyCoords) =>
+    polyCoords.map((listOfPairs) => listOfPairs.map((c) => proj4(fromProj, toProj, c))),
+  );
 
 const transformMultiPolygonToNewCrs = (multiPolygon, toProj, fromProj) => {
   const transformedCoords = transformCoordMultiPolygon(multiPolygon.coordinates, toProj, fromProj);

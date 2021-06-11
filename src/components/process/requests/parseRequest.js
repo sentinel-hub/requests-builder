@@ -23,36 +23,28 @@ const dispatchEvalscript = (parsedBody) => {
   }
 };
 
+export const crsByUrl = (url) => Object.keys(CRS).find((key) => CRS[key].url === url);
+
 export const dispatchBounds = (parsedBody) => {
   try {
     let bounds = parsedBody.input.bounds;
     //crs
-    const crs = bounds.properties?.crs ?? undefined;
+    const crsUrl = bounds.properties?.crs ?? undefined;
     let selectedCrs;
-    if (crs) {
-      selectedCrs = Object.keys(CRS).find((key) => CRS[key].url === crs);
-      if (selectedCrs) {
-        // store.dispatch(requestSlice.actions.setCRS(selectedCrs));
+    if (crsUrl) {
+      selectedCrs = crsByUrl(crsUrl);
+      if (!selectedCrs) {
+        selectedCrs = 'EPSG:4326';
       }
-    } else {
-      selectedCrs = 'EPSG:4326';
-      // store.dispatch(requestSlice.actions.setCRS(selectedCrs));
     }
     //is bbox
     if (bounds.bbox) {
       let geometry = bounds.bbox;
-      // if not wgs84 -> transform to it
-      // if (selectedCrs !== 'EPSG:4326') {
-      //   geometry = transformGeometryToNewCrs(bounds.bbox, 'EPSG:4326', selectedCrs);
-      // }
       store.dispatch(mapSlice.actions.setConvertedGeometryWithCrs({ geometry, crs: selectedCrs }));
     }
     //polygon
     else if (bounds.geometry) {
       let geometry = bounds.geometry;
-      // if (selectedCrs !== 'EPSG:4326') {
-      //   geometry = transformGeometryToNewCrs(geometry, 'EPSG:4326', selectedCrs);
-      // }
       store.dispatch(mapSlice.actions.setConvertedGeometryWithCrs({ geometry, crs: selectedCrs }));
     }
   } catch (err) {

@@ -61,8 +61,8 @@ export const generateBatchBodyRequest = (requestState, batchState, mapState) => 
     id: batchState.tillingGrid,
     resolution: batchState.resolution,
   };
-
-  if (batchState.specifyingBucketName) {
+  const trimmedTilePath = batchState.defaultTilePath.trim();
+  if (trimmedTilePath === '') {
     batchRequest.bucketName = batchState.bucketName;
   } else {
     batchRequest.output = {

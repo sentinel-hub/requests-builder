@@ -65,6 +65,7 @@ const TPDIOrderOptions = ({
   afterOrderCreationAction,
   amountOfFoundProducts,
   harmonizeTo,
+  productBundle,
 }) => {
   const [limit, setLimit] = useState(10.0);
 
@@ -251,10 +252,22 @@ const TPDIOrderOptions = ({
         ) : null}
 
         {provider === 'PLANET' && (
-          <div className="u-flex-aligned">
-            <label className="form__label u-margin-right-tiny">Harmonize data</label>
-            <Toggle onChange={handleHarmonizeChange} checked={harmonizeTo === 'PS2'} />
-          </div>
+          <>
+            <div className="u-flex-aligned" style={{ justifyContent: 'space-between' }}>
+              <div className="u-flex-aligned">
+                <label className="form__label u-margin-right-tiny">Harmonize data</label>
+                <Toggle
+                  onChange={handleHarmonizeChange}
+                  checked={harmonizeTo === 'PS2'}
+                  disabled={productBundle.includes('sr')}
+                />
+              </div>
+              <Tooltip
+                content="Harmonization is not yet supported for surface reflectance products, thus this field must be explicitly set to NONE if productBundle is analytic_sr or analytic_sr_udm2."
+                direction="right"
+              />
+            </div>
+          </>
         )}
 
         <TPDIPlaceOrderButton
@@ -278,6 +291,7 @@ const mapStateToProps = (state) => ({
   isParsing: state.tpdi.isParsing,
   isUsingQuery: state.tpdi.isUsingQuery,
   harmonizeTo: state.planet.harmonizeTo,
+  productBundle: state.planet.productBundle,
 });
 
 export default connect(mapStateToProps)(TPDIOrderOptions);

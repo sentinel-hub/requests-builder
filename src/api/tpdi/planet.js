@@ -11,7 +11,7 @@ export const getPlanetSearchRequestBody = (state) => {
     data: [
       {
         itemType: 'PSScene4Band',
-        productBundle: 'analytic',
+        productBundle: state.planet.productBundle,
         dataFilter: {
           ...getTimeRange(state.request, state.tpdi.isSingleDate),
           maxCloudCoverage: state.planet.maxCloudCoverage,
@@ -28,7 +28,7 @@ export const getPlanetOrderBody = (state) => {
   requestBody.name = state.tpdi.name;
   requestBody.collectionId = state.tpdi.collectionId;
   delete requestBody.input.data[0].dataFilter;
-  requestBody.input.data[0].productBundle = 'analytic';
+  requestBody.input.data[0].productBundle = state.planet.productBundle;
   requestBody.input.data[0].itemIds = state.tpdi.products.map((product) => product.id);
   requestBody.input.data[0].harmonizeTo = state.planet.harmonizeTo;
   return requestBody;

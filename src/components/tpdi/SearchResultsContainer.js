@@ -55,6 +55,7 @@ const generateFeatures = (featuresWithProvider, geometry, productIds) => {
         key={feature.catalogID}
         feature={feature}
         isDisabled={productIds.find((id) => id === feature.catalogID)}
+        geometry={geometry}
       />
     ));
   }

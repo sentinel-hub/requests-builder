@@ -32,6 +32,9 @@ export const configureParams = async (params) => {
       console.error(err);
     }
   }
+  if (params['extended-settings'] !== undefined) {
+    store.dispatch(paramsSlice.actions.setExtendedSettings());
+  }
 };
 
 export const getUrlParams = () => {

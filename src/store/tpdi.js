@@ -124,6 +124,7 @@ export const planetSlice = createSlice({
     planetApiKey: '',
     maxCloudCoverage: 100,
     harmonizeTo: 'PS2',
+    productBundle: 'analytic',
   },
   reducers: {
     setApiKey: (state, action) => {
@@ -134,6 +135,9 @@ export const planetSlice = createSlice({
     },
     setHarmonizeTo: (state, action) => {
       state.harmonizeTo = action.payload;
+    },
+    setProductBundle: (state, action) => {
+      state.productBundle = action.payload;
     },
   },
 });
