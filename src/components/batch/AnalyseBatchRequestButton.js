@@ -24,6 +24,7 @@ const AnalyseBatchRequestButton = ({ requestId, token, analyseRequest, setOpened
       errorHandler={addAlertOnError}
       request={BatchResource.analyseOrder}
       args={[{ orderId: requestId }]}
+      style={{ width: '70%', marginTop: '0' }}
     />
   );
 };

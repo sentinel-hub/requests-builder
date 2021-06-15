@@ -17,7 +17,7 @@ export const fetchTilesBatchRequest = async (id) => {
   let res = await TileResource.getTiles({ orderId: id });
   let tiles = res.data.data;
   while (res.data.links.next) {
-    res = await TileResource.getNextTiles(res.links.next)();
+    res = await TileResource.getNextTiles(res.data.links.next)();
     tiles = tiles.concat(res.data.data);
   }
   return new Promise((resolve, reject) => {
@@ -25,9 +25,15 @@ export const fetchTilesBatchRequest = async (id) => {
   });
 };
 
-const tillingGridIdToName = (id) => {
-  return ['S2GM Grid', '10km Grid', '100,08km Grid', 'WGS84'][id];
-};
+const gridsArray = [
+  'S2GM Grid', // 0
+  '10km Grid', // 1
+  '100,08km Grid', // 2
+  'WGS84', // 3
+  'WGS84 0.25 degree', // 4
+  'New Zealand Topo50', // 5
+];
+const tillingGridIdToName = (id) => gridsArray[id];
 
 const validStatus = (status) => {
   return Boolean(status !== 'CREATED' && status !== 'CANCELED' && status !== 'ANALYSING');
@@ -65,8 +71,23 @@ const updateTileInfo = (tiles) => {
   }, initial);
 };
 
+const validDeleteStatus = ['FAILED', 'CREATED', 'ANALYSIS_DONE'];
 const isValidDeleteStatus = (status) => {
-  return ['FAILED', 'CREATED', 'ANALYSIS_DONE'].includes(status);
+  return validDeleteStatus.includes(status);
+};
+
+const getPathToCopyFromTilePath = (tilePath) => {
+  const splitted = tilePath.split('/');
+  const resPathArr = [];
+  const testRegex = /<\w+>/g;
+  for (let word of splitted) {
+    if (testRegex.test(word)) {
+      break;
+    } else {
+      resPathArr.push(word);
+    }
+  }
+  return resPathArr.join('/');
 };
 
 const BatchRequestSummary = ({
@@ -115,9 +136,8 @@ const BatchRequestSummary = ({
   }, [isExpanded]);
 
   const generateCopyCommand = useCallback(() => {
-    //if tilePath
     if (props.output && props.output.defaultTilePath) {
-      let path = props.output.defaultTilePath.split('<')[0];
+      const path = getPathToCopyFromTilePath(props.output.defaultTilePath);
       return `aws s3 sync ${path} ./`;
     }
     return `aws s3 sync s3://${bucketName}/${id}/ ./`;
@@ -239,7 +259,7 @@ const BatchRequestSummary = ({
                 </p>
               ) : null} */}
               <p className="text">
-                <span>Tilling Grid:</span> {tillingGridIdToName(props.tilingGrid.id)}
+                <span>Tiling Grid:</span> {tillingGridIdToName(props.tilingGrid.id)}
               </p>
               <p className="text">
                 <span>Resolution:</span> {props.tilingGrid.resolution}
@@ -249,14 +269,58 @@ const BatchRequestSummary = ({
               </p>
             </>
           </div>
-
-          <BatchActions
-            requestId={id}
-            token={token}
-            setSingleResponse={setSingleResponse}
-            setFetchedRequests={setFetchedRequests}
-            setOpenedContainers={setOpenedContainers}
-          />
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              width: '100%',
+              justifyContent: 'space-around',
+              alignItems: 'center',
+            }}
+          >
+            <BatchActions
+              requestId={id}
+              token={token}
+              setSingleResponse={setSingleResponse}
+              setFetchedRequests={setFetchedRequests}
+              setOpenedContainers={setOpenedContainers}
+              status={status}
+            />
+            <div className="batch-request-summary-actions">
+              <button
+                onClick={handleSeeGeometry}
+                className="secondary-button secondary-button--wrapped"
+                style={{ width: '70%' }}
+              >
+                See geometry on map
+              </button>
+              <button
+                onClick={handleSetGeometry}
+                className="secondary-button secondary-button--wrapped"
+                style={{ width: '70%' }}
+              >
+                Set geometry on map
+              </button>
+              <button
+                onClick={handleParseBatch}
+                className="secondary-button secondary-button--wrapped"
+                style={{ width: '70%' }}
+              >
+                Parse Batch Request
+              </button>
+              {isValidDeleteStatus(status) && (
+                <RequestButton
+                  request={BatchResource.deleteOrder}
+                  args={[{ orderId: id }]}
+                  buttonText="Delete Batch Request"
+                  className="secondary-button secondary-button--cancel"
+                  validation={true}
+                  responseHandler={deleteResponseHandler}
+                  errorHandler={deleteErrorHandler}
+                />
+              )}
+            </div>
+          </div>
         </div>
       )}
 
@@ -305,38 +369,6 @@ const BatchRequestSummary = ({
         </>
       ) : null}
 
-      {isExpanded ? (
-        <div>
-          <button
-            onClick={handleSeeGeometry}
-            style={{ width: 'fit-content', marginRight: '1rem' }}
-            className="secondary-button u-margin-bottom-small"
-          >
-            See geometry on map
-          </button>
-          <button
-            onClick={handleSetGeometry}
-            style={{ width: 'fit-content', marginRight: '1rem' }}
-            className="secondary-button u-margin-bottom-small"
-          >
-            Set geometry on map
-          </button>
-          <button onClick={handleParseBatch} className="secondary-button" style={{ marginRight: '1rem' }}>
-            Parse Batch Request
-          </button>
-          {isValidDeleteStatus(status) && (
-            <RequestButton
-              request={BatchResource.deleteOrder}
-              args={[{ orderId: id }]}
-              buttonText="Delete Batch Request"
-              className="secondary-button secondary-button--cancel"
-              validation={true}
-              responseHandler={deleteResponseHandler}
-              errorHandler={deleteErrorHandler}
-            />
-          )}
-        </div>
-      ) : null}
       <hr></hr>
     </div>
   );

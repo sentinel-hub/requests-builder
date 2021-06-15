@@ -62,18 +62,18 @@ export const doLogout = () => {
     });
 };
 
-const AuthHeader = ({ user, isEdcUser, customUrl }) => {
+const AuthHeader = ({ user, isEdcUser, customUrl, isImpersonating }) => {
   useEffect(() => {
-    if (!isEdcUser) {
+    if (!isEdcUser && !isImpersonating) {
       // edc token won't be saved on localstorage since a call to the /token_sentinel_hub needs to be done to know if it's deployed on EDC or not.
       signInOnLoad();
     }
-  }, [isEdcUser]);
+  }, [isEdcUser, isImpersonating]);
 
-  const signInOnLoad = async () => {
+  const signInOnLoad = async (isImpersonating) => {
     try {
       const token = await getTokenFromLocalStorage();
-      if (token) {
+      if (token && !isImpersonating) {
         store.dispatch(
           authSlice.actions.setUser({
             userdata: decodeToken(token),
@@ -110,6 +110,7 @@ const mapStateToProps = (store) => ({
   user: store.auth.user,
   isEdcUser: store.auth.isEDC,
   customUrl: store.params.customUrl,
+  isImpersonating: store.auth.isImpersonating,
 });
 
 export default connect(mapStateToProps, null)(AuthHeader);

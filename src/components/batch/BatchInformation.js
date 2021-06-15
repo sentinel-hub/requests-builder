@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 import { groupBy } from '../../utils/const';
 import BatchStatusRequestsContainer from './BatchStatusRequestsContainer';
 import GetAllBatchRequestsButton from './GetAllBatchRequestsButton';
+import GetLatestRequestButton from './GetLatestRequestButton';
+import { isCreatedStatus, isFinishedStatus, isRunningStatus } from './lib/utils';
 
 const filterRequestsResults = (searchText, requests) => {
   if (searchText === '') {
@@ -26,13 +28,13 @@ const filterRequestsResults = (searchText, requests) => {
 
 export const groupBatchAggregator = (el) => {
   const { status } = el;
-  if (status === 'ANALYSING' || status === 'ANALYSIS_DONE' || status === 'CREATED') {
+  if (isCreatedStatus(status)) {
     return 'CREATED';
   }
-  if (status === 'PROCESSING') {
+  if (isRunningStatus(status)) {
     return 'RUNNING';
   }
-  if (status === 'DONE' || status === 'PARTIAL' || status === 'FAILED' || status === 'CANCELED') {
+  if (isFinishedStatus(status)) {
     return 'FINISHED';
   }
 };
@@ -104,6 +106,12 @@ const BatchInformation = ({
           <GetAllBatchRequestsButton
             setFetchedRequests={setFetchedRequests}
             setGetAllResponse={setGetAllResponse}
+          />
+
+          <GetLatestRequestButton
+            setFetchedRequests={setFetchedRequests}
+            setGetAllResponse={setGetAllResponse}
+            handleExpandContainer={handleExpandContainer}
           />
           <input
             value={searchText}

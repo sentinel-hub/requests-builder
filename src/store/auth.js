@@ -10,6 +10,7 @@ const authSlice = createSlice({
     },
     // For EDC Deployment. Assume it's true so feature get toggled and not dissapear.
     isEDC: true,
+    isImpersonating: false,
   },
   reducers: {
     setUser: (state, action) => {
@@ -30,6 +31,9 @@ const authSlice = createSlice({
     setToken: (state, action) => {
       state.user.access_token = action.payload.access_token;
       state.user.expires_in = action.payload.expires_in;
+    },
+    setIsImpersonating: (state) => {
+      state.isImpersonating = true;
     },
   },
 });

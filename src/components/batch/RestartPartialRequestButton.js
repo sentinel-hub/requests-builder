@@ -26,6 +26,7 @@ const RestartPartialRequestButton = ({ requestId, token }) => {
       request={BatchResource.restartOrder}
       args={[{ orderId: requestId }]}
       className="secondary-button"
+      style={{ width: '70%', marginTop: '0' }}
     />
   );
 };

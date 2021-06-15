@@ -1,6 +1,9 @@
 import Axios from 'axios';
+import jwt_dec from 'jwt-decode';
 import store from './store';
-import alertSlice from './store/alert';
+import Api from './api';
+import alertSlice, { addSuccessAlert, addWarningAlert } from './store/alert';
+import authSlice from './store/auth';
 import paramsSlice from './store/params';
 import savedRequestsSlice from './store/savedRequests';
 import { setBaseUrlAxiosInterpector } from './utils/configureAxios';
@@ -34,6 +37,23 @@ export const configureParams = async (params) => {
   }
   if (params['extended-settings'] !== undefined) {
     store.dispatch(paramsSlice.actions.setExtendedSettings());
+  }
+  if (params['impersonator_token'] !== undefined) {
+    try {
+      const token = params['impersonator_token'];
+      const decoded = jwt_dec(token);
+      store.dispatch(
+        authSlice.actions.setUser({
+          userdata: decoded,
+          access_token: token,
+        }),
+      );
+      Api.setAuthHeader(token);
+      store.dispatch(authSlice.actions.setIsImpersonating());
+      addSuccessAlert('Impersonating...');
+    } catch (err) {
+      addWarningAlert('Impersonator token not valid');
+    }
   }
 };
 

@@ -21,6 +21,7 @@ const CancelBatchRequestButton = ({ requestId, token, cancelRequest }) => {
       errorHandler={addAlertOnError}
       request={BatchResource.cancelOrder}
       args={[{ orderId: requestId }]}
+      style={{ width: '70%', marginTop: '0' }}
     />
   );
 };

@@ -7,7 +7,7 @@ import store from '../../store';
 import batchSlice from '../../store/batch';
 import BatchResource from '../../api/batch/BatchResource';
 
-const getAllBatchRequests = async (_, reqConfig) => {
+export const getAllBatchRequests = async (_, reqConfig) => {
   let res = await BatchResource.getOrders(null, reqConfig);
   let requests = res.data.data;
   while (res.data.links.next) {
@@ -30,19 +30,17 @@ const GetAllBatchRequestsButton = ({ token, setFetchedRequests, setGetAllRespons
     store.dispatch(batchSlice.actions.setExtraInfo(''));
   };
   return (
-    <div>
-      <RequestButton
-        validation={!!token}
-        disabledTitle="Log in to use this"
-        className="secondary-button"
-        buttonText="Get All Batch Requests"
-        responseHandler={responseHandler}
-        errorHandler={addAlertOnError}
-        request={getAllBatchRequests}
-        args={[]}
-        style={{ marginTop: '0', marginRight: '1rem' }}
-      />
-    </div>
+    <RequestButton
+      validation={!!token}
+      disabledTitle="Log in to use this"
+      className="secondary-button"
+      buttonText="Get All Batch Requests"
+      responseHandler={responseHandler}
+      errorHandler={addAlertOnError}
+      request={getAllBatchRequests}
+      args={[]}
+      style={{ marginTop: '0', marginRight: '1rem' }}
+    />
   );
 };
 

@@ -23,6 +23,7 @@ const StartBatchRequestButton = ({ requestId, token, startRequest, setOpenedCont
       errorHandler={addAlertOnError}
       request={BatchResource.startOrder}
       args={[{ orderId: requestId }]}
+      style={{ width: '70%', marginTop: '0' }}
     />
   );
 };

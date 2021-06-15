@@ -1,11 +1,20 @@
 import React, { useCallback } from 'react';
+import Tooltip from '../common/Tooltip/Tooltip';
 import AnalyseBatchRequestButton from './AnalyseBatchRequestButton';
 import CancelBatchRequestButton from './CancelBatchRequestButton';
 import GetSingleRequestButton from './GetSingleRequestButton';
+import { canAnalyse, canStart, canCancel, canRestart } from './lib/utils';
 import RestartPartialRequestButton from './RestartPartialRequestButton';
 import StartBatchRequestButton from './StartBatchRequestButton';
 
-const BatchActions = ({ requestId, token, setSingleResponse, setFetchedRequests, setOpenedContainers }) => {
+const BatchActions = ({
+  requestId,
+  token,
+  status,
+  setSingleResponse,
+  setFetchedRequests,
+  setOpenedContainers,
+}) => {
   const curriyedUpdater = useCallback(
     (newItem, collapseAllExceptNew = true) => (requestId) => {
       setFetchedRequests((prev) => {
@@ -24,25 +33,51 @@ const BatchActions = ({ requestId, token, setSingleResponse, setFetchedRequests,
   );
 
   return (
-    <div className="batch-request-summary-actions">
-      <AnalyseBatchRequestButton
-        requestId={requestId}
-        token={token}
-        analyseRequest={curriyedUpdater({ userAction: 'ANALYSE', status: 'ANALYSING' })}
-        setOpenedContainers={setOpenedContainers}
-      />
-      <StartBatchRequestButton
-        requestId={requestId}
-        token={token}
-        startRequest={curriyedUpdater({ userAction: 'START' })}
-        setOpenedContainers={setOpenedContainers}
-      />
-      <CancelBatchRequestButton
-        requestId={requestId}
-        token={token}
-        cancelRequest={curriyedUpdater({ userAction: 'CANCEL' })}
-      />
-      <RestartPartialRequestButton requestId={requestId} token={token} />
+    <div className="batch-request-summary-actions" style={{ borderBottom: '1rem' }}>
+      {canAnalyse(status) && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <AnalyseBatchRequestButton
+            requestId={requestId}
+            token={token}
+            analyseRequest={curriyedUpdater({ userAction: 'ANALYSE', status: 'ANALYSING' })}
+            setOpenedContainers={setOpenedContainers}
+          />
+          <Tooltip
+            direction="right"
+            content="Analysing the request will provide you with the approximate cost of the batch request"
+          />
+        </div>
+      )}
+      {canStart(status) && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <StartBatchRequestButton
+            requestId={requestId}
+            token={token}
+            startRequest={curriyedUpdater({ userAction: 'START' })}
+            setOpenedContainers={setOpenedContainers}
+          />
+          <Tooltip
+            direction="bottom"
+            content="Starting the request will start the processing and substract you with appropriate PUs"
+          />
+        </div>
+      )}
+      {canCancel(status) && (
+        <CancelBatchRequestButton
+          requestId={requestId}
+          token={token}
+          cancelRequest={curriyedUpdater({ userAction: 'CANCEL' })}
+        />
+      )}
+      {canRestart(status) && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <RestartPartialRequestButton requestId={requestId} token={token} />
+          <Tooltip
+            direction="bottom"
+            content="Restarting will retry the request in case it's partially processed"
+          />
+        </div>
+      )}
       <GetSingleRequestButton
         requestId={requestId}
         token={token}
