@@ -16,6 +16,7 @@ const ProcessRequestOverlayButton = ({
   requestState,
   collectionRequestIdx,
   wgs84Geometry,
+  reqConfig,
   skipSaving = true,
 }) => {
   const readerRef = useRef();
@@ -71,11 +72,12 @@ const ProcessRequestOverlayButton = ({
       className={className}
       buttonText={buttonText}
       request={request}
-      args={args}
+      args={[...args]}
       validation={validation}
       responseHandler={responseHandler}
       errorHandler={errorHandler}
       useShortcut={true}
+      requestConfiguration={reqConfig}
     />
   );
 };

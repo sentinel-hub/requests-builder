@@ -53,6 +53,7 @@ const dispatchAggregation = (aggregation) => {
         { timeFrom: aggregation.timeRange.from, timeTo: aggregation.timeRange.to },
       ]),
     );
+    store.dispatch(requestSlice.actions.disableTimerange(false));
   }
   if (aggregation.aggregationInterval && aggregation.aggregationInterval.of) {
     store.dispatch(statisticalSlice.actions.setAggregationInterval(aggregation.aggregationInterval.of));

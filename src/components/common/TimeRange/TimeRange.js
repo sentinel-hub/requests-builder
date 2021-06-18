@@ -5,7 +5,7 @@ import moment from 'moment';
 import store from '../../../store';
 import requestSlice from '../../../store/request';
 import Axios from 'axios';
-import { S1GRD, S2L2A, S2L1C, L8L1C, S3OLCI, S3SLSTR, S5PL2 } from '../../../utils/const';
+import { S1GRD, S2L2A, S2L1C, L8L1C, S3OLCI, S3SLSTR, S5PL2 } from '../../../utils/const/const';
 import { getFetchDatesBody } from '../../../api/catalog/utils';
 import CatalogResource from '../../../api/catalog/CatalogResource';
 

@@ -14,6 +14,7 @@ const BatchResource = {
   startOrder: POST(`${BATCH_BASE_URL}/process/:orderId/start`),
   cancelOrder: POST(`${BATCH_BASE_URL}/process/:orderId/cancel`),
   restartOrder: POST(`${BATCH_BASE_URL}/process/:orderId/restartpartial`),
+  getLatestOrders: GET(`${BATCH_BASE_URL}/process?sort=created%3Adesc`),
 };
 
 export default BatchResource;

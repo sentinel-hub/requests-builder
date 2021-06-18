@@ -1,4 +1,4 @@
-import { S2L2A, S2L1C, S1GRD, L8L1C, S5PL2, S3SLSTR, S3OLCI } from '../../utils/const';
+import { S2L2A, S2L1C, S1GRD, L8L1C, S5PL2, S3SLSTR, S3OLCI } from '../../utils/const/const';
 
 export const S2L1C_CATALOG_ID = 'sentinel-2-l1c';
 export const S2L2A_CATALOG_ID = 'sentinel-2-l2a';

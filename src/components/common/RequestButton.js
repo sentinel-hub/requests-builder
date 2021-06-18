@@ -19,6 +19,7 @@ const RequestButton = ({
   useConfirmation,
   dialogText,
   style,
+  requestConfiguration = {},
 }) => {
   const [isFetching, setIsFetching] = useState(false);
   const [openedConfirmDialog, setOpenedConfirmDialog] = useState(false);
@@ -48,6 +49,7 @@ const RequestButton = ({
         setIsFetching(true);
         sourceRef.current = Axios.CancelToken.source();
         const reqConfig = {
+          ...requestConfiguration,
           cancelToken: sourceRef.current.token,
         };
         const res = await request(...usedArgs, reqConfig);
@@ -66,6 +68,7 @@ const RequestButton = ({
         }
       }
     }
+    // eslint-disable-next-line
   }, [isFetching, args, request, errorHandler, responseHandler, openedConfirmDialog, useConfirmation]);
 
   const handleCloseDialog = () => {

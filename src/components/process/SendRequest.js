@@ -42,11 +42,12 @@ const SendRequest = ({ token, requestState, mapState }) => {
       className="button"
       buttonText="Send Request"
       request={ProcessResource.stateRequest(requestState)}
-      args={[getRequestObject(requestState, mapState), { responseType: 'blob' }]}
+      args={[getRequestObject(requestState, mapState)]}
       validation={Boolean(isValid && token)}
       requestState={requestState}
       skipSaving={false}
       wgs84Geometry={mapState.wgs84Geometry}
+      reqConfig={{ responseType: 'blob' }}
     />
   );
 };

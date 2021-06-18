@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { isEmpty } from '../utils/const';
+import { isEmpty } from '../utils/commonUtils';
 
 const DEFAULT_ENDPOINT_CONFIG = {
   authenticated: true,
@@ -100,3 +100,6 @@ class Api {
 const instance = new Api();
 
 export default instance;
+
+export const getMessageFromApiError = (error, defaultErrorText = 'Something went wrong') =>
+  error.body?.error?.message ?? defaultErrorText;

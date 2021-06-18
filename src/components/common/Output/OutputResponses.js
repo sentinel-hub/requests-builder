@@ -1,7 +1,7 @@
 import React from 'react';
 import store from '../../../store';
 import requestSlice from '../../../store/request';
-import { OUTPUT_FORMATS } from '../../../utils/const';
+import { OUTPUT_FORMATS } from '../../../utils/const/const';
 import { connect } from 'react-redux';
 
 const generateResponses = (responses, mode) => {

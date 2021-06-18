@@ -7,6 +7,8 @@ import RequestButton from '../common/RequestButton';
 import { statisticalRequestStateSelector } from './utils/utils';
 import StatisticalResource from '../../api/statistical/StatisticalResource';
 import { getStatisticalRequestBody } from '../../api/statistical/utils';
+import { DATASOURCES } from '../../utils/const/const';
+import { getMessageFromApiError } from '../../api';
 
 export const statisticsResponseHandler = (response, stringRequest) => {
   if (response === '') {
@@ -24,8 +26,8 @@ export const statisticsResponseHandler = (response, stringRequest) => {
 };
 
 const statisticsErrorHandler = (err) => {
-  console.error(err);
-  store.dispatch(alertSlice.actions.addAlert({ type: 'WARNING', text: 'Something went wrong' }));
+  const msg = getMessageFromApiError(err);
+  store.dispatch(alertSlice.actions.addAlert({ type: 'WARNING', text: msg }));
 };
 
 const StatisticalSendRequestButton = ({
@@ -64,7 +66,7 @@ const StatisticalSendRequestButton = ({
     <RequestButton
       className="button"
       buttonText="Send Request"
-      request={StatisticalResource.statisticalRequest}
+      request={StatisticalResource.statisticalRequest(DATASOURCES[datasource]?.url)}
       args={[
         getStatisticalRequestBody(
           datasource,

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import store from '../../../store';
 import requestSlice from '../../../store/request';
-import { CUSTOM, DATAFUSION, DATASOURCES } from '../../../utils/const';
+import { CUSTOM, DATAFUSION, DATASOURCES } from '../../../utils/const/const';
 import { generateDataSourceRelatedOptions } from '../DataSourceSelect';
 import Toggle from '../Toggle';
 

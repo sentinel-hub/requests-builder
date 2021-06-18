@@ -2,10 +2,9 @@ import store from '../../../store';
 import requestSlice from '../../../store/request';
 import tpdiSlice, { airbusSlice, planetSlice } from '../../../store/tpdi';
 import omit from 'lodash.omit';
-import { crsUrlToCrsKey } from '../../../utils/const';
 import { constellationToStateConstellation } from '../utils';
 import mapSlice from '../../../store/map';
-
+import { crsUrlToCrsKey } from '../../../utils/const/constMap';
 const dispatchBounds = (bounds) => {
   if (bounds.bbox) {
     const bbox = bounds.bbox;

@@ -10,12 +10,12 @@ import {
   L8L1C,
   LOTL1,
   LOTL2,
-  isEmpty,
   CUSTOM,
   DATAFUSION,
-} from '../../../utils/const';
+} from '../../../utils/const/const';
 import { generateSHBbox } from './generateShjsRequest';
 import { isBbox, isPolygon } from '../../common/Map/utils/crsTransform';
+import { isEmpty } from '../../../utils/commonUtils';
 
 const formatToSHPY = {
   // JPEG not supported on shpy

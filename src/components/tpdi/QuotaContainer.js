@@ -3,10 +3,10 @@ import { errorHandlerTPDI } from './TPDIOrderOptions';
 import RequestButton from '../common/RequestButton';
 import { getQuotaCurlCommand } from './utils/curls';
 import { connect } from 'react-redux';
-import { formatNumber } from '../../utils/const';
 import CommonRequestPreview from '../common/CommonRequestPreview';
 import { formatText } from '../../utils/stringUtils';
 import TpdiResource from '../../api/tpdi/TpdiResource';
+import { formatNumber } from '../../utils/commonUtils';
 
 const QuotaContainer = ({ token }) => {
   const [quotas, setQuotas] = useState([]);

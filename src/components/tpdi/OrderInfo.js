@@ -8,13 +8,14 @@ import GetDeliveriesButton from './GetDeliveriesButton';
 import { parseTPDIRequest } from './parse';
 import Tooltip from '../common/Tooltip/Tooltip';
 import { getFormattedDatetime } from './utils';
-import { CUSTOM, formatNumber } from '../../utils/const';
+import { CUSTOM } from '../../utils/const/const';
 import mapSlice from '../../store/map';
 import requestSlice from '../../store/request';
 import { dispatchBounds } from '../process/requests/parseRequest';
 import { addSuccessAlert, addWarningAlert } from '../../store/alert';
 import CopyIcon from '../common/CopyIcon';
 import TpdiResource from '../../api/tpdi/TpdiResource';
+import { formatNumber } from '../../utils/commonUtils';
 
 const getColorByStatus = (status) => {
   if (status === 'PARTIAL') {

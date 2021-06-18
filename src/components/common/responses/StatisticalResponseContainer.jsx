@@ -1,9 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react';
 
-import { isEmpty } from '../../../utils/const';
 import DownloadLink from '../DownloadLink';
 import OgcFisResponse from '../../wms/FisResponse';
 import StatisticalResponse from '../../statistical/response/StatisticalResponse';
+import { isEmpty } from '../../../utils/commonUtils';
 
 const StatisticalResponseContainer = ({ statisticalResponse, request }) => {
   const containerRef = useRef();

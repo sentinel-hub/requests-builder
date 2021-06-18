@@ -1,7 +1,9 @@
 import axios from 'axios';
 import { isBbox, isMultiPolygon, isPolygon } from '../../components/common/Map/utils/crsTransform';
 import { getRequestBody, getUrlFromCurl } from '../../components/process/requests/parseRequest';
-import { CRS, CUSTOM, DATAFUSION, DATASOURCES, isEmpty } from '../../utils/const';
+import { isEmpty } from '../../utils/commonUtils';
+import { CUSTOM, DATAFUSION, DATASOURCES } from '../../utils/const/const';
+import { CRS } from '../../utils/const/constMap';
 
 export const byocLocationToBaseUrl = (location) => {
   if (location === 'EU-CENTRAL-1') {
@@ -16,7 +18,7 @@ export const getUrl = (requestState) => {
   if (requestState.datasource === CUSTOM) {
     return byocLocationToBaseUrl(requestState.byocLocation) + 'api/v1/process';
   } else {
-    return DATASOURCES[requestState.datasource].url;
+    return DATASOURCES[requestState.datasource].url + '/process';
   }
 };
 

@@ -1,7 +1,8 @@
 import React from 'react';
 import store from '../../../store';
 import mapSlice from '../../../store/map';
-import { CRS, groupBy } from '../../../utils/const';
+import { groupBy } from '../../../utils/commonUtils';
+import { CRS } from '../../../utils/const/constMap';
 
 // Generate CRS JSX Options, skip those which have internal:true.
 const optionsForGroup = (entries) => {

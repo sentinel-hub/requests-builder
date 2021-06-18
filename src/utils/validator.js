@@ -1,4 +1,4 @@
-import { CUSTOM } from './const';
+import { CUSTOM } from './const/const';
 
 const validateDatasource = (requestState) => {
   return Boolean(

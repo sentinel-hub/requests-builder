@@ -17,7 +17,7 @@ import { addSuccessAlert, addWarningAlert } from '../../store/alert';
 import { collectionToDatasource } from './const';
 import CopyIcon from '../common/CopyIcon';
 import DisplayableProperties from '../common/DisplayableProperties';
-import { CUSTOM } from '../../utils/const';
+import { CUSTOM } from '../../utils/const/const';
 
 const CatalogResultEntry = ({ feature, usedCollection, skippedProperties = [] }) => {
   const [isExpanded, setIsExpanded] = useState(false);

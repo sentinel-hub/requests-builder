@@ -1,12 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
-import {
-  DEFAULT_EVALSCRIPTS,
-  S1GRD,
-  S2L2A,
-  DATASOURCES,
-  DEFAULT_STATISTICAL_EVALSCRIPT,
-} from '../utils/const';
+import { S1GRD, S2L2A, DATASOURCES, getStatisticalDefaultEvalscript } from '../utils/const/const';
 import moment from 'moment';
+import { DEFAULT_S2_EVALSCRIPT } from '../utils/const/constEvalscript';
 
 const PROCESS_INITIAL_STATE = {
   mode: 'PROCESS',
@@ -20,7 +15,7 @@ const PROCESS_INITIAL_STATE = {
   width: 512,
   height: 512,
   isAutoRatio: true,
-  evalscript: DEFAULT_EVALSCRIPTS[S2L2A],
+  evalscript: DEFAULT_S2_EVALSCRIPT,
   // Array with options and index to individually modify certain options on datafusion
   dataFilterOptions: [
     {
@@ -68,13 +63,6 @@ const requestSlice = createSlice({
 
       resetAdvancedOptions(state);
     },
-    // setDatasourceAndEvalscript: (state, action) => {
-    //   state.datasource = action.payload;
-    //   state.evalscript = DEFAULT_EVALSCRIPTS[action.payload];
-
-    //   //Reset advanced options on datasource change
-    //   resetAdvancedOptions(state);
-    // },
     setTimeFrom: (state, action) => {
       state.timeFrom[action.payload.idx] = action.payload.timeFrom;
     },
@@ -181,7 +169,12 @@ const requestSlice = createSlice({
       }
       // Todo: remove once normal defaults work.
       if (action.payload === 'STATISTICAL') {
-        state.evalscript = DEFAULT_STATISTICAL_EVALSCRIPT;
+        let dataCol = state.datasource;
+        if (!DATASOURCES[state.datasource].isStatApiSupported) {
+          state.datasource = S2L2A;
+          dataCol = S2L2A;
+        }
+        state.evalscript = getStatisticalDefaultEvalscript(dataCol);
       }
     },
     setDatafusionSource: (state, action) => {

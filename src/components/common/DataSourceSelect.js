@@ -17,7 +17,8 @@ import {
   DEM,
   CUSTOM,
   DATAFUSION,
-} from '../../utils/const';
+  DATASOURCES_NAMES,
+} from '../../utils/const/const';
 import BasicOptions from './DataSourceSpecificOptions/BasicOptions';
 import S2L1COptions from './DataSourceSpecificOptions/S2L1COptions';
 import S3SLSTROptions from './DataSourceSpecificOptions/S3SLSTROptions';
@@ -31,9 +32,11 @@ import Toggle from './Toggle';
 import OverlayButton from './OverlayButton';
 
 export const generateDatasourcesOptions = (appMode) => {
-  let filteredDatasourcesKeys = Object.keys(DATASOURCES);
+  let filteredDatasourcesKeys = DATASOURCES_NAMES;
   if (appMode === 'BATCH') {
-    filteredDatasourcesKeys = filteredDatasourcesKeys.filter((key) => DATASOURCES[key].isBatchSupported);
+    filteredDatasourcesKeys = DATASOURCES_NAMES.filter((key) => DATASOURCES[key].isBatchSupported);
+  } else if (appMode === 'STATISTICAL') {
+    filteredDatasourcesKeys = DATASOURCES_NAMES.filter((key) => DATASOURCES[key].isStatApiSupported);
   }
   return filteredDatasourcesKeys.map((key) => (
     <option key={key} value={key}>

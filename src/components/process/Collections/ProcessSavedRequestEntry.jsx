@@ -4,7 +4,7 @@ import Axios from 'axios';
 import store from '../../../store';
 import alertSlice from '../../../store/alert';
 import requestSlice from '../../../store/request';
-import { DATASOURCES } from '../../../utils/const';
+import { DATASOURCES } from '../../../utils/const/const';
 import ProcessRequestOverlayButton from '../../common/ProcessRequestOverlayButton';
 import { dispatchChanges } from '../requests/parseRequest';
 import { CommonSavedRequestEntryFields } from './CommonSavedRequestEntry';
@@ -33,7 +33,7 @@ const sendRequest = (request, token) => {
     if (parsed.input?.data.length > 1) {
       url = getUrlOnDatafusion(parsed.input.data);
     } else {
-      url = DATASOURCES[parsed.input.data[0].type].url;
+      url = DATASOURCES[parsed.input.data[0].type].url + '/process';
     }
   } catch (err) {
     store.dispatch(alertSlice.actions.addAlert({ type: 'WARNING', text: 'Cannot parse request' }));
@@ -42,7 +42,7 @@ const sendRequest = (request, token) => {
 };
 
 const getUrlOnDatafusion = (dataArray) => {
-  const urls = dataArray.map((d) => DATASOURCES[d.type].url);
+  const urls = dataArray.map((d) => DATASOURCES[d.type].url + '/process');
   // services.sentinel-hub takes priority.
   if (urls.includes('https://services.sentinel-hub.com/api/v1/process')) {
     return 'https://services.sentinel-hub.com/api/v1/process';

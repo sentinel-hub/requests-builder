@@ -5,13 +5,11 @@ import { addAlertOnError, isFinishedStatus, isRunningStatus } from './lib/utils'
 import RequestButton from '../common/RequestButton';
 import store from '../../store';
 import batchSlice from '../../store/batch';
-import { getAllBatchRequests } from './GetAllBatchRequestsButton';
+import BatchResource from '../../api/batch/BatchResource';
 
-const GetLatestRequestButton = ({ token, setFetchedRequests, setGetAllResponse, handleExpandContainer }) => {
+const GetLatestRequestButton = ({ token, setFetchedRequests, handleExpandContainer }) => {
   const responseHandler = (response) => {
-    setGetAllResponse(JSON.stringify(response, null, 2));
-
-    const sortedAndExpanded = response.member
+    const sortedAndExpanded = response.data
       .sort((a, b) => new Date(b.created) - new Date(a.created))
       .map((req) => ({ ...req, isExpanded: true }));
     const latest = sortedAndExpanded[0];
@@ -37,7 +35,7 @@ const GetLatestRequestButton = ({ token, setFetchedRequests, setGetAllResponse, 
       buttonText="Get Latest"
       responseHandler={responseHandler}
       errorHandler={addAlertOnError}
-      request={getAllBatchRequests}
+      request={BatchResource.getLatestOrders}
       args={[]}
       style={{ marginTop: '0', marginRight: '1rem' }}
     />

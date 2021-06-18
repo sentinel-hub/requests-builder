@@ -1,4 +1,4 @@
-import { isEmpty } from '../../../utils/const';
+import { isEmpty } from '../../../utils/commonUtils';
 import { isBbox } from '../../common/Map/utils/crsTransform';
 import { getSHPYCredentials, getSHPYBounds } from '../../process/lib/generateShPyRequest';
 

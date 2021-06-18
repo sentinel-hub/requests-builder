@@ -3,7 +3,12 @@ import { connect } from 'react-redux';
 import store from '../../../store';
 import requestSlice from '../../../store/request';
 import { Controlled as CodeMirror } from 'react-codemirror2';
-import { DEFAULT_EVALSCRIPTS, CUSTOM, DATAFUSION, datasourceToCustomRepoLink } from '../../../utils/const';
+import {
+  CUSTOM,
+  DATAFUSION,
+  datasourceToCustomRepoLink,
+  getDefaultEvalscript,
+} from '../../../utils/const/const';
 import { fetchDataProducts } from './utils';
 import { JSHINT } from 'jshint';
 import Toggle from '../Toggle';
@@ -26,7 +31,7 @@ window.JSHINT = JSHINT;
 
 const canUseDataProducts = (datasource, token) => token && datasource !== CUSTOM && datasource !== DATAFUSION;
 
-const EvalscriptEditor = ({ datasource, evalscript, token, consoleValue, className }) => {
+const EvalscriptEditor = ({ datasource, mode, evalscript, token, consoleValue, className }) => {
   const [toggledConsole, setToggledConsole] = useState(false);
   const [useDataProduct, setUseDataProduct] = useState(false);
   const [dataProducts, setDataProducts] = useState([]);
@@ -74,7 +79,7 @@ const EvalscriptEditor = ({ datasource, evalscript, token, consoleValue, classNa
   };
 
   const handleSetDefaultEvalscript = () => {
-    const defaultEvalscript = DEFAULT_EVALSCRIPTS[datasource];
+    const defaultEvalscript = getDefaultEvalscript(mode, datasource);
     store.dispatch(requestSlice.actions.setEvalscript(defaultEvalscript));
   };
 
@@ -189,6 +194,7 @@ const mapStateToProps = (store) => ({
   datasource: store.request.datasource,
   token: store.auth.user.access_token,
   consoleValue: store.request.consoleValue,
+  mode: store.request.mode,
 });
 
 export default connect(mapStateToProps, null)(EvalscriptEditor);

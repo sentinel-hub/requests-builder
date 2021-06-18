@@ -7,7 +7,7 @@ import { addWarningAlert } from '../../../store/alert';
 import mapSlice from '../../../store/map';
 import RequestButton from '../RequestButton';
 import CatalogResource from '../../../api/catalog/CatalogResource';
-import { CUSTOM } from '../../../utils/const';
+import { CUSTOM } from '../../../utils/const/const';
 
 const ByocDataFinder = ({
   datasource,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatNumber } from '../../../utils/const';
+import { formatNumber } from '../../../utils/commonUtils';
 
 const BandStatistics = React.memo(({ stats }) => {
   return (

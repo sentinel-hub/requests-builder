@@ -1,5 +1,6 @@
 import omit from 'lodash.omit';
-import { CUSTOM, DATAFUSION, isEmpty } from '../../utils/const';
+import { isEmpty } from '../../utils/commonUtils';
+import { CUSTOM, DATAFUSION } from '../../utils/const/const';
 import { generateBounds, getNonDefaultOptions } from '../process/utils';
 
 export const getStatisticalRequestBody = (

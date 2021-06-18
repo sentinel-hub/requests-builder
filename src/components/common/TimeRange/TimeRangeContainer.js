@@ -4,7 +4,7 @@ import TimeRange from './TimeRange';
 import store from '../../../store';
 import requestSlice from '../../../store/request';
 import Toggle from '../Toggle';
-import { DATAFUSION, DEM } from '../../../utils/const';
+import { DATAFUSION, DEM } from '../../../utils/const/const';
 
 const multipleTimeRangeIsValid = (mode, datasource) => {
   return (mode === 'PROCESS' || mode === 'BATCH') && datasource === DATAFUSION;

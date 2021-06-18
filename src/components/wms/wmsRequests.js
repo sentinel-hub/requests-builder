@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { isBbox } from '../common/Map/utils/crsTransform';
 import BBox from '@turf/bbox';
-import { DATASOURCES } from '../../utils/const';
+import { DATASOURCES } from '../../utils/const/const';
 
 const getConfigHelper = (token, reqConfig) => {
   return {

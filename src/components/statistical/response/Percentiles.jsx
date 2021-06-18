@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatNumber } from '../../../utils/commonUtils';
 
 const Percentiles = ({ onEnter, onLeave, onMove, points, path }) => {
   if (!points) {

@@ -14,7 +14,8 @@ const GetLowResPreviewButton = ({ requestState, mapState, token }) => {
       validation={Boolean(isValid && token)}
       buttonText={'Get Low Res Preview'}
       request={ProcessResource.stateRequest(requestState)}
-      args={[getRequestObject(requestState, mapState), { responseType: 'blob' }]}
+      args={[getRequestObject(requestState, mapState)]}
+      reqConfig={{ responseType: 'blob' }}
       requestState={requestState}
       skipSaving={true}
       wgs84Geometry={mapState.wgs84Geometry}

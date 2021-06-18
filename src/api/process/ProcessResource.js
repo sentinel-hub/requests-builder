@@ -1,5 +1,5 @@
 import Api from '..';
-import { CUSTOM, DATASOURCES } from '../../utils/const';
+import { getUrl } from './utils';
 
 export const byocLocationToBaseUrl = (location) => {
   if (location === 'aws-eu-central-1') {
@@ -19,14 +19,6 @@ const getTarHeader = (responses) => {
     };
   }
   return {};
-};
-
-const getUrl = (requestState) => {
-  if (requestState.datasource === CUSTOM) {
-    return byocLocationToBaseUrl(requestState.byocLocation) + 'api/v1/process';
-  } else {
-    return DATASOURCES[requestState.datasource].url;
-  }
 };
 
 const ProcessResource = {

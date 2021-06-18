@@ -9,13 +9,13 @@ import RequestButton from '../../common/RequestButton';
 import requestSlice from '../../../store/request';
 import { statisticsResponseHandler } from '../../statistical/StatisticalSendRequestButton';
 import savedRequestsSlice from '../../../store/savedRequests';
-import { STATISTICAL_BASE_URL } from '../../../api/statistical/StatisticalResource';
 import { getStatisticalAuthConfig } from '../../../api/statistical/utils';
+import { DATASOURCES } from '../../../utils/const/const';
 
 const sendStatisticalRequest = (request, token, reqConfig) => {
   try {
     const parsed = JSON.parse(request);
-    const url = STATISTICAL_BASE_URL;
+    const url = DATASOURCES[parsed.input.data[0].type]?.url + '/statistics';
     const config = getStatisticalAuthConfig(token, reqConfig);
     return axios.post(url, parsed, config);
   } catch (err) {

@@ -1,6 +1,6 @@
 import bbox from '@turf/bbox';
+import { isEmpty } from '../../../utils/commonUtils';
 import {
-  isEmpty,
   S2L2A,
   S2L1C,
   L8L1C,
@@ -14,7 +14,7 @@ import {
   DEM,
   CUSTOM,
   DATAFUSION,
-} from '../../../utils/const';
+} from '../../../utils/const/const';
 import { isBbox, isPolygon } from '../../common/Map/utils/crsTransform';
 
 const datasourceToSHJSLayer = {

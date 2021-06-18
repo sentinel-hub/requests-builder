@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { connect } from 'react-redux';
-import { groupBy } from '../../utils/const';
+import { groupBy } from '../../utils/commonUtils';
 import BatchStatusRequestsContainer from './BatchStatusRequestsContainer';
 import GetAllBatchRequestsButton from './GetAllBatchRequestsButton';
 import GetLatestRequestButton from './GetLatestRequestButton';
@@ -110,7 +110,6 @@ const BatchInformation = ({
 
           <GetLatestRequestButton
             setFetchedRequests={setFetchedRequests}
-            setGetAllResponse={setGetAllResponse}
             handleExpandContainer={handleExpandContainer}
           />
           <input

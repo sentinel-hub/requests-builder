@@ -1,5 +1,5 @@
 import omit from 'lodash.omit';
-import { isEmpty } from '../../utils/const';
+import { isEmpty } from '../../utils/commonUtils';
 
 import { getRequestObject } from '../process/utils';
 

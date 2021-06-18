@@ -4,9 +4,9 @@ import { errorHandlerTPDI } from './TPDIOrderOptions';
 import OrderInfo, { OrdersTooltip } from './OrderInfo';
 
 import { connect } from 'react-redux';
-import { groupBy } from '../../utils/const';
 import OverlayButton from '../common/OverlayButton';
 import TpdiResource from '../../api/tpdi/TpdiResource';
+import { groupBy } from '../../utils/commonUtils';
 
 const groupAggregator = (el) => {
   if (el.status === 'PARTIAL' || el.status === 'DONE' || el.status === 'FAILED') {

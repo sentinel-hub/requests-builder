@@ -1,5 +1,5 @@
-import { STATISTICAL_BASE_URL } from '../../../api/statistical/StatisticalResource';
 import { getStatisticalRequestBody } from '../../../api/statistical/utils';
+import { DATASOURCES } from '../../../utils/const/const';
 
 export const getStatisticalCurlCommand = (
   token,
@@ -28,7 +28,9 @@ export const getStatisticalCurlCommand = (
     timeRange,
     statisticalState,
   );
-  const curlCommand = `curl -X POST ${STATISTICAL_BASE_URL} \n -H 'Content-Type: application/json' \n -H 'Authorization: Bearer ${
+  const curlCommand = `curl -X POST ${
+    DATASOURCES[datasource].url
+  }/statistics \n -H 'Content-Type: application/json' \n -H 'Authorization: Bearer ${
     token ?? '<your token here>'
   }' \n -d '${JSON.stringify(body, null, 2)}'`;
   return curlCommand;

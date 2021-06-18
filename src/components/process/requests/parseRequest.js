@@ -4,12 +4,12 @@ import mapSlice from '../../../store/map';
 import requestSlice from '../../../store/request';
 import {
   DATASOURCES_NAMES,
-  CRS,
   OUTPUT_FORMATS,
   CUSTOM,
   DATAFUSION,
-  OLD_DATASOURCES_TO_NEW_MAP,
-} from '../../../utils/const';
+  NEW_DATASOURCES_TO_OLD_MAP,
+} from '../../../utils/const/const';
+import { CRS } from '../../../utils/const/constMap';
 import { calculateMaxMetersPerPixel } from '../../common/Map/utils/bboxRatio';
 
 const dispatchEvalscript = (parsedBody) => {
@@ -109,9 +109,9 @@ const getDataCollection = (datasource) => {
   if (validDatasource !== undefined) {
     return validDatasource;
   }
-  const oldDatasource = Object.keys(OLD_DATASOURCES_TO_NEW_MAP).find((d) => d === datasource);
-  if (oldDatasource !== undefined) {
-    return OLD_DATASOURCES_TO_NEW_MAP[oldDatasource];
+  const newDataCollection = Object.keys(NEW_DATASOURCES_TO_OLD_MAP).find((d) => d === datasource);
+  if (newDataCollection !== undefined) {
+    return NEW_DATASOURCES_TO_OLD_MAP[newDataCollection];
   }
   return undefined;
 };

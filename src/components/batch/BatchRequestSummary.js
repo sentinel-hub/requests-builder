@@ -190,14 +190,14 @@ const BatchRequestSummary = ({
 
   return (
     <div className="batch-request-summary" ref={requestRef}>
-      <div
-        title="Click to show information about the request"
-        onClick={() => handleExpand(id)}
-        className="batch-request-summary-header"
-      >
+      <div onClick={() => handleExpand(id)} className="batch-request-summary-header">
         <div className="batch-request-summary-header-title">
           <div style={{ display: 'flex', marginBottom: '1rem' }}>
-            <p className="text" style={{ width: '280px', marginRight: '1rem', fontWeight: '700' }}>
+            <p
+              className="text"
+              style={{ width: '280px', marginRight: '1rem', fontWeight: '700' }}
+              title="Click to show information about the request"
+            >
               {id}
             </p>
             <CopyIcon

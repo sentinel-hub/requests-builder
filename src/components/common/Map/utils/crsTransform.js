@@ -2,8 +2,8 @@ import bboxPolygon from '@turf/bbox-polygon';
 import proj4 from 'proj4';
 import area from '@turf/area';
 import intersect from '@turf/intersect';
-import { CRS } from '../../../../utils/const';
 import { addWarningAlert } from '../../../../store/alert';
+import { CRS } from '../../../../utils/const/constMap';
 
 export const getAreaFromGeometry = (geometry) => {
   if (isBbox(geometry)) {
