@@ -1216,7 +1216,7 @@ input:checked + .slider::before {
       width: 100%; } }
 
 .batch-responses {
-  max-height: 200px;
+  max-height: 300px;
   overflow-y: scroll; }
   @media (max-width: 62.5em) {
     .batch-responses {

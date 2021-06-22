@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import store from '../../store';
 import batchSlice from '../../store/batch';
@@ -8,6 +8,7 @@ import CreateBatchRequestButton from './CreateBatchRequestButton';
 import CogParameters from './CogParameters';
 import Tooltip from '../common/Tooltip/Tooltip';
 import TargetBlankLink from '../common/TargetBlankLink';
+import OutputDimensions from '../common/Output/OutputDimensions';
 
 const generateResolutions = (tillingGridId) => {
   switch (tillingGridId) {
@@ -52,6 +53,7 @@ const BatchOptions = ({
   batchOverwrite,
   extendedSettings,
 }) => {
+  const [displayDimensions, setDisplayDimensions] = useState(false);
   const handleGridChange = (e) => {
     store.dispatch(batchSlice.actions.setTillingGrid(Number(e.target.value)));
 
@@ -113,9 +115,9 @@ const BatchOptions = ({
           />
         </div>
         <select id="tiling-grid" className="form__input" value={tillingGrid} onChange={handleGridChange}>
-          <option value={0}>S2GM grid</option>
+          <option value={0}>20km grid</option>
           <option value={1}>10km grid</option>
-          <option value={2}>100.08km grid</option>
+          <option value={2}>100km grid</option>
           <option value={3}>WGS84 1 degree grid</option>
           {extendedSettings && generateAdditionalGrids()}
         </select>
@@ -262,6 +264,41 @@ const BatchOptions = ({
             setCreateResponse={setCreateResponse}
             openOnlyCreateContainer={openOnlyCreateContainer}
           />
+        </div>
+
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            margin: '1rem 1rem 1rem 0',
+            width: '100%',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <label
+              className="form__label"
+              style={{ marginBottom: '0', marginRight: '1rem', cursor: 'pointer' }}
+              htmlFor="display-dimensions"
+            >
+              Display low res dimensions
+            </label>
+            <Toggle
+              checked={displayDimensions}
+              onChange={() => {
+                setDisplayDimensions((prev) => !prev);
+              }}
+              id="display-dimensions"
+            />
+          </div>
+          <Tooltip
+            content="Low resolution dimensions are only applied to the equivalent Process API request made when clicking 'Get Low Res Preview' and it doesn't affect the batch request."
+            direction="right"
+            infoStyles={{ marginRight: '1rem' }}
+          />
+        </div>
+        <div style={{ display: displayDimensions ? 'block' : 'none' }}>
+          <OutputDimensions />
         </div>
       </div>
     </>

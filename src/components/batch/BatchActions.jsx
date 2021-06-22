@@ -14,6 +14,7 @@ const BatchActions = ({
   setSingleResponse,
   setFetchedRequests,
   setOpenedContainers,
+  fetchTiles,
 }) => {
   const curriyedUpdater = useCallback(
     (newItem, collapseAllExceptNew = true) => (requestId) => {
@@ -84,6 +85,7 @@ const BatchActions = ({
         setSingleResponse={setSingleResponse}
         curriyedUpdater={curriyedUpdater}
         setOpenedContainers={setOpenedContainers}
+        fetchTiles={fetchTiles}
       />
     </div>
   );

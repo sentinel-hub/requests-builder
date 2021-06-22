@@ -12,8 +12,10 @@ const GetSingleRequestButton = ({
   setSingleResponse,
   curriyedUpdater,
   setOpenedContainers,
+  fetchTiles,
 }) => {
   const getSingleBatchHandler = (response) => {
+    fetchTiles();
     setSingleResponse(JSON.stringify(response, null, 2));
     curriyedUpdater(response)(requestId);
     store.dispatch(batchSlice.actions.setExtraInfo(''));

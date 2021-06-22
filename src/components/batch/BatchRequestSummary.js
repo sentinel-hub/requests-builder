@@ -26,10 +26,10 @@ export const fetchTilesBatchRequest = async (id) => {
 };
 
 const gridsArray = [
-  'S2GM Grid', // 0
+  '20km grid', // 0
   '10km Grid', // 1
-  '100,08km Grid', // 2
-  'WGS84', // 3
+  '100km Grid', // 2
+  'WGS84 1 degree Grid', // 3
   'WGS84 0.25 degree', // 4
   'New Zealand Topo50', // 5
 ];
@@ -42,7 +42,6 @@ const validStatus = (status) => {
 const updateTileInfo = (tiles) => {
   let initial = {
     processedTiles: 0,
-    processingTiles: 0,
     scheduledTiles: 0,
     consumedPu: 0,
     totalTiles: 0,
@@ -59,9 +58,6 @@ const updateTileInfo = (tiles) => {
     }
     if (tile.status === 'SCHEDULED') {
       acc['scheduledTiles']++;
-    }
-    if (tile.status === 'PROCESSING') {
-      acc['processingTiles']++;
     }
     if (tile.status === 'FAILED') {
       acc['failedTiles']++;
@@ -108,7 +104,6 @@ const BatchRequestSummary = ({
   const [isFetchingTiles, setIsFetchingTiles] = useState(false);
   const [fetchedTiles, setFetchedTiles] = useState({
     processedTiles: 0,
-    processingTiles: 0,
     scheduledTiles: 0,
     consumedPu: 0,
     totalTiles: 0,
@@ -285,6 +280,7 @@ const BatchRequestSummary = ({
               setFetchedRequests={setFetchedRequests}
               setOpenedContainers={setOpenedContainers}
               status={status}
+              fetchTiles={fetchTiles}
             />
             <div className="batch-request-summary-actions">
               <button
@@ -339,7 +335,6 @@ const BatchRequestSummary = ({
               <thead>
                 <tr>
                   <th scope="col">Processed</th>
-                  <th scope="col">Processing</th>
                   <th scope="col">Scheduled</th>
                   <th scope="col">Failed</th>
                   <th scope="col">Pending</th>
@@ -349,7 +344,6 @@ const BatchRequestSummary = ({
               <tbody>
                 <tr>
                   <td>{fetchedTiles.processedTiles}</td>
-                  <td>{fetchedTiles.processingTiles}</td>
                   <td>{fetchedTiles.scheduledTiles}</td>
                   <td>{fetchedTiles.failedTiles}</td>
                   <td>{fetchedTiles.pendingTiles}</td>

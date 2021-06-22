@@ -6,21 +6,44 @@ import Axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSync } from '@fortawesome/free-solid-svg-icons';
 import ByocResource from '../../../api/byoc/ByocResource';
+import { checkValidUuid } from '../../../utils/stringUtils';
 
-const generateCollectionOptions = (collections) => {
-  return collections.map((collection) => (
-    <option key={collection.id} value={collection.id}>
-      {collection.name} - {collection.id}
-    </option>
-  ));
+const generateCollectionDatalist = (collections) => {
+  return (
+    <datalist id="collections-list">
+      {collections.map((col) => (
+        <option value={col.id} label={col.name} key={col.id} />
+      ))}
+    </datalist>
+  );
 };
 
 const BYOCOptions = ({ token, byocLocation, byocCollectionType, byocCollectionId }) => {
   const [collections, setCollections] = useState([]);
   const sourceRef = useRef();
 
+  const handleSetTimeRange = useCallback((type) => {
+    if (type === 'BATCH') {
+      store.dispatch(requestSlice.actions.disableTimerange(true));
+    } else {
+      store.dispatch(requestSlice.actions.disableTimerange(false));
+    }
+  }, []);
+
   const handleCollectionIdChange = (e) => {
-    store.dispatch(requestSlice.actions.setByocCollectionId(e.target.value));
+    const { value } = e.target;
+    if (checkValidUuid(value)) {
+      const selected = collections.find((col) => col.id === value);
+      if (selected) {
+        let { type, location } = selected;
+        location = location ?? '';
+        type = type ?? '';
+        store.dispatch(requestSlice.actions.setByocLocation(location));
+        store.dispatch(requestSlice.actions.setByocCollectionType(type));
+        handleSetTimeRange(type);
+      }
+    }
+    store.dispatch(requestSlice.actions.setByocCollectionId(value));
   };
 
   const loadCustomCollections = useCallback(async () => {
@@ -53,19 +76,8 @@ const BYOCOptions = ({ token, byocLocation, byocCollectionType, byocCollectionId
   };
 
   const handleByocCollectionTypeChange = (e) => {
+    handleSetTimeRange(e.target.value);
     store.dispatch(requestSlice.actions.setByocCollectionType(e.target.value));
-  };
-
-  const handleDropdownIdChange = (e) => {
-    const selectedCollection = collections.find((col) => col.id === e.target.value);
-    if (selectedCollection !== undefined) {
-      let { type, location } = selectedCollection;
-      location = location ?? '';
-      type = type ?? '';
-      store.dispatch(requestSlice.actions.setByocLocation(location));
-      store.dispatch(requestSlice.actions.setByocCollectionType(type));
-    }
-    store.dispatch(requestSlice.actions.setByocCollectionId(e.target.value));
   };
 
   const handleRefreshCollections = () => {
@@ -74,38 +86,34 @@ const BYOCOptions = ({ token, byocLocation, byocCollectionType, byocCollectionId
   };
 
   return (
-    <div className="form byoc-options">
-      {collections.length > 0 ? (
-        <>
-          <label htmlFor="personal-collections" className="form__label">
-            Personal collections
-          </label>
-          <div className="u-flex-aligned u-margin-bottom-tiny">
-            <select id="personal-collections" onChange={handleDropdownIdChange} className="form__input">
-              <option value="">Select a custom collection</option>
-              {generateCollectionOptions(collections)}
-            </select>
-            {token && (
-              <button className="secondary-button u-margin-left-tiny" onClick={handleRefreshCollections}>
-                <FontAwesomeIcon icon={faSync} />
-              </button>
-            )}
-          </div>
-        </>
-      ) : null}
-
+    <div className="form byoc-options" style={{ padding: '0 0 0 1rem' }}>
       <label htmlFor="collection-id" className="form__label">
         Collection Id
       </label>
-      <input
-        id="collection-id"
-        required
-        value={byocCollectionId}
-        onChange={handleCollectionIdChange}
-        type="text"
-        className="form__input"
-        placeholder="Write your collection Id"
-      />
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+        <input
+          id="collection-id"
+          required
+          value={byocCollectionId}
+          onChange={handleCollectionIdChange}
+          type="text"
+          className="form__input"
+          placeholder="Write your collection Id"
+          list="collections-list"
+          style={{ marginBottom: '0' }}
+        />
+        {token && collections.length > 0 && generateCollectionDatalist(collections)}
+
+        {token && (
+          <button
+            className="secondary-button"
+            onClick={handleRefreshCollections}
+            style={{ marginTop: '0', marginLeft: '0.5rem' }}
+          >
+            <FontAwesomeIcon icon={faSync} />
+          </button>
+        )}
+      </div>
 
       <label htmlFor="byoc-location" className="form__label">
         Location
