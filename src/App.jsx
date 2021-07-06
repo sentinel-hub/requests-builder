@@ -97,8 +97,8 @@ function App({ mode }) {
       <Alert />
       <OverlayResponse />
       <SavedRequests />
-      <div className="header">
-        <div className="header__title">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center">
           <HeaderLogo />
         </div>
         {getHeaderButtons(mode)}

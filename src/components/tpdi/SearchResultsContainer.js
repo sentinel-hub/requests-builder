@@ -66,7 +66,7 @@ const SearchResultsContainer = ({ featuresWithProvider, geometry, products }) =>
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <h2 className="heading-secondary">Search Results (Products Found)</h2>
-      <div className="form" style={{ overflowY: 'scroll', maxHeight: '450px' }}>
+      <div className="form" style={{ overflowY: 'scroll', maxHeight: '500px' }}>
         {featuresWithProvider.features.length > 0 ? (
           generateFeatures(sortTpdiFeatures(featuresWithProvider), geometry, productIds)
         ) : (

@@ -37,7 +37,7 @@ const GetLatestRequestButton = ({ token, setFetchedRequests, handleExpandContain
       errorHandler={addAlertOnError}
       request={BatchResource.getLatestOrders}
       args={[]}
-      style={{ marginTop: '0', marginRight: '1rem' }}
+      additionalClassNames={['mt-0', 'mr-2', 'wrapped']}
     />
   );
 };

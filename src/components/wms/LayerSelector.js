@@ -94,7 +94,7 @@ const LayerSelector = ({ layerId, instanceId, shouldFetchLayers, token }) => {
 
   return (
     <>
-      <label htmlFor="layer" className="form__label">
+      <label htmlFor="layer" className="form__label mt-2">
         Layer
       </label>
       <select
@@ -111,13 +111,12 @@ const LayerSelector = ({ layerId, instanceId, shouldFetchLayers, token }) => {
         <input
           id="layer"
           type="text"
-          className="form__input"
+          className="form__input my-2"
           placeholder="Layer id"
           value={layerIdInput}
           onChange={handleLayerIdChange}
         />
       )}
-      {!token && <p className="text text--warning">Log in to see your personal instances</p>}
     </>
   );
 };

@@ -12,6 +12,33 @@ import statisticalSlice from './statistical';
 import tpdiSlice, { airbusSlice, maxarSlice, planetSlice } from './tpdi';
 import wmsSlice from './wms';
 
+const asyncDispatchMiddleware = (store) => (next) => (action) => {
+  let syncActivityFinished = false;
+  let actionQueue = [];
+
+  function flushQueue() {
+    actionQueue.forEach((a) => store.dispatch(a)); // flush queue
+    actionQueue = [];
+  }
+
+  function asyncDispatch(asyncAction) {
+    actionQueue = actionQueue.concat([asyncAction]);
+
+    if (syncActivityFinished) {
+      flushQueue();
+    }
+  }
+
+  const actionWithAsyncDispatch = Object.assign({}, action, { asyncDispatch });
+
+  const res = next(actionWithAsyncDispatch);
+
+  syncActivityFinished = true;
+  flushQueue();
+
+  return res;
+};
+
 const reducers = combineReducers({
   auth: authSlice.reducer,
   request: requestSlice.reducer,
@@ -38,7 +65,7 @@ const store = configureStore({
       ignoredPaths: ['map.additionalLayers', 'response.imageResponse'],
       ignoredActionPaths: ['payload.arrayBuffer'],
     },
-  }),
+  }).concat(asyncDispatchMiddleware),
 });
 
 export default store;

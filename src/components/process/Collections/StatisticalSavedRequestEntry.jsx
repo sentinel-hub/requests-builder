@@ -50,24 +50,21 @@ const StatisticalSavedRequestEntry = ({ request, response, creationTime, mode, n
   };
 
   return (
-    <div className="saved-request-entry">
+    <div>
       <CommonSavedRequestEntryFields creationTime={creationTime} mode={mode} name={name} />
       {response && (
         <p className="text">
           <span>Response: </span>
-          <button className="tertiary-button u-margin-top-tiny" onClick={handleDisplay}>
+          <button className="tertiary-button mt-1" onClick={handleDisplay}>
             Display
           </button>
         </p>
       )}
-      <div className="u-flex-aligned u-margin-top-tiny" style={{ width: '100%' }}>
-        <button className="tertiary-button u-margin-right-tiny" onClick={handleCopyRequest}>
+      <div className="flex items-center mt-1" style={{ width: '100%' }}>
+        <button className="tertiary-button mr-1" onClick={handleCopyRequest}>
           Copy
         </button>
-        <button
-          className="tertiary-button tertiary-button--wrapped u-margin-right-tiny"
-          onClick={handleParse}
-        >
+        <button className="tertiary-button tertiary-button--wrapped mr-1" onClick={handleParse}>
           Update UI
         </button>
         <RequestButton
@@ -80,7 +77,7 @@ const StatisticalSavedRequestEntry = ({ request, response, creationTime, mode, n
           responseHandler={(resp, req) => responseHandler(resp, req, idx)}
         />
       </div>
-      <hr className="u-margin-top-tiny u-margin-bottom-tiny" />
+      <hr className="mt-1 mb-1" />
     </div>
   );
 };

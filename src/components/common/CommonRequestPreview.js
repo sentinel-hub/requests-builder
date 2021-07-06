@@ -3,6 +3,7 @@ import { Controlled } from 'react-codemirror2';
 import store from '../../store';
 import alertSlice from '../../store/alert';
 import RequestButton from './RequestButton';
+import Select from './Select';
 import Toggle from './Toggle';
 require('codemirror/lib/codemirror.css');
 require('codemirror/theme/eclipse.css');
@@ -72,8 +73,8 @@ const CommonRequestPreview = ({
     setHasTextChanged(false);
   }, [selectedOption, toggled]);
 
-  const handleSelectedOptionChange = (e) => {
-    const newOption = options.find((opt) => opt.name === e.target.value);
+  const handleSelectedOptionChange = (value) => {
+    const newOption = options.find((opt) => opt.name === value);
     if (newOption.nonToggle && toggled) {
       setToggled(false);
     }
@@ -93,22 +94,18 @@ const CommonRequestPreview = ({
   };
   return (
     <>
-      {options.length > 1 ? (
-        <div className="toggle-with-label">
-          <label className="form__label">Request</label>
-          <select
-            className="form__input form__input--fit"
-            value={selectedOption.name}
-            onChange={handleSelectedOptionChange}
-          >
-            {options.map((opt) => (
-              <option key={opt.name} value={opt.name}>
-                {opt.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      ) : null}
+      {options.length > 1 && (
+        <Select
+          buttonClassNames="w-fit mb-2"
+          selected={selectedOption.name}
+          onChange={handleSelectedOptionChange}
+          options={options.map((opt) => ({
+            name: opt.name,
+            value: opt.name,
+          }))}
+          optionsClassNames="w-fit"
+        />
+      )}
       <Controlled
         value={text}
         options={{
@@ -126,14 +123,14 @@ const CommonRequestPreview = ({
         }}
       />
       {!selectedOption.nonToggle && (
-        <div className="toggle-with-label u-margin-top-tiny">
-          <label htmlFor={id} className="form__label">
+        <div className="flex items-center mb-2 mt-1">
+          <label htmlFor={id} className="form__label cursor-pointer mr-2">
             See response
           </label>
           <Toggle id={id} checked={toggled} onChange={handleToggleChange} />
         </div>
       )}
-      <div className="u-flex-aligned u-margin-top-tiny">
+      <div className="flex items-center mt-1">
         {canCopy && (
           <button className="secondary-button" style={{ marginTop: 0 }} onClick={handleCopy}>
             Copy

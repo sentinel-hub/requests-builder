@@ -1,13 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { connect } from 'react-redux';
 import TimeRange from './TimeRange';
 import store from '../../../store';
 import requestSlice from '../../../store/request';
 import Toggle from '../Toggle';
-import { DATAFUSION, DEM } from '../../../utils/const/const';
+import { DEM } from '../../../utils/const/const';
 
-const multipleTimeRangeIsValid = (mode, datasource) => {
-  return (mode === 'PROCESS' || mode === 'BATCH') && datasource === DATAFUSION;
+const multipleTimeRangeIsValid = (mode, isOnDatafusion) => {
+  return (mode === 'PROCESS' || mode === 'BATCH') && isOnDatafusion;
 };
 
 const supportsTimeRange = (datasource) => !(datasource === DEM);
@@ -17,28 +17,39 @@ const TimeRangeContainer = ({
   timeFromArray,
   isDisabled,
   mode,
-  datafusionSources,
-  datasource,
+  dataCollections,
   geometry,
   token,
 }) => {
+  const isOnDatafusion = useMemo(() => {
+    return dataCollections.length > 1;
+  }, [dataCollections.length]);
+
+  const firstDataCollectionType = useMemo(() => {
+    return dataCollections[0].type;
+  }, [dataCollections]);
+
   useEffect(() => {
-    if (!supportsTimeRange(datasource)) {
+    if (!supportsTimeRange(firstDataCollectionType)) {
       store.dispatch(requestSlice.actions.disableTimerange(true));
     }
-  }, [datasource]);
+  }, [firstDataCollectionType]);
 
   const handleDisableTimerange = () => {
-    if (supportsTimeRange(datasource)) {
+    if (supportsTimeRange(firstDataCollectionType)) {
       store.dispatch(requestSlice.actions.disableTimerange(!isDisabled));
     }
   };
 
-  const generateTimeRangesJSX = () => {
+  const generateTimeRangesJSX = (canHaveMultipleTimeRanges) => {
     const timerangeLength = timeToArray.length;
-    return timeToArray.map((timeTo, i) => {
+    let usedTimeToArray = timeToArray;
+    if (!canHaveMultipleTimeRanges) {
+      usedTimeToArray = usedTimeToArray.slice(0, 1);
+    }
+    return usedTimeToArray.map((timeTo, i) => {
       // If datafusion select the proper datasource.
-      const selectedDatasource = datasource === DATAFUSION ? datafusionSources[i].datasource : datasource;
+      const selectedDatasource = dataCollections[i].type;
       return (
         <React.Fragment key={i}>
           <TimeRange
@@ -60,7 +71,7 @@ const TimeRangeContainer = ({
               Delete Timerange
             </button>
           ) : null}
-          {i < timerangeLength - 1 ? <hr className="u-margin-bottom-tiny u-margin-top-tiny"></hr> : null}
+          {i < timerangeLength - 1 ? <hr className="mb-1 mt-1"></hr> : null}
         </React.Fragment>
       );
     });
@@ -73,13 +84,9 @@ const TimeRangeContainer = ({
     store.dispatch(requestSlice.actions.deleteTimerange(e.target.name));
   };
 
-  const canAddTimeRange = () => {
-    return (
-      timeFromArray.length < datafusionSources.length &&
-      timeToArray.length < datafusionSources.length &&
-      multipleTimeRangeIsValid(mode, datasource)
-    );
-  };
+  const canHaveMultipleTimeRanges = useMemo(() => {
+    return multipleTimeRangeIsValid(mode, isOnDatafusion);
+  }, [mode, isOnDatafusion]);
 
   return (
     <>
@@ -87,26 +94,28 @@ const TimeRangeContainer = ({
       <div
         className="form"
         style={{
-          overflowY: `${multipleTimeRangeIsValid(mode, datasource) ? 'scroll' : 'initial'}`,
-          maxHeight: `${multipleTimeRangeIsValid(mode, datasource) ? '224px' : ''}`,
+          overflowY: `${canHaveMultipleTimeRanges ? 'scroll' : 'initial'}`,
+          maxHeight: `${canHaveMultipleTimeRanges ? '330px' : ''}`,
         }}
       >
-        <div className="toggle-with-label">
-          <label htmlFor="toggle-timerange" className="form__label">
-            {isDisabled ? 'Enable timerange' : 'Disable timerange'}
-          </label>
-          <Toggle id="toggle-timerange" onChange={handleDisableTimerange} checked={isDisabled} />
-        </div>
+        {!isOnDatafusion && (
+          <div className="flex items-center mb-2">
+            <label htmlFor="toggle-timerange" className="form__label cursor-pointer mr-2">
+              {isDisabled ? 'Enable timerange' : 'Disable timerange'}
+            </label>
+            <Toggle id="toggle-timerange" onChange={handleDisableTimerange} checked={isDisabled} />
+          </div>
+        )}
 
-        {generateTimeRangesJSX()}
+        {generateTimeRangesJSX(canHaveMultipleTimeRanges)}
 
-        {canAddTimeRange() ? (
+        {canHaveMultipleTimeRanges && timeToArray.length < dataCollections.length ? (
           <>
-            <button className="secondary-button" onClick={handleAddTimerange}>
+            <button className="secondary-button mt-2 w-fit" onClick={handleAddTimerange}>
               Add Timerange
             </button>
 
-            <p className="text u-margin-top-small">
+            <p className="text mt-2">
               <i>Note: Data collections that don't have a timerange defined will use the first one</i>
             </p>
           </>
@@ -119,9 +128,8 @@ const mapStateToProps = (store) => ({
   timeToArray: store.request.timeTo,
   timeFromArray: store.request.timeFrom,
   isDisabled: store.request.isTimeRangeDisabled,
-  datasource: store.request.datasource,
+  dataCollections: store.request.dataCollections,
   mode: store.request.mode,
-  datafusionSources: store.request.datafusionSources,
   token: store.auth.user.access_token,
   geometry: store.map.wgs84Geometry,
 });

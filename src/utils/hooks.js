@@ -106,7 +106,9 @@ export const useOverlayComponent = (ref, overlayedClassName = undefined) => {
       if (ref.current) {
         const parent = ref.current.parentNode;
         const wrapper = document.createElement('div');
-        wrapper.className = 'general-overlay';
+        // wrapper.className = 'general-overlay';
+        wrapper.className =
+          'fixed top-0 left-0 right-0 bottom-0 w-full z-50 flex cursor-pointer items-center bg-gray-700 bg-opacity-50 justify-center max-h-full py-4 px-0';
         overlayRef.current = wrapper;
         parent.replaceChild(wrapper, ref.current);
         wrapper.appendChild(ref.current);

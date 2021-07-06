@@ -5,7 +5,7 @@ import StatisticalSendRequestButton from './StatisticalSendRequestButton';
 
 const StatisticalAuthHeader = () => {
   return (
-    <div className="header__buttons">
+    <div className="flex">
       <StatisticalSendRequestButton />
       <AuthHeader />
     </div>

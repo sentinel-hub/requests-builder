@@ -20,18 +20,18 @@ const PlanetOptions = ({ apiKey, maxCC, productBundle, harmonizeTo }) => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
+    <div className="flex flex-col">
       <label htmlFor="planet-api-key" className="form__label">
         Planet API Key
       </label>
-      <div className="u-flex-aligned u-margin-bottom-tiny" style={{ justifyContent: 'space-between' }}>
+      <div className="flex items-center justify-between">
         <input
           id="planet-api-key"
           placeholder="Your Planet API key"
           value={apiKey}
           required
           type="text"
-          className="form__input"
+          className="form__input mb-2"
           onChange={handleApiKeyChange}
         />
         <Tooltip
@@ -42,9 +42,9 @@ const PlanetOptions = ({ apiKey, maxCC, productBundle, harmonizeTo }) => {
       <label className="form__label" htmlFor="planet-product-bundle">
         Product Bundle
       </label>
-      <div className="u-flex-aligned u-margin-bottom-tiny" style={{ justifyContent: 'space-between' }}>
+      <div className="flex items-center justify-between">
         <select
-          className="form__input"
+          className="form__input mb-2"
           id="planet-product-bundle"
           value={productBundle}
           onChange={handleProductBundleChange}
@@ -77,7 +77,7 @@ const PlanetOptions = ({ apiKey, maxCC, productBundle, harmonizeTo }) => {
       <input
         id="planet-cc"
         value={maxCC}
-        className="form__input form__input--range"
+        className="form__input mb-2 form__input--range"
         onChange={handleMaxCCChange}
         type="range"
         min="0"

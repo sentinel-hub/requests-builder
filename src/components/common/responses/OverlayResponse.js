@@ -47,7 +47,7 @@ const OverlayResponse = ({
     if (error) {
       return (
         <>
-          <h2 className="heading-secondary u-margin-bottom-small">Something went wrong</h2>
+          <h2 className="heading-secondary mb-2">Something went wrong</h2>
           <p className="text">{error}</p>
         </>
       );
@@ -67,9 +67,12 @@ const OverlayResponse = ({
   return (
     <>
       {displayResponse ? (
-        <div className="overlay-response">
+        <div className="fixed top-0 left-0 right-0 bottom-0 w-full h-full cursor-pointer flex justify-center items-center z-50 bg-gray-700 bg-opacity-50">
           <div ref={ref} className="overlay-image-container">
-            <span className="overlay-close" onClick={handleCloseClick}>
+            <span
+              className="absolute top-5 right-0 cursor-pointer font-bold text-xl"
+              onClick={handleCloseClick}
+            >
               &#x2715;
             </span>
             {shouldDisplaySaveRequestForm(stringRequest, mode, isFromCollections) && (

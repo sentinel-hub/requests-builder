@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSync } from '@fortawesome/free-solid-svg-icons';
 import ByocResource from '../../../api/byoc/ByocResource';
 import { checkValidUuid } from '../../../utils/stringUtils';
+import Select from '../Select';
 
 const generateCollectionDatalist = (collections) => {
   return (
@@ -18,7 +19,34 @@ const generateCollectionDatalist = (collections) => {
   );
 };
 
-const BYOCOptions = ({ token, byocLocation, byocCollectionType, byocCollectionId }) => {
+const byocTypeOptions = [
+  { value: '', name: 'Select a type' },
+  { value: 'BYOC', name: 'BYOC' },
+  { value: 'BATCH', name: 'BATCH' },
+];
+
+const AWS_LOCATION_OPTION = {
+  value: 'aws-eu-central-1',
+  name: 'AWS eu-central-1',
+};
+
+const OTHER_LOCATION_OPTIONS = [
+  { value: 'aws-us-west-2', name: 'AWS us-west-2' },
+  { value: 'creo', name: 'Creodias' },
+  { value: 'codede', name: 'Code-de' },
+];
+
+const isByocLocationSupported = (location, appMode) => {
+  return appMode === 'PROCESS' || location === 'aws-eu-central-1';
+};
+const BYOCOptions = ({
+  token,
+  byocCollectionLocation,
+  byocCollectionType,
+  byocCollectionId,
+  appMode,
+  idx,
+}) => {
   const [collections, setCollections] = useState([]);
   const sourceRef = useRef();
 
@@ -38,12 +66,12 @@ const BYOCOptions = ({ token, byocLocation, byocCollectionType, byocCollectionId
         let { type, location } = selected;
         location = location ?? '';
         type = type ?? '';
-        store.dispatch(requestSlice.actions.setByocLocation(location));
-        store.dispatch(requestSlice.actions.setByocCollectionType(type));
+        store.dispatch(requestSlice.actions.setByocLocation({ idx, location }));
+        store.dispatch(requestSlice.actions.setByocCollectionType({ idx, type }));
         handleSetTimeRange(type);
       }
     }
-    store.dispatch(requestSlice.actions.setByocCollectionId(value));
+    store.dispatch(requestSlice.actions.setByocCollectionId({ id: value, idx }));
   };
 
   const loadCustomCollections = useCallback(async () => {
@@ -71,28 +99,35 @@ const BYOCOptions = ({ token, byocLocation, byocCollectionType, byocCollectionId
     };
   }, [token, loadCustomCollections]);
 
-  const handleByocLocationChange = (e) => {
-    store.dispatch(requestSlice.actions.setByocLocation(e.target.value));
+  useEffect(() => {
+    if (!isByocLocationSupported(byocCollectionLocation, appMode)) {
+      store.dispatch(requestSlice.actions.setByocLocation({ idx, location: '' }));
+    }
+    // eslint-disable-next-line
+  }, []);
+
+  const handleByocLocationChange = (value) => {
+    store.dispatch(requestSlice.actions.setByocLocation({ idx, location: value }));
   };
 
-  const handleByocCollectionTypeChange = (e) => {
-    handleSetTimeRange(e.target.value);
-    store.dispatch(requestSlice.actions.setByocCollectionType(e.target.value));
+  const handleByocCollectionTypeChange = (value) => {
+    handleSetTimeRange(value);
+    store.dispatch(requestSlice.actions.setByocCollectionType({ idx, type: value }));
   };
 
   const handleRefreshCollections = () => {
     loadCustomCollections();
-    store.dispatch(requestSlice.actions.setByocCollectionId(''));
+    store.dispatch(requestSlice.actions.setByocCollectionId({ idx, id: '' }));
   };
 
   return (
     <div className="form byoc-options" style={{ padding: '0 0 0 1rem' }}>
-      <label htmlFor="collection-id" className="form__label">
+      <label htmlFor={`collection-id-${idx}`} className="form__label mt-2">
         Collection Id
       </label>
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+      <div className="flex items-center mb-2">
         <input
-          id="collection-id"
+          id={`collection-id-${idx}`}
           required
           value={byocCollectionId}
           onChange={handleCollectionIdChange}
@@ -115,44 +150,31 @@ const BYOCOptions = ({ token, byocLocation, byocCollectionType, byocCollectionId
         )}
       </div>
 
-      <label htmlFor="byoc-location" className="form__label">
-        Location
-      </label>
-      <select
-        required
-        id="byoc-location"
-        value={byocLocation}
+      <Select
+        label="Location"
+        selected={byocCollectionLocation}
         onChange={handleByocLocationChange}
-        className="form__input"
-      >
-        <option value="">Select a location</option>
-        <option value="aws-eu-central-1">AWS eu-central-1</option>
-        <option value="aws-us-west-2">AWS us-west-2</option>
-      </select>
-
-      <label htmlFor="byoc-collection-type" className="form__label">
-        Collection Type
-      </label>
-      <select
-        required
-        id="byoc-location"
-        value={byocCollectionType}
+        buttonClassNames="mb-2"
+        options={
+          appMode === 'PROCESS' ? [AWS_LOCATION_OPTION, ...OTHER_LOCATION_OPTIONS] : [AWS_LOCATION_OPTION]
+        }
+      />
+      <Select
+        label="Collection Type"
+        selected={byocCollectionType}
         onChange={handleByocCollectionTypeChange}
-        className="form__input"
-      >
-        <option value="">Select a Type</option>
-        <option value="BYOC">BYOC</option>
-        <option value="BATCH">BATCH</option>
-      </select>
+        options={byocTypeOptions}
+      />
     </div>
   );
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state, ownProps) => ({
   token: state.auth.user.access_token,
-  byocLocation: state.request.byocLocation,
-  byocCollectionType: state.request.byocCollectionType,
-  byocCollectionId: state.request.byocCollectionId,
+  byocCollectionLocation: state.request.dataCollections[ownProps.idx].byocCollectionLocation,
+  byocCollectionType: state.request.dataCollections[ownProps.idx].byocCollectionType,
+  byocCollectionId: state.request.dataCollections[ownProps.idx].byocCollectionId,
+  appMode: state.request.mode,
 });
 
 export default connect(mapStateToProps)(BYOCOptions);

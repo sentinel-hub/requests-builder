@@ -103,10 +103,10 @@ const TPDIPlaceOrderButton = ({
     );
   };
   return (
-    <div className="u-flex-aligned u-margin-top-small" style={{ justifyContent: 'space-between' }}>
+    <div className="flex items-center mt-2" style={{ justifyContent: 'space-between' }}>
       <div />
       {getRequestButton()}
-      <div className="u-flex-aligned" style={{ justifyContent: 'flex-end' }}>
+      <div className="flex items-center" style={{ justifyContent: 'flex-end' }}>
         <Tooltip
           direction="right"
           content='When you click "Prepare Order", your order will be created. At this stage, the order will not go through and no quota will be substracted. This will happen when you confirm the order. Before you do, you will be able to review the requested quota and decide if you would like to proceed.'

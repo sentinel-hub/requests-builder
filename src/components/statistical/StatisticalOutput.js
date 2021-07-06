@@ -11,13 +11,13 @@ const StatisticalOutput = ({ aggregationInterval }) => {
 
   return (
     <>
-      <h2 className="heading-secondary u-margin-top-small">Aggregation</h2>
+      <h2 className="heading-secondary mt-2">Aggregation</h2>
       <div className="form">
         <label className="form__label" htmlFor="aggregations">
           Interval
         </label>
         <input
-          className="form__input u-margin-bottom-small"
+          className="form__input mb-2"
           type="text"
           id="aggregations"
           placeholder="e.g: P30D"

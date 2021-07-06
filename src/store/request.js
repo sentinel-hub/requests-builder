@@ -1,11 +1,19 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { S1GRD, S2L2A, DATASOURCES, getStatisticalDefaultEvalscript } from '../utils/const/const';
+import { createSelector, createSlice } from '@reduxjs/toolkit';
+import {
+  S2L2A,
+  DATASOURCES,
+  getStatisticalDefaultEvalscript,
+  batchDataCollectionNames,
+  statisticalDataCollectionNames,
+  CUSTOM,
+} from '../utils/const/const';
 import moment from 'moment';
 import { DEFAULT_S2_EVALSCRIPT } from '../utils/const/constEvalscript';
+import alertSlice from './alert';
+import { doesModeSupportCrossRegion } from '../utils/commonUtils';
 
 const PROCESS_INITIAL_STATE = {
   mode: 'PROCESS',
-  datasource: S2L2A,
   //default times: today and one month ago.
   timeFrom: [moment.utc().subtract(1, 'month').startOf('day').format()],
   timeTo: [moment.utc().endOf('day').format()],
@@ -22,24 +30,12 @@ const PROCESS_INITIAL_STATE = {
       options: {},
       idx: 0,
     },
-    {
-      options: {},
-      idx: 1,
-    },
   ],
   processingOptions: [
     {
       options: {},
       idx: 0,
     },
-    {
-      options: {},
-      idx: 1,
-    },
-  ],
-  datafusionSources: [
-    { datasource: S1GRD, id: 's1' },
-    { datasource: S2L2A, id: 'l2a' },
   ],
   responses: [
     {
@@ -48,20 +44,87 @@ const PROCESS_INITIAL_STATE = {
       idx: 0,
     },
   ],
-  byocLocation: 'aws-eu-central-1',
-  byocCollectionType: '',
-  byocCollectionId: '',
   consoleValue: '',
+  dataCollections: [
+    {
+      type: S2L2A,
+      byocCollectionId: '',
+      byocCollectionType: '',
+      byocCollectionLocation: '',
+      id: '',
+    },
+  ],
+  isRequestRunning: false,
 };
 
 const requestSlice = createSlice({
   name: 'request',
   initialState: PROCESS_INITIAL_STATE,
   reducers: {
-    setDatasource: (state, action) => {
-      state.datasource = action.payload;
+    setDataCollection: (state, action) => {
+      let idx = 0;
+      if (action.payload.idx) {
+        idx = action.payload.idx;
+      }
+      state.dataCollections[idx].type = action.payload.dataCollection;
 
-      resetAdvancedOptions(state);
+      resetAdvancedOptions(state, idx);
+    },
+    addDataCollection: (state) => {
+      state.dataCollections.push({
+        type: S2L2A,
+        byocCollectionId: '',
+        byocCollectionType: '',
+        byocCollectionLocation: '',
+        id: '',
+      });
+      const currenLen = state.dataFilterOptions.length;
+      state.dataFilterOptions.push({
+        options: {},
+        idx: currenLen,
+      });
+      state.processingOptions.push({
+        options: {},
+        idx: currenLen,
+      });
+    },
+    removeDataCollection: (state, action) => {
+      const { idx } = action.payload;
+      console.log(idx);
+      state.dataCollections = state.dataCollections
+        .slice(0, idx)
+        .concat(state.dataCollections.slice(idx + 1));
+      state.processingOptions = state.processingOptions
+        .slice(0, idx)
+        .concat(state.processingOptions.slice(idx + 1));
+      state.dataFilterOptions = state.dataFilterOptions
+        .slice(0, idx)
+        .concat(state.dataFilterOptions.slice(idx + 1));
+    },
+    setDataCollectionId: (state, action) => {
+      const { idx, id } = action.payload;
+      state.dataCollections[idx].id = id;
+    },
+    setByocCollectionId: (state, action) => {
+      let idx = 0;
+      if (action.payload.idx) {
+        idx = action.payload.idx;
+      }
+      state.dataCollections[idx].byocCollectionId = action.payload.id;
+    },
+    setByocLocation: (state, action) => {
+      let idx = 0;
+      if (action.payload.idx) {
+        idx = action.payload.idx;
+      }
+      state.dataCollections[idx].byocCollectionLocation = action.payload.location;
+    },
+    setByocCollectionType: (state, action) => {
+      let idx = 0;
+      if (action.payload.idx) {
+        idx = action.payload.idx;
+      }
+      state.dataCollections[idx].byocCollectionType = action.payload.type;
     },
     setTimeFrom: (state, action) => {
       state.timeFrom[action.payload.idx] = action.payload.timeFrom;
@@ -145,16 +208,9 @@ const requestSlice = createSlice({
       };
     },
     resetAdvancedOptions: (state, action) => {
-      let idx = action.payload || 0;
-
-      state.dataFilterOptions[idx] = {
-        options: {},
-        idx: idx,
-      };
-      state.processingOptions[idx] = {
-        options: {},
-        idx: idx,
-      };
+      const idx = action.payload.idx;
+      state.dataFilterOptions[idx].options = {};
+      state.processingOptions[idx].options = {};
     },
     setMode: (state, action) => {
       state.mode = action.payload;
@@ -163,84 +219,42 @@ const requestSlice = createSlice({
         if (state.responses[0].format === 'image/jpeg') {
           state.responses[0].format = 'image/png';
         }
-        if (!DATASOURCES[state.datasource].isBatchSupported) {
-          state.datasource = S2L2A;
-        }
+        const firstSupportedBatchCollection = batchDataCollectionNames[0];
+        state.dataCollections.forEach((dataCol, idx) => {
+          if (!DATASOURCES[dataCol.type].isBatchSupported) {
+            const notSupported = dataCol.type;
+            state.dataCollections[idx].type = firstSupportedBatchCollection;
+            resetAdvancedOptions(state, idx);
+            action.asyncDispatch(
+              alertSlice.actions.addAlert({
+                text: `${notSupported} has been set to ${firstSupportedBatchCollection} since it's not supported on BATCH`,
+                type: 'WARNING',
+                time: 5000,
+              }),
+            );
+          }
+        });
       }
-      // Todo: remove once normal defaults work.
+
       if (action.payload === 'STATISTICAL') {
-        let dataCol = state.datasource;
-        if (!DATASOURCES[state.datasource].isStatApiSupported) {
-          state.datasource = S2L2A;
-          dataCol = S2L2A;
+        const firstSupportedStatCollection = statisticalDataCollectionNames[0];
+        state.dataCollections.forEach((dataCol, idx) => {
+          if (!DATASOURCES[dataCol.type].isStatApiSupported) {
+            const notSupported = dataCol.type;
+            state.dataCollections[idx].type = firstSupportedStatCollection;
+            resetAdvancedOptions(state, idx);
+            action.asyncDispatch(
+              alertSlice.actions.addAlert({
+                text: `${notSupported} has been set to ${firstSupportedStatCollection} since it's not supported on STAT API`,
+                type: 'WARNING',
+                time: 5000,
+              }),
+            );
+          }
+        });
+        if (state.dataCollections.length === 1) {
+          state.evalscript = getStatisticalDefaultEvalscript(state.dataCollections[0].type);
         }
-        state.evalscript = getStatisticalDefaultEvalscript(dataCol);
-      }
-    },
-    setDatafusionSource: (state, action) => {
-      const datasource = action.payload.datasource;
-      state.datafusionSources[action.payload.idx].datasource = datasource;
-      // Set id
-      let newId = DATASOURCES[datasource].defaultDatafusionId;
-      if (newId) {
-        state.datafusionSources[action.payload.idx].id = newId;
-      }
-
-      //Reset advanced options on datasource change
-      const idx = action.payload.idx;
-      state.dataFilterOptions[idx] = {
-        options: {},
-        idx: idx,
-      };
-      state.processingOptions[idx] = {
-        options: {},
-        idx: idx,
-      };
-    },
-    setDatafusionSourcesAbs: (state, action) => {
-      state.datafusionSources = action.payload;
-
-      //Push processingOptions and Datafilter options based on length of action.payload (datafusionSources)
-      let len = action.payload.length;
-      for (let i = 2; i < len; i++) {
-        state.processingOptions.push({
-          options: {},
-          idx: i,
-        });
-        state.dataFilterOptions.push({
-          options: {},
-          idx: i,
-        });
-      }
-    },
-    setDataFusionId: (state, action) => {
-      state.datafusionSources[action.payload.idx].id = action.payload.id;
-    },
-    addDatafusionSource: (state) => {
-      state.datafusionSources.push({ datasource: S2L2A, id: '' });
-      // add new options on processing and datafilter
-      const lastIdx = state.dataFilterOptions[state.dataFilterOptions.length - 1].idx;
-      state.processingOptions.push({
-        options: {},
-        idx: lastIdx + 1,
-      });
-      state.dataFilterOptions.push({
-        options: {},
-        idx: lastIdx + 1,
-      });
-    },
-    deleteDatafusionSource: (state, action) => {
-      let idx = parseInt(action.payload);
-      if (idx > 1) {
-        state.datafusionSources = state.datafusionSources
-          .slice(0, idx)
-          .concat(state.datafusionSources.slice(idx + 1));
-        state.processingOptions = state.processingOptions
-          .slice(0, idx)
-          .concat(state.processingOptions.slice(idx + 1));
-        state.dataFilterOptions = state.dataFilterOptions
-          .slice(0, idx)
-          .concat(state.dataFilterOptions.slice(idx + 1));
       }
     },
     addResponse: (state) => {
@@ -270,17 +284,8 @@ const requestSlice = createSlice({
     setResponses: (state, action) => {
       state.responses = action.payload;
     },
-    setByocLocation: (state, action) => {
-      state.byocLocation = action.payload;
-    },
     setConsoleValue: (state, action) => {
       state.consoleValue = '> ' + action.payload.slice(0, -2);
-    },
-    setByocCollectionType: (state, action) => {
-      state.byocCollectionType = action.payload;
-    },
-    setByocCollectionId: (state, action) => {
-      state.byocCollectionId = action.payload;
     },
     resetState: (state, action) => {
       const { resetMode } = action.payload;
@@ -289,31 +294,36 @@ const requestSlice = createSlice({
       }
       return { ...PROCESS_INITIAL_STATE, mode: state.mode };
     },
+    setIsRunningRequest: (state, action) => {
+      state.isRequestRunning = action.payload;
+    },
   },
 });
 
-const resetAdvancedOptions = (state) => {
-  state.dataFilterOptions = [
-    {
-      options: {},
-      idx: 0,
-    },
-    {
-      options: {},
-      idx: 1,
-    },
-  ];
-  state.processingOptions = [
-    {
-      options: {},
-      idx: 0,
-    },
-    {
-      options: {},
-      idx: 1,
-    },
-  ];
-  return state;
+const resetAdvancedOptions = (state, idx) => {
+  state.dataFilterOptions[idx].options = {};
+  state.processingOptions[idx].options = {};
 };
 
 export default requestSlice;
+
+export const isInvalidDatafusionState = createSelector(
+  (state) => state,
+  (state) => {
+    if (state.dataCollections.length === 1 || doesModeSupportCrossRegion(state.appMode)) {
+      return false;
+    }
+    const withByocFiltered = state.dataCollections.filter((dc) => dc.type !== CUSTOM);
+    if (withByocFiltered.length === 0) {
+      return false;
+    }
+    const firstRegion = DATASOURCES[withByocFiltered[0].type].region;
+    for (let dataCol of withByocFiltered) {
+      // ignore byoc
+      if (dataCol.type !== CUSTOM && DATASOURCES[dataCol.type].region !== firstRegion) {
+        return true;
+      }
+    }
+    return false;
+  },
+);

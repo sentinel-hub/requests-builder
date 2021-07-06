@@ -30,8 +30,8 @@ const AirbusFeatureInfo = ({ feature, geometry, isDisabled }) => {
         expandedInfo={expandedInfo}
       />
       {expandedInfo ? (
-        <div className="u-flex-aligned">
-          <div className="tpdi-feature-extra-info u-margin-bottom-tiny">
+        <div className="flex items-center">
+          <div className="tpdi-feature-extra-info mb-1">
             <p className="text">
               <span>Acquisition Date: </span>
               {feature.properties.acquisitionDate}

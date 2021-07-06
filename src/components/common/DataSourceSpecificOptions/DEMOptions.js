@@ -4,7 +4,15 @@ import store from '../../../store';
 import requestSlice from '../../../store/request';
 import { connect } from 'react-redux';
 import Toggle from '../Toggle';
+import { samplingOptions } from './BaseOptionsNoCC';
+import Select from '../Select';
 
+const demInstanceOptions = [
+  { value: 'DEFAULT', name: 'Default' },
+  { value: 'MAPZEN', name: 'Mapzen' },
+  { value: 'COPERNICUS_30', name: 'Copernicus 30/90m DEM' },
+  { value: 'COPERNICUS_90', name: 'Copernicus 90m DEM' },
+];
 //Contains MosaickingOrder, Upsampling, Downsampling.
 const DEMOptions = ({ processingOptions, dataFilterOptions, idx }) => {
   const upsampling = processingOptions.upsampling;
@@ -13,12 +21,12 @@ const DEMOptions = ({ processingOptions, dataFilterOptions, idx }) => {
   const egm = processingOptions.egm;
   const demInstance = dataFilterOptions.demInstance;
 
-  const handleUpsamplingChange = (e) => {
-    store.dispatch(requestSlice.actions.setProcessingOptions({ upsampling: e.target.value, idx: idx }));
+  const handleUpsamplingChange = (value) => {
+    store.dispatch(requestSlice.actions.setProcessingOptions({ upsampling: value, idx: idx }));
   };
 
-  const handleDownsamplingChange = (e) => {
-    store.dispatch(requestSlice.actions.setProcessingOptions({ downsampling: e.target.value, idx: idx }));
+  const handleDownsamplingChange = (value) => {
+    store.dispatch(requestSlice.actions.setProcessingOptions({ downsampling: value, idx: idx }));
   };
 
   const handleClampChange = () => {
@@ -29,66 +37,44 @@ const DEMOptions = ({ processingOptions, dataFilterOptions, idx }) => {
     store.dispatch(requestSlice.actions.setProcessingOptions({ egm: !egm, idx: idx }));
   };
 
-  const handleDemInstanceChange = (e) => {
-    store.dispatch(requestSlice.actions.setDataFilterOptions({ demInstance: e.target.value, idx: idx }));
+  const handleDemInstanceChange = (value) => {
+    store.dispatch(requestSlice.actions.setDataFilterOptions({ demInstance: value, idx: idx }));
   };
   return (
     <>
-      <label htmlFor={`dem-upsampling-${idx}`} className="form__label">
-        Upsampling
-      </label>
-      <select
-        id={`dem-upsampling-${idx}`}
-        value={upsampling}
+      <Select
+        label="Upsampling"
         onChange={handleUpsamplingChange}
-        className="form__input"
-      >
-        <option value="DEFAULT">Default</option>
-        <option value="NEAREST">Nearest</option>
-        <option value="BILINEAR">Bilinear</option>
-        <option value="BICUBIC">Bicubic</option>
-      </select>
-      <label htmlFor={`dem-downsampling-${idx}`} className="form__label">
-        Downsampling
-      </label>
-      <select
-        id={`dem-downsampling-${idx}`}
-        value={downsampling}
+        selected={upsampling}
+        options={samplingOptions}
+        buttonClassNames="mb-2"
+      />
+      <Select
+        label="Upsampling"
         onChange={handleDownsamplingChange}
-        className="form__input"
-      >
-        <option value="DEFAULT">Default</option>
-        <option value="NEAREST">Nearest</option>
-        <option value="BILINEAR">Bilinear</option>
-        <option value="BICUBIC">Bicubic</option>
-      </select>
-      <div className="toggle-with-label">
-        <label htmlFor={`clampNeg-${idx}`} className="form__label">
+        selected={downsampling}
+        options={samplingOptions}
+        buttonClassNames="mb-2"
+      />
+      <div className="flex items-center mb-2">
+        <label htmlFor={`clampNeg-${idx}`} className="form__label cursor-pointer mr-2">
           Clamp Negative
         </label>
         <Toggle id={`clampNeg-${idx}`} checked={Boolean(clampNegative)} onChange={handleClampChange} />
       </div>
-      <div className="toggle-with-label">
-        <label htmlFor={`egm-${idx}`} className="form__label">
+      <div className="flex items-center mb-2">
+        <label htmlFor={`egm-${idx}`} className="form__label cursor-pointer mr-2">
           Apply EGM
         </label>
         <Toggle id={`egm-${idx}`} checked={Boolean(egm)} onChange={handleEgmChange} />
       </div>
-
-      <label htmlFor={`demInstance-${idx}`} className="form__label">
-        Dem Instance
-      </label>
-      <select
-        id={`demInstance-${idx}`}
-        value={demInstance}
-        className="form__input"
+      <Select
+        label="Dem Instance"
+        buttonClassNames="mb-2"
+        options={demInstanceOptions}
+        selected={demInstance}
         onChange={handleDemInstanceChange}
-      >
-        <option value="DEFAULT">Default</option>
-        <option value="MAPZEN">Mapzen DEM</option>
-        <option value="COPERNICUS_30">Copernicus 30/90m DEM</option>
-        <option value="COPERNICUS_90">Copernicus 90m DEM</option>
-      </select>
+      />
     </>
   );
 };

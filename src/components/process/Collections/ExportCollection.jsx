@@ -36,8 +36,8 @@ const ExportCollection = ({ savedRequests }) => {
 
   if (isDialogOpen) {
     return (
-      <div className="general-overlay">
-        <form onSubmit={handleExport} className="dialog" ref={dialogRef}>
+      <div className="fixed top-0 left-0 right-0 bottom-0 w-full bg-gray-700 bg-opacity-50 z-50 flex items-center justify-center py-2 px-0 max-h-full">
+        <form onSubmit={handleExport} className="w-1/2 bg-white cursor-auto p-4" ref={dialogRef}>
           <label className="form__label" required htmlFor="collection-name-input">
             Collection name
           </label>
@@ -57,7 +57,7 @@ const ExportCollection = ({ savedRequests }) => {
   }
 
   return (
-    <button className="tertiary-button u-margin-right-tiny" onClick={openDialog}>
+    <button className="tertiary-button mr-1" onClick={openDialog}>
       Export
     </button>
   );

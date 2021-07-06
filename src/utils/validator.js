@@ -1,14 +1,5 @@
-import { CUSTOM } from './const/const';
-
 const validateDatasource = (requestState) => {
-  return Boolean(
-    requestState.datasource &&
-      ((requestState.datasource === CUSTOM &&
-        requestState.byocCollectionId &&
-        requestState.byocLocation &&
-        requestState.byocCollectionType) ||
-        requestState.datasource !== CUSTOM),
-  );
+  return true;
 };
 
 export const validateRequestState = (requestState) => {

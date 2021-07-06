@@ -4,10 +4,13 @@
   "homepage": ".",
   "private": true,
   "dependencies": {
+    "@craco/craco": "^6.1.2",
     "@fortawesome/fontawesome-svg-core": "^1.2.30",
     "@fortawesome/free-solid-svg-icons": "^5.14.0",
     "@fortawesome/react-fontawesome": "^0.1.11",
     "@geoman-io/leaflet-geoman-free": "^2.6.0",
+    "@headlessui/react": "^1.2.0",
+    "@heroicons/react": "^1.0.1",
     "@reduxjs/toolkit": "^1.3.6",
     "@tmcw/togeojson": "^4.1.0",
     "@turf/area": "^6.0.1",
@@ -40,9 +43,9 @@
     "react-scripts": "^4.0.3"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
     "eject": "react-scripts eject",
     "watch:sass": "node-sass sass/main.scss src/App2.css -w",
     "lint": "eslint --max-warnings 0 --ext .js src/",
@@ -73,13 +76,16 @@
     "@types/node": "^12.0.0",
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
+    "autoprefixer": "^9.8.6",
     "husky": "^4.2.5",
     "node-sass": "^4.14.1",
+    "postcss": "^7.0.35",
     "prettier": "2.0.5",
     "stylelint": "^13.13.1",
     "stylelint-config-recommended-scss": "^4.2.0",
     "stylelint-config-standard": "^20.0.0",
     "stylelint-scss": "^3.18.0",
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.1.4",
     "typescript": "~3.7.2"
   },
   "husky": {

@@ -184,22 +184,17 @@ const BatchRequestSummary = ({
   };
 
   return (
-    <div className="batch-request-summary" ref={requestRef}>
-      <div onClick={() => handleExpand(id)} className="batch-request-summary-header">
-        <div className="batch-request-summary-header-title">
-          <div style={{ display: 'flex', marginBottom: '1rem' }}>
-            <p
-              className="text"
-              style={{ width: '280px', marginRight: '1rem', fontWeight: '700' }}
-              title="Click to show information about the request"
-            >
+    <div className="mb-1" ref={requestRef}>
+      <div
+        onClick={() => handleExpand(id)}
+        className="w-full h-full cursor-pointer items-center flex-col flex mb-1 lg:flex-row"
+      >
+        <div className="flex flex-col">
+          <div className="flex items-center">
+            <p className="text w-80 mr-2 font-bold" title="Click to show information about the request">
               {id}
             </p>
-            <CopyIcon
-              className="batch-request-summary-header-icon"
-              style={{ marginRight: '2rem' }}
-              item={id}
-            />
+            <CopyIcon className="mr-2" item={id} />
           </div>
           {description !== undefined && (
             <p className="text" style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
@@ -208,71 +203,60 @@ const BatchRequestSummary = ({
           )}
         </div>
         <FontAwesomeIcon
-          className="batch-request-summary-header-icon"
-          style={{ marginLeft: '2rem' }}
+          className="ml-2 text-center my-2 lg:mr-auto lg:my-0"
           icon={isExpanded ? faAngleDoubleUp : faAngleDoubleDown}
         />
-        <p className="text" style={{ marginRight: '2rem', fontWeight: '700' }}>
-          {status}
-        </p>
+        <p className="text mr-4 font-bold text-center lg:text-left">{status}</p>
       </div>
 
       {isExpanded && (
-        <div className="batch-request-summary-container">
-          <div className="batch-request-summary-info">
+        <div className="pl-2 flex flex-col lg:flex-row">
+          <div className="flex flex-col justify-between w-full lg:w-1/2">
             <>
-              <p className="text">
-                <span>Status:</span> {status}
+              <p className="text mr-1 mb-1">
+                <span className="font-bold">Status:</span> {status}
               </p>
               {props.error !== undefined ? (
-                <p className="text" style={{ color: 'red' }}>
-                  <span>Error:</span> {props.error}
+                <p className="text mr-1 mb-1 text-red-700">
+                  <span className="font-bold">Error:</span> {props.error}
                 </p>
               ) : null}
               {description ? (
-                <p className="text">
-                  <span>Description:</span> {description}
+                <p className="text mr-1 mb-1">
+                  <span className="font-bold">Description:</span> {description}
                 </p>
               ) : null}
-              <p className="text">
-                <span>Created At:</span> {created}
+              <p className="text mr-1 mb-1">
+                <span className="font-bold">Created At:</span> {created}
               </p>
-              <p className="text">
-                <span>Number of tiles:</span> {tileCount}
+              <p className="text mr-1 mb-1">
+                <span className="font-bold">Number of tiles:</span> {tileCount}
               </p>
-              <p className="text">
-                <span>Bucket Name:</span> {bucketName}
+              <p className="text mr-1 mb-1">
+                <span className="font-bold">Bucket Name:</span> {bucketName}
               </p>
               {valueEstimate ? (
-                <p className="text">
-                  <span>Estimated Value (in PU):</span> {Math.round(valueEstimate / 3)}
+                <p className="text mr-1 mb-1">
+                  <span className="font-bold">Estimated Value (in PU):</span> {Math.round(valueEstimate / 3)}
                 </p>
               ) : null}
               {/* {fetchedTiles.consumedPu ? (
-                <p className="text">
-                  <span>Consumed PU:</span> {Math.round(fetchedTiles.consumedPu)}
+                <p className="text mr-1 mb-1">
+                  <span className="font-bold">Consumed PU:</span> {Math.round(fetchedTiles.consumedPu)}
                 </p>
               ) : null} */}
-              <p className="text">
-                <span>Tiling Grid:</span> {tillingGridIdToName(props.tilingGrid.id)}
+              <p className="text mr-1 mb-1">
+                <span className="font-bold">Tiling Grid:</span> {tillingGridIdToName(props.tilingGrid.id)}
               </p>
-              <p className="text">
-                <span>Resolution:</span> {props.tilingGrid.resolution}
+              <p className="text mr-1 mb-1">
+                <span className="font-bold">Resolution:</span> {props.tilingGrid.resolution}
               </p>
-              <p className="text">
-                <span>Last user Action:</span> {props.userAction}
+              <p className="text mr-1 mb-1">
+                <span className="font-bold">Last user Action:</span> {props.userAction}
               </p>
             </>
           </div>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              width: '100%',
-              justifyContent: 'space-around',
-              alignItems: 'center',
-            }}
-          >
+          <div className="flex flex-col w-full justify-around items-center">
             <BatchActions
               requestId={id}
               token={token}
@@ -282,24 +266,24 @@ const BatchRequestSummary = ({
               status={status}
               fetchTiles={fetchTiles}
             />
-            <div className="batch-request-summary-actions">
+            <div className="w-full lg:w-1/2 grid grid-cols-2 gap-1 mr-1 h-fit">
               <button
                 onClick={handleSeeGeometry}
-                className="secondary-button secondary-button--wrapped"
+                className="secondary-button wrapped"
                 style={{ width: '70%' }}
               >
                 See geometry on map
               </button>
               <button
                 onClick={handleSetGeometry}
-                className="secondary-button secondary-button--wrapped"
+                className="secondary-button wrapped"
                 style={{ width: '70%' }}
               >
                 Set geometry on map
               </button>
               <button
                 onClick={handleParseBatch}
-                className="secondary-button secondary-button--wrapped"
+                className="secondary-button wrapped"
                 style={{ width: '70%' }}
               >
                 Parse Batch Request
@@ -309,10 +293,12 @@ const BatchRequestSummary = ({
                   request={BatchResource.deleteOrder}
                   args={[{ orderId: id }]}
                   buttonText="Delete Batch Request"
-                  className="secondary-button secondary-button--cancel"
+                  additionalClassNames={['secondary-button--cancel', 'wrapped']}
+                  className="secondary-button"
                   validation={true}
                   responseHandler={deleteResponseHandler}
                   errorHandler={deleteErrorHandler}
+                  style={{ width: '70%', marginTop: '0' }}
                 />
               )}
             </div>
@@ -323,12 +309,12 @@ const BatchRequestSummary = ({
       {isExpanded ? (
         <>
           {!validStatus(status) ? null : isFetchingTiles ? (
-            <p className="text u-margin-bottom-small">Loading...</p>
+            <p className="text mb-2">Loading...</p>
           ) : (
             <table summary="Tile Information" className="table">
               <caption>
                 Tile Information
-                <button onClick={handleRefreshTiles} className="secondary-button u-margin-left-small">
+                <button onClick={handleRefreshTiles} className="secondary-button ml-1">
                   Refresh Tiles
                 </button>
               </caption>
@@ -356,14 +342,12 @@ const BatchRequestSummary = ({
             <p className="text">
               <i>Note: To copy produced data to your location, you can use the following command:</i>
             </p>
-            <p className="text u-margin-top-tiny u-margin-left-tiny u-margin-bottom-small">
-              &gt;&nbsp; {generateCopyCommand()}
-            </p>
+            <p className="text mt-1 ml-1 mb-2">&gt;&nbsp; {generateCopyCommand()}</p>
           </>
         </>
       ) : null}
 
-      <hr></hr>
+      <hr className="my-2"></hr>
     </div>
   );
 };

@@ -48,9 +48,7 @@ const handleParseRequest = (text) => {
 const RequestPreview = ({ requestState, token, mapState }) => {
   return (
     <>
-      <h2 className="heading-secondary" style={{ marginBottom: '1.3rem' }}>
-        Request Preview
-      </h2>
+      <h2 className="heading-secondary mb-3">Request Preview</h2>
       <div className="form">
         <CommonRequestPreview
           options={[

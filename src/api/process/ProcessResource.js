@@ -2,12 +2,18 @@ import Api from '..';
 import { getUrl } from './utils';
 
 export const byocLocationToBaseUrl = (location) => {
-  if (location === 'aws-eu-central-1') {
-    return 'https://services.sentinel-hub.com/';
-  } else if (location === 'aws-us-west-2') {
-    return 'https://services-uswest2.sentinel-hub.com/';
+  switch (location) {
+    case 'aws-eu-central-1':
+      return 'https://services.sentinel-hub.com/';
+    case 'aws-us-west-2':
+      return 'https://services-uswest2.sentinel-hub.com/';
+    case 'creo':
+      return 'https://creodias.sentinel-hub.com/';
+    case 'codede':
+      return 'https://code-de.sentinel-hub.com';
+    default:
+      return 'https://services.sentinel-hub.com/';
   }
-  return 'https://services.sentinel-hub.com/';
 };
 
 const { POST } = Api;

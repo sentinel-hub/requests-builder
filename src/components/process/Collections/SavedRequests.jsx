@@ -9,7 +9,7 @@ import ExportCollection from './ExportCollection';
 import ProcessSavedRequestEntry from './ProcessSavedRequestEntry';
 import StatisticalSavedRequestEntry from './StatisticalSavedRequestEntry';
 
-const doesModeSupportSaving = (mode) => mode === 'PROCESS' || mode === 'STATISTICAL';
+const doesModeSupportSaving = (mode) => mode === 'PROCESS' || mode === 'STATISTICAL' || mode === 'BATCH';
 
 const SavedRequests = ({ savedRequests, mode, expandedSidebar, token }) => {
   const handleExpand = () => {
@@ -95,7 +95,7 @@ const SavedRequests = ({ savedRequests, mode, expandedSidebar, token }) => {
                 <span>Save a request to see it here!</span>
               </p>
             )}
-            <p className="text u-margin-top-tiny u-margin-bottom-tiny">
+            <p className="text mt-1 mb-1">
               <span>
                 <i>Note: Saved requests will disappear after refreshing or closing the page</i>
               </span>
@@ -103,7 +103,7 @@ const SavedRequests = ({ savedRequests, mode, expandedSidebar, token }) => {
                 <i> Export them to a local file to to save them.</i>
               </span>
             </p>
-            <div className="u-flex-aligned">
+            <div className="flex items-center">
               <ExportCollection savedRequests={savedRequests} />
               <input
                 type="file"

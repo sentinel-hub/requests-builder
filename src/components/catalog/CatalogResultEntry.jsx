@@ -14,10 +14,9 @@ import mapSlice from '../../store/map';
 import { focusMap } from '../common/Map/utils/crsTransform';
 import requestSlice from '../../store/request';
 import { addSuccessAlert, addWarningAlert } from '../../store/alert';
-import { collectionToDatasource } from './const';
 import CopyIcon from '../common/CopyIcon';
 import DisplayableProperties from '../common/DisplayableProperties';
-import { CUSTOM } from '../../utils/const/const';
+import { CUSTOM, DATASOURCES_NAMES } from '../../utils/const/const';
 
 const CatalogResultEntry = ({ feature, usedCollection, skippedProperties = [] }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -59,14 +58,14 @@ const CatalogResultEntry = ({ feature, usedCollection, skippedProperties = [] })
       } else {
         store.dispatch(requestSlice.actions.disableTimerange(true));
       }
-      let datasource = collectionToDatasource[usedCollection];
-      if (!datasource) {
-        datasource = CUSTOM;
+      let dataCollection = DATASOURCES_NAMES.find((dc) => dc === usedCollection);
+      if (!dataCollection) {
+        dataCollection = CUSTOM;
         const [type, ...collection] = usedCollection.split('-');
-        store.dispatch(requestSlice.actions.setByocCollectionId(collection.join('-')));
-        store.dispatch(requestSlice.actions.setByocCollectionType(type.toUpperCase()));
+        store.dispatch(requestSlice.actions.setByocCollectionId({ idx: 0, id: collection.join('-') }));
+        store.dispatch(requestSlice.actions.setByocCollectionType({ idx: 0, type: type.toUpperCase() }));
       }
-      store.dispatch(requestSlice.actions.setDatasource(datasource));
+      store.dispatch(requestSlice.actions.setDataCollection({ dataCollection: dataCollection, idx: 0 }));
       addSuccessAlert('Request parsed successfully!\nRemember to set the evalscript.');
     } catch (err) {
       addWarningAlert('Something went wrong, check the console for more details');
@@ -75,15 +74,19 @@ const CatalogResultEntry = ({ feature, usedCollection, skippedProperties = [] })
   };
   return (
     <>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <p className="catalog-feature-title" onClick={handleExpandResult}>
+      <div className="flex items-center mb-3">
+        <p
+          className="text-md font-bold px-2 cursor-pointer mr-2 overflow-wr w-11/12"
+          style={{ overflowWrap: 'break-word' }}
+          onClick={handleExpandResult}
+        >
           {feature.id ? feature.id : 'Catalog Result'}
           {feature.id && <CopyIcon item={feature.id} style={{ marginLeft: '1rem' }} />}
         </p>
         <FontAwesomeIcon icon={isExpanded ? faAngleDoubleUp : faAngleDoubleDown} />
       </div>
       {isExpanded ? (
-        <div className="catalog-feature-info">
+        <div className="ml-4">
           {feature.stac_version ? (
             <p className="text">
               <span>Stac Version: </span> {feature.stac_version}
@@ -92,38 +95,26 @@ const CatalogResultEntry = ({ feature, usedCollection, skippedProperties = [] })
 
           <DisplayableProperties properties={feature.properties} skippedProperties={skippedProperties} />
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              width: '100%',
-              columnGap: '1rem',
-              marginRight: '1rem',
-            }}
-          >
+          <div className="grid grid-cols-2 w-full gap-2 my-3">
             <button
-              className="secondary-button secondary-button--fit secondary-button--wrapped"
+              className="secondary-button w-fit wrapped"
               onClick={copyFeature}
               title="Copy JSON feature on clipboard"
             >
-              <FontAwesomeIcon className="text" style={{ marginRight: '1rem' }} icon={faCopy} />
+              <FontAwesomeIcon className="text mr-2" icon={faCopy} />
               Copy JSON
             </button>
             {feature.bbox ? (
               <div>
                 <button
-                  className="secondary-button secondary-button--fit secondary-button--wrapped"
-                  style={{ borderRight: '1px dotted black' }}
+                  className="secondary-button w-fit wrapped border-r-2 border-black"
                   onClick={showBbox}
                   title="Display BBox on the map"
                 >
-                  <FontAwesomeIcon className="text" style={{ marginRight: '1rem' }} icon={faMapMarkedAlt} />
+                  <FontAwesomeIcon className="text mr-2" icon={faMapMarkedAlt} />
                   Bbox
                 </button>
-                <button
-                  className="secondary-button secondary-button--fit secondary-button--wrapped"
-                  title="Copy Bbox on clipboard"
-                >
+                <button className="secondary-button w-fit wrapped" title="Copy Bbox on clipboard">
                   <FontAwesomeIcon className="text" onClick={copyBbox} icon={faCopy} />
                 </button>
               </div>
@@ -132,18 +123,14 @@ const CatalogResultEntry = ({ feature, usedCollection, skippedProperties = [] })
             {feature.geometry ? (
               <div>
                 <button
-                  className="secondary-button secondary-button--fit secondary-button--wrapped"
-                  style={{ borderRight: '1px dotted black' }}
+                  className="secondary-button w-fit wrapped border-r-2 border-black"
                   onClick={showGeometry}
                   title="Display geometry on the map"
                 >
                   <FontAwesomeIcon className="text" style={{ marginRight: '1rem' }} icon={faMapMarkedAlt} />
                   Geometry
                 </button>
-                <button
-                  className="secondary-button secondary-button--fit secondary-button--wrapped"
-                  title="Copy geometry on clipboard"
-                >
+                <button className="secondary-button w-fit wrapped" title="Copy geometry on clipboard">
                   <FontAwesomeIcon onClick={copyGeometry} icon={faCopy} className="text" />
                 </button>
               </div>
@@ -151,7 +138,7 @@ const CatalogResultEntry = ({ feature, usedCollection, skippedProperties = [] })
 
             {canDoProcessRequest && (
               <button
-                className="secondary-button secondary-button--fit secondary-button--wrapped"
+                className="secondary-button w-fit wrapped"
                 onClick={handleParseToProcess}
                 title="This will set the appropiate data collection, time-range and geometry."
               >

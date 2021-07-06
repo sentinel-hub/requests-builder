@@ -3,10 +3,11 @@ import store from '../../../store';
 import requestSlice from '../../../store/request';
 import BaseOptionsNoCC from './BaseOptionsNoCC';
 import { connect } from 'react-redux';
+import Select from '../Select';
 
 const getOrthorectifyValue = (orthorectify, demInstance) => {
   if (!Boolean(orthorectify)) {
-    return false;
+    return '';
   }
   return demInstance !== undefined ? demInstance : 'MAPZEN';
 };
@@ -22,35 +23,35 @@ const S1GRDOptions = ({
   reduxDemInstance,
   idx,
 }) => {
-  const handleResolutionChange = (e) => {
-    store.dispatch(requestSlice.actions.setDataFilterOptions({ resolution: e.target.value, idx: idx }));
+  const handleResolutionChange = (value) => {
+    store.dispatch(requestSlice.actions.setDataFilterOptions({ resolution: value, idx: idx }));
   };
 
-  const handleAqcuisitionModeChange = (e) => {
-    store.dispatch(requestSlice.actions.setDataFilterOptions({ acquisitionMode: e.target.value, idx: idx }));
+  const handleAqcuisitionModeChange = (value) => {
+    store.dispatch(requestSlice.actions.setDataFilterOptions({ acquisitionMode: value, idx: idx }));
   };
 
-  const handlePolarizationChange = (e) => {
-    store.dispatch(requestSlice.actions.setDataFilterOptions({ polarization: e.target.value, idx: idx }));
+  const handlePolarizationChange = (value) => {
+    store.dispatch(requestSlice.actions.setDataFilterOptions({ polarization: value, idx: idx }));
   };
 
-  const handleOrbitDirectionChange = (e) => {
-    store.dispatch(requestSlice.actions.setDataFilterOptions({ orbitDirection: e.target.value, idx: idx }));
+  const handleOrbitDirectionChange = (value) => {
+    store.dispatch(requestSlice.actions.setDataFilterOptions({ orbitDirection: value, idx: idx }));
   };
 
-  const handleBackCoeffChange = (e) => {
-    store.dispatch(requestSlice.actions.setProcessingOptions({ backCoeff: e.target.value, idx: idx }));
+  const handleBackCoeffChange = (value) => {
+    store.dispatch(requestSlice.actions.setProcessingOptions({ backCoeff: value, idx: idx }));
   };
 
-  const handleTimelinessChange = (e) => {
-    store.dispatch(requestSlice.actions.setDataFilterOptions({ timeliness: e.target.value, idx: idx }));
+  const handleTimelinessChange = (value) => {
+    store.dispatch(requestSlice.actions.setDataFilterOptions({ timeliness: value, idx: idx }));
   };
 
-  const handleOrthorectifyChange = (e) => {
-    const orthorectify = Boolean(e.target.value);
+  const handleOrthorectifyChange = (value) => {
+    const orthorectify = Boolean(value);
     store.dispatch(requestSlice.actions.setProcessingOptions({ orthorectify: orthorectify, idx: idx }));
     if (orthorectify) {
-      store.dispatch(requestSlice.actions.setProcessingOptions({ demInstance: e.target.value, idx: idx }));
+      store.dispatch(requestSlice.actions.setProcessingOptions({ demInstance: value, idx: idx }));
     } else {
       store.dispatch(requestSlice.actions.setProcessingOptions({ demInstance: 'DEFAULT', idx: idx }));
     }
@@ -59,114 +60,103 @@ const S1GRDOptions = ({
   return (
     <>
       <BaseOptionsNoCC idx={idx} />
-      <label htmlFor={`s1-resolution-${idx}`} className="form__label">
-        Resolution
-      </label>
-      <select
-        id={`s1-resolution-${idx}`}
+      <Select
+        label="Resolution"
         onChange={handleResolutionChange}
-        value={reduxResolution}
-        className="form__input"
-      >
-        <option value="DEFAULT">Default</option>
-        <option value="HIGH">High</option>
-        <option value="MEDIUM">Medium</option>
-      </select>
-      <label htmlFor={`acquisition-mode-${idx}`} className="form__label">
-        Acquisition Mode
-      </label>
-      <select
-        id={`acquisition-mode-${idx}`}
+        selected={reduxResolution}
+        buttonClassNames="mb-2"
+        options={[
+          { value: 'DEFAULT', name: 'Default' },
+          { value: 'HIGH', name: 'High' },
+          { value: 'MEDIUM', name: 'Medium' },
+        ]}
+      />
+      <Select
+        label="Acquisition Mode"
         onChange={handleAqcuisitionModeChange}
-        value={reduxAcquisitionMode}
-        className="form__input"
-      >
-        <option value="DEFAULT">Default (any)</option>
-        <option value="SM">SM</option>
-        <option value="IW">IW</option>
-        <option value="EW">EW</option>
-        <option value="WV">WV</option>
-      </select>
-      <label htmlFor={`polarization-${idx}`} className="form__label">
-        Polarization
-      </label>
-      <select
-        id={`polarization-${idx}`}
+        selected={reduxAcquisitionMode}
+        buttonClassNames="mb-2"
+        options={[
+          { value: 'DEFAULT', name: 'Default(any)' },
+          { value: 'SM', name: 'SM' },
+          { value: 'IW', name: 'IW' },
+          { value: 'EW', name: 'EW' },
+          { value: 'WV', name: 'WV' },
+        ]}
+      />
+
+      <Select
+        label="Polarization"
         onChange={handlePolarizationChange}
-        value={reduxPolarization}
-        className="form__input"
-      >
-        <option value="DEFAULT">Default (any)</option>
-        <option value="SH">SH</option>
-        <option value="SV">SV</option>
-        <option value="DH">DH</option>
-        <option value="DV">DV</option>
-        <option value="HH">HH</option>
-        <option value="HV">HV</option>
-        <option value="VV">VV</option>
-        <option value="VH">VH</option>
-      </select>
-      <label htmlFor={`orbit-direction-${idx}`} className="form__label">
-        Orbit Direction
-      </label>
-      <select
-        id={`orbit-direction-${idx}`}
+        selected={reduxPolarization}
+        options={[
+          { value: 'DEFAULT', name: 'Default (any)' },
+          { value: 'SH', name: 'SH' },
+          { value: 'SV', name: 'SV' },
+          { value: 'DH', name: 'DH' },
+          { value: 'DV', name: 'DV' },
+          { value: 'HH', name: 'HH' },
+          { value: 'HV', name: 'HV' },
+          { value: 'VV', name: 'VV' },
+          { value: 'VH', name: 'VH' },
+        ]}
+      />
+
+      <Select
+        label="Orbit Direction"
+        selected={reduxOrbitDirection}
+        buttonClassNames="mb-2"
+        options={[
+          { value: 'DEFAULT', name: 'Default' },
+          { value: 'ASCENDING', name: 'Ascending' },
+          { value: 'DESCENDING', name: 'Descending' },
+        ]}
         onChange={handleOrbitDirectionChange}
-        value={reduxOrbitDirection}
-        className="form__input"
-      >
-        <option value="DEFAULT">Default (any)</option>
-        <option value="ASCENDING">Ascending</option>
-        <option value="DESCENDING">Descending</option>
-      </select>
-      <label htmlFor={`backscatter-coef-${idx}`} className="form__label">
-        Backscatter coefficient
-      </label>
-      <select
-        id={`backscatter-coef-${idx}`}
+      />
+
+      <Select
+        label="Backscatter coefficient"
+        selected={reduxBackCoeff}
         onChange={handleBackCoeffChange}
-        value={reduxBackCoeff}
-        className="form__input"
-      >
-        <option value="DEFAULT">Default (gamma0 ellipsoid)</option>
-        <option value="BETA0">beta0</option>
-        <option value="SIGMA0_ELLIPSOID">sigma0</option>
-        <option value="GAMMA0_ELLIPSOID">gamma0 (ellipsoid)</option>
-        <option value="GAMMA0_TERRAIN">gamma0 (terrain)</option>
-      </select>
-      <label htmlFor={`timeliness-${idx}`} className="form__label">
-        Timeliness
-      </label>
-      <select
-        id={`timeliness-${idx}`}
+        buttonClassNames="mb-2"
+        options={[
+          { value: 'DEFAULT', name: 'Default (gamma0 ellipsoid)' },
+          { value: 'BETA0', name: 'beta0' },
+          { value: 'SIGMA0_ELLIPSOID', name: 'sigma0' },
+          { value: 'GAMMA0_ELLIPSOID', name: 'gamma0 (ellipsoid)' },
+          { value: 'GAMMA0_TERRAIN', name: 'gamma0 (terrain)' },
+        ]}
+      />
+
+      <Select
+        label="Timeliness"
+        selected={reduxTimeliness}
+        buttonClassNames="mb-2"
         onChange={handleTimelinessChange}
-        value={reduxTimeliness}
-        className="form__input"
-      >
-        <option value="DEFAULT">Default</option>
-        <option value="NRT10m">NRT10m</option>
-        <option value="NRT1h">NRT1h</option>
-        <option value="NRT3h">NRT3h</option>
-        <option value="Fast24h">Fast24h</option>
-        <option value="Offline">Offline</option>
-        <option value="Reprocessing">Reprocessing</option>
-        <option value="ArchNormal">ArchNormal</option>
-      </select>
-      <label htmlFor={`orthorectify-${idx}`} className="form__label">
-        Orthorectify
-      </label>
-      <select
-        id={`orthorectify-${idx}`}
-        value={getOrthorectifyValue(reduxOrthorectify, reduxDemInstance)}
+        options={[
+          { value: 'DEFAULT', name: 'Default' },
+          { value: 'NRT10m', name: 'NRT10m' },
+          { value: 'NRT1h', name: 'NRT1h' },
+          { value: 'NRT3h', name: 'NRT3h' },
+          { value: 'Fast24h', name: 'Fast24h' },
+          { value: 'Offline', name: 'Offline' },
+          { value: 'Reprocessing', name: 'Reprocessing' },
+          { value: 'ArchNormal', name: 'ArchNormal' },
+        ]}
+      />
+
+      <Select
+        label="Orthorectify"
+        selected={getOrthorectifyValue(reduxOrthorectify, reduxDemInstance)}
         onChange={handleOrthorectifyChange}
-        className="form__input"
-      >
-        <option value="">Disabled</option>
-        <option value="MAPZEN">Yes - using Mapzen DEM</option>
-        <option value="COPERNICUS">Yes - using Copernicus 10m/30m DEM</option>
-        <option value="COPERNICUS_30">Yes - using Copernicus 30m DEM</option>
-        <option value="COPERNICUS_90">Yes - using Copernicus 90m DEM</option>
-      </select>
+        options={[
+          { value: '', name: 'Disabled' },
+          { value: 'MAPZEN', name: 'Yes - using Mapzen DEM' },
+          { value: 'COPERNICUS', name: 'Yes - using Copernicus 10m/30m DEM' },
+          { value: 'COPERNICUS_30', name: 'Yes - using Copernicus 30m DEM' },
+          { value: 'COPERNICUS_90', name: 'Yes - using Copernicus 90m DEM' },
+        ]}
+      />
     </>
   );
 };
@@ -178,7 +168,7 @@ const mapStateToProps = (store, ownProps) => ({
   reduxOrbitDirection: store.request.dataFilterOptions[ownProps.idx].options.orbitDirection,
   reduxBackCoeff: store.request.processingOptions[ownProps.idx].options.backCoeff,
   reduxOrthorectify: store.request.processingOptions[ownProps.idx].options.orthorectify,
-  reduxTimeliness: store.request.processingOptions[ownProps.idx].options.timeliness,
+  reduxTimeliness: store.request.dataFilterOptions[ownProps.idx].options.timeliness,
   reduxDemInstance: store.request.processingOptions[ownProps.idx].options.demInstance,
 });
 

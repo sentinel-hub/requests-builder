@@ -90,11 +90,11 @@ const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder, expandO
   const handleRequestProcess = () => {
     try {
       store.dispatch(requestSlice.actions.resetState({ resetMode: true }));
-      store.dispatch(requestSlice.actions.setDatasource(CUSTOM));
-      store.dispatch(requestSlice.actions.setByocCollectionId(order.collectionId));
-      store.dispatch(requestSlice.actions.setByocCollectionType('BYOC'));
+      store.dispatch(requestSlice.actions.setDataCollection({ dataCollection: CUSTOM, idx: 0 }));
+      store.dispatch(requestSlice.actions.setByocCollectionId({ id: order.collectionId, idx: 0 }));
+      store.dispatch(requestSlice.actions.setByocCollectionType({ idx: 0, type: 'BYOC' }));
       store.dispatch(requestSlice.actions.disableTimerange(true));
-      store.dispatch(requestSlice.actions.setEvalscript(''));
+      store.dispatch(requestSlice.actions.setEvalscript('// Write your evalscript'));
       dispatchBounds(order);
       addSuccessAlert('Order successfully parsed.\nRemember to set an appropiate evalscript!');
     } catch (err) {
@@ -176,16 +176,8 @@ const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder, expandO
               </p>
             </>
           ) : null}
-          <div className="u-flex-aligned">
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                width: '60%',
-                columnGap: '1rem',
-                marginRight: '1rem',
-              }}
-            >
+          <div className="flex items-center">
+            <div className="grid grid-cols-2 w-2/3 gap-2 mr-2">
               {order.status !== 'DONE' && order.status !== 'RUNNING' && (
                 <RequestButton
                   request={TpdiResource.confirmOrder}

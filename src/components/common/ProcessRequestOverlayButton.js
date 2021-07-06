@@ -13,11 +13,13 @@ const ProcessRequestOverlayButton = ({
   args,
   validation,
   className,
+  additionalClassNames,
   requestState,
   collectionRequestIdx,
   wgs84Geometry,
   reqConfig,
   skipSaving = true,
+  useShortcut,
 }) => {
   const readerRef = useRef();
   const shouldDisplayDimensions =
@@ -70,14 +72,16 @@ const ProcessRequestOverlayButton = ({
   return (
     <RequestButton
       className={className}
+      additionalClassNames={additionalClassNames}
       buttonText={buttonText}
       request={request}
       args={[...args]}
       validation={validation}
       responseHandler={responseHandler}
       errorHandler={errorHandler}
-      useShortcut={true}
+      useShortcut={useShortcut}
       requestConfiguration={reqConfig}
+      shouldTriggerIsRunningRequest
     />
   );
 };

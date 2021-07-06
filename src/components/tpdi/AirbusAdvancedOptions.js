@@ -28,14 +28,14 @@ const AirbusAdvancedOptions = ({ dataFilterOptions }) => {
   }, []);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
+    <div className="flex flex-col">
       <label htmlFor="tpdi-cloud-coverage" className="form__label">
         Cloud Coverage - {dataFilterOptions.maxCloudCoverage} %
       </label>
       <input
         id="tpdi-cloud-coverage"
         value={dataFilterOptions.maxCloudCoverage}
-        className="form__input form__input--range"
+        className="form__input mb-2 form__input--range"
         onChange={handleMaxCCChange}
         type="range"
         min="0"
@@ -48,7 +48,7 @@ const AirbusAdvancedOptions = ({ dataFilterOptions }) => {
       <select
         id="processing-level"
         value={dataFilterOptions.processingLevel}
-        className="form__input"
+        className="form__input mb-2"
         onChange={handleProcessingLevelChange}
       >
         <option value="DEFAULT">Default</option>
@@ -62,7 +62,7 @@ const AirbusAdvancedOptions = ({ dataFilterOptions }) => {
       <input
         id="snow-coverage"
         value={dataFilterOptions.maxSnowCoverage}
-        className="form__input form__input--range"
+        className="form__input mb-2 form__input--range"
         onChange={handleMaxSnowChange}
         type="range"
         min="0"
@@ -75,7 +75,7 @@ const AirbusAdvancedOptions = ({ dataFilterOptions }) => {
       <input
         id="incidence-angle"
         value={dataFilterOptions.maxIncidenceAngle}
-        className="form__input form__input--range"
+        className="form__input mb-2 form__input--range"
         onChange={handleMaxIncidenceChange}
         type="range"
         min="0"

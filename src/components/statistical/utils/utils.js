@@ -11,10 +11,7 @@ import { isWritingDecimal } from '../../../utils/stringUtils';
 
 export const statisticalRequestStateSelector = (state) => ({
   token: state.auth.user.access_token,
-  datasource: state.request.datasource,
-  datafusionSources: state.request.datafusionSources,
-  byocCollectionType: state.request.byocCollectionType,
-  byocCollectionId: state.request.byocCollectionId,
+  dataCollections: state.request.dataCollections,
   dataFilterOptions: state.request.dataFilterOptions,
   processingOptions: state.request.processingOptions,
   evalscript: state.request.evalscript,

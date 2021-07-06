@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import DataSourceSelect from '../components/common/DataSourceSelect';
 import EvalscriptEditor from '../components/common/Evalscript/EvalscriptEditor';
 import MapContainer from '../components/common/Map/MapContainer';
+import RunningRequestIndicator from '../components/common/RunningRequestIndicator';
 import TimeRangeContainer from '../components/common/TimeRange/TimeRangeContainer';
 import StatisticalCalculations from '../components/statistical/StatisticalCalculations';
 import StatisticalOutput from '../components/statistical/StatisticalOutput';
@@ -37,6 +38,7 @@ const StatisticalRequestForm = () => {
           />
         </div>
       </div>
+      <RunningRequestIndicator />
     </div>
   );
 };

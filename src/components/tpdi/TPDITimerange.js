@@ -27,9 +27,9 @@ const TPDITimerange = ({ isSingleDate, timeTo, timeFrom }) => {
   return (
     <>
       <h2 className="heading-secondary">Time Range</h2>
-      <div className="form" style={{ height: '10%', marginBottom: '1rem' }}>
-        <div className="toggle-with-label">
-          <label htmlFor="toggle-single-date" className="form__label">
+      <div className="form h-1/6 mb-2">
+        <div className="flex items-center mb-2">
+          <label htmlFor="toggle-single-date" className="form__label cursor-pointer mr-2">
             Single Date
           </label>
           <Toggle id="toggle-single-date" onChange={handleSingleDate} checked={isSingleDate} />
@@ -49,9 +49,8 @@ const TPDITimerange = ({ isSingleDate, timeTo, timeFrom }) => {
             onDayChange={handleTimeFromChange}
             inputProps={{
               required: true,
-              className: 'form__input',
+              className: 'form__input w-28',
               id: 'timefrom',
-              style: { width: '100px' },
             }}
           />
           {!isSingleDate && (
@@ -69,9 +68,8 @@ const TPDITimerange = ({ isSingleDate, timeTo, timeFrom }) => {
                 onDayChange={handleTimeToChange}
                 inputProps={{
                   required: true,
-                  className: 'form__input',
+                  className: 'form__input w-28',
                   id: 'timeto',
-                  style: { width: '100px' },
                 }}
               />
             </>

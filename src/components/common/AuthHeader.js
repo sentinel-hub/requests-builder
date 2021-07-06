@@ -44,6 +44,7 @@ export const doLogin = (customUrl) => {
           text: 'Invalid account\nPlease check your account status',
         }),
       );
+      doLogout();
     }
   });
 };

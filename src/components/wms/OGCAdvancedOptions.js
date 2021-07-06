@@ -27,7 +27,13 @@ const OGCAdvancedOptions = ({ mode, advancedOptions }) => {
   return (
     <>
       <label className="form__label">Bins</label>
-      <input onChange={handleBinsChange} value={BINS} className="form__input" type="number" />
+      <input
+        onChange={handleBinsChange}
+        value={BINS}
+        className="form__input mb-2"
+        type="number"
+        placeholder="Number of bins"
+      />
       <label className="form__label">Style</label>
       <select className="form__input" onChange={handleStyleChange}>
         <option value="">No style</option>

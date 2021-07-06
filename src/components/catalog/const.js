@@ -1,4 +1,4 @@
-import { S2L2A, S2L1C, S1GRD, L8L1C, S5PL2, S3SLSTR, S3OLCI } from '../../utils/const/const';
+import { S2L2A, S2L1C, S1GRD, S5PL2, S3SLSTR, S3OLCI } from '../../utils/const/const';
 
 export const S2L1C_CATALOG_ID = 'sentinel-2-l1c';
 export const S2L2A_CATALOG_ID = 'sentinel-2-l2a';
@@ -86,20 +86,9 @@ export const datasourceToCollection = {
   [S2L2A]: S2L2A_CATALOG_ID,
   [S2L1C]: S2L1C_CATALOG_ID,
   [S1GRD]: S1GRD_CATALOG_ID,
-  [L8L1C]: LANDSAT_8_CATALOG_ID,
   [S5PL2]: S5PL2_CATALOG_ID,
   [S3SLSTR]: S3SLSTR_CATALOG_ID,
   [S3OLCI]: S3OLCI_CATALOG_ID,
-};
-
-export const collectionToDatasource = {
-  [S2L1C_CATALOG_ID]: S2L2A,
-  [S2L2A_CATALOG_ID]: S2L1C,
-  [S1GRD_CATALOG_ID]: S1GRD,
-  [LANDSAT_8_CATALOG_ID]: L8L1C,
-  [S5PL2_CATALOG_ID]: S5PL2,
-  [S3OLCI_CATALOG_ID]: S3OLCI,
-  [S3SLSTR_CATALOG_ID]: S3SLSTR,
 };
 
 export const collectionToOptions = {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { connect } from 'react-redux';
 import omit from 'lodash.omit';
 
@@ -9,27 +9,22 @@ import RequestButton from '../RequestButton';
 import CatalogResource from '../../../api/catalog/CatalogResource';
 import { CUSTOM } from '../../../utils/const/const';
 
-const ByocDataFinder = ({
-  datasource,
-  processCollectionId,
-  processCollectionType,
-  token,
-  appMode,
-  wmsCollectionId,
-  wmsCollectionType,
-}) => {
+const ByocDataFinder = ({ dataCollections, token, appMode, wmsCollectionId, wmsCollectionType }) => {
   const [foundFeatures, setFoundFeatures] = useState([]);
   const [selectedFeatureIndex, setSelectedFeatureIndex] = useState(null);
+  const byocDataCollection = useMemo(() => {
+    return dataCollections.find((dt) => dt.type === CUSTOM);
+  }, [dataCollections]);
 
-  const collectionId = appMode === 'WMS' ? wmsCollectionId : processCollectionId;
-  const collectionType = appMode === 'WMS' ? wmsCollectionType : processCollectionType;
+  const collectionId = appMode === 'WMS' ? wmsCollectionId : byocDataCollection?.byocCollectionId;
+  const collectionType = appMode === 'WMS' ? wmsCollectionType : byocDataCollection?.byocCollectionType;
 
   useEffect(() => {
     setFoundFeatures([]);
     setSelectedFeatureIndex(null);
-  }, [processCollectionId, wmsCollectionId]);
+  }, [collectionId]);
 
-  if (!((appMode === 'PROCESS' || appMode === 'BATCH') && datasource === CUSTOM) && !(appMode === 'WMS')) {
+  if (!((appMode === 'PROCESS' || appMode === 'BATCH') && byocDataCollection) && !(appMode === 'WMS')) {
     return null;
   }
 
@@ -104,9 +99,7 @@ const ByocDataFinder = ({
 };
 
 const mapStateToProps = (state) => ({
-  datasource: state.request.datasource,
-  processCollectionId: state.request.byocCollectionId,
-  processCollectionType: state.request.byocCollectionType,
+  dataCollections: state.request.dataCollections,
   wmsCollectionId: state.wms.layer.otherDefaults?.collectionId ?? null,
   wmsCollectionType: state.wms.layer.otherDefaults?.subType ?? 'BYOC',
   token: state.auth.user.access_token,

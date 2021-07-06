@@ -1,0 +1,72 @@
+.editor {
+  background-color: var(--white);
+  margin-bottom: 1rem;
+
+  &:invalid {
+    border: 1px solid #f74343;
+  }
+}
+
+.CodeMirror {  /* stylelint-disable-line */
+  font-size: 1rem;
+  height: auto !important;
+  width: 100%;
+  z-index: 0;
+}
+
+.quota-preview {
+  width: 100%;
+
+  .CodeMirror-scroll { /* stylelint-disable-line */
+    overflow-y: scroll;
+    height: 435px !important;
+  }
+}
+
+.tpdi-order-preview {
+
+  .CodeMirror-scroll { /* stylelint-disable-line */
+    overflow-y: scroll;
+    height: 380px;
+  }
+}
+
+.tpdi-search-preview {
+
+  .CodeMirror-scroll { /* stylelint-disable-line */
+    overflow-y: scroll;
+    height: 370px;
+  }
+}
+
+.process-editor {
+  .CodeMirror-scroll { /* stylelint-disable-line */
+    overflow-y: scroll;
+    min-height: 400px;
+    max-height: 500px;
+  }
+
+  &--evalscript {
+    width: 647px;
+
+    @include respond(tab-land) {
+      width: 500px;
+    }
+
+    @include respond(tab-port) {
+      width: 100%;
+    }
+  }
+
+  &--console {
+    .CodeMirror-scroll { /* stylelint-disable-line */
+      height: 500px;
+    }
+  }
+}
+
+.tpdi-editor {
+  .CodeMirror-scroll { /* stylelint-disable-line */
+    height: 414px !important;
+  }
+}

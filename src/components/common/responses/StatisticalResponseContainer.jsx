@@ -39,8 +39,8 @@ const StatisticalResponseContainer = ({ statisticalResponse, request }) => {
   }
 
   return (
-    <div className="statistical-response" ref={containerRef}>
-      <div className="u-flex-aligned">
+    <div className="p-4 w-full h-full" ref={containerRef}>
+      <div className="flex items-center">
         <DownloadLink url={downloadUrl} />
       </div>
       <StatisticalResponse response={statisticalResponse} containerRef={containerRef} />

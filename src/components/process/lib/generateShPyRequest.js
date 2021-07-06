@@ -7,11 +7,11 @@ import {
   S5PL2,
   MODIS,
   DEM,
-  L8L1C,
   LOTL1,
   LOTL2,
   CUSTOM,
-  DATAFUSION,
+  LTML1,
+  LTML2,
 } from '../../../utils/const/const';
 import { generateSHBbox } from './generateShjsRequest';
 import { isBbox, isPolygon } from '../../common/Map/utils/crsTransform';
@@ -72,8 +72,9 @@ const getSHPYS1Datasource = (reqState) => {
   return possibleOptions.length > 0 ? possibleOptions[0] : 'SENTINEL1_IW';
 };
 
-const datasourceToSHPYDatasource = (datasource, requestState) => {
-  switch (datasource) {
+const datasourceToSHPYDatasource = (dataCollection, requestState) => {
+  const { type } = dataCollection;
+  switch (type) {
     case S1GRD:
       return `DataCollection.${getSHPYS1Datasource(requestState)}`;
     case S2L2A:
@@ -88,15 +89,18 @@ const datasourceToSHPYDatasource = (datasource, requestState) => {
       return 'DataCollection.MODIS';
     case DEM:
       return 'DataCollection.DEM';
-    case L8L1C:
-      return 'DataCollection.LANDSAT8';
     case LOTL1:
+      return 'DataCollection.LANDSAT8_L1';
     case LOTL2:
-      return 'Not yet supported on the library';
+      return 'DataCollection.LANDSAT8_L2';
+    case LTML1:
+      return 'DataCollection.LANDSAT45_L1';
+    case LTML2:
+      return 'DataCollection.LANDSAT45_L2';
     case S5PL2:
       return 'DataCollection.SENTINEL5P';
     case CUSTOM:
-      return `DataCollection.define_byoc('${requestState.byocCollectionId}')`;
+      return `DataCollection.define_byoc('${dataCollection.byocCollectionId}')`;
     default:
       return '';
   }
@@ -173,11 +177,12 @@ export const getSHPYBounds = (mapState, oneOrTheOther = false) => {
 
 const generateSHPYInputs = (reqState) => {
   // Datafusion
-  if (reqState.datasource === DATAFUSION) {
+  const isOnDatafusion = reqState.dataCollections.length > 1;
+  if (isOnDatafusion) {
     let datafusionString = '';
-    reqState.datafusionSources.forEach((source, idx) => {
+    reqState.dataCollections.forEach((source, idx) => {
       datafusionString += `SentinelHubRequest.input_data(
-      data_collection=${datasourceToSHPYDatasource(source.datasource, reqState)},
+      data_collection=${datasourceToSHPYDatasource(source, reqState)},
       ${getSHPYTimerange(reqState, idx)}\
         ${getSHPYAdvancedOptions(reqState, idx)}
     ),\n    `;
@@ -187,7 +192,7 @@ const generateSHPYInputs = (reqState) => {
 
   // No datafusion
   return `SentinelHubRequest.input_data(
-    data_collection=${datasourceToSHPYDatasource(reqState.datasource, reqState)},
+    data_collection=${datasourceToSHPYDatasource(reqState.dataCollections[0], reqState)},
     ${getSHPYTimerange(reqState)}\
     ${getSHPYAdvancedOptions(reqState)}
 )`;
@@ -207,6 +212,7 @@ const getSHPYAdvancedOptions = (reqState, idx = 0) => {
   const initialProcessingOptions = reqState.processingOptions[idx].options;
   const dataFilterOptions = {};
   const processing = {};
+  const dataColType = reqState.dataCollections[idx].type;
   // Iterate through the options and add non default to datafilterOptions/processing
   if (!isEmpty(initialDataFilterOptions)) {
     Object.keys(initialDataFilterOptions).forEach((key) => {
@@ -227,7 +233,7 @@ const getSHPYAdvancedOptions = (reqState, idx = 0) => {
   }
 
   //If S1, delete acqMode, polarization and orbitDir since they're specified via Datasource.
-  if (reqState.datasource === S1GRD) {
+  if (dataColType === S1GRD) {
     delete dataFilterOptions['acquisitionMode'];
     delete dataFilterOptions['polarization'];
     delete dataFilterOptions['orbitDirection'];
@@ -245,8 +251,8 @@ const getSHPYAdvancedOptions = (reqState, idx = 0) => {
   }
 
   // If datafusion, add location, and id to other args.
-  if (reqState.datasource === DATAFUSION) {
-    resultObject.id = reqState.datafusionSources[idx].id;
+  if (dataColType === 'DATAFUSION') {
+    resultObject.id = reqState.dataCollections[idx].id;
   }
 
   let resultString = !isEmpty(resultObject) ? `\n      other_args = ${JSON.stringify(resultObject)}` : '';

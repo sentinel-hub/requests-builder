@@ -102,7 +102,7 @@ const BatchInformation = ({
     <>
       <h2 className="heading-secondary">Batch Information</h2>
       <div className="form" style={{ minHeight: '800px' }}>
-        <div className="u-flex-aligned">
+        <div className="flex items-center">
           <GetAllBatchRequestsButton
             setFetchedRequests={setFetchedRequests}
             setGetAllResponse={setGetAllResponse}
@@ -121,13 +121,13 @@ const BatchInformation = ({
             style={{ width: '30%' }}
           />
         </div>
-        <hr className="u-margin-top-tiny u-margin-bottom-tiny" />
+        <hr className="mt-1 mb-1" />
         {extraInfo !== '' ? (
           <>
             <div className="info-banner" style={{ marginBottom: '1rem' }}>
               <p>{extraInfo}</p>
             </div>
-            <hr className="u-margin-bottom-tiny" />
+            <hr className="mb-1" />
           </>
         ) : null}
 

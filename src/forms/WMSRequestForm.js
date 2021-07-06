@@ -7,6 +7,7 @@ import Output from '../components/common/Output';
 import WmsModeSelector from '../components/wms/WmsModeSelector';
 import OGCAdvancedOptions from '../components/wms/OGCAdvancedOptions';
 import TimeRangeContainer from '../components/common/TimeRange/TimeRangeContainer';
+import RunningRequestIndicator from '../components/common/RunningRequestIndicator';
 
 const WMSRequestForm = () => {
   return (
@@ -25,7 +26,7 @@ const WMSRequestForm = () => {
         </div>
         <div className="wms-request-form-first-row-second-item">
           <TimeRangeContainer />
-          <div className="output u-margin-top-small">
+          <div className="output mt-2">
             <Output />
           </div>
         </div>
@@ -39,6 +40,7 @@ const WMSRequestForm = () => {
           <WmsRequestPreview />
         </div>
       </div>
+      <RunningRequestIndicator />
     </div>
   );
 };

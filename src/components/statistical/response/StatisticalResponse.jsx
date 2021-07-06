@@ -44,7 +44,7 @@ const StatisticalResponse = ({ response, containerRef }) => {
 
   return (
     <>
-      <h3 className="heading-tertiary u-margin-top-small">Interval</h3>
+      <h3 className="heading-tertiary mt-2">Interval</h3>
       <select
         className="form__input form__input--fit"
         onChange={handleIntervalChange}
@@ -57,7 +57,7 @@ const StatisticalResponse = ({ response, containerRef }) => {
         ))}
       </select>
 
-      <h3 className="heading-tertiary u-margin-top-small">Calculation</h3>
+      <h3 className="heading-tertiary mt-2">Calculation</h3>
       {Object.keys(calculations).map((calculationKey) => (
         <button
           className={`secondary-button ${

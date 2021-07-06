@@ -40,14 +40,14 @@ const CatalogFields = ({ includeFields, disableInclude, excludeFields, disableEx
     <>
       <h2 className="heading-secondary">Fields Selection</h2>
       <div className="form">
-        <div className="toggle-with-label">
-          <label htmlFor="catalog-include" className="form__label">
+        <div className="flex items-center mb-2">
+          <label htmlFor="catalog-include" className="form__label cursor-pointer mr-2">
             Include
           </label>
           <Toggle id="catalog-include" checked={!disableInclude} onChange={handleDisableInclude} />
         </div>
         {includeFields.map((field, idx) => (
-          <div key={'include - ' + idx} className="input-with-item">
+          <div key={'include - ' + idx} className="flex items-center">
             <input
               onChange={handleIncludeFieldChange}
               disabled={disableInclude}
@@ -55,9 +55,9 @@ const CatalogFields = ({ includeFields, disableInclude, excludeFields, disableEx
               value={field}
               name={idx}
               placeholder="Field path"
-              className="form__input"
+              className="form__input mb-2 mr-4"
             />
-            <span name={idx} className="close-span" onClick={handleDeleteIncludeField}>
+            <span name={idx} className="text-lg cursor-pointer" onClick={handleDeleteIncludeField}>
               &#x2715;
             </span>
           </div>
@@ -65,14 +65,13 @@ const CatalogFields = ({ includeFields, disableInclude, excludeFields, disableEx
         <button
           onClick={handleAddIncludeField}
           disabled={disableInclude}
-          className={`secondary-button secondary-button--fit ${
-            disableInclude ? 'secondary-button--disabled' : ''
-          }`}
+          className={`secondary-button w-fit ${disableInclude ? 'secondary-button--disabled' : ''}`}
         >
           Add Field
         </button>
-        <div className="toggle-with-label u-margin-top-small">
-          <label htmlFor="catalog-exclude" className="form__label">
+
+        <div className="flex items-center mb-2 mt-4">
+          <label htmlFor="catalog-exclude" className="form__label mr-2 cursor-pointer">
             Exclude
           </label>
           <Toggle id="catalog-exclude" checked={!disableExclude} onChange={handleDisableExclude} />
@@ -86,9 +85,9 @@ const CatalogFields = ({ includeFields, disableInclude, excludeFields, disableEx
               value={field}
               name={idx}
               placeholder="Field path"
-              className="form__input"
+              className="form__input mb-2 mr-4"
             />
-            <span name={idx} className="close-span" onClick={handleDeleteExcludeField}>
+            <span name={idx} className="cursor-pointer text-lg" onClick={handleDeleteExcludeField}>
               &#x2715;
             </span>
           </div>
@@ -96,9 +95,7 @@ const CatalogFields = ({ includeFields, disableInclude, excludeFields, disableEx
         <button
           onClick={handleAddExcludeField}
           disabled={disableExclude}
-          className={`secondary-button secondary-button--fit ${
-            disableExclude ? 'secondary-button--disabled' : ''
-          }`}
+          className={`secondary-button w-fit ${disableExclude ? 'secondary-button--disabled' : ''}`}
         >
           Add Field
         </button>

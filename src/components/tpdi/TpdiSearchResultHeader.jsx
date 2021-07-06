@@ -58,7 +58,7 @@ export const TpdiSearchResultHeader = ({
           <FontAwesomeIcon className="icon" icon={faAngleDoubleDown} />
         )}
       </div>
-      <div className="u-flex-aligned" style={{ justifyContent: 'space-between', width: '30%' }}>
+      <div className="flex flex-col lg:flex-row items-center justify-between w-1/2 lg:w-1/3">
         <button
           className={`secondary-button ${isDisabled ? 'secondary-button--disabled' : ''}`}
           onClick={handleAddToOrder}

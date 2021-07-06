@@ -21,11 +21,11 @@ const QuotaContainer = ({ token }) => {
       <h2 className="heading-secondary">Quota</h2>
       <div className="form">
         <div className="quota-container-items">
-          <div style={{ marginRight: '2rem', marginLeft: '1rem', marginBottom: '2rem' }}>
+          <div className="mr-2 ml-1 mb-2">
             {quotas.length > 0 ? (
               quotas.map((quota) => (
-                <div className="u-margin-bottom-small" key={quota.id}>
-                  <p className="text u-margin-bottom-tiny">
+                <div className="mb-2" key={quota.id}>
+                  <p className="text mt-1">
                     <span>{formatText(quota.collectionId.replace('_', ' '))}</span>
                   </p>
                   <div style={{ marginLeft: '0.5rem' }}>
@@ -52,16 +52,16 @@ const QuotaContainer = ({ token }) => {
               args={[]}
               buttonText={quotas.length > 0 ? 'Refresh Quotas' : 'Get Quotas'}
               validation={Boolean(token)}
+              additionalClassNames={['mt-1', 'ml-3']}
               className="secondary-button"
               responseHandler={handleGetQuota}
               disabledTitle="Log in to use this"
               errorHandler={errorHandlerTPDI}
-              style={{ marginTop: '3rem', marginLeft: '20%' }}
             />
           </div>
 
           <div className="quota-container-items--second-item">
-            <p className="text u-margin-bottom-tiny">
+            <p className="text mt-1">
               <span>Request Preview</span>
             </p>
             <CommonRequestPreview

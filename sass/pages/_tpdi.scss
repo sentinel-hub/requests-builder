@@ -1,36 +1,25 @@
-.product-id {
-  display: flex;
-  align-items: center;
-  width: 100%;
-
-  input {
-    width: 75%;
-    margin: 0 !important;
-  }
-}
-
 .tpdi-feature {
   &-title {
     display: flex;
     align-items: center;
-    margin-bottom: 1.5rem;
-    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    margin-top: 0.5rem;
     padding: 0.5rem 1rem;
 
     .icon {
-      font-size: 2rem;
-      margin-left: 2rem;
+      font-size: 1rem;
+      margin-left: 1rem;
     }
 
     button {
-      margin-right: 2rem;
+      margin-right: 1rem;
     }
   }
 
   &-extra-info {
     display: flex;
     flex-direction: column;
-    margin-left: 2rem;
+    margin-left: 1rem;
 
     p {
       margin-bottom: 0.8rem;
@@ -43,11 +32,11 @@
 }
 
 .order-info {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.75rem;
 
   &-extra-info {
-    margin-bottom: 2rem;
-    margin-left: 2rem;
+    margin-bottom: 1rem;
+    margin-left: 1rem;
 
     p {
       margin-bottom: 0.5rem;
@@ -64,44 +53,6 @@
 
   button {
     margin-right: 0.5rem;
-  }
-}
-
-.quota-info {
-  label {
-    cursor: pointer;
-  }
-}
-
-.tpdi-limit {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1rem;
-
-  label {
-    margin-bottom: 0;
-    margin-right: 1rem;
-  }
-}
-
-.tpdi-request-preview-select-request {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1rem;
-
-  label {
-    margin-bottom: 0;
-    margin-right: 1rem;
-  }
-}
-
-.tpdi-search-orders {
-  display: flex;
-  align-items: center;
-
-  input {
-    margin-bottom: 1.5rem;
-    margin-left: 1.5rem;
   }
 }
 
@@ -207,7 +158,6 @@
 
       & button {
         align-self: center;
-        width: 25%;
       }
     }
   }
@@ -269,78 +219,4 @@
       width: 100%;
     }
   }
-}
-
-.remove-product-id {
-  font-size: 3rem;
-  cursor: pointer;
-  margin-left: 1rem;
-  display: inline-block;
-}
-
-.tpdi-actions-buttons {
-  display: flex;
-  justify-content: flex-start;
-  margin-bottom: 2rem;
-}
-
-.tpdi-info {
-  display: flex;
-  height: 300px;
-  overflow-y: scroll;
-  justify-content: space-between;
-  white-space: nowrap;
-
-  &-title-label {
-    cursor: pointer;
-    border-bottom: 1px solid black;
-  }
-
-  &-first-item {
-    width: 30%;
-
-    @include respond(tab-port) {
-      width: 100%;
-      margin-left: 1rem;
-      margin-bottom: 3rem;
-      border-bottom: 1px solid black;
-    }
-  }
-
-  &-second-item {
-    margin-left: 3rem;
-    width: 60%;
-
-    @include respond(tab-port) {
-      width: 100%;
-      margin-bottom: 3rem;
-      border-bottom: 1px solid black;
-      margin-left: 1rem;
-    }
-  }
-
-  &-third-item {
-    margin-left: 3rem;
-    width: 100%;
-
-    @include respond(tab-port) {
-      width: 100%;
-      margin-bottom: 1rem;
-      margin-left: 1rem;
-    }
-  }
-
-  @include respond(tab-port) {
-    flex-direction: column;
-  }
-}
-
-.tpdi-request-preview {
-  width: 95%;
-  padding: 1rem 2rem;
-}
-
-.tpdi-request-preview-buttons {
-  display: flex;
-  margin-left: 2rem;
 }

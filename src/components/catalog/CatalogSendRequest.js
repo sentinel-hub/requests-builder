@@ -19,14 +19,21 @@ const NormalCatalogSearch = ({ limit, next, setResults, setCatalogSearchResponse
         id="catalog-limit"
         onChange={handleLimitChange}
         value={limit}
-        className="form__input"
+        className="form__input mb-3"
         type="number"
       />
 
       <label htmlFor="next" className="form__label">
         Next
       </label>
-      <input id="next" value={next} className="form__input" type="number" readOnly />
+      <input
+        id="next"
+        value={next}
+        className="form__input mb-2"
+        type="number"
+        readOnly
+        placeholder="Next results..."
+      />
 
       <div className="buttons-container">
         <CatalogSendRequestButton
@@ -85,9 +92,9 @@ const CatalogSearchByIds = ({ setResults, setCatalogSearchResponse, setUsedColle
           </span>
         </div>
       ))}
-      <div className="u-flex-column">
+      <div className="flex flex-col">
         {ids.length < 5 && (
-          <button className="secondary-button" onClick={handleAddId}>
+          <button className="secondary-button w-fit my-2" onClick={handleAddId}>
             Add ID
           </button>
         )}
@@ -118,14 +125,10 @@ const CatalogSendRequest = ({
 }) => {
   return (
     <>
-      <h2 className="heading-secondary u-margin-top-small">Request Options</h2>
+      <h2 className="heading-secondary mt-2">Request Options</h2>
       <div className="form">
-        <div className="u-flex-aligned u-margin-bottom-tiny">
-          <label
-            className="form__label u-margin-right-small"
-            htmlFor="search-by-ids"
-            style={{ cursor: 'pointer' }}
-          >
+        <div className="flex items-center mb-1">
+          <label className="form__label mr-2" htmlFor="search-by-ids" style={{ cursor: 'pointer' }}>
             Search by ids
           </label>
           <Toggle

@@ -52,6 +52,7 @@ const CatalogSendRequestButton = ({
       args={[getCatalogRequestBody(catalogState, geometry, timeRange)]}
       validation={Boolean(token && catalogState.deploymentUrl)}
       className="secondary-button"
+      additionalClassNames={['w-fit mr-2']}
       disabledTitle="Log in to use this"
       buttonText="Send Request"
       responseHandler={responseHandler}

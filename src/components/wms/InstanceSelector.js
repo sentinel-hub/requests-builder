@@ -94,7 +94,7 @@ const InstanceSelector = ({ token, instanceId }) => {
       <label htmlFor="instance" className="form__label">
         Instance
       </label>
-      <div className="u-flex-aligned u-margin-bottom-tiny">
+      <div className="flex items-center mb-1">
         <select
           id="personal-instances"
           onChange={handleSelectInstanceId}
@@ -108,7 +108,7 @@ const InstanceSelector = ({ token, instanceId }) => {
           )}
         </select>
         {token && (
-          <button className="secondary-button u-margin-left-tiny" onClick={handleRefreshInstances}>
+          <button className="secondary-button ml-1" onClick={handleRefreshInstances}>
             <FontAwesomeIcon icon={faSync} />
           </button>
         )}

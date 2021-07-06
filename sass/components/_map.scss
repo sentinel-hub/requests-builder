@@ -1,6 +1,7 @@
 .map {
   width: 67%;
   height: 647px;
+  z-index: 1;
 
   .leaflet-bottom .leaflet-control-scale {
     margin-bottom: 2rem;
@@ -13,55 +14,7 @@
   }
 }
 
+// needed for expanding map
 .overlayed-map {
   width: 90% !important;
-}
-
-.textarea-aoi-container {
-  display: flex;
-  flex-direction: column;
-  width: 30%;
-  align-items: center;
-  height: 90%;
-
-  @include respond(tab-land) {
-    width: 100%;
-  }
-
-  textarea {
-    height: 600px;
-    width: 90%;
-
-    @include respond(tab-land) {
-      height: 300px;
-    }
-
-    @include respond(phone) {
-      height: 200px;
-    }
-  }
-
-  button {
-    width: 50%;
-
-    @include respond(tab-land) {
-      width: 20%;
-    }
-  }
-}
-
-.map-buttons {
-  display: flex;
-  align-items: center;
-  width: 100%;
-
-  button {
-    width: fit-content;
-    margin-left: 1rem;
-  }
-
-  span {
-    margin-top: 1rem;
-    margin-left: 1rem;
-  }
 }

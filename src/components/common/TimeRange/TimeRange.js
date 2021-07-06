@@ -5,7 +5,7 @@ import moment from 'moment';
 import store from '../../../store';
 import requestSlice from '../../../store/request';
 import Axios from 'axios';
-import { S1GRD, S2L2A, S2L1C, L8L1C, S3OLCI, S3SLSTR, S5PL2 } from '../../../utils/const/const';
+import { S1GRD, S2L2A, S2L1C, S3OLCI, S3SLSTR, S5PL2 } from '../../../utils/const/const';
 import { getFetchDatesBody } from '../../../api/catalog/utils';
 import CatalogResource from '../../../api/catalog/CatalogResource';
 
@@ -18,7 +18,7 @@ const highlightedStyle = `.DayPicker-Day--highlighted {
 export const utcDateToYYYYMMDDFormat = (utcDate) => utcDate.split('T')[0];
 
 const shouldFetchDates = (datasource, mode) =>
-  [S1GRD, S2L2A, S2L1C, L8L1C, S3OLCI, S3SLSTR, S5PL2].includes(datasource) &&
+  [S1GRD, S2L2A, S2L1C, S3OLCI, S3SLSTR, S5PL2].includes(datasource) &&
   (mode === 'BATCH' || mode === 'PROCESS');
 
 const getStartOfMonth = (dateString) => {
@@ -154,7 +154,7 @@ const TimeRange = ({ index, timeTo, timeFrom, isDisabled, datasource, geometry, 
         }}
       />
 
-      <label htmlFor="timeto" className="form__label u-margin-top-small">
+      <label htmlFor="timeto" className="form__label mt-2">
         Time To
       </label>
       <DayPickerInput
@@ -172,7 +172,7 @@ const TimeRange = ({ index, timeTo, timeFrom, isDisabled, datasource, geometry, 
         inputProps={{
           disabled: isDisabled,
           required: true,
-          className: `form__input ${!isValidTimeTo ? 'timerange-input--invalid' : ''}`,
+          className: `form__input ${!isValidTimeTo ? 'border-2 border-red-900 focus:outline-red' : ''}`,
           id: 'timeto',
         }}
       />

@@ -133,7 +133,7 @@ const Chart = ({ histogram, percentiles, onEnter, onLeave, onMove, bandName }) =
 
   return (
     <div style={{ marginRight: '2rem', maxHeight: '50%', display: 'flex', flexDirection: 'column' }}>
-      <h4 className="heading-4 u-margin-bottom-tiny">Histogram</h4>
+      <h4 className="heading-4 mb-1">Histogram</h4>
 
       <svg width={width} height={height} ref={svgRef} viewBox={`0 0 ${width} ${height}`}>
         {bars &&
@@ -174,10 +174,7 @@ const Chart = ({ histogram, percentiles, onEnter, onLeave, onMove, bandName }) =
           <g ref={yAxisRef} transform={`translate(${margin.left}, 0)`} />
         </g>
       </svg>
-      <button
-        className="secondary-button secondary-button--fit u-margin-bottom-small"
-        onClick={() => handleDownloadSvg(true)}
-      >
+      <button className="secondary-button w-fit mb-2" onClick={() => handleDownloadSvg(true)}>
         <FontAwesomeIcon icon={faSave} style={{ marginRight: '1rem' }} />
         Download SVG as PNG
       </button>

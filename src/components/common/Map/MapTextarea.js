@@ -4,6 +4,7 @@ import store from '../../../store';
 import mapSlice from '../../../store/map';
 import { addWarningAlert } from '../../../store/alert';
 import { crsByUrl } from '../../process/requests/parseRequest';
+import Tooltip from '../Tooltip/Tooltip';
 
 const isFeatureCollection = (parsedGeometry) => parsedGeometry.type === 'FeatureCollection';
 const isFeature = (parsedGeometry) => parsedGeometry.type === 'Feature';
@@ -96,33 +97,31 @@ const MapTextarea = ({ fitToMainBounds, extraGeometry, geometry, setParsedError,
   }, [geometry]);
 
   return (
-    <div className="textarea-aoi-container">
+    <div className="flex flex-col items-center h-5/6 w-full xl:w-1/3">
       <textarea
+        className="h-48 xl:h-600 p-2 w-5/6 border-primary border outline-none focus:border-2 rounded-md"
         onChange={handleGeometryTextChange}
         value={geometryText}
         spellCheck="false"
-        className="textarea"
       />
-      <div className="map-buttons">
-        <button onClick={handleParseGeometryClick} className="secondary-button">
+      <div className="flex items-center justify-center w-full mt-2">
+        <button onClick={handleParseGeometryClick} className="secondary-button w-fit mr-2">
           Parse
         </button>
         <input onChange={handleFileUpload} id="file-input" type="file" style={{ display: 'none' }} />
         <button
           title="Upload a KML or GeoJSON file to parse the geometry."
           onClick={handleUploadFileButtonClick}
-          className="secondary-button secondary-button--wrapped"
+          className="secondary-button wrapped w-fit mr-2"
         >
           Upload KML/GeoJSON
         </button>
-        <span
-          className="info"
-          title="Upload a KML or GeoJSON file to parse the geometry (Only first geometry on the file gets parsed)."
-        >
-          &#8505;
-        </span>
+        <Tooltip
+          direction="left"
+          content="Upload a KML or GeoJSON file to parse the geometry (Only first geometry on the file gets parsed)."
+        />
         {extraGeometry ? (
-          <button className="secondary-button secondary-button--wrapped" onClick={handleClearExtraGeometry}>
+          <button className="secondary-button wrapped w-fit ml-2" onClick={handleClearExtraGeometry}>
             Clear Extra Geometry
           </button>
         ) : null}

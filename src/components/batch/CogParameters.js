@@ -2,9 +2,44 @@ import React from 'react';
 import { connect } from 'react-redux';
 import store from '../../store';
 import batchSlice from '../../store/batch';
-
+import Select from '../common/Select';
 import Toggle from '../common/Toggle';
 import Tooltip from '../common/Tooltip/Tooltip';
+
+const resamplingAlgorithmOptions = [
+  {
+    value: 'average',
+    name: 'Default (average)',
+  },
+  {
+    value: 'nearest',
+    name: 'nearest',
+  },
+  {
+    value: 'gauss',
+    name: 'gauss',
+  },
+  {
+    value: 'cubic',
+    name: 'cubic',
+  },
+  {
+    value: 'cubicspline',
+    name: 'cubicspline',
+  },
+  {
+    value: 'lanczos',
+    name: 'lanczos',
+  },
+  {
+    value: 'average_magphase',
+    name: 'average_magphase',
+  },
+  {
+    value: 'mode',
+    name: 'mode',
+  },
+];
 
 const CogParameters = ({ isSpecifyingCogParams, collectionId, cogParameters }) => {
   const handleToggleChange = () => {
@@ -19,10 +54,14 @@ const CogParameters = ({ isSpecifyingCogParams, collectionId, cogParameters }) =
     store.dispatch(batchSlice.actions.setCogParameter({ key: 'usePredictor', value: newValue }));
   };
 
+  const handleResamplingChange = (value) => {
+    store.dispatch(batchSlice.actions.setCogParameter({ key: 'resamplingAlgorithm', value }));
+  };
+
   return (
     <>
-      <div className="toggle-with-label">
-        <label htmlFor="specify-cog-params" className="form__label">
+      <div className="flex items-center mb-2">
+        <label htmlFor="specify-cog-params" className="form__label cursor-pointer mr-2">
           Show advanced COG Parameters
         </label>
         <Toggle
@@ -40,7 +79,7 @@ const CogParameters = ({ isSpecifyingCogParams, collectionId, cogParameters }) =
 
       {isSpecifyingCogParams ? (
         <div style={{ paddingLeft: '1rem' }}>
-          <div className="label-with-info">
+          <div className="flex items-center mb-2">
             <label className="form__label" htmlFor="overviewlevels" style={{ marginRight: 'auto' }}>
               Overview Levels
             </label>
@@ -59,7 +98,7 @@ const CogParameters = ({ isSpecifyingCogParams, collectionId, cogParameters }) =
             id="overviewlevels"
           />
 
-          <div className="label-with-info">
+          <div className="flex items-center mb-2">
             <label className="form__label" htmlFor="overviewminsize" style={{ marginRight: 'auto' }}>
               Overview Min Size
             </label>
@@ -79,7 +118,7 @@ const CogParameters = ({ isSpecifyingCogParams, collectionId, cogParameters }) =
             id="overviewminsize"
           />
 
-          <div className="label-with-info">
+          <div className="flex items-center mb-2">
             <label className="form__label" htmlFor="blockxsize" style={{ marginRight: 'auto' }}>
               Block X Size
             </label>
@@ -99,7 +138,7 @@ const CogParameters = ({ isSpecifyingCogParams, collectionId, cogParameters }) =
             id="blockxsize"
           />
 
-          <div className="label-with-info">
+          <div className="flex items-center mb-2">
             <label className="form__label" htmlFor="blockysize" style={{ marginRight: 'auto' }}>
               Block Y Size
             </label>
@@ -119,7 +158,7 @@ const CogParameters = ({ isSpecifyingCogParams, collectionId, cogParameters }) =
             id="blockysize"
           />
 
-          <div className="label-with-info">
+          <div className="flex items-center mb-2">
             <label className="form__label" htmlFor="resampling-algo" style={{ marginRight: 'auto' }}>
               Resampling Algorithm
             </label>
@@ -129,25 +168,16 @@ const CogParameters = ({ isSpecifyingCogParams, collectionId, cogParameters }) =
               infoStyles={{ marginRight: '1rem' }}
             />
           </div>
-          <select
-            className="form__input"
+          <Select
             disabled={Boolean(collectionId)}
-            onChange={curriyedCogPropertyUpdater('resamplingAlgorithm')}
-            value={cogParameters.resamplingAlgorithm ?? 'average'}
-            id="resampling-algo"
-          >
-            <option value="average">Default (average)</option>
-            <option value="nearest">nearest</option>
-            <option value="gauss">gauss</option>
-            <option value="cubic">cubic</option>
-            <option value="cubicspline">cubicspline</option>
-            <option value="lanczos">lanczos</option>
-            <option value="average_magphase">average_magphase</option>
-            <option value="mode">mode</option>
-          </select>
+            onChange={handleResamplingChange}
+            selected={cogParameters.resamplingAlgorithm ?? 'average'}
+            options={resamplingAlgorithmOptions}
+            buttonClassNames="mb-2"
+          />
 
-          <div className="toggle-with-label">
-            <label className="form__label" htmlFor="use-predictor">
+          <div className="flex items-center mb-2">
+            <label className="form__label cursor-pointer mr-2" htmlFor="use-predictor">
               Use Predictor
             </label>
             <Toggle
@@ -162,7 +192,7 @@ const CogParameters = ({ isSpecifyingCogParams, collectionId, cogParameters }) =
               infoStyles={{ marginRight: '1rem' }}
             />
           </div>
-          <hr className="u-margin-bottom-tiny" />
+          <hr className="mb-1" />
         </div>
       ) : null}
     </>

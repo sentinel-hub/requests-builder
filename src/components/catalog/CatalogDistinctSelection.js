@@ -3,29 +3,38 @@ import { connect } from 'react-redux';
 import store, { catalogSlice } from '../../store';
 import { S1GRD_CATALOG_ID, S2L1C_CATALOG_ID, S2L2A_CATALOG_ID } from './const';
 import { hasProperties } from './CatalogQueryOptions';
+import Select from '../common/Select';
 
-const BaseDistinctOptions = () => {
-  return <option value="date">Date</option>;
-};
+const baseDistinctOptions = [
+  {
+    name: 'Date',
+    value: 'date',
+  },
+];
 
-const S1DistinctOptions = () => {
-  return (
-    <>
-      <BaseDistinctOptions />
-      <option value="sar:instrument_mode">Instrument Mode</option>
-      <option value="sat:orbit_state">Orbit State</option>
-      <option value="polarization">Polarization</option>
-    </>
-  );
-};
+const s1DistinctOptions = [
+  ...baseDistinctOptions,
+  {
+    name: 'Instrument Mode',
+    value: 'sar:instrument_mode',
+  },
+  {
+    name: 'Orbit State',
+    value: 'sat:orbit_state',
+  },
+  {
+    name: 'Polarization',
+    value: 'polarization',
+  },
+];
 
 const generateDistinctOptions = (collectionId) => {
   switch (collectionId) {
     case S2L2A_CATALOG_ID:
     case S2L1C_CATALOG_ID:
-      return <BaseDistinctOptions />;
+      return baseDistinctOptions;
     case S1GRD_CATALOG_ID:
-      return <S1DistinctOptions />;
+      return s1DistinctOptions;
     default:
       return null;
   }
@@ -40,12 +49,13 @@ const CatalogDistinctSelection = ({ distinct, selectedCollection }) => {
     <>
       {hasProperties(selectedCollection) ? (
         <>
-          <h2 className="heading-secondary u-margin-top-small">Distinct</h2>
+          <h2 className="heading-secondary mt-2">Distinct</h2>
           <div className="form">
-            <select value={distinct} onChange={handleDistinctChange} className="form__input">
-              <option value="">Non Distinct</option>
-              {generateDistinctOptions(selectedCollection)}
-            </select>
+            <Select
+              selected={distinct}
+              onChange={handleDistinctChange}
+              options={generateDistinctOptions(selectedCollection)}
+            />
           </div>
         </>
       ) : null}

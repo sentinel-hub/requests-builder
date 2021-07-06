@@ -34,9 +34,9 @@ const BatchActions = ({
   );
 
   return (
-    <div className="batch-request-summary-actions" style={{ borderBottom: '1rem' }}>
+    <div className="w-full lg:w-1/2 grid grid-cols-2 gap-1 mr-1 h-fit mb-1">
       {canAnalyse(status) && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="flex justify-between items-center">
           <AnalyseBatchRequestButton
             requestId={requestId}
             token={token}
@@ -50,7 +50,7 @@ const BatchActions = ({
         </div>
       )}
       {canStart(status) && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="flex justify-between items-center">
           <StartBatchRequestButton
             requestId={requestId}
             token={token}
@@ -71,7 +71,7 @@ const BatchActions = ({
         />
       )}
       {canRestart(status) && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="flex justify-between items-center">
           <RestartPartialRequestButton requestId={requestId} token={token} />
           <Tooltip
             direction="bottom"

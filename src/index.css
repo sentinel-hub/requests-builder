@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .heading-secondary {
+    @apply text-xl whitespace-nowrap font-bold;
+  }
+  .heading-primary {
+    @apply text-2xl;
+  }
+  .heading-tertiary {
+    @apply text-lg mb-2 font-bold underline;
+  }
+  .heading-4 {
+    @apply text-lg mb-2 font-bold;
+  }
+  .text {
+    @apply text-base;
+  }
+  .text--warning {
+    @apply text-red-600;
+  }
+
+  /* FORM */
+
+  .form {
+    @apply bg-gray-100 flex flex-col py-4 px-3 h-full mr-3 rounded-md;
+  }
+  .form__label {
+    @apply inline-block font-bold text-black select-none;
+  }
+  .form__input {
+    font-family: 'Open Sans', sans-serif;
+    @apply py-1 px-3 w-4/5 rounded-md border-primary-light border active:border-primary active:border-2 focus:border-primary focus:border-2 outline-none bg-white;
+  }
+  .form__input--range {
+    @apply px-0;
+  }
+  .form__input::placeholder {
+    @apply italic;
+  }
+  .form__input:disabled {
+    @apply bg-gray-300 border-none italic cursor-not-allowed;
+  }
+
+  /* BUTTONS */
+
+  .secondary-button {
+    @apply bg-primary py-1 px-2 cursor-pointer font-bold hover:bg-primary-light active:bg-primary-dark rounded-md;
+  }
+  .secondary-button--disabled, .secondary-button:disabled {
+    @apply bg-gray-300 text-black cursor-not-allowed hover:bg-gray-300;
+  }
+  .secondary-button--cancel {
+    @apply bg-red-600 text-black hover:bg-red-400;
+  }
+
+  .button {
+    @apply rounded-md font-bold cursor-pointer py-3 px-4 text-lg border-primary border;
+  }
+
+  .button--active {
+    @apply bg-primary;
+  }
+
+  .button--disabled {
+    @apply cursor-not-allowed;
+  }
+  
+  .button--cancel {
+    @apply bg-red-600;
+  }
+
+  .tertiary-button {
+    @apply bg-transparent border border-black py-1 px-2 cursor-pointer font-bold hover:bg-primary-dark active:bg-primary-light;
+  }
+
+  .info-banner {
+    @apply flex flex-col py-2 px-3 w-fit rounded-sm bg-primary-light text-green-900 font-bold tracking-wide italic;
+  }
+}
+
+@layer utilities {
+  @variants responsive {
+    .w-fit {
+      width: fit-content;
+    }
+    .h-fit {
+      height: fit-content;
+    }
+    .h-600 {
+      height: 600px;
+    }
+  }
+  .wrapped {
+    @apply overflow-hidden whitespace-nowrap overflow-ellipsis;
+  }
+}
+
+.text > span { 
+  font-weight: bold;
+}

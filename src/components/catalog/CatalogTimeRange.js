@@ -34,9 +34,9 @@ const CatalogTimeRange = ({ isTimeToOpen, timeTo, isTimeFromOpen, timeFrom }) =>
     <>
       <h2 className="heading-secondary">Time Range</h2>
       <div className="form">
-        <div className="timerange">
-          <div className="toggle-with-label">
-            <label htmlFor="catalog-from" className="form__label">
+        <div className="flex flex-col h-full w-full mb-1">
+          <div className="flex items-center mb-2 w-full">
+            <label htmlFor="catalog-from" className="form__label cursor-pointer mr-2">
               From
             </label>
             <Toggle id="catalog-from" checked={isTimeFromOpen} onChange={handleOpenTimeFrom} />
@@ -50,8 +50,8 @@ const CatalogTimeRange = ({ isTimeToOpen, timeTo, isTimeFromOpen, timeFrom }) =>
             }}
             onDayChange={handleChangeTimeFrom}
           />
-          <div className="toggle-with-label u-margin-top-small">
-            <label htmlFor="catalog-to" className="form__label">
+          <div className="flex items-center mb-2 mt-2 w-full">
+            <label htmlFor="catalog-to" className="form__label cursor-pointer mr-2">
               To
             </label>
             <Toggle id="catalog-to" checked={isTimeToOpen} onChange={handleOpenTimeTo} />

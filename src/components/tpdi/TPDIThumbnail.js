@@ -48,7 +48,7 @@ const TPDIThumbnail = ({ collectionId, productId, geometry }) => {
   }, []);
 
   return (
-    <div className="u-flex-column-centered" style={{ marginLeft: '2rem' }}>
+    <div className="flex flex-col items-center" style={{ marginLeft: '2rem' }}>
       <p className="text" style={{ marginBottom: '1rem' }}>
         <span>Thumbnail</span>
       </p>
@@ -58,18 +58,18 @@ const TPDIThumbnail = ({ collectionId, productId, geometry }) => {
         <>
           <BaseModal
             trigger={
-              <div className="u-flex-aligned" style={{ cursor: 'pointer', height: '100%' }}>
+              <div className="flex items-center" style={{ cursor: 'pointer', height: '100%' }}>
                 <img src={srcUrl} alt={`${productId}-thumbnail-miniature`} style={{ height: '100px' }} />
                 <FontAwesomeIcon icon={faExpandArrowsAlt} style={{ marginLeft: '1rem', fontSize: '2rem' }} />
               </div>
             }
             content={
-              <div className="u-flex-column-centered">
+              <div className="flex flex-col items-center">
                 <img src={srcUrl} style={{ maxHeight: '70vh' }} alt={`${productId}-thumbnail`} />
-                <button className="secondary-button" onClick={handleAddToMap}>
+                <button className="secondary-button mt-2" onClick={handleAddToMap}>
                   Add to map
                 </button>
-                <p className="text text--warning u-margin-top-tiny">
+                <p className="text text--warning mt-2">
                   Thumbnail is not georeferenced so the resulting map layer is just an approximation. <br />
                   Check the product geometry to see the exact polygon that will be ordered.
                 </p>

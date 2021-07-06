@@ -21,9 +21,7 @@ const sendEditedStatisticalRequest = (token, text, reqConfig) => {
 };
 
 const StatisticalRequestPreview = ({
-  datasource,
-  datafusionSources,
-  byocCollectionType,
+  dataCollections,
   byocCollectionId,
   dataFilterOptions,
   processingOptions,
@@ -74,10 +72,7 @@ const StatisticalRequestPreview = ({
               name: 'request',
               value: getStatisticalCurlCommand(
                 token,
-                datasource,
-                datafusionSources,
-                byocCollectionType,
-                byocCollectionId,
+                dataCollections,
                 dataFilterOptions,
                 processingOptions,
                 bounds,

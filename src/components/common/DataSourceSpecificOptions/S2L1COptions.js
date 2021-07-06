@@ -3,29 +3,27 @@ import BasicOptions from './BasicOptions';
 import store from '../../../store';
 import requestSlice from '../../../store/request';
 import { connect } from 'react-redux';
+import Select from '../Select';
 
 const S2L1COptions = ({ reduxPreviewMode, idx }) => {
-  const handlePreviewChange = (e) => {
-    store.dispatch(requestSlice.actions.setDataFilterOptions({ previewMode: e.target.value, idx: idx }));
+  const handlePreviewChange = (value) => {
+    store.dispatch(requestSlice.actions.setDataFilterOptions({ previewMode: value, idx: idx }));
   };
 
   return (
     <>
       <BasicOptions idx={idx} />
-      <label htmlFor={`preview-mode-${idx}`} className="form__label u-margin-top-tiny">
-        Preview Mode
-      </label>
-      <select
-        id={`preview-mode-${idx}`}
-        className="form__input"
-        value={reduxPreviewMode}
+      <Select
+        label="Preview Mode"
+        selected={reduxPreviewMode}
         onChange={handlePreviewChange}
-      >
-        <option value="DEFAULT">Default</option>
-        <option value="DETAIL">Detail</option>
-        <option value="PREVIEW">Preview</option>
-        <option value="EXTENDED_PREVIEW">Extended preview</option>
-      </select>
+        options={[
+          { value: 'DEFAULT', name: 'Default' },
+          { value: 'DETAIL', name: 'Detail' },
+          { value: 'PREVIEW', name: 'Preview' },
+          { value: 'EXTENDED_PREVIEW', name: 'Extended preview' },
+        ]}
+      />
     </>
   );
 };

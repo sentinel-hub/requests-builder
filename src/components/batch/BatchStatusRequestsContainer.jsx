@@ -64,11 +64,7 @@ const BatchStatusRequestsContainer = ({
   };
   return (
     <>
-      <h3
-        className="heading-secondary u-margin-bottom-small"
-        onClick={handleExpandCont}
-        style={{ cursor: 'pointer' }}
-      >
+      <h3 className="heading-secondary mb-2" onClick={handleExpandCont} style={{ cursor: 'pointer' }}>
         {containerTitle}
         <FontAwesomeIcon
           style={{ marginLeft: '1rem' }}
@@ -86,7 +82,7 @@ const BatchStatusRequestsContainer = ({
           }}
         >
           {requests === undefined || requests.length === 0 ? (
-            <p className="text u-margin-bottom-small">No requests found.</p>
+            <p className="text mb-2">No requests found.</p>
           ) : (
             renderBatchRequestSummary(
               requests,

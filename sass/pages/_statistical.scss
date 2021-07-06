@@ -68,7 +68,7 @@
 
     & > div.form {
       overflow-y: scroll;
-      height: 600px;
+      height: 650px;
 
       @include respond(tab-port) {
         height: 100%;

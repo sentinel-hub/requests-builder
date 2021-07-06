@@ -98,7 +98,7 @@ const TPDISearchOptions = ({
         <label htmlFor="tpdi-provider" className="form__label">
           Constellation
         </label>
-        <select id="tpdi-provider" className="form__input" value={provider} onChange={handleChange}>
+        <select id="tpdi-provider" className="form__input mb-2" value={provider} onChange={handleChange}>
           <option value="AIRBUS_SPOT">Airbus (SPOT)</option>
           <option value="AIRBUS_PHR">Airbus (Pleiades)</option>
           <option value="PLANET">Planet Scope</option>
@@ -109,6 +109,7 @@ const TPDISearchOptions = ({
           request={searchAllOrders}
           args={[state]}
           buttonText="Search for data"
+          additionalClassNames={['w-fit', 'mt-2']}
           validation={validateSearch(token, state)}
           className="secondary-button"
           responseHandler={handleSearchFeatures}

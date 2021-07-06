@@ -3,40 +3,41 @@ import BasicOptions from './BasicOptions';
 import store from '../../../store';
 import requestSlice from '../../../store/request';
 import { connect } from 'react-redux';
+import Select from '../Select';
 
 const S3SLSTROptions = ({ reduxOrbitDirection, reduxView, idx }) => {
-  const handleOrbitDirectionChange = (e) => {
-    store.dispatch(requestSlice.actions.setDataFilterOptions({ orbitDirection: e.target.value, idx: idx }));
+  const handleOrbitDirectionChange = (value) => {
+    store.dispatch(requestSlice.actions.setDataFilterOptions({ orbitDirection: value, idx: idx }));
   };
 
-  const handleViewChange = (e) => {
-    store.dispatch(requestSlice.actions.setProcessingOptions({ view: e.target.value, idx: idx }));
+  const handleViewChange = (value) => {
+    store.dispatch(requestSlice.actions.setProcessingOptions({ view: value, idx: idx }));
   };
 
   return (
     <>
       <BasicOptions idx={idx} />
-      <label htmlFor={`orbit-direction-${idx}`} className="form__label u-margin-top-tiny">
-        Orbit Direction
-      </label>
-      <select
-        id={`orbit-direction-${idx}`}
-        className="form__input"
-        value={reduxOrbitDirection}
+      <Select
+        label="Orbit Direction"
+        buttonClassNames="mb-2"
+        selected={reduxOrbitDirection}
         onChange={handleOrbitDirectionChange}
-      >
-        <option value="DEFAULT">Default</option>
-        <option value="ASCENDING">Ascending</option>
-        <option value="DESCENDING">Descending</option>
-      </select>
-      <label htmlFor={`slstr-view-${idx}`} className="form__label">
-        View
-      </label>
-      <select id={`slstr-view-${idx}`} className="form__input" value={reduxView} onChange={handleViewChange}>
-        <option value="DEFAULT">Default</option>
-        <option value="NADIR">Nadir</option>
-        <option value="OBLIQUE">Oblique</option>
-      </select>
+        options={[
+          { value: 'DEFAULT', name: 'Default' },
+          { value: 'ASCENDING', name: 'Ascending' },
+          { value: 'DESCENDING', name: 'Descending' },
+        ]}
+      />
+      <Select
+        label="View"
+        selected={reduxView}
+        onChange={handleViewChange}
+        options={[
+          { value: 'DEFAULT', name: 'Default' },
+          { value: 'NADIR', name: 'Nadir' },
+          { value: 'OBLIQUE', name: 'Oblique' },
+        ]}
+      />
     </>
   );
 };

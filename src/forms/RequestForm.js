@@ -5,6 +5,7 @@ import EvalscriptEditor from '../components/common/Evalscript/EvalscriptEditor';
 import RequestPreview from '../components/process/RequestPreview';
 import MapContainer from '../components/common/Map/MapContainer';
 import TimeRangeContainer from '../components/common/TimeRange/TimeRangeContainer';
+import RunningRequestIndicator from '../components/common/RunningRequestIndicator';
 
 const RequestForm = () => {
   return (
@@ -15,7 +16,7 @@ const RequestForm = () => {
         </div>
         <div className="process-first-row-second-item">
           <TimeRangeContainer />
-          <div className="output u-margin-top-small">
+          <div className="output mt-4 md:mt-2">
             <Output />
           </div>
         </div>
@@ -31,6 +32,7 @@ const RequestForm = () => {
           <RequestPreview />
         </div>
       </div>
+      <RunningRequestIndicator />
     </div>
   );
 };

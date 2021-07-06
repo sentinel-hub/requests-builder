@@ -39,7 +39,7 @@ const GetAllBatchRequestsButton = ({ token, setFetchedRequests, setGetAllRespons
       errorHandler={addAlertOnError}
       request={getAllBatchRequests}
       args={[]}
-      style={{ marginTop: '0', marginRight: '1rem' }}
+      additionalClassNames={['mt-0', 'mr-2', 'wrapped']}
     />
   );
 };

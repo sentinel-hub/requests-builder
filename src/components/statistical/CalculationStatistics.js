@@ -63,11 +63,11 @@ const CalculationStatistics = ({ idx, statistics, statIdx }) => {
 
   return (
     <div style={{ padding: '0 0 0.5rem 1rem' }}>
-      <label className="form__label">Apply to</label>
+      <label className="form__label block">Apply to</label>
       <select
         value={isSpecifyingBand ? 'specific' : 'default'}
         onChange={handleSelectBandName}
-        className="form__input"
+        className="form__input mb-2"
       >
         <option value="default">All bands</option>
         <option value="specific">Specific band</option>
@@ -87,28 +87,25 @@ const CalculationStatistics = ({ idx, statistics, statIdx }) => {
       <input
         type="text"
         onChange={handlePercentilesArrayChange}
-        className="form__input"
+        className="form__input mb-2"
         placeholder="e.g: 50,90,95,99,100"
         value={statistics.k.toString()}
       />
 
       <label className="form__label">Interpolation</label>
       <input
-        className="form__input"
+        className="form__input mb-2"
         type="text"
         readOnly
         placeholder="e.g: higher"
         value={statistics.interpolation}
       />
 
-      <button
-        className="secondary-button secondary-button--cancel secondary-button--fit"
-        onClick={handleDeleteStatistics}
-      >
+      <button className="secondary-button secondary-button--cancel w-fit" onClick={handleDeleteStatistics}>
         Delete Statistics
       </button>
 
-      <hr style={{ margin: '1rem 0' }} />
+      <hr className="my-2" />
     </div>
   );
 };

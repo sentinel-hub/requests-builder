@@ -7,7 +7,7 @@ const CalculationResults = ({ calculation, selectedBand, containerRef, setSelect
   };
   return (
     <div>
-      <h3 className="heading-tertiary u-margin-top-small">Band</h3>
+      <h3 className="heading-tertiary mt-2">Band</h3>
       {Object.keys(calculation.bands).map((bandKey) => (
         <button
           className={`secondary-button ${bandKey === selectedBand ? 'secondary-button--disabled' : ''}`}

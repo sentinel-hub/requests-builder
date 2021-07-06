@@ -56,7 +56,7 @@ const TPDIBannerInfo = ({ token }) => {
   // };
 
   return shouldRenderTpdiBanner ? (
-    <div className="info-banner u-margin-bottom-small">
+    <div className="info-banner mb-2">
       <p>
         TPDI is disabled by default for all users. You can find more information on buying a package on the
         following links:{' '}
@@ -64,6 +64,7 @@ const TPDIBannerInfo = ({ token }) => {
           href="https://docs.sentinel-hub.com/api/latest/data/planet-scope/#purchasing-the-data"
           target={'_blank'}
           rel="noopener noreferrer"
+          className="italic text-green-800 underline"
         >
           PLANET
         </a>
@@ -72,6 +73,7 @@ const TPDIBannerInfo = ({ token }) => {
           href="https://docs.sentinel-hub.com/api/latest/data/airbus/pleiades/#purchasing-pleiades-data"
           target={'_blank'}
           rel="noopener noreferrer"
+          className="italic text-green-800 underline"
         >
           AIRBUS - PHR
         </a>
@@ -80,6 +82,7 @@ const TPDIBannerInfo = ({ token }) => {
           href="https://docs.sentinel-hub.com/api/latest/data/airbus/spot/#purchasing-spot-data"
           target={'_blank'}
           rel="noopener noreferrer"
+          className="italic text-green-800 underline"
         >
           AIRBUS - SPOT
         </a>
@@ -92,7 +95,7 @@ const TPDIBannerInfo = ({ token }) => {
         {/* <button className="button-link" onClick={handleStartPlanetDemo}>
           PLANET
         </button>{' '} */}
-        <button className="button-link" onClick={handleStartAirbusDemo}>
+        <button className="font-bold italic text-green-700" onClick={handleStartAirbusDemo}>
           AIRBUS
         </button>
       </p>

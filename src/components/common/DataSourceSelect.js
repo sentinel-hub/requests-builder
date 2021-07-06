@@ -1,12 +1,11 @@
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { connect } from 'react-redux';
 import store from '../../store';
-import requestSlice from '../../store/request';
+import requestSlice, { isInvalidDatafusionState } from '../../store/request';
 import {
   DATASOURCES,
   S2L2A,
   S2L1C,
-  L8L1C,
   LOTL1,
   LOTL2,
   MODIS,
@@ -16,8 +15,11 @@ import {
   S1GRD,
   DEM,
   CUSTOM,
-  DATAFUSION,
   DATASOURCES_NAMES,
+  LTML1,
+  LTML2,
+  batchDataCollectionNames,
+  statisticalDataCollectionNames,
 } from '../../utils/const/const';
 import BasicOptions from './DataSourceSpecificOptions/BasicOptions';
 import S2L1COptions from './DataSourceSpecificOptions/S2L1COptions';
@@ -27,34 +29,38 @@ import S1GRDOptions from './DataSourceSpecificOptions/S1GRDOptions';
 import BaseOptionsNoCC from './DataSourceSpecificOptions/BaseOptionsNoCC';
 import DEMOptions from './DataSourceSpecificOptions/DEMOptions';
 import BYOCOptions from './DataSourceSpecificOptions/BYOCOptions';
-import DataFusionOptions from './DataSourceSpecificOptions/DataFusionOptions';
 import Toggle from './Toggle';
 import OverlayButton from './OverlayButton';
+import Select from './Select';
 
-export const generateDatasourcesOptions = (appMode) => {
+const getDataCollectionNamesByMode = (appMode) => {
   let filteredDatasourcesKeys = DATASOURCES_NAMES;
   if (appMode === 'BATCH') {
-    filteredDatasourcesKeys = DATASOURCES_NAMES.filter((key) => DATASOURCES[key].isBatchSupported);
+    filteredDatasourcesKeys = batchDataCollectionNames;
   } else if (appMode === 'STATISTICAL') {
-    filteredDatasourcesKeys = DATASOURCES_NAMES.filter((key) => DATASOURCES[key].isStatApiSupported);
+    filteredDatasourcesKeys = statisticalDataCollectionNames;
   }
-  return filteredDatasourcesKeys.map((key) => (
-    <option key={key} value={key}>
-      {DATASOURCES[key].selectName ?? key}
-    </option>
-  ));
+  return filteredDatasourcesKeys;
+};
+
+const generateDataCollectionSelectOptions = (appMode) => {
+  return getDataCollectionNamesByMode(appMode).map((key) => ({
+    value: key,
+    name: DATASOURCES[key].selectName ?? key,
+  }));
 };
 
 //idx is to reference different datasource options (in case of datafusion)
-export const generateDataSourceRelatedOptions = (datasource, idx = 0) => {
+const generateDataCollectionAdvancedOptions = (datasource, idx = 0) => {
   switch (datasource) {
     case S2L2A:
       return <BasicOptions idx={idx} />;
     case S2L1C:
       return <S2L1COptions idx={idx} />;
-    case L8L1C:
     case LOTL1:
     case LOTL2:
+    case LTML1:
+    case LTML2:
       return <BasicOptions idx={idx} />;
     case MODIS:
       return <BaseOptionsNoCC idx={idx} />;
@@ -70,83 +76,153 @@ export const generateDataSourceRelatedOptions = (datasource, idx = 0) => {
       return <DEMOptions idx={idx} />;
     case CUSTOM:
       return <BYOCOptions idx={idx} />;
-    case DATAFUSION:
-      return <DataFusionOptions idx={idx} />;
     default:
-      return '';
+      return null;
   }
 };
 
-const DataSourceSelect = ({ datasource, appMode }) => {
+const DataSourceSelect = ({ dataCollections, appMode }) => {
   const overlayRef = useRef();
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  const isOnDatafusion = useMemo(() => {
+    return dataCollections.length > 1;
+  }, [dataCollections.length]);
 
-  const handleChange = (e) => {
-    store.dispatch(requestSlice.actions.setDatasource(e.target.value));
+  const handleAddDataCollection = () => {
+    store.dispatch(requestSlice.actions.addDataCollection());
   };
-
-  const handleShowAdvanced = () => {
-    setShowAdvanced(!showAdvanced);
-  };
-
-  const handleReset = () => {
-    store.dispatch(requestSlice.actions.resetAdvancedOptions());
-    setShowAdvanced(false);
-  };
-
+  const isInvalidDatafusion = isInvalidDatafusionState({ dataCollections, appMode });
   return (
     <>
       <h2 className="heading-secondary">
-        <div className="u-expand-title">
-          Data Collection
+        <div className="flex items-center">
+          <div className="mr-2">
+            Data Collection
+            {isInvalidDatafusion && <span className="text-red-600 ml-2"> !</span>}
+          </div>
           <OverlayButton elementRef={overlayRef} />
         </div>
       </h2>
-      <div className="form" ref={overlayRef}>
-        <label htmlFor="datasource-select" className="form__label">
-          Data Collection
-        </label>
-        <select
-          id="datasource-select"
-          value={datasource}
-          required
-          className="form__input"
-          onChange={handleChange}
-        >
-          {generateDatasourcesOptions(appMode)}
-        </select>
-        {datasource !== CUSTOM && datasource !== DATAFUSION ? (
-          <div style={{ whiteSpace: 'nowrap' }}>
-            <div className="toggle-with-label">
-              <label className="form__label" htmlFor="advanced-options">
-                {showAdvanced ? 'Hide advanced options' : 'Show advanced options'}
-              </label>
-              <Toggle id="advanced-options" onChange={handleShowAdvanced} checked={showAdvanced} />
-            </div>
-          </div>
-        ) : null}
-        <div style={{ paddingTop: 0 }}>
-          {datasource === CUSTOM || datasource === DATAFUSION ? (
-            generateDataSourceRelatedOptions(datasource)
-          ) : showAdvanced ? (
-            <>
-              {generateDataSourceRelatedOptions(datasource)}
-              <button
-                onClick={handleReset}
-                className="secondary-button secondary-button--fit u-margin-right-small"
-              >
-                Reset to default
-              </button>
-            </>
-          ) : null}
-        </div>
+      <div
+        className="form"
+        ref={overlayRef}
+        style={isOnDatafusion ? { maxHeight: '730px', overflowY: 'scroll' } : {}}
+      >
+        {dataCollections.map((dataCol, idx) => (
+          <SingleDataCollection
+            key={`data-collection-${idx}`}
+            dataCollection={dataCol}
+            appMode={appMode}
+            isOnDatafusion={isOnDatafusion}
+            idx={idx}
+          />
+        ))}
+        <button className="secondary-button w-fit mt-4" onClick={handleAddDataCollection}>
+          {!isOnDatafusion ? 'Start Data Fusion request' : 'Add Data Collection'}
+        </button>
+        {isInvalidDatafusion && (
+          <p className="text text--warning mt-3">
+            <b>
+              WARNING!
+              <br />
+              Current data fusion request is not valid. <br />
+              {appMode} mode does not support cross deployment requests.
+            </b>
+          </p>
+        )}
       </div>
     </>
   );
 };
 
+const SingleDataCollection = ({ dataCollection, idx, appMode, isOnDatafusion }) => {
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const handleDataCollectionChange = (val) => {
+    store.dispatch(requestSlice.actions.setDataCollection({ idx, dataCollection: val }));
+  };
+  const handleShowAdvanced = () => {
+    setShowAdvanced((prev) => !prev);
+  };
+  const handleReset = () => {
+    store.dispatch(requestSlice.actions.resetAdvancedOptions({ idx }));
+    setShowAdvanced(false);
+  };
+  const { type } = dataCollection;
+
+  const handleRemoveDataCollection = () => {
+    store.dispatch(requestSlice.actions.removeDataCollection({ idx }));
+  };
+  const handleDataCollectionIdChange = (e) => {
+    store.dispatch(requestSlice.actions.setDataCollectionId({ idx, id: e.target.value }));
+  };
+  return (
+    <>
+      {isOnDatafusion && (
+        <label className="form__label" htmlFor={`data-collection-${idx}`}>
+          Data Collection {idx + 1}
+        </label>
+      )}
+      <Select
+        options={generateDataCollectionSelectOptions(appMode)}
+        selected={type}
+        onChange={handleDataCollectionChange}
+        buttonClassNames="mb-2"
+      />
+      {isOnDatafusion && (
+        <>
+          <label className="form__label" htmlFor={`data-collection-id-${idx}`}>
+            Identifier
+          </label>
+          <input
+            className="form__input"
+            type="text"
+            value={dataCollection.id}
+            onChange={handleDataCollectionIdChange}
+            id={`data-collection-id-${idx}`}
+            placeholder="Identifier"
+          />
+        </>
+      )}
+
+      {type !== CUSTOM && (
+        <div className="flex items-center mb-2">
+          <label htmlFor={`advanced-options-${idx}`} className="form__label cursor-pointer mr-2 my-1">
+            {showAdvanced ? 'Hide advanced options' : 'Show advanced options'}
+          </label>
+          <Toggle id={`advanced-options-${idx}`} onChange={handleShowAdvanced} checked={showAdvanced} />
+        </div>
+      )}
+
+      {type === CUSTOM ? (
+        <div className="pl-3 mb-2">{generateDataCollectionAdvancedOptions(type, idx)}</div>
+      ) : (
+        showAdvanced && (
+          <div className="pl-3 mb-2">
+            {generateDataCollectionAdvancedOptions(type, idx)}
+            <button onClick={handleReset} className="secondary-button w-fit mr-2 mb-2">
+              Reset to default
+            </button>
+          </div>
+        )
+      )}
+
+      {idx > 0 && (
+        <>
+          <button
+            className="secondary-button w-fit secondary-button--cancel"
+            onClick={handleRemoveDataCollection}
+          >
+            Remove Data Collection
+          </button>
+        </>
+      )}
+
+      {isOnDatafusion && <hr className="my-2 border-2 border-primary-dark" />}
+    </>
+  );
+};
+
 const mapStateToProps = (store) => ({
-  datasource: store.request.datasource,
+  dataCollections: store.request.dataCollections,
   appMode: store.request.mode,
 });
 

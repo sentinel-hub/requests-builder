@@ -5,13 +5,12 @@
   z-index: 100000;
   max-width: 500px;
   align-items: stretch;
-  font-size: 2rem;
+  font-size: 1rem;
   cursor: pointer;
   border-radius: 5px;
   display: none;
 
   @include respond(tab-land) {
-    font-size: 1rem;
     max-width: 300px;
   }
 
@@ -21,12 +20,12 @@
     align-items: center;
     justify-content: center;
     margin-right: 1rem;
-    font-size: 3rem;
+    font-size: 1.5rem;
     border-top-left-radius: 5px;
     border-bottom-left-radius: 5px;
 
     @include respond(tab-land) {
-      font-size: 2rem;
+      font-size: 1rem;
     }
   }
 
@@ -60,10 +59,10 @@
     align-items: center;
     justify-content: center;
     margin-right: 1rem;
-    font-size: 3rem;
+    font-size: 1.5rem;
 
     @include respond(tab-land) {
-      font-size: 2rem;
+      font-size: 1rem;
     }
   }
 }

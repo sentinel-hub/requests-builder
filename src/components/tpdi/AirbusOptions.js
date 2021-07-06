@@ -11,8 +11,8 @@ const AirbusOptions = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <div className="toggle-with-label">
-        <label htmlFor="adv-options" className="form__label">
+      <div className="flex items-center mb-2">
+        <label htmlFor="adv-options" className="form__label cursor-pointer mr-2">
           Advanced Options
         </label>
         <Toggle id="adv-options" checked={showAdvanced} onChange={handleShowAdvancedChange} />

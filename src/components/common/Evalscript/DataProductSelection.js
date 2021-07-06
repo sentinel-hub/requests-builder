@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import store from '../../../store';
 import requestSlice from '../../../store/request';
+import Select from '../Select';
 
 // Search by id, name, description.
 const filterDataProducts = (dataproducts, filterText) => {
@@ -28,9 +29,9 @@ const DataProductSelection = ({ dataproducts }) => {
     setFilterText(e.target.value);
   };
 
-  const handleSelectedDataProductChange = (e) => {
-    if (e.target.value) {
-      setSelectedDataProduct(dataproducts.find((dp) => dp.id === parseInt(e.target.value)));
+  const handleSelectedDataProductChange = (value) => {
+    if (value) {
+      setSelectedDataProduct(dataproducts.find((dp) => dp.id === parseInt(value)));
     } else {
       setSelectedDataProduct({ id: '' });
     }
@@ -52,31 +53,31 @@ const DataProductSelection = ({ dataproducts }) => {
     <>
       {dataproducts.length > 0 ? (
         <>
-          <select
-            value={selectedDataProduct.id}
-            onChange={handleSelectedDataProductChange}
-            className="form__input"
-          >
-            <option value="">Select a Dataproduct</option>
-            {filteredDataProducts.map((dp) => (
-              <option value={dp.id} key={dp.id} className="text">
-                {dp.name}
-              </option>
-            ))}
-          </select>
+          <div className="flex items-center mb-3">
+            <input
+              className="form__input w-fit mr-4"
+              value={filterText}
+              onChange={handleChangeFilterText}
+              type="text"
+              placeholder="Search for Data Products"
+            />
 
-          <input
-            className="form__input"
-            value={filterText}
-            onChange={handleChangeFilterText}
-            type="text"
-            placeholder="Search for Data Products"
-          />
+            <Select
+              selected={selectedDataProduct.id}
+              onChange={handleSelectedDataProductChange}
+              options={[
+                { value: '', name: 'Select a data product' },
+                ...filteredDataProducts.map((dp) => ({ value: dp.id, name: dp.name })),
+              ]}
+              buttonClassNames="w-fit"
+              optionsClassNames="w-full"
+            />
+          </div>
 
           {selectedDataProduct.id ? (
             <>
-              <p className="text u-margin-bottom-tiny">
-                <span>Description:</span>
+              <p className="text mb-1">
+                <span>Description: </span>
                 {dataproducts.find((dp) => dp.id === parseInt(selectedDataProduct.id)).description}
               </p>
             </>

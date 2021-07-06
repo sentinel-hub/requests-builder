@@ -1,3 +1,5 @@
+import { CUSTOM, DATASOURCES, DATASOURCES_NAMES } from './const/const';
+
 export const formatNumber = (n, roundedDigits, fixed = false) => {
   const roundedResult = Math.round(n * 10 ** roundedDigits) / 10 ** roundedDigits;
   if (fixed) {
@@ -29,4 +31,21 @@ export const isEmptyDefault = (obj) => {
     }
   }
   return true;
+};
+
+export const doesModeSupportCrossRegion = (mode) => mode === 'PROCESS';
+
+export const getCrossRegionDataCollectionsIndexes = (dataCollections) => {
+  const firstRegion = dataCollections[0].type;
+  return dataCollections.reduce((acc, dataCol, idx) => {
+    if (dataCol.type !== firstRegion) {
+      acc.push(idx);
+    }
+    return acc;
+  }, []);
+};
+
+export const getSameRegionDataCollectionTypes = (dataCollectionType) => {
+  const region = DATASOURCES[dataCollectionType].region;
+  return DATASOURCES_NAMES.filter((type) => DATASOURCES[type].region === region).concat(CUSTOM);
 };

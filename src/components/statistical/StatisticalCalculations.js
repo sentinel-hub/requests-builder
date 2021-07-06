@@ -37,8 +37,8 @@ const StatisticalCalculationsContainer = ({ calculations }) => {
 
   return (
     <>
-      <h2 className="heading-secondary" style={{ marginBottom: '1.3rem' }}>
-        <div className="u-expand-title">
+      <h2 className="heading-secondary mb-3">
+        <div className="flex justify-between items-center w-11/12">
           Calculations & Histograms
           <OverlayButton elementRef={overlayRef} />
         </div>
@@ -55,11 +55,9 @@ const StatisticalCalculationsContainer = ({ calculations }) => {
             isExpanded={expandedCalculations[idx]}
           />
         ))}
-        <div className="u-flex-between">
-          <button className="secondary-button" onClick={handleAddCalculation}>
-            Add Calculation
-          </button>
-        </div>
+        <button className="secondary-button w-fit my-4" onClick={handleAddCalculation}>
+          Add Calculation
+        </button>
       </div>
     </>
   );
@@ -128,12 +126,8 @@ const StatisticalCalculation = ({
 
   return (
     <>
-      <h3
-        className="heading-tertiary"
-        style={{ cursor: 'pointer' }}
-        onClick={() => handleExpandCalculation(idx)}
-      >
-        <div className="u-flex-between">
+      <h3 className="heading-tertiary cursor-pointer" onClick={() => handleExpandCalculation(idx)}>
+        <div className="flex justify-between">
           <span>
             Calculation {idx + 1} - {calculation.outputName}
           </span>
@@ -165,13 +159,9 @@ const StatisticalCalculation = ({
             />
           )}
 
-          <h3
-            className="heading-tertiary"
-            style={{ marginBottom: '1rem', cursor: 'pointer', width: 'fit-content' }}
-            onClick={handleExpandHistograms}
-          >
-            <div className="u-flex-between">
-              <span className="u-margin-right-small">Histograms</span>
+          <h3 className="heading-tertiary mb-1 cursor-pointer w-fit" onClick={handleExpandHistograms}>
+            <div className="flex justify-between items-center my-2">
+              <span className="mr-2">Histograms</span>
               <FontAwesomeIcon icon={areHistogramsExpanded ? faAngleDoubleUp : faAngleDoubleDown} />
             </div>
           </h3>
@@ -184,20 +174,13 @@ const StatisticalCalculation = ({
                 key={`hist-${histIdx}`}
               />
             ))}
-          <button
-            className="secondary-button secondary-button--fit u-margin-bottom-small"
-            onClick={handleAddHistogram}
-          >
+          <button className="secondary-button w-fit mb-3" onClick={handleAddHistogram}>
             Add Histogram
           </button>
 
-          <h3
-            className="heading-tertiary"
-            style={{ cursor: 'pointer', width: 'fit-content', marginBottom: '1rem' }}
-            onClick={handleExpandStatistics}
-          >
-            <div className="u-flex-between">
-              <span className="u-margin-right-small">Statistics</span>
+          <h3 className="heading-tertiary cursor-pointer w-fit mb-1" onClick={handleExpandStatistics}>
+            <div className="flex justify-between items-center">
+              <span className="mr-2 my-2">Statistics</span>
               <FontAwesomeIcon icon={areStatisticsExpanded ? faAngleDoubleUp : faAngleDoubleDown} />
             </div>
           </h3>
@@ -210,16 +193,13 @@ const StatisticalCalculation = ({
                 key={`stats-${statIdx}`}
               />
             ))}
-          <button
-            className="secondary-button secondary-button--fit u-margin-bottom-small"
-            onClick={handleAddStatistics}
-          >
+          <button className="secondary-button w-fit mb-3" onClick={handleAddStatistics}>
             Add Statistics
           </button>
 
           {idx > 0 && (
             <button
-              className="secondary-button secondary-button--cancel u-margin-bottom-small"
+              className="secondary-button secondary-button--cancel mb-2 w-fit"
               onClick={handleDeleteCalculation}
             >
               Delete Calculation

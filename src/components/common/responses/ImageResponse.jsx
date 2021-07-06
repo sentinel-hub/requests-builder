@@ -18,7 +18,7 @@ const ImageResponse = ({ imageResponse, hasBeenAddedToMap, setHasBeenAddedToMap 
   return (
     <>
       {shouldNotDisplayFormat ? null : <img src={src} alt="response" />}
-      <a href={src} download>
+      <a href={src} download className="underline my-2 text-lg">
         Click to download the response
       </a>
       {dimensions !== undefined && (
@@ -26,7 +26,7 @@ const ImageResponse = ({ imageResponse, hasBeenAddedToMap, setHasBeenAddedToMap 
           <p className="text">
             <span>Meters per pixel on X axis:</span> {dimensions[0].toFixed(3)}
           </p>
-          <p className="text">
+          <p className="text mb-2">
             <span>Meters per pixel on Y axis:</span> {dimensions[1].toFixed(3)}
           </p>
         </>
@@ -41,7 +41,7 @@ const ImageResponse = ({ imageResponse, hasBeenAddedToMap, setHasBeenAddedToMap 
             Add to Map
           </button>
           {arrayBuffer !== undefined && (
-            <p className="text text--warning u-margin-top-tiny">
+            <p className="text text--warning mt-1">
               <b>
                 <i>Note: </i>
               </b>

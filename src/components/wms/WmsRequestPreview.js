@@ -59,7 +59,7 @@ const WmsRequestPreview = ({ wmsState, requestState, mapState, mode, token }) =>
 
   return (
     <>
-      <h2 className="heading-secondary u-margin-bottom-small">Request Preview (URL)</h2>
+      <h2 className="heading-secondary mb-2">Request Preview (URL)</h2>
       <div className="form">
         <CommonRequestPreview
           options={generateRequestPreviewOptions()}
@@ -69,7 +69,7 @@ const WmsRequestPreview = ({ wmsState, requestState, mapState, mode, token }) =>
           additionalCodeMirrorOptions={{ lineWrapping: true }}
         />
         {wmsState.layer.id && mode === 'WMS' && (
-          <button className="secondary-button secondary-button--fit" onClick={handleSeeOnProcess}>
+          <button className="secondary-button w-fit" onClick={handleSeeOnProcess}>
             See on Process Mode
           </button>
         )}

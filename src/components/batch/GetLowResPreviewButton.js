@@ -11,14 +11,16 @@ const GetLowResPreviewButton = ({ requestState, mapState, token }) => {
   return (
     <ProcessRequestOverlayButton
       className="secondary-button"
+      additionalClassNames={['mr-2']}
       validation={Boolean(isValid && token)}
       buttonText={'Get Low Res Preview'}
       request={ProcessResource.stateRequest(requestState)}
       args={[getRequestObject(requestState, mapState)]}
       reqConfig={{ responseType: 'blob' }}
       requestState={requestState}
-      skipSaving={true}
       wgs84Geometry={mapState.wgs84Geometry}
+      skipSaving
+      useShortcut
     />
   );
 };

@@ -42,13 +42,13 @@ export const hasProperties = (collectionId) => collectionToOptions[collectionId]
 const CatalogQueryOptions = ({ selectedCollection, queryProperties }) => {
   const generateQueryOptions = () => {
     return queryProperties.map((property, idx) => (
-      <div key={'property' + idx} className="u-margin-bottom-small">
-        <label className="form__label">Property {idx + 1}</label>
+      <div key={'property' + idx} className="mb-3">
+        <label className="form__label mb-1">Property {idx + 1}</label>
         {generateOptionsByCollectionId(selectedCollection, idx)}
         <button
           onClick={handleRemoveProperty}
           name={idx}
-          className="secondary-button secondary-button--cancel secondary-button--fit"
+          className="secondary-button secondary-button--cancel w-fit"
         >
           Remove Property
         </button>
@@ -68,11 +68,11 @@ const CatalogQueryOptions = ({ selectedCollection, queryProperties }) => {
     <>
       {hasProperties(selectedCollection) ? (
         <>
-          <h2 className="heading-secondary u-margin-top-small">Query Options</h2>
+          <h2 className="heading-secondary mt-2">Query Options</h2>
           <div className="form" style={{ maxHeight: '301px', overflowY: 'scroll' }}>
             {generateQueryOptions()}
             {areQueriesLeft(selectedCollection, queryProperties.length) ? (
-              <button onClick={handleAddQueryProperty} className="secondary-button secondary-button--fit">
+              <button onClick={handleAddQueryProperty} className="secondary-button w-fit">
                 Add Query
               </button>
             ) : null}

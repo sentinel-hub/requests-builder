@@ -4,7 +4,7 @@ import { formatNumber } from '../../../utils/commonUtils';
 const BandStatistics = React.memo(({ stats }) => {
   return (
     <div>
-      <h4 className="heading-4 u-margin-bottom-tiny">Statistics</h4>
+      <h4 className="heading-4 mb-1">Statistics</h4>
       {Object.entries(stats).map(([key, value]) => {
         if (key !== 'percentiles') {
           return (

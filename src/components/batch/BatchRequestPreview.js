@@ -70,7 +70,7 @@ const BatchRequestPreview = ({
 }) => {
   return (
     <>
-      <h2 className="heading-secondary u-margin-bottom-tiny">Request Preview</h2>
+      <h2 className="heading-secondary mb-1">Request Preview</h2>
       <div className="form">
         <CommonRequestPreview
           options={[

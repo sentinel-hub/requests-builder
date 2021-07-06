@@ -37,6 +37,7 @@ const GetSingleRequestButton = ({
       errorHandler={addAlertOnError}
       request={BatchResource.getSingleOrder}
       args={[{ orderId: requestId }]}
+      additionalClassNames={['wrapped']}
       style={{ width: '70%', marginTop: '0' }}
     />
   );

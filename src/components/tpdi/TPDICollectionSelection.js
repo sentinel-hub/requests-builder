@@ -69,7 +69,7 @@ const TPDICollectionSelection = ({ token, collectionId }) => {
       <select
         value={stateCollectionIdToValue(collectionId)}
         onChange={handleTpdiCollectionChange}
-        className="form__input"
+        className="form__input mb-2"
       >
         <option value="CREATE">Create a new collection</option>
         <option value="MANUAL">Manual Entry</option>
@@ -90,7 +90,7 @@ const TPDICollectionSelection = ({ token, collectionId }) => {
           value={collectionId}
           placeholder="Enter your collection Id"
           type="text"
-          className="form__input"
+          className="form__input mb-2"
           onChange={handleTpdiInputCollectionChange}
           autoComplete="off"
         />

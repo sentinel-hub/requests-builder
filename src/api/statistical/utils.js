@@ -1,13 +1,10 @@
 import omit from 'lodash.omit';
 import { isEmpty } from '../../utils/commonUtils';
-import { CUSTOM, DATAFUSION } from '../../utils/const/const';
+import { CUSTOM } from '../../utils/const/const';
 import { generateBounds, getNonDefaultOptions } from '../process/utils';
 
 export const getStatisticalRequestBody = (
-  datasource,
-  datafusionSources,
-  byocCollectionType,
-  byocCollectionId,
+  dataCollections,
   dataFilterOptions,
   processingOptions,
   bounds,
@@ -21,14 +18,7 @@ export const getStatisticalRequestBody = (
       bounds: {
         ...getStatisticalBounds(bounds),
       },
-      data: getStatisticalDataArray(
-        datasource,
-        datafusionSources,
-        byocCollectionType,
-        byocCollectionId,
-        dataFilterOptions,
-        processingOptions,
-      ),
+      data: getStatisticalDataArray(dataCollections, dataFilterOptions, processingOptions),
     },
     aggregation: {
       ...getStatisticalAggregation(timeRange, dimensions, statisticalState),
@@ -54,46 +44,23 @@ const getOptions = (options, name, getEmpty = false) => {
   return {};
 };
 
-const getStatisticalDataArray = (
-  datasource,
-  datafusionSources,
-  byocCollectionType,
-  byocCollectionId,
-  dataFilterOptions,
-  processingOptions,
-) => {
-  if (datasource === DATAFUSION) {
-    return datafusionSources.map((ds, idx) => {
-      const dataFilter = getOptions(dataFilterOptions[idx].options, 'dataFilter', true);
-      const processing = getOptions(processingOptions[idx].options, 'processing');
-      return {
-        type: ds.datasource,
-        id: ds.id,
-        ...dataFilter,
-        ...processing,
-      };
-    });
-  }
-  const dataFilter = getOptions(dataFilterOptions[0].options, 'dataFilter', true);
-  const processing = getOptions(processingOptions[0].options, 'processing');
-
-  if (datasource === CUSTOM) {
-    return [
-      {
-        type: `${byocCollectionType.toLowerCase()}-${byocCollectionId}`,
-        ...dataFilter,
-        ...processing,
-      },
-    ];
-  } else {
-    return [
-      {
-        type: datasource,
-        ...dataFilter,
-        ...processing,
-      },
-    ];
-  }
+const getStatisticalDataArray = (dataCollections, dataFilterOptions, processingOptions) => {
+  const isDataFusion = dataCollections.length > 1;
+  return dataCollections.map((dataCol, idx) => {
+    let dataObj = {
+      ...getOptions(dataFilterOptions[idx].options, 'dataFilter', true),
+      ...getOptions(processingOptions[idx].options, 'processing'),
+    };
+    if (isDataFusion) {
+      dataObj.id = dataCol.id;
+    }
+    if (dataCol.type === CUSTOM) {
+      dataObj.type = `${dataCol.byocCollectionType.toLowerCase()}-${dataCol.byocCollectionId}`;
+    } else {
+      dataObj.type = dataCol.type;
+    }
+    return dataObj;
+  });
 };
 
 const getStatisticalAggregation = (timeRange, dimensions, statisticalState) => {

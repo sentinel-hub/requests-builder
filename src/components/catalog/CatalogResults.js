@@ -22,11 +22,11 @@ const CatalogResults = ({ results, fieldsLength, usedCollection, idsLength }) =>
     setFilteredResults(filterResults(results.results, filterText));
   }, [results, filterText]);
 
-  const maxHeight = 500 + fieldsLength * 20 + idsLength * 20;
+  const maxHeight = 520 + fieldsLength * 20 + idsLength * 20;
   return (
     <>
       <h2 className="heading-secondary">
-        <div className="u-expand-title">
+        <div className="flex justify-between items-center w-11/12">
           Catalog Results
           <OverlayButton elementRef={resultsRef} />
         </div>
@@ -40,14 +40,14 @@ const CatalogResults = ({ results, fieldsLength, usedCollection, idsLength }) =>
           placeholder="Search features by id"
           onChange={handleFilterTextChange}
           type="text"
-          className="form__input"
+          className="form__input my-2"
         />
         {filteredResults.length > 0 ? (
           filteredResults.map((res) => (
             <CatalogResultEntry feature={res} key={res.id} usedCollection={usedCollection} />
           ))
         ) : (
-          <p className="text">No results</p>
+          <p className="text my-2">No results</p>
         )}
       </div>
     </>

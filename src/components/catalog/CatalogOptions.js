@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import store from '../../store';
 import catalogSlice from '../../store/catalog';
+import Select from '../common/Select';
 
 const CatalogOptions = ({ options, queryProperties, idx }) => {
   const alreadyDefined = queryProperties
@@ -20,12 +21,11 @@ const CatalogOptions = ({ options, queryProperties, idx }) => {
     (option) => option.propertyName === queryProperties[idx].propertyName,
   );
 
-  const handlePropertyChange = (e) => {
-    store.dispatch(catalogSlice.actions.setQueryProperty({ idx: idx, propertyName: e.target.value }));
+  const handlePropertyChange = (value) => {
+    store.dispatch(catalogSlice.actions.setQueryProperty({ idx: idx, propertyName: value }));
   };
 
-  const handlePropertyValueChange = (e) => {
-    let { value } = e.target;
+  const handlePropertyValueChange = (value) => {
     if (currentOption.possibleValues === 'Numbers') {
       if (value !== '') {
         value = Number(value);
@@ -34,59 +34,62 @@ const CatalogOptions = ({ options, queryProperties, idx }) => {
     store.dispatch(catalogSlice.actions.setQueryProperty({ idx: idx, propertyValue: value }));
   };
 
-  const handleOperatorChange = (e) => {
-    store.dispatch(catalogSlice.actions.setQueryProperty({ idx: idx, operator: e.target.value }));
+  const handleOperatorChange = (value) => {
+    store.dispatch(catalogSlice.actions.setQueryProperty({ idx: idx, operator: value }));
   };
 
   return (
     <div>
-      <select
-        className="form__input"
-        value={queryProperties[idx].propertyName}
+      <Select
+        buttonClassNames="mb-2"
+        selected={queryProperties[idx].propertyName}
         onChange={handlePropertyChange}
-      >
-        <option value="">Select a Property</option>
-        {filteredOptions.map((option) => (
-          <option value={option.propertyName} key={option.propertyName}>
-            {option.propertyName}
-          </option>
-        ))}
-      </select>
-
-      {queryProperties[idx].propertyName ? (
-        <select className="form__input" value={queryProperties[idx].operator} onChange={handleOperatorChange}>
-          <option value="">Select an Operator</option>
-          {currentOption.operators.map((val) => (
-            <option value={val} key={val}>
-              {val}
-            </option>
-          ))}
-        </select>
-      ) : null}
+        options={[
+          { value: '', name: 'Select a property' },
+          ...filteredOptions.map((opt) => ({
+            name: opt.propertyName,
+            value: opt.propertyName,
+          })),
+        ]}
+      />
+      {queryProperties[idx].propertyName && (
+        <Select
+          buttonClassNames="mb-2"
+          selected={queryProperties[idx].operator}
+          onChange={handleOperatorChange}
+          options={[
+            { name: 'Select an operator', value: '' },
+            ...currentOption.operators.map((op) => ({
+              value: op,
+              name: op,
+            })),
+          ]}
+        />
+      )}
 
       {queryProperties[idx].propertyName ? (
         currentOption.possibleValues === 'Numbers' ? (
           <input
             type="text"
-            className="form__input"
+            className="form__input mb-2"
             value={queryProperties[idx].propertyValue}
-            onChange={handlePropertyValueChange}
+            onChange={(e) => handlePropertyValueChange(e.target.value)}
           />
         ) : (
-          <select
-            className="form__input"
-            value={queryProperties[idx].propertyValue}
+          <Select
+            buttonClassNames="mb-2"
+            selected={queryProperties[idx].propertyValue}
             onChange={handlePropertyValueChange}
-          >
-            <option value="">Select a Value</option>
-            {filteredOptions
-              .find((option) => option.propertyName === queryProperties[idx].propertyName)
-              .possibleValues.map((val) => (
-                <option key={val} value={val}>
-                  {val}
-                </option>
-              ))}
-          </select>
+            options={[
+              { value: '', name: 'Select a value' },
+              ...filteredOptions
+                .find((option) => option.propertyName === queryProperties[idx].propertyName)
+                .possibleValues.map((val) => ({
+                  value: val,
+                  name: val,
+                })),
+            ]}
+          />
         )
       ) : null}
     </div>

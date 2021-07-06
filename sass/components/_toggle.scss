@@ -4,10 +4,11 @@
   display: inline-block;
   width: 35px;
   height: 22px;
+  z-index: 0;
 
   @include respond(tab-port) {
-    width: 20px;
-    height: 12px;
+    width: 30px;
+    height: 17px;
   }
 }
 
@@ -29,6 +30,7 @@
   background-color: #ccc;
   -webkit-transition: 0.2s;
   transition: 0.2s;
+  z-index: 1;
 }
 
 .slider::before {
@@ -41,11 +43,12 @@
   background-color: white;
   -webkit-transition: 0.2s;
   transition: 0.2s;
+  z-index: 1;
 
   @include respond(tab-port) {
-    width: 8px;
-    height: 8px;
-    left: 2px;
+    width: 13px;
+    height: 13px;
+    left: 4px;
     bottom: 2px;
   }
 }
@@ -73,6 +76,7 @@ input:checked + .slider::before {
 /* Rounded sliders */
 .slider.round {
   border-radius: 34px;
+  z-index: 1;
 
   @include respond(tab-port) {
     border-radius: 21px;

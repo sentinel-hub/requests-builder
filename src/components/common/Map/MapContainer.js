@@ -276,36 +276,29 @@ const MapContainer = ({ wgs84Geometry, selectedCrs, textGeometry, extraGeometry,
 
   return (
     <div>
-      <div className="u-flex-aligned">
+      <div className="flex items-center">
         <h2 className="heading-secondary" style={{ marginRight: '2rem' }}>
           Area of interest
         </h2>
-        <i className="clickable-icon" onClick={openOverlay}>
+        <i className="cursor-pointer flex items-center text-xl" onClick={openOverlay}>
           <FontAwesomeIcon icon={faExpandArrowsAlt} />
         </i>
       </div>
       <div className="form" ref={mapContainerRef}>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
           <CRSSelection selectedCrs={selectedCrs} />
-          <p
-            className="text"
-            style={{ margin: '0 2rem', height: '100%', display: 'flex', alignItems: 'center' }}
-          >
-            <span>Area selected:</span> {(getAreaFromGeometry(wgs84Geometry) / 1e6).toFixed(2)} km<sup>2</sup>
+          <p className="text mx-2 h-full flex items-center">
+            <span className="mr-1">Area selected:</span>{' '}
+            {(getAreaFromGeometry(wgs84Geometry) / 1e6).toFixed(2)} km<sup>2</sup>
           </p>
           {isPolygon(textGeometry) && (
-            <button
-              style={{ marginTop: '0', marginRight: '1rem' }}
-              className="secondary-button"
-              onClick={handleSwapToBbox}
-            >
+            <button className="secondary-button mr-1" onClick={handleSwapToBbox}>
               Get bbox
             </button>
           )}
           {isBbox(textGeometry) && polygonBeforeConversion && (
             <button
-              style={{ marginTop: '0', marginRight: '1rem' }}
-              className="secondary-button"
+              className="secondary-button mr-1"
               onClick={() => store.dispatch(mapSlice.actions.setTextGeometry(polygonBeforeConversion))}
             >
               Undo
@@ -314,9 +307,9 @@ const MapContainer = ({ wgs84Geometry, selectedCrs, textGeometry, extraGeometry,
           <ByocDataFinder />
         </div>
         {(parsedError || mapError) && (
-          <div style={{ marginBottom: '1rem' }}>
+          <div className="mb-1">
             {parsedError && (
-              <p className="text text--warning" style={{ marginLeft: 'auto' }}>
+              <p className="text text--warning ml-auto">
                 When parsing, the displayed geometry on the map can have some minor errors due to
                 re-projection to EPSG:4326.
               </p>
@@ -329,7 +322,7 @@ const MapContainer = ({ wgs84Geometry, selectedCrs, textGeometry, extraGeometry,
             )}
           </div>
         )}
-        <div className="map-container" style={{ zIndex: '1' }}>
+        <div className="flex flex-col justify-between h-full items-stretch xl:flex-row z-1">
           <Map
             mapRef={mapRef}
             drawnItemsRef={drawnItemsRef}

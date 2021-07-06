@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
+import { MinusCircleIcon } from '@heroicons/react/outline';
 import store from '../../store';
 import alertSlice from '../../store/alert';
 import TPDIPlaceOrderButton from './TPDIPlaceOrderButton';
@@ -82,7 +83,7 @@ const TPDIOrderOptions = ({
   const generateProductIdInputs = (products) => {
     if (products.length > 0) {
       return products.map((prod) => (
-        <div key={prod.idx} className="product-id u-margin-bottom-tiny">
+        <div key={prod.idx} className="flex items-center mb-2">
           <input
             required
             placeholder="Add products by search"
@@ -94,9 +95,7 @@ const TPDIOrderOptions = ({
             readOnly
           />
           {prod.idx !== 0 ? (
-            <span value={prod.idx} onClick={removeProductId} className="remove-product-id">
-              -
-            </span>
+            <MinusCircleIcon value={prod.idx} onClick={removeProductId} className="cursor-pointer w-5 ml-3" />
           ) : null}
         </div>
       ));
@@ -149,22 +148,22 @@ const TPDIOrderOptions = ({
           placeholder="e.g: My planet"
           type="text"
           value={name}
-          className="form__input"
+          className="form__input mb-2"
           onChange={handleOrderNameChange}
           autoComplete="off"
         />
-        <div className="u-flex-aligned u-margin-bottom-tiny" style={{ justifyContent: 'space-between' }}>
-          <label className="form__label">Choose order type</label>
+        <div className="flex items-center" style={{ justifyContent: 'space-between' }}>
+          <label className="form__label mb-1">Choose order type</label>
           <Tooltip
             direction="right"
             content={
               <div>
-                <h3 style={{ marginBottom: '0.5rem' }}>ORDER USING PRODUCTS IDS</h3>
+                <h3 className="mb-1">ORDER USING PRODUCTS IDS</h3>
                 <p className="text">
                   Search for data and add products to you order by clicking on "Add to Order" buttons. This
                   will add product IDs to your Order Options under "Added Products (by ID)."
                 </p>
-                <h3 style={{ marginBottom: '0.5rem', marginTop: '1rem' }}>ORDER USING QUERY</h3>
+                <h3 className="mb-1 mt-2">ORDER USING QUERY</h3>
                 <p className="text">
                   Your order will be based on your AOI and time range, without searching for data and adding
                   products to your order. Especially useful for ordering time-series data. <br />
@@ -176,8 +175,8 @@ const TPDIOrderOptions = ({
           />
         </div>
 
-        <div className="toggle-with-label" style={{ marginLeft: '1rem' }}>
-          <label className="form__label">
+        <div className="flex items-center mb-2 ml-2">
+          <label className="form__label cursor-pointer mr-2">
             <input
               type="radio"
               style={{ marginRight: '1rem' }}
@@ -187,14 +186,9 @@ const TPDIOrderOptions = ({
             Order Product IDs
           </label>
         </div>
-        <div className="toggle-with-label" style={{ marginLeft: '1rem' }}>
-          <label className="form__label">
-            <input
-              type="radio"
-              style={{ marginRight: '1rem' }}
-              checked={isUsingQuery}
-              onChange={handleOrderTypeChange}
-            />
+        <div className="flex items-center mb-2 ml-2">
+          <label className="form__label cursor-pointer mr-2">
+            <input type="radio" className="mr-2" checked={isUsingQuery} onChange={handleOrderTypeChange} />
             Order using query
           </label>
         </div>
@@ -203,9 +197,9 @@ const TPDIOrderOptions = ({
         </label>
         <TPDICollectionSelection />
 
-        <label className="form__label">Order size{!isAreaExact ? ' (approx)' : ''}</label>
-        <div className="u-flex-aligned u-margin-bottom-tiny" style={{ justifyContent: 'space-between' }}>
-          <p className="text u-margin-bottom-tiny">
+        <label className="form__label mb-2">Order size{!isAreaExact ? ' (approx)' : ''}</label>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text">
             {!isUsingQuery ? (
               <span>
                 {areaSelected} km<sup>2</sup>
@@ -217,19 +211,19 @@ const TPDIOrderOptions = ({
           <Tooltip content="Ordered products will be clipped to the selected area" direction="right" />
         </div>
 
-        <div className="tpdi-limit">
+        <div className="flex items-center mb-2">
           <label htmlFor="order-limit" className="form__label">
             Order Limit (in km<sup>2</sup>)
           </label>
         </div>
-        <div className="u-flex-aligned u-margin-bottom-tiny" style={{ justifyContent: 'space-between' }}>
+        <div className="flex items-center justify-between">
           <input
             id="order-limit"
             type="number"
             placeholder="No limit"
             onChange={handleLimitChange}
             defaultValue={10}
-            className="form__input"
+            className="form__input mb-2"
           />
           <Tooltip
             content="Set an approximate order limit to prevent undesired large area requests."
@@ -237,25 +231,21 @@ const TPDIOrderOptions = ({
           ></Tooltip>
         </div>
 
-        {!isUsingQuery && (
-          <label style={{ display: 'inline-block' }} className="form__label">
-            Added Products (by ID)
-          </label>
-        )}
+        {!isUsingQuery && <label className="form__label inline-block">Added Products (by ID)</label>}
 
         {!isUsingQuery && generateProductIdInputs(products)}
 
         {canClear ? (
-          <button className="secondary-button u-margin-bottom-small" onClick={handleClearProducts}>
+          <button className="secondary-button mb-2" onClick={handleClearProducts}>
             Clear Products
           </button>
         ) : null}
 
         {provider === 'PLANET' && (
           <>
-            <div className="u-flex-aligned" style={{ justifyContent: 'space-between' }}>
-              <div className="u-flex-aligned">
-                <label className="form__label u-margin-right-tiny">Harmonize data</label>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <label className="form__label mr-1">Harmonize data</label>
                 <Toggle
                   onChange={handleHarmonizeChange}
                   checked={harmonizeTo === 'PS2'}

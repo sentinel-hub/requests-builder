@@ -128,33 +128,19 @@ export const DEFAULT_S5PL2_EVALSCRIPT = `return [O3];`;
 
 export const DEFAULT_BYOC_EVALSCRIPT = `//Write here your evalscript`;
 
-export const DEFAULT_DATAFUSION_EVALSCRIPT = `//VERSION=3
-function setup (){
+export const DEFAULT_LTML_EVALSCRIPT = `//VERSION=3
+
+function setup() {
   return {
-    input: [
-      {datasource: "s1", bands:["VV"]},
-      {datasource: "l2a", bands:["B02", "B03", "B04", "SCL"], units:"REFLECTANCE"}],
-    output: [
-      {id: "default", bands: 3, sampleType: SampleType.AUTO}
-    ]
+    input: ["B03", "B02", "B01"],
+    output: { bands: 3 }
   };
 }
 
-
-function evaluatePixel(samples, inputData, inputMetadata, customData, outputMetadata) {
-  var sample = samples.s1[0];
-  var sample2 = samples.l2a[0];
-  
-  if ([7, 8, 9, 10].includes(sample2.SCL)) {
-    return {
-      default: [sample.VV, sample.VV, sample.VV]
-    };
-  } else {
-    return {
-      default: [sample2.B04*2.5, sample2.B03*2.5, sample2.B02*2.5]
-    };
-  }
-}`;
+function evaluatePixel(sample) {
+  return [2.5 * sample.B03, 2.5 * sample.B02, 2.5 * sample.B01];
+}
+`;
 
 // STAT
 
@@ -394,6 +380,37 @@ function evaluatePixel(samples) {
         data: [index, samples.B08, samples.B04],
         dataMask: [samples.dataMask],
         scl: [samples.SCL]
+    };
+}
+`;
+
+export const DEFAULT_STATISTICAL_LTML_EVALSCRIPT = `//VERSION=3
+function setup() {
+  return {
+    input: [{
+      bands: [
+        "B03",
+        "B04",
+        "dataMask"
+      ]
+    }],
+    output: [
+      {
+        id: "data",
+        bands: 2
+      },
+      {
+        id: "dataMask",
+        bands: 1
+      }]
+  };
+}
+
+function evaluatePixel(samples) {
+    let index = (samples.B04 - samples.B03) / (samples.B04+samples.B03);
+    return {
+        data: [index, samples.B04, samples.B03],
+        dataMask: [samples.dataMask]
     };
 }
 `;

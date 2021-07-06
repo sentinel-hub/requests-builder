@@ -23,13 +23,13 @@ const generateResponses = (responses, mode) => {
 
   if (mode === 'WMS') {
     return (
-      <div className="response">
+      <div className="flex w-full flex-col mb-2">
         <label className="form__label">Image Format</label>
         <select
           onChange={handleImageFormatChange}
           value={responses[0].format}
           name={responses[0].idx}
-          className="form__input"
+          className="form__input mb-2"
         >
           {OUTPUT_FORMATS.map((format) => (
             <option key={format.name} value={format.value}>
@@ -51,7 +51,7 @@ const generateResponses = (responses, mode) => {
         onChange={handleImageFormatChange}
         value={resp.format}
         name={resp.idx}
-        className="form__input"
+        className="form__input mb-2"
       >
         {OUTPUT_FORMATS.map((format) => (
           <option key={format.name} value={format.value}>
@@ -69,20 +69,20 @@ const generateResponses = (responses, mode) => {
         onChange={handleIdentifierChange}
         name={resp.idx}
         type="text"
-        className="form__input"
+        className="form__input mb-2"
         autoComplete="off"
       />
 
       {resp.idx !== 0 ? (
         <button
           name={resp.idx}
-          className="secondary-button secondary-button--cancel"
+          className="secondary-button secondary-button--cancel w-fit mb-2"
           onClick={handleDeleteResponse}
         >
           Remove Response
         </button>
       ) : null}
-      {responses.length - 1 !== idx ? <hr className="u-margin-top-tiny"></hr> : null}
+      {responses.length - 1 !== idx ? <hr className="mt-1"></hr> : null}
     </div>
   ));
 };
@@ -96,7 +96,7 @@ const OutputResponses = ({ responses, mode }) => {
       {generateResponses(responses, mode)}
 
       {mode !== 'WMS' ? (
-        <button className="secondary-button secondary-button--fit" onClick={handleAddResponse}>
+        <button className="secondary-button w-fit" onClick={handleAddResponse}>
           Add Response
         </button>
       ) : null}

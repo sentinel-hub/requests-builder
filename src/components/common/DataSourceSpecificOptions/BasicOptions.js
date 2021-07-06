@@ -29,12 +29,12 @@ const BasicOptions = ({ stateMaxCC, idx }) => {
   return (
     <>
       <label htmlFor={`cloud-coverage-${idx}`} className="form__label">
-        Cloud Coverage
+        Cloud Coverage - {maxCC !== undefined ? maxCC + ' %' : 'Default'}
       </label>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <input
           id={`cloud-coverage-${idx}`}
-          className="form__input form__input--range"
+          className="form__input form__input--range mb-1"
           type="range"
           min="0"
           max="100"
@@ -42,9 +42,6 @@ const BasicOptions = ({ stateMaxCC, idx }) => {
           onChange={handleCCChange}
           style={{ display: 'inline-block' }}
         />
-        <p className="text" style={{ display: 'inline-block', marginLeft: '1.5rem', marginBottom: '0.8rem' }}>
-          {maxCC ? maxCC + ' %' : 'Default'}
-        </p>
       </div>
       <BaseOptionsNoCC withCC={true} idx={idx} />
     </>

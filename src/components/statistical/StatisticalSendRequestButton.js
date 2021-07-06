@@ -9,6 +9,7 @@ import StatisticalResource from '../../api/statistical/StatisticalResource';
 import { getStatisticalRequestBody } from '../../api/statistical/utils';
 import { DATASOURCES } from '../../utils/const/const';
 import { getMessageFromApiError } from '../../api';
+import { isInvalidDatafusionState } from '../../store/request';
 
 export const statisticsResponseHandler = (response, stringRequest) => {
   if (response === '') {
@@ -31,10 +32,7 @@ const statisticsErrorHandler = (err) => {
 };
 
 const StatisticalSendRequestButton = ({
-  datasource,
-  datafusionSources,
-  byocCollectionType,
-  byocCollectionId,
+  dataCollections,
   dataFilterOptions,
   processingOptions,
   evalscript,
@@ -62,17 +60,17 @@ const StatisticalSendRequestButton = ({
     width,
   };
 
+  const isInvalidDatafusion = isInvalidDatafusionState({ dataCollections, appMode: 'STATISTICAL' });
+
   return (
     <RequestButton
       className="button"
       buttonText="Send Request"
-      request={StatisticalResource.statisticalRequest(DATASOURCES[datasource]?.url)}
+      request={StatisticalResource.statisticalRequest(DATASOURCES[dataCollections[0].type]?.url)}
+      additionalClassNames={['mr-2']}
       args={[
         getStatisticalRequestBody(
-          datasource,
-          datafusionSources,
-          byocCollectionType,
-          byocCollectionId,
+          dataCollections,
           dataFilterOptions,
           processingOptions,
           bounds,
@@ -82,10 +80,11 @@ const StatisticalSendRequestButton = ({
           statisticalState,
         ),
       ]}
-      validation={Boolean(token)}
+      validation={Boolean(token && !isInvalidDatafusion)}
       responseHandler={statisticsResponseHandler}
-      useShortcut
       errorHandler={statisticsErrorHandler}
+      useShortcut
+      shouldTriggerIsRunningRequest
     />
   );
 };

@@ -9,6 +9,7 @@ import CogParameters from './CogParameters';
 import Tooltip from '../common/Tooltip/Tooltip';
 import TargetBlankLink from '../common/TargetBlankLink';
 import OutputDimensions from '../common/Output/OutputDimensions';
+import Select from '../common/Select';
 
 const generateResolutions = (tillingGridId) => {
   switch (tillingGridId) {
@@ -29,14 +30,34 @@ const generateResolutions = (tillingGridId) => {
   }
 };
 
-const generateAdditionalGrids = () => {
-  return (
-    <optgroup label="Internal grids">
-      <option value={4}>0.25 WGS84</option>
-      <option value={5}>New Zealand Topo50</option>
-    </optgroup>
-  );
-};
+const tilingGridOptions = [
+  {
+    value: 0,
+    name: '20km grid',
+  },
+  {
+    value: 1,
+    name: '10km grid',
+  },
+  {
+    value: 2,
+    name: '100km grid',
+  },
+  {
+    value: 3,
+    name: 'WGS84 1 degree grid',
+  },
+];
+const additionalGrids = [
+  {
+    value: 4,
+    name: 'WGS84 0.25 degree grid',
+  },
+  {
+    value: 5,
+    name: 'New Zealand Topo 50',
+  },
+];
 
 const BatchOptions = ({
   resolution,
@@ -54,17 +75,17 @@ const BatchOptions = ({
   extendedSettings,
 }) => {
   const [displayDimensions, setDisplayDimensions] = useState(false);
-  const handleGridChange = (e) => {
-    store.dispatch(batchSlice.actions.setTillingGrid(Number(e.target.value)));
+  const handleGridChange = (value) => {
+    store.dispatch(batchSlice.actions.setTillingGrid(Number(value)));
 
-    const possibleResolutions = generateResolutions(Number(e.target.value));
+    const possibleResolutions = generateResolutions(Number(value));
     if (!possibleResolutions.includes(resolution)) {
       store.dispatch(batchSlice.actions.setResolution(possibleResolutions[0]));
     }
   };
 
-  const handleResChange = (e) => {
-    store.dispatch(batchSlice.actions.setResolution(Number(e.target.value)));
+  const handleResChange = (value) => {
+    store.dispatch(batchSlice.actions.setResolution(Number(value)));
   };
 
   const handleBucketNameChange = (e) => {
@@ -99,56 +120,55 @@ const BatchOptions = ({
     <>
       <h2 className="heading-secondary">Batch Options</h2>
       <div className="form">
-        <div className="label-with-info">
-          <label htmlFor="tiling-grid" className="form__label" style={{ marginRight: 'auto' }}>
-            Tiling Grid
-          </label>
-          <Tooltip
-            direction="right"
-            content={
-              <TargetBlankLink
-                href="https://docs.sentinel-hub.com/api/latest/api/batch/#tiling-grids"
-                children="Check the docs for more information"
+        <Select
+          selected={tillingGrid}
+          onChange={handleGridChange}
+          options={extendedSettings ? [...tilingGridOptions, ...additionalGrids] : tilingGridOptions}
+          label={
+            <div className="flex items-center mb-2">
+              <label htmlFor="tiling-grid" className="form__label mr-auto">
+                Tiling Grid
+              </label>
+              <Tooltip
+                direction="right"
+                content={
+                  <TargetBlankLink
+                    href="https://docs.sentinel-hub.com/api/latest/api/batch/#tiling-grids"
+                    children="Check the docs for more information"
+                  />
+                }
+                infoStyles={{ marginRight: '1rem' }}
               />
-            }
-            infoStyles={{ marginRight: '1rem' }}
-          />
-        </div>
-        <select id="tiling-grid" className="form__input" value={tillingGrid} onChange={handleGridChange}>
-          <option value={0}>20km grid</option>
-          <option value={1}>10km grid</option>
-          <option value={2}>100km grid</option>
-          <option value={3}>WGS84 1 degree grid</option>
-          {extendedSettings && generateAdditionalGrids()}
-        </select>
+            </div>
+          }
+          buttonClassNames="mb-2"
+        />
 
-        <label htmlFor="resolution" className="form__label">
-          Resolution
-        </label>
-        <select id="resolution" className="form__input" value={resolution} onChange={handleResChange}>
-          {generateResolutions(tillingGrid).map((res) => {
-            return (
-              <option key={res} value={res}>
-                {res}
-              </option>
-            );
-          })}
-        </select>
+        <Select
+          label="Resolution"
+          options={generateResolutions(tillingGrid).map((res) => ({
+            name: res,
+            value: res,
+          }))}
+          onChange={handleResChange}
+          selected={resolution}
+          buttonClassNames="mb-2"
+        />
 
         <label htmlFor="bucket-name" className="form__label">
           Bucket Name
         </label>
         <input
           id="bucket-name"
-          className="form__input"
+          className="form__input mb-2"
           placeholder="(Required) Write your S3 bucket name here"
           type="text"
           onChange={handleBucketNameChange}
           value={bucketName}
         />
 
-        <div className="label-with-info">
-          <label htmlFor="tile-path" className="form__label" style={{ marginRight: 'auto' }}>
+        <div className="flex items-center justify-between">
+          <label htmlFor="tile-path" className="form__label">
             Tile Path {cogOutput ? '(Required)' : ''}
           </label>
           <Tooltip
@@ -177,7 +197,7 @@ const BatchOptions = ({
         </label>
         <input
           id="batch-description"
-          className="form__input"
+          className="form__input mb-2"
           type="text"
           placeholder="(Optional) Add a short description to your request"
           onChange={handleDescriptionChange}
@@ -185,8 +205,8 @@ const BatchOptions = ({
           autoComplete="off"
         />
 
-        <div className="toggle-with-label">
-          <label htmlFor="cogOutput" className="form__label">
+        <div className="flex items-center mb-2">
+          <label htmlFor="cogOutput" className="form__label cursor-pointer mr-2">
             COG Output
           </label>
           <Toggle
@@ -204,8 +224,8 @@ const BatchOptions = ({
 
         {cogOutput && !createCollection ? <CogParameters /> : null}
 
-        <div className="toggle-with-label">
-          <label htmlFor="create-collection" className="form__label">
+        <div className="flex items-center mb-2">
+          <label htmlFor="create-collection" className="form__label mr-2">
             Create Collection?
           </label>
           <Toggle
@@ -221,7 +241,7 @@ const BatchOptions = ({
           />
         </div>
 
-        <div className="label-with-info">
+        <div className="flex items-center mb-2">
           <label htmlFor="batch-collection-id" className="form__label" style={{ marginRight: 'auto' }}>
             Collection Id
           </label>
@@ -236,12 +256,12 @@ const BatchOptions = ({
           disabled={createCollection}
           value={collectionId}
           onChange={handleCollectionIdChange}
-          className="form__input"
+          className="form__input mb-2"
           placeholder="(Optional) Write your collection id"
         />
 
-        <div className="label-with-info">
-          <label htmlFor="batch-overwrite" className="form__label">
+        <div className="flex items-center">
+          <label htmlFor="batch-overwrite" className="form__label mr-2">
             Overwrite
           </label>
           <Toggle
@@ -257,7 +277,7 @@ const BatchOptions = ({
           />
         </div>
 
-        <div className="buttons-container">
+        <div className="flex items-center flex-wrap mt-2">
           <GetLowResPreviewButton />
           <CreateBatchRequestButton
             setFetchedRequests={setFetchedRequests}

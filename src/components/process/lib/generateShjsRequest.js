@@ -3,7 +3,6 @@ import { isEmpty } from '../../../utils/commonUtils';
 import {
   S2L2A,
   S2L1C,
-  L8L1C,
   LOTL1,
   LOTL2,
   S1GRD,
@@ -13,16 +12,18 @@ import {
   MODIS,
   DEM,
   CUSTOM,
-  DATAFUSION,
+  LTML1,
+  LTML2,
 } from '../../../utils/const/const';
 import { isBbox, isPolygon } from '../../common/Map/utils/crsTransform';
 
 const datasourceToSHJSLayer = {
   [S2L2A]: 'S2L2ALayer',
   [S2L1C]: 'S2L1CLayer',
-  [L8L1C]: 'Landsat8AWSLayer',
-  [LOTL1]: '<not yet supported>',
-  [LOTL2]: '<not yet supported>',
+  [LOTL1]: 'Landsat8AWSLOTL1Layer',
+  [LOTL2]: 'Landsat8AWSLOTL2Layer',
+  [LTML1]: 'Landsat45AWSLTML1Layer',
+  [LTML2]: 'Landsat45AWSLTML2Layer',
   [S1GRD]: 'S1GRDAWSEULayer',
   [S3OLCI]: 'S3OLCILayer',
   [S3SLSTR]: 'S3SLSTRLayer',
@@ -30,7 +31,6 @@ const datasourceToSHJSLayer = {
   [MODIS]: 'MODISLayer',
   [DEM]: 'DEMLayer',
   [CUSTOM]: 'BYOCLayer',
-  [DATAFUSION]: 'ProcessingDataFusionLayer',
 };
 
 const crsToSHJSCrs = {
@@ -43,6 +43,7 @@ const getShjsCrs = (crs) => {
   if (res === undefined) {
     return '<CRS-NOT-SUPPORTED>';
   }
+  return res;
 };
 
 const formatToSHJS = {
@@ -58,18 +59,19 @@ const locationToSHJSLocation = {
 };
 
 const getSHJSImports = (reqState, selectedCrs) => {
-  const layer = datasourceToSHJSLayer[reqState.datasource];
+  const usedDataCol = reqState.dataCollections.length > 1 ? 'DATAFUSION' : reqState.dataCollections[0].type;
+  const layer = datasourceToSHJSLayer[usedDataCol];
   let imports = layer + `, setAuthToken, ApiType, MimeTypes, ${getShjsCrs(selectedCrs)}, BBox`;
 
   //If Byoc, location is needed
-  if (reqState.datasource === CUSTOM) {
+  if (usedDataCol === CUSTOM) {
     imports += ', LocationIdSHv3';
   }
 
   //If datafusion, need to import other layers too.
-  if (reqState.datasource === DATAFUSION) {
-    imports += `, ${datasourceToSHJSLayer[reqState.datafusionSources[0].datasource]}, ${
-      datasourceToSHJSLayer[reqState.datafusionSources[1].datasource]
+  if (usedDataCol === 'DATAFUSION') {
+    imports += `, ${datasourceToSHJSLayer[reqState.dataCollections[0].type]}, ${
+      datasourceToSHJSLayer[reqState.dataCollections[1].type]
     }`;
   }
 
@@ -109,9 +111,11 @@ const getSHJSOptions = (reqState, idx = 0) => {
   // Iterate through the different options and write non DEFAULT ones.
   const dataFilterOptions = reqState.dataFilterOptions[idx].options;
   const processingOptions = reqState.processingOptions[idx].options;
+  const hasS1Layer = reqState.dataCollections.find((dc) => dc.type === S1GRD);
+  const customLayer = reqState.dataCollections.find((dc) => dc.type === CUSTOM);
   // If S1, add default options since shjs always need the options
   let dataFilterOptionsWithDefaults = dataFilterOptions;
-  if (reqState.datasource === S1GRD) {
+  if (hasS1Layer) {
     dataFilterOptionsWithDefaults = addDefaultOptionsS1IfNeeded(dataFilterOptions);
   }
   if (!isEmpty(dataFilterOptionsWithDefaults)) {
@@ -130,23 +134,23 @@ const getSHJSOptions = (reqState, idx = 0) => {
   }
 
   // If byoc, need to specify location + collectionId
-  if (reqState.datasource === CUSTOM) {
+  if (customLayer) {
     shjsOptions =
       shjsOptions +
-      `\n  locationId: LocationIdSHv3.${locationToSHJSLocation[reqState.byocLocation]},\n  collectionId: '${
-        reqState.byocCollectionId
-      }'`;
+      `\n  locationId: LocationIdSHv3.${
+        locationToSHJSLocation[customLayer.byocCollectionLocation]
+      },\n  collectionId: '${customLayer.byocCollectionId}'`;
   }
   return shjsOptions;
 };
 
 const getShJSLayers = (reqState) => {
   let stringLayer = '';
-
+  const isOnDatafusion = reqState.dataCollections.length > 1;
   //if datafusion need to create previous layers and layers array.
-  if (reqState.datasource === DATAFUSION) {
-    reqState.datafusionSources.forEach((source, idx) => {
-      const datafusionLayer = datasourceToSHJSLayer[source.datasource];
+  if (isOnDatafusion) {
+    reqState.dataCollections.forEach((source, idx) => {
+      const datafusionLayer = datasourceToSHJSLayer[source.type];
       stringLayer =
         stringLayer +
         `const layer${idx} = new ${datafusionLayer}({
@@ -161,27 +165,26 @@ const getShJSLayers = (reqState) => {
 const layers = [
   {
     layer: layer0,
-    id: '${reqState.datafusionSources[0].id}',
+    id: '${reqState.dataCollections[0].id}',
     timeFrom: new Date('${reqState.timeFrom[0]}'),
     timeTo: new Date('${reqState.timeTo[0]}')
   },
   {
     layer: layer1,
-    id: '${reqState.datafusionSources[1].id}',
+    id: '${reqState.dataCollections[1].id}',
     timeFrom: new Date('${reqState.timeFrom[1] ? reqState.timeFrom[1] : reqState.timeFrom[0]}'),
     timeTo: new Date('${reqState.timeTo[1] ? reqState.timeTo[1] : reqState.timeTo[0]}')
   }
 ]
 `;
-    const layer = datasourceToSHJSLayer[reqState.datasource];
     stringLayer =
       stringLayer +
-      `const layer = new ${layer}({
+      `const layer = new ProcessingDataFusionLayer({
   evalscript: evalscript,
   layers: layers
 });`;
   } else {
-    const layer = datasourceToSHJSLayer[reqState.datasource];
+    const layer = datasourceToSHJSLayer[reqState.dataCollections[0].type];
     stringLayer =
       stringLayer +
       `const layer = new ${layer}({

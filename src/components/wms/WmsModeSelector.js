@@ -10,39 +10,39 @@ const WmsModeSelector = ({ mode }) => {
 
   return (
     <>
-      <h2 className="heading-secondary u-margin-bottom-small">Service</h2>
-      <div className="wms-mode-selector">
+      <h2 className="heading-secondary">Service</h2>
+      <div className="flex items-center mb-2">
         <input
           id="wms-mode"
           onChange={handleWmsModeChange}
-          className="form__input"
+          className="form__input w-fit"
           type="radio"
           value="WMS"
           checked={mode === 'WMS'}
         />
-        <label htmlFor="wms-mode" className="form__label">
+        <label htmlFor="wms-mode" className="form__label mr-2">
           WMS
         </label>
         <input
           id="fis"
           onChange={handleWmsModeChange}
-          className="form__input"
+          className="form__input w-fit"
           type="radio"
           value="FIS"
           checked={mode === 'FIS'}
         />
-        <label htmlFor="fis" className="form__label">
+        <label htmlFor="fis" className="form__label mr-2">
           FIS
         </label>
         <input
           id="wcs"
           onChange={handleWmsModeChange}
-          className="form__input"
+          className="form__input w-fit"
           type="radio"
           value="WCS"
           checked={mode === 'WCS'}
         />
-        <label htmlFor="wcs" className="form__label">
+        <label htmlFor="wcs" className="form__label mr-2">
           WCS
         </label>
       </div>

@@ -6,8 +6,7 @@ import {
   DATASOURCES_NAMES,
   OUTPUT_FORMATS,
   CUSTOM,
-  DATAFUSION,
-  NEW_DATASOURCES_TO_OLD_MAP,
+  OLD_DATASOURCES_TO_NEW_MAP,
 } from '../../../utils/const/const';
 import { CRS } from '../../../utils/const/constMap';
 import { calculateMaxMetersPerPixel } from '../../common/Map/utils/bboxRatio';
@@ -75,67 +74,64 @@ const dispatchTimeRange = (parsedBody) => {
   }
 };
 
-const handleDatafusionParsing = (parsedBody) => {
-  store.dispatch(requestSlice.actions.setDatasource(DATAFUSION));
-  let dataFusionSources = [];
-  parsedBody.input.data.forEach((data) => {
-    let datasource = data.type;
-    datasource = getDataCollection(datasource);
-    dataFusionSources.push({ datasource, id: data.id ? data.id : '' });
-  });
-  store.dispatch(requestSlice.actions.setDatafusionSourcesAbs(dataFusionSources));
-};
-
-const handleOldByocParsing = (parsedBody) => {
-  // {type: 'CUSTOM', dataFilter: {collectionId: <id>}}
-  store.dispatch(requestSlice.actions.setByocCollectionType('BYOC'));
-  if (parsedBody.input.data[0].dataFilter.collectionId) {
+const handleOldByocParsing = (parsedBody, idx) => {
+  store.dispatch(requestSlice.actions.setByocCollectionType({ idx, type: 'BYOC' }));
+  if (parsedBody.input.data[idx]?.dataFilter?.collectionId) {
     store.dispatch(
-      requestSlice.actions.setByocCollectionId(parsedBody.input.data[0].dataFilter.collectionId),
+      requestSlice.actions.setByocCollectionId({ idx, id: parsedBody.input.data[0].dataFilter.collectionId }),
     );
   }
 };
 
-const handleByocParsing = (datasource) => {
+const handleByocParsing = (dataObject, idx) => {
   // {type: byoc-<id>}
-  const [type, ...rest] = datasource.split('-');
-  store.dispatch(requestSlice.actions.setDatasource(CUSTOM));
-  store.dispatch(requestSlice.actions.setByocCollectionId(rest.join('-')));
-  store.dispatch(requestSlice.actions.setByocCollectionType(type.toUpperCase()));
+  const dataCollection = dataObject.type;
+  const [type, ...rest] = dataCollection.split('-');
+  store.dispatch(requestSlice.actions.setDataCollection({ idx, dataCollection: CUSTOM }));
+  store.dispatch(requestSlice.actions.setByocCollectionId({ idx, id: rest.join('-') }));
+  store.dispatch(requestSlice.actions.setByocCollectionType({ idx, type: type.toUpperCase() }));
 };
 
-const getDataCollection = (datasource) => {
+export const getProperDataCollectionType = (datasource) => {
   const validDatasource = DATASOURCES_NAMES.find((d) => d === datasource);
   if (validDatasource !== undefined) {
     return validDatasource;
   }
-  const newDataCollection = Object.keys(NEW_DATASOURCES_TO_OLD_MAP).find((d) => d === datasource);
-  if (newDataCollection !== undefined) {
-    return NEW_DATASOURCES_TO_OLD_MAP[newDataCollection];
+  const oldDataCol = Object.keys(OLD_DATASOURCES_TO_NEW_MAP).find((d) => d === datasource);
+  if (oldDataCol !== undefined) {
+    return OLD_DATASOURCES_TO_NEW_MAP[oldDataCol];
   }
   return undefined;
 };
 
 export const dispatchDatasource = (parsedBody) => {
-  try {
-    if (parsedBody.input.data.length > 1) {
-      handleDatafusionParsing(parsedBody);
-      return;
-    }
-    const datasource = parsedBody.input.data[0].type;
-    const usedDataCollection = getDataCollection(datasource);
-    store.dispatch(requestSlice.actions.setDatasource(usedDataCollection));
-    if (usedDataCollection === CUSTOM) {
-      handleOldByocParsing(parsedBody);
-      return;
-    }
-    if (datasource.includes('byoc-') || datasource.includes('batch-')) {
-      handleByocParsing(datasource);
-      return;
-    }
-  } catch (err) {
-    console.error('Error while parsing datasources', err);
+  const data = parsedBody.input?.data;
+  if (data === undefined) {
+    return;
   }
+  if (data.length > 0)
+    data.forEach((dataObject, idx) => {
+      if (idx > 0) {
+        // add data collection;
+        store.dispatch(requestSlice.actions.addDataCollection());
+      }
+      const { type } = dataObject;
+      const dataCollection = getProperDataCollectionType(type);
+      if (dataCollection) {
+        store.dispatch(requestSlice.actions.setDataCollection({ idx, dataCollection }));
+      }
+      if (dataObject.id !== undefined) {
+        store.dispatch(requestSlice.actions.setDataCollectionId({ idx, id: dataObject.id }));
+      }
+      if (type === CUSTOM) {
+        handleOldByocParsing(parsedBody, idx);
+        return;
+      }
+      if (type.includes('byoc-') || type.includes('batch-')) {
+        handleByocParsing(dataObject, idx);
+        return;
+      }
+    });
 };
 
 // Should keep ratio if dimension are close to 5% to geometry ratio.

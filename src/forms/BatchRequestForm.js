@@ -7,6 +7,7 @@ import MapContainer from '../components/common/Map/MapContainer';
 import BatchInformation from '../components/batch/BatchInformation';
 import TimeRangeContainer from '../components/common/TimeRange/TimeRangeContainer';
 import BatchOutput from '../components/batch/BatchOutput';
+import RunningRequestIndicator from '../components/common/RunningRequestIndicator';
 
 const BatchRequestForm = () => {
   const [fetchedRequests, setFetchedRequests] = useState([]);
@@ -37,7 +38,7 @@ const BatchRequestForm = () => {
         </div>
       </div>
 
-      <div className="process-second-row u-margin-bottom-medium">
+      <div className="process-second-row mb-4">
         <div className="process-second-row-first-item">
           <EvalscriptEditor />
         </div>
@@ -72,6 +73,7 @@ const BatchRequestForm = () => {
           />
         </div>
       </div>
+      <RunningRequestIndicator />
     </div>
   );
 };

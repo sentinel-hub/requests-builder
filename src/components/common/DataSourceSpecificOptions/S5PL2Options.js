@@ -3,13 +3,14 @@ import store from '../../../store';
 import requestSlice from '../../../store/request';
 import { connect } from 'react-redux';
 import BaseOptionsNoCC from './BaseOptionsNoCC';
+import Select from '../Select';
 
 const S5PL2Options = ({ reduxTimeliness, reduxMinQa, idx }) => {
   const [minQa, setMinQa] = useState('50');
   const [enableMinQa, setEnableMinQa] = useState(false);
 
-  const handleTimelinessChange = (e) => {
-    store.dispatch(requestSlice.actions.setDataFilterOptions({ timeliness: e.target.value, idx: idx }));
+  const handleTimelinessChange = (value) => {
+    store.dispatch(requestSlice.actions.setDataFilterOptions({ timeliness: value, idx: idx }));
   };
 
   const handleMinQaChange = (e) => {
@@ -33,48 +34,42 @@ const S5PL2Options = ({ reduxTimeliness, reduxMinQa, idx }) => {
   return (
     <>
       <BaseOptionsNoCC idx={idx} />
-      <label htmlFor={`timeliness-${idx}`} className="form__label u-margin-top-tiny">
-        Timeliness
-      </label>
-      <select
-        id={`timeliness-${idx}`}
-        className="form__input"
+      <Select
+        label="Timeliness"
         onChange={handleTimelinessChange}
-        value={reduxTimeliness}
-      >
-        <option value="DEFAULT">Default</option>
-        <option value="NRTI">NRTI</option>
-        <option value="OFFL">OFFL</option>
-        <option value="RPRO">RPRO</option>
-      </select>
-      <label htmlFor={`min-qa-${idx}`} className="form__label">
+        selected={reduxTimeliness}
+        options={[
+          { value: 'DEFAULT', name: 'Default' },
+          { value: 'NRTI', name: 'NRTI' },
+          { value: 'OFFL', name: 'OFFL' },
+          { value: 'RPRO', name: 'RPRO' },
+        ]}
+      />
+
+      <label htmlFor={`min-qa-${idx}`} className="form__label block">
         MinQa
       </label>
-      <div className="minqa-option">
+      <div className="flex">
         <input
           id={`min-qa-${idx}`}
           disabled={!enableMinQa}
-          className="form__input form__input--range"
-          style={{ display: 'inline-block' }}
+          className="form__input form__input--range inline-block mb-2"
           type="range"
           min="0"
           max="100"
           value={minQa}
           onChange={handleMinQaChange}
         />
-        <p className="text" style={{ display: 'inline-block', marginBottom: '0.8rem', marginLeft: '1rem' }}>
-          {minQa !== 'DEFAULT' ? minQa + ' %' : ''}
-        </p>
-        <div className="minqa-option--checkbox">
+        <p className="text inline-block mb-2 ml-2">{minQa !== 'DEFAULT' ? minQa + ' %' : ''}</p>
+        <div className="flex ml-4">
           <input
             id={`enable-minQa-${idx}`}
-            className="form__input"
-            style={{ display: 'inline-block', marginRight: '1rem' }}
+            className="form__input inline-block mb-2"
             type="checkbox"
             checked={enableMinQa}
             onChange={handleDisableMinQa}
           />
-          <label htmlFor={`enable-minQa-${idx}`} className="text" style={{ display: 'inline-block' }}>
+          <label htmlFor={`enable-minQa-${idx}`} className="text block">
             {enableMinQa ? 'Default' : 'Enable'}
           </label>
         </div>

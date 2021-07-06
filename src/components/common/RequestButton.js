@@ -2,6 +2,8 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import Axios from 'axios';
 import Mousetrap from 'mousetrap';
 import ConfirmDialog from './ConfirmDialog';
+import store from '../../store';
+import requestSlice from '../../store/request';
 
 //Abstraction of button that sends a request.
 const RequestButton = ({
@@ -10,6 +12,7 @@ const RequestButton = ({
   args,
   validation,
   className,
+  additionalClassNames = [],
   responseHandler,
   errorHandler,
   disabledTitle,
@@ -20,6 +23,7 @@ const RequestButton = ({
   dialogText,
   style,
   requestConfiguration = {},
+  shouldTriggerIsRunningRequest = false,
 }) => {
   const [isFetching, setIsFetching] = useState(false);
   const [openedConfirmDialog, setOpenedConfirmDialog] = useState(false);
@@ -47,6 +51,9 @@ const RequestButton = ({
           setOpenedConfirmDialog(false);
         }
         setIsFetching(true);
+        if (shouldTriggerIsRunningRequest) {
+          store.dispatch(requestSlice.actions.setIsRunningRequest(true));
+        }
         sourceRef.current = Axios.CancelToken.source();
         const reqConfig = {
           ...requestConfiguration,
@@ -56,6 +63,9 @@ const RequestButton = ({
         if (res.data || res.status === 204) {
           setIsFetching(false);
           await responseHandler(res.data, res.config?.data);
+          if (shouldTriggerIsRunningRequest) {
+            store.dispatch(requestSlice.actions.setIsRunningRequest(false));
+          }
         }
       } catch (err) {
         if (!Axios.isCancel(err)) {
@@ -64,6 +74,9 @@ const RequestButton = ({
             errorHandler(err);
           } else {
             console.error(err);
+          }
+          if (shouldTriggerIsRunningRequest) {
+            store.dispatch(requestSlice.actions.setIsRunningRequest(false));
           }
         }
       }
@@ -89,13 +102,15 @@ const RequestButton = ({
   }, [useShortcut, handleSendRequest, validation]);
 
   const generateClassName = () => {
+    let cl;
     if (!validation) {
-      return className + '--disabled';
+      cl = className + '--disabled';
     } else if (validation && isFetching) {
-      return className + '--cancel';
+      cl = className + '--cancel';
     } else if (validation && !isFetching) {
-      return className + '--active';
+      cl = className + '--active';
     }
+    return cl + ' ' + additionalClassNames.join(' ');
   };
 
   return (

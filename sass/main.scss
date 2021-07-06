@@ -1,39 +1,23 @@
 // imports here
 // ex: @import "abstract/functions";
-// to run: npm run watch:sass -> App.css
+// to run: npm run watch:sass -> App2.css
 
 @import "abstract/variables";
 @import "abstract/mixins";
-@import "base/base";
-@import "base/typography";
-@import "base/utilities";
 
-//layout
-@import "layout/header";
-@import "layout/app";
-@import "components/button";
-@import "components/form";
+// Components
 @import "components/map";
-@import "components/textarea";
-@import "components/validator";
-@import "components/output";
-@import "components/s5pl2options";
-@import "components/label-checkbox";
-@import "components/heading-with-button";
+@import "components/codemirror";
 @import "components/alert";
 @import "components/info";
 @import "components/toggle";
 @import "components/table";
-@import "components/buttons-container";
 @import "components/overlay-response";
-@import "components/input-with-item";
-@import "components/map-button";
-@import "components/close-span";
 @import "components/confirm-dialog";
-@import "components/info-banner";
 @import "components/saved-requests";
-@import "components/statistical-response";
-@import "components/timerange-input";
+@import "components/scrollbar";
+
+// Layouts of each page
 @import "pages/process";
 @import "pages/batch";
 @import "pages/tpdi";

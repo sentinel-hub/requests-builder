@@ -6,7 +6,7 @@ import { faExpandArrowsAlt } from '@fortawesome/free-solid-svg-icons';
 const OverlayButton = ({ elementRef }) => {
   const { openOverlay } = useOverlayComponent(elementRef);
   return (
-    <i className="clickable-icon" onClick={openOverlay}>
+    <i className="cursor-pointer flex items-center" onClick={openOverlay}>
       <FontAwesomeIcon icon={faExpandArrowsAlt} />
     </i>
   );

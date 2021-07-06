@@ -2,7 +2,7 @@ import React from 'react';
 
 const Toggle = ({ onChange, className, id, checked, name, defaultChecked, style, disabled = false }) => {
   return (
-    <div className={className ? className : ''} style={style}>
+    <div className={className ? className + 'flex' : 'flex'} style={style}>
       <label className="switch">
         <input
           defaultChecked={defaultChecked}

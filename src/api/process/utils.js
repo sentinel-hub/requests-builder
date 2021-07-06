@@ -2,24 +2,33 @@ import axios from 'axios';
 import { isBbox, isMultiPolygon, isPolygon } from '../../components/common/Map/utils/crsTransform';
 import { getRequestBody, getUrlFromCurl } from '../../components/process/requests/parseRequest';
 import { isEmpty } from '../../utils/commonUtils';
-import { CUSTOM, DATAFUSION, DATASOURCES } from '../../utils/const/const';
+import { CUSTOM, DATASOURCES } from '../../utils/const/const';
 import { CRS } from '../../utils/const/constMap';
 
-export const byocLocationToBaseUrl = (location) => {
-  if (location === 'EU-CENTRAL-1') {
-    return 'https://services.sentinel-hub.com/';
-  } else if (location === 'US-WEST-2') {
-    return 'https://services-uswest2.sentinel-hub.com/';
+const byocLocationToBaseUrl = (location) => {
+  switch (location) {
+    case 'aws-eu-central-1':
+      return 'https://services.sentinel-hub.com/';
+    case 'aws-us-west-2':
+      return 'https://services-uswest2.sentinel-hub.com/';
+    case 'creo':
+      return 'https://creodias.sentinel-hub.com/';
+    case 'codede':
+      return 'https://code-de.sentinel-hub.com';
+    default:
+      return 'https://services.sentinel-hub.com/';
   }
-  return 'https://services.sentinel-hub.com/';
+};
+
+const getUrlForCollection = (type) => {
+  if (type === CUSTOM) {
+    return byocLocationToBaseUrl(type) + 'api/v1/process';
+  }
+  return DATASOURCES[type].url + '/process';
 };
 
 export const getUrl = (requestState) => {
-  if (requestState.datasource === CUSTOM) {
-    return byocLocationToBaseUrl(requestState.byocLocation) + 'api/v1/process';
-  } else {
-    return DATASOURCES[requestState.datasource].url + '/process';
-  }
+  return getUrlForCollection(requestState.dataCollections[0].type);
 };
 
 export const getJSONRequestBody = (reqState, mapState, formated = true) => {
@@ -96,31 +105,24 @@ export const getEvalscriptDebuggerHelper = (evalscript) => {
 };
 
 const getRequestData = (reqState) => {
-  if (reqState.datasource === DATAFUSION) {
-    return reqState.datafusionSources.map((source, idx) => ({
-      type: source.datasource,
-      id: source.id,
+  const { dataCollections } = reqState;
+  const isDatafusion = dataCollections.length > 1;
+  return dataCollections.map((dataCol, idx) => {
+    const { type } = dataCol;
+    const dataObj = {
       ...getDataFilter(reqState, idx),
       ...getProcessingOptions(reqState, idx),
-    }));
-  }
-  if (reqState.datasource === CUSTOM) {
-    return [
-      {
-        type: `${reqState.byocCollectionType.toLowerCase()}-${reqState.byocCollectionId}`,
-        ...getDataFilter(reqState),
-        ...getProcessingOptions(reqState),
-      },
-    ];
-  } else {
-    return [
-      {
-        type: reqState.datasource,
-        ...getDataFilter(reqState),
-        ...getProcessingOptions(reqState),
-      },
-    ];
-  }
+    };
+    if (type === CUSTOM) {
+      dataObj.type = `${dataCol.byocCollectionType.toLowerCase()}-${dataCol.byocCollectionId}`;
+    } else {
+      dataObj.type = type;
+    }
+    if (isDatafusion) {
+      dataObj.id = dataCol.id;
+    }
+    return dataObj;
+  });
 };
 
 const getDataFilter = (requestState, idx) => {

@@ -74,12 +74,12 @@ const CalculationHistogram = ({ histogram, histIdx, idx }) => {
   };
 
   return (
-    <div style={{ padding: '0 0 0.5rem 1rem' }}>
-      <label className="form__label">Apply to</label>
+    <div className="pl-2">
+      <label className="form__label block">Apply to</label>
       <select
         value={isSpecifyingBand ? 'specific' : 'default'}
         onChange={handleSelectBandName}
-        className="form__input"
+        className="form__input mb-2"
       >
         <option value="default">All bands</option>
         <option value="specific">Specify band</option>
@@ -95,10 +95,10 @@ const CalculationHistogram = ({ histogram, histIdx, idx }) => {
         />
       )}
 
-      <label className="form__label">Specify</label>
-      <div className="u-flex-between u-margin-bottom-small">
+      <label className="form__label block">Specify</label>
+      <div className="flex justify-between mb-2">
         <button
-          className={`secondary-button ${
+          className={`secondary-button h-full ${
             histogramBinsMethod === 'NBINS' ? 'secondary-button--disabled' : ''
           }`}
           value="NBINS"
@@ -113,7 +113,6 @@ const CalculationHistogram = ({ histogram, histIdx, idx }) => {
             histogramBinsMethod === 'BINWIDTH' ? 'secondary-button--disabled' : ''
           }`}
           value="BINWIDTH"
-          style={{ margin: '1rem' }}
           onClick={handleHistogramTextParamChange}
           name="histogramBinsMethod"
         >
@@ -133,7 +132,7 @@ const CalculationHistogram = ({ histogram, histIdx, idx }) => {
         <>
           <label className="form__label">Number of bins</label>
           <input
-            className="form__input"
+            className="form__input mb-2"
             value={histogram.nBins}
             name="nBins"
             type="text"
@@ -144,7 +143,7 @@ const CalculationHistogram = ({ histogram, histIdx, idx }) => {
       )}
       {histogramBinsMethod === 'BINWIDTH' && (
         <>
-          <label className="form__label">Bin Width</label>
+          <label className="form__label block">Bin Width</label>
           <input
             className="form__input"
             value={histogram.binWidth}
@@ -159,7 +158,7 @@ const CalculationHistogram = ({ histogram, histIdx, idx }) => {
         <>
           <label className="form__label">Low Edge (optional)</label>
           <input
-            className="form__input"
+            className="form__input mb-2"
             value={histogram.lowEdge}
             type="text"
             name="lowEdge"
@@ -168,7 +167,7 @@ const CalculationHistogram = ({ histogram, histIdx, idx }) => {
           />
           <label className="form__label">High Edge (optional)</label>
           <input
-            className="form__input"
+            className="form__input mb-2"
             value={histogram.highEdge}
             type="text"
             name="highEdge"
@@ -179,7 +178,7 @@ const CalculationHistogram = ({ histogram, histIdx, idx }) => {
       )}
       {histogramBinsMethod === 'BINS' && (
         <>
-          <label className="form__label">Bins array</label>
+          <label className="form__label block">Bins array</label>
           <input
             className="form__input"
             value={histogram.bins?.toString()}
@@ -190,12 +189,12 @@ const CalculationHistogram = ({ histogram, histIdx, idx }) => {
         </>
       )}
       <button
-        className="secondary-button secondary-button--cancel secondary-button--fit"
+        className="secondary-button secondary-button--cancel w-fit mt-2"
         onClick={handleDeleteHistogram}
       >
         Delete Histogram
       </button>
-      <hr style={{ margin: '1rem 0' }} />
+      <hr className="my-2" />
     </div>
   );
 };

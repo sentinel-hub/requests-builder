@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import RequestButton from '../common/RequestButton';
 import { errorHandlerTPDI } from './TPDIOrderOptions';
 import OrderInfo, { OrdersTooltip } from './OrderInfo';
@@ -15,7 +15,7 @@ const groupAggregator = (el) => {
   return el.status;
 };
 
-const TPDIOrdersContainer = ({ token, setGetOrdersResponse, orders, setOrders }) => {
+const TPDIOrdersContainer = ({ token, setGetOrdersResponse, orders, setOrders, productsLength }) => {
   const containerRef = useRef();
   const runningRef = useRef();
   const finishedRef = useRef();
@@ -85,10 +85,14 @@ const TPDIOrdersContainer = ({ token, setGetOrdersResponse, orders, setOrders })
   }, [orders.length]);
 
   const { FINISHED, CREATED, RUNNING } = groupBy(orders, groupAggregator);
+
+  const maxHeight = useMemo(() => {
+    return 550 + productsLength * 55 + 'px';
+  }, [productsLength]);
   return (
     <>
-      <div className="u-expand-title">
-        <div className="u-flex-aligned" style={{ marginBottom: '0.5rem' }}>
+      <div className="flex justify-between items-center w-11/12">
+        <div className="flex items-center" style={{ marginBottom: '0.5rem' }}>
           <h2 className="heading-secondary" style={{ marginRight: '3rem' }}>
             My Orders
           </h2>
@@ -96,8 +100,8 @@ const TPDIOrdersContainer = ({ token, setGetOrdersResponse, orders, setOrders })
         </div>
         <OverlayButton elementRef={containerRef} />
       </div>
-      <div className="form" style={{ overflowY: 'scroll', maxHeight: '500px' }} ref={containerRef}>
-        <div className="u-margin-bottom-small">
+      <div className="form" style={{ overflowY: 'scroll', maxHeight }} ref={containerRef}>
+        <div className="mb-2">
           <RequestButton
             request={TpdiResource.getOrders}
             args={[null]}
@@ -112,7 +116,7 @@ const TPDIOrdersContainer = ({ token, setGetOrdersResponse, orders, setOrders })
         <h3 className="heading-secondary">Created Orders (Not confirmed)</h3>
         <div style={{ marginLeft: '1rem', marginTop: '1rem', marginBottom: '1rem' }}>
           {CREATED === undefined || CREATED.length === 0 ? (
-            <p className="text u-margin-bottom-small">No orders found</p>
+            <p className="text mb-2">No orders found</p>
           ) : (
             CREATED.map((order) => (
               <OrderInfo
@@ -131,7 +135,7 @@ const TPDIOrdersContainer = ({ token, setGetOrdersResponse, orders, setOrders })
         <h3 className="heading-secondary">Running Orders</h3>
         <div style={{ marginLeft: '1rem', marginTop: '1rem', marginBottom: '1rem' }} ref={runningRef}>
           {RUNNING === undefined || RUNNING.length === 0 ? (
-            <p className="text u-margin-bottom-small">No orders found</p>
+            <p className="text mb-2">No orders found</p>
           ) : (
             RUNNING.map((order) => (
               <OrderInfo
@@ -150,7 +154,7 @@ const TPDIOrdersContainer = ({ token, setGetOrdersResponse, orders, setOrders })
         <h3 className="heading-secondary">Finished Orders</h3>
         <div style={{ marginLeft: '1rem', marginTop: '1rem', marginBottom: '1rem' }} ref={finishedRef}>
           {FINISHED === undefined || FINISHED.length === 0 ? (
-            <p className="text u-margin-bottom-small">No orders found</p>
+            <p className="text mb-2">No orders found</p>
           ) : (
             FINISHED.map((order) => (
               <OrderInfo
@@ -172,6 +176,7 @@ const TPDIOrdersContainer = ({ token, setGetOrdersResponse, orders, setOrders })
 
 const mapStateToProps = (state) => ({
   token: state.auth.user.access_token,
+  productsLength: state.tpdi.products.length,
 });
 
 export default connect(mapStateToProps)(TPDIOrdersContainer);

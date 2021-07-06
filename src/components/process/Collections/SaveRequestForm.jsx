@@ -22,9 +22,9 @@ const SaveRequestForm = ({ stringRequest, response, mode, hasSavedRequest, setHa
     setRequestName(e.target.value);
   };
   return (
-    <div className="save-request-form">
-      <form className="u-flex-column-centered" style={{ width: '70%' }} onSubmit={handleSaveRequest}>
-        <label className="form__label u-margin-top-small" htmlFor="name-request-input">
+    <div className="flex flex-col items-center justify-center max-w-xl pb-2 mb-1 border-b lg:flex-row">
+      <form className="flex flex-col items-center" style={{ width: '70%' }} onSubmit={handleSaveRequest}>
+        <label className="form__label mt-2" htmlFor="name-request-input">
           Request name (optional)
         </label>
         <input
@@ -32,7 +32,7 @@ const SaveRequestForm = ({ stringRequest, response, mode, hasSavedRequest, setHa
           value={requestName}
           type="text"
           placeholder="Add an optional name to your saved request"
-          className="form__input"
+          className="form__input mb-2"
           id="name-request-input"
           onChange={handleNameRequestChange}
         />
@@ -43,7 +43,7 @@ const SaveRequestForm = ({ stringRequest, response, mode, hasSavedRequest, setHa
           {hasSavedRequest ? 'Saved' : 'Save Request'}
         </button>
       </form>
-      <div className="info-banner u-margin-top-tiny">
+      <div className="info-banner mr-2">
         <p>
           Saved requests will only last until the page is refreshed! Remember to export your requests before
           closing the tab.

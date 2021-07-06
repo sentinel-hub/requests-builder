@@ -1,5 +1,5 @@
 .App { /* stylelint-disable-line */
-  padding: 2rem;
+  padding: 1rem;
 
   @include respond(tab-port) {
     padding: 0;
@@ -11,8 +11,7 @@
   display: flex;
   align-items: stretch;
   height: 100%;
-  overflow-y: hidden;
-  margin-bottom: 3rem;
+  margin-bottom: 1rem;
 
   &-first-item {
     display: flex;
@@ -21,6 +20,7 @@
 
     @include respond(tab-port) {
       width: 100%;
+      margin-bottom: 1rem;
     }
   }
 
@@ -31,6 +31,7 @@
 
     @include respond(tab-port) {
       width: 100%;
+      margin-bottom: 1rem;
     }
 
     button {
@@ -52,14 +53,6 @@
   @include respond(tab-port) {
     flex-direction: column;
   }
-}
-
-.timerange {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
-  margin-bottom: 2rem;
 }
 
 .output {
@@ -101,17 +94,6 @@
   height: 100%;
 }
 
-.map-container {
-  display: flex;
-  justify-content: space-between;
-  height: 100%;
-  align-items: stretch;
-
-  @include respond(tab-land) {
-    flex-direction: column;
-  }
-}
-
 //Second row
 .process-second-row {
   display: flex;
@@ -126,6 +108,7 @@
 
     @include respond(tab-port) {
       width: 100%;
+      margin-bottom: 1rem;
     }
   }
 
@@ -147,6 +130,7 @@
 
     @include respond(tab-port) {
       width: 100%;
+      margin-bottom: 1rem;
     }
   }
 
@@ -182,22 +166,5 @@
   overflow-y: scroll;
   display: flex;
   flex-direction: column;
-  width: 100%;
-}
-
-.request-preview-buttons {
-  margin-bottom: 1.5rem;
-  display: flex;
-  align-items: center;
-
-  & * {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-    margin-left: 0 !important;
-    margin-right: 1rem;
-  }
-}
-
-.process-request-preview {
   width: 100%;
 }

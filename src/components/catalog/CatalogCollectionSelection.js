@@ -6,13 +6,13 @@ import Axios from 'axios';
 import { addWarningAlert } from '../../store/alert';
 import CatalogResource from '../../api/catalog/CatalogResource';
 import { CATALOG_OPTIONS } from './const';
+import Select from '../common/Select';
 
 const generateCollectionsOptions = (collections) =>
-  collections.map((collection) => (
-    <option key={collection.id} value={collection.id}>
-      {collection.title}
-    </option>
-  ));
+  collections.map((collection) => ({
+    value: collection.id,
+    name: collection.title,
+  }));
 
 const CatalogCollectionSelection = ({ token, selectedCollection, deploymentUrl }) => {
   const [collections, setCollections] = useState([]);
@@ -36,7 +36,7 @@ const CatalogCollectionSelection = ({ token, selectedCollection, deploymentUrl }
           setIsFetchingCollections(false);
         }
       } catch (err) {
-        if (!Axios.isCancel(err)) {
+        if (Axios.isCancel(err)) {
           console.error(err);
         } else {
           addWarningAlert('Something went wrong');
@@ -56,12 +56,12 @@ const CatalogCollectionSelection = ({ token, selectedCollection, deploymentUrl }
     };
   }, [token, deploymentUrl]);
 
-  const handleSelectedCollectionChange = (e) => {
-    store.dispatch(catalogSlice.actions.setSelectedCollection(e.target.value));
+  const handleSelectedCollectionChange = (value) => {
+    store.dispatch(catalogSlice.actions.setSelectedCollection(value));
   };
 
-  const handleDeploymentChange = (e) => {
-    store.dispatch(catalogSlice.actions.setDeploymentUrl(e.target.value));
+  const handleDeploymentChange = (value) => {
+    store.dispatch(catalogSlice.actions.setDeploymentUrl(value));
   };
 
   if (!token) {
@@ -69,44 +69,45 @@ const CatalogCollectionSelection = ({ token, selectedCollection, deploymentUrl }
       <>
         <h2 className="heading-secondary">Collections</h2>
         <div className="form">
-          <p className="text">Log in to use this!</p>;
+          <p className="text">Log in to use this!</p>
         </div>
       </>
     );
   }
-
   return (
     <>
       <h2 className="heading-secondary">Collections</h2>
       <div className="form">
-        <label className="form__label">Deployment</label>
-        <select className="form__input" value={deploymentUrl} onChange={handleDeploymentChange}>
-          <option value="">Select a deployment</option>
-          {CATALOG_OPTIONS.map((opt) => (
-            <option value={opt.url} key={opt.url}>
-              {opt.name}
-            </option>
-          ))}
-        </select>
+        <Select
+          selected={deploymentUrl}
+          buttonClassNames="mb-2"
+          label="Deployment"
+          options={[
+            { name: 'Select a deployment', value: '' },
+            ...CATALOG_OPTIONS.map((opt) => ({
+              value: opt.url,
+              name: opt.name,
+            })),
+          ]}
+          onChange={handleDeploymentChange}
+        />
 
-        <label className="form__label">Collection</label>
         {deploymentUrl !== '' ? (
           isFetchingCollections ? (
             <p className="text">Fetching collections...</p>
           ) : (
-            <select
-              id="catalog-collection"
-              value={selectedCollection}
+            <Select
+              label="Data Collection"
+              selected={selectedCollection}
+              buttonClassNames="mb-2"
+              options={[
+                { name: 'Select a collection', value: '' },
+                ...generateCollectionsOptions(collections),
+              ]}
               onChange={handleSelectedCollectionChange}
-              className="form__input"
-            >
-              <option value="">Select a Collection</option>
-              {generateCollectionsOptions(collections)}
-            </select>
+            />
           )
-        ) : (
-          <p className="text">Select a deployment to see the collections</p>
-        )}
+        ) : null}
       </div>
     </>
   );

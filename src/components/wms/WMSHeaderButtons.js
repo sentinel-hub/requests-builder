@@ -4,7 +4,7 @@ import AuthHeader from '../common/AuthHeader';
 
 const WMSHeaderButtons = () => {
   return (
-    <div className="header__buttons">
+    <div className="flex">
       <SendWmsRequest />
       <AuthHeader />
     </div>

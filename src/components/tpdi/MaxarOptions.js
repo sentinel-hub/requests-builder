@@ -23,9 +23,9 @@ const MaxarOptions = ({
       <label htmlFor="maxar-maxcc" className="form__label">
         Max Cloud Coverage
       </label>
-      <div className="u-flex-aligned u-margin-bottom-tiny">
+      <div className="flex items-center">
         <input
-          className="form__input form__input--range"
+          className="form__input mb-2 form__input--range"
           id="maxar-maxcc"
           onChange={handleParamChange('maxCloudCoverage', true)}
           type="range"
@@ -40,9 +40,9 @@ const MaxarOptions = ({
       <label htmlFor="maxar-minnadir" className="form__label">
         Min Off Nadir
       </label>
-      <div className="u-flex-aligned u-margin-bottom-tiny">
+      <div className="flex items-center">
         <input
-          className="form__input form__input--range"
+          className="form__input mb-2 form__input--range"
           id="maxar-minnadir"
           onChange={handleParamChange('minOffNadir', true)}
           type="range"
@@ -57,9 +57,9 @@ const MaxarOptions = ({
       <label htmlFor="maxar-maxnadir" className="form__label">
         Max Off Nadir
       </label>
-      <div className="u-flex-aligned u-margin-bottom-tiny">
+      <div className="flex items-center">
         <input
-          className="form__input form__input--range"
+          className="form__input mb-2 form__input--range"
           id="maxar-maxnadir"
           onChange={handleParamChange('maxOffNadir', true)}
           type="range"
@@ -74,9 +74,9 @@ const MaxarOptions = ({
       <label htmlFor="maxar-minsun" className="form__label">
         Min Sun Elevation
       </label>
-      <div className="u-flex-aligned u-margin-bottom-tiny">
+      <div className="flex items-center">
         <input
-          className="form__input form__input--range"
+          className="form__input mb-2 form__input--range"
           id="maxar-minsun"
           onChange={handleParamChange('minSunElevation', true)}
           type="range"
@@ -91,9 +91,9 @@ const MaxarOptions = ({
       <label htmlFor="maxar-maxsun" className="form__label">
         Max Sun Elevation
       </label>
-      <div className="u-flex-aligned u-margin-bottom-tiny">
+      <div className="flex items-center">
         <input
-          className="form__input form__input--range"
+          className="form__input mb-2 form__input--range"
           id="maxar-maxsun"
           onChange={handleParamChange('maxSunElevation', true)}
           type="range"
@@ -109,7 +109,7 @@ const MaxarOptions = ({
         Sensor
       </label>
       <select
-        className="form__input"
+        className="form__input mb-2"
         id="maxar-sensor"
         value={sensor === null ? '' : sensor}
         onChange={handleParamChange('sensor')}

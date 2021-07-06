@@ -65,12 +65,14 @@ const SendWmsRequest = ({ wmsState, requestState, mapState, token, mode }) => {
     <RequestButton
       buttonText="Send Request"
       className="button"
+      additionalClassNames={['mr-2']}
       request={request}
       args={[wmsState, requestState, mapState, token]}
       validation={validateWmsSendRequest()}
       responseHandler={mode === 'WMS' || mode === 'WCS' ? responseHandler : responseHandlerFis}
       errorHandler={errorHandler}
-      useShortcut={true}
+      useShortcut
+      shouldTriggerIsRunningRequest
     />
   );
 };
