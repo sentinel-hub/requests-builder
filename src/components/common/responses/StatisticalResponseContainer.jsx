@@ -5,10 +5,12 @@ import OgcFisResponse from '../../wms/FisResponse';
 import StatisticalResponse from '../../statistical/response/StatisticalResponse';
 import { isEmpty } from '../../../utils/commonUtils';
 
-const StatisticalResponseContainer = ({ statisticalResponse, request }) => {
+const StatisticalResponseContainer = ({ statisticalResponse, mode }) => {
   const containerRef = useRef();
   const [downloadUrl, setDownloadUrl] = useState();
   const isEmptyResponse = isEmpty(statisticalResponse);
+  const isValidStatApiResponse = Boolean(statisticalResponse?.data?.length);
+  const isFisResponse = mode === 'WMS';
 
   useEffect(() => {
     let srcUrl;
@@ -24,17 +26,15 @@ const StatisticalResponseContainer = ({ statisticalResponse, request }) => {
     // eslint-disable-next-line
   }, []);
 
-  const responseData = statisticalResponse?.data ? statisticalResponse.data[0] : null;
-
-  if (!responseData && isEmptyResponse) {
-    return <p className="text text--warning">Error: NO DATA!</p>;
-  }
-
-  if (!responseData && !isEmptyResponse) {
+  if (isFisResponse) {
     return <OgcFisResponse statisticalResponse={statisticalResponse} url={downloadUrl} />;
   }
 
-  if (statisticalResponse.status === 'FAILED') {
+  if (!statisticalResponse || isEmptyResponse) {
+    return <p className="text text--warning">Error: NO DATA!</p>;
+  }
+
+  if (statisticalResponse.status === 'FAILED' || !isValidStatApiResponse) {
     return <p className="text text--warning">Something went wrong.</p>;
   }
 

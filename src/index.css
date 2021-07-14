@@ -85,6 +85,7 @@
   @variants responsive {
     .w-fit {
       width: fit-content;
+      width: -moz-fit-content;
     }
     .h-fit {
       height: fit-content;

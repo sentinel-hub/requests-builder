@@ -12,6 +12,7 @@ import { getSHPYCode } from './lib/generateShPyRequest';
 
 import CommonRequestPreview from '../common/CommonRequestPreview';
 import { getJSONRequestBody, sendEditedRequest } from '../../api/process/utils';
+import { addWarningAlert } from '../../store/alert';
 
 const handleParseRequest = (text) => {
   try {
@@ -42,6 +43,7 @@ const handleParseRequest = (text) => {
     }
   } catch (err) {
     console.error('Error while parsing the request', err);
+    addWarningAlert('Error while parsing the request, most likely invalid JSON');
   }
 };
 

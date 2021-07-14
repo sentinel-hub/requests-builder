@@ -155,3 +155,17 @@ export const getLatLngFromBbox = (bbox) => {
     [maxY, maxX],
   ];
 };
+
+const areAllNumbers = (arr) =>
+  Boolean(
+    arr?.reduce((acc, cv) => {
+      if (typeof cv !== 'number') {
+        acc = false;
+      }
+      return acc;
+    }, true),
+  );
+export const isValidBbox = (bbox) => bbox.length === 4 && areAllNumbers(bbox);
+
+export const isValidGeometry = (geometry) =>
+  (isPolygon(geometry) || isMultiPolygon(geometry)) && areAllNumbers(geometry.coordinates?.flat(Infinity));

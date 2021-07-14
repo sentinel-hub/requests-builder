@@ -90,7 +90,6 @@ const requestSlice = createSlice({
     },
     removeDataCollection: (state, action) => {
       const { idx } = action.payload;
-      console.log(idx);
       state.dataCollections = state.dataCollections
         .slice(0, idx)
         .concat(state.dataCollections.slice(idx + 1));

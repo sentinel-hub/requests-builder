@@ -24,17 +24,22 @@ const ConfirmDialog = ({ dialogText, onConfirm, onDecline }) => {
   }, [onDecline]);
 
   return (
-    <div className="confirm-dialog">
-      <div ref={ref} className="confirm-dialog-container">
-        <FontAwesomeIcon className="confirm-dialog-icon" icon={faExclamation} />
+    <div className="z-50 fixed top-0 left-0 w-full h-full bg-gray-400 bg-opacity-50 flex justify-center items-center">
+      <div
+        ref={ref}
+        className="bg-white w-80 h-fit flex flex-col items-center justify-center rounded-md p-8 shadow-xl"
+      >
+        <FontAwesomeIcon className="text-3xl text-yellow-600 m-3" icon={faExclamation} />
         {dialogText.split('\n').map((line, idx) => (
-          <p key={idx}>{line}</p>
+          <p key={idx} className="mb-2 text-center text-lg">
+            {line}
+          </p>
         ))}
-        <div className="confirm-dialog-buttons">
-          <button onClick={onConfirm} className="secondary-button">
+        <div className="flex items-end w-full justify-evenly m-2">
+          <button onClick={onConfirm} className="secondary-button w-20">
             Yes
           </button>
-          <button onClick={onDecline} className="secondary-button secondary-button--cancel">
+          <button onClick={onDecline} className="secondary-button secondary-button--cancel w-20">
             No
           </button>
         </div>

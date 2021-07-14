@@ -53,7 +53,7 @@ const OverlayResponse = ({
       );
     }
     if (fisResponse) {
-      return <StatisticalResponseContainer statisticalResponse={fisResponse} stringRequest={stringRequest} />;
+      return <StatisticalResponseContainer statisticalResponse={fisResponse} mode={mode} />;
     }
     return (
       <ImageResponse

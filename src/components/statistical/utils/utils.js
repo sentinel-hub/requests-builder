@@ -8,6 +8,7 @@ import {
   dispatchAdvancedOptions,
 } from '../../process/requests/parseRequest';
 import { isWritingDecimal } from '../../../utils/stringUtils';
+import { addSuccessAlert, addWarningAlert } from '../../../store/alert';
 
 export const statisticalRequestStateSelector = (state) => ({
   token: state.auth.user.access_token,
@@ -31,13 +32,20 @@ export const handleStatisticalParse = (text) => {
     dispatchStatisticsState(request);
   } catch (err) {
     console.error('Something went wrong while parsing the request', err);
+    addWarningAlert('Error parsing the request json');
   }
 };
 
 const dispatchStatisticsState = (request) => {
   dispatchAggregation(request.aggregation);
-  dispatchCalculations(request.calculations);
-  dispatchInput(request.input);
+  const calcsError = dispatchCalculations(request.calculations);
+  const inputErrors = dispatchInput(request.input);
+  const errors = inputErrors.concat(calcsError).filter((er) => er);
+  if (errors.length > 0) {
+    addWarningAlert(inputErrors.concat(errors).join('\n'), 5000);
+  } else {
+    addSuccessAlert('Successfully parsed');
+  }
 };
 
 const dispatchAggregation = (aggregation) => {
@@ -87,38 +95,43 @@ const dispatchCalculations = (calculations) => {
       return 'BINWIDTH';
     }
   };
-  const stateCalculations = Object.entries(calculations).map(([key, value]) => {
-    return {
-      outputName: key,
-      histograms: value.histograms
-        ? Object.entries(value.histograms).map(([key, value]) => {
-            return {
-              ...initialHistogramState,
-              histogramBandName: key,
-              histogramBinsMethod: getHistogramMethod(value),
-              ...value,
-            };
-          })
-        : [],
-      statistics: value.statistics
-        ? Object.entries(value.statistics).map(([key, value]) => {
-            return {
-              statisticsBandName: key,
-              k: value.percentiles?.k ?? [],
-              interpolation: value.percentiles?.interpolation ?? 'higher',
-            };
-          })
-        : [],
-    };
-  });
+  try {
+    const stateCalculations = Object.entries(calculations).map(([key, value]) => {
+      return {
+        outputName: key,
+        histograms: value.histograms
+          ? Object.entries(value.histograms).map(([key, value]) => {
+              return {
+                ...initialHistogramState,
+                histogramBandName: key,
+                histogramBinsMethod: getHistogramMethod(value),
+                ...value,
+              };
+            })
+          : [],
+        statistics: value.statistics
+          ? Object.entries(value.statistics).map(([key, value]) => {
+              return {
+                statisticsBandName: key,
+                k: value.percentiles?.k ?? [],
+                interpolation: value.percentiles?.interpolation ?? 'higher',
+              };
+            })
+          : [],
+      };
+    });
 
-  store.dispatch(statisticalSlice.actions.setCalculationsAbsolute(stateCalculations));
+    store.dispatch(statisticalSlice.actions.setCalculationsAbsolute(stateCalculations));
+  } catch (err) {
+    return 'Error while parsing calculations';
+  }
 };
 
 const dispatchInput = (input) => {
   dispatchBounds({ input });
   dispatchDatasource({ input });
-  dispatchAdvancedOptions({ input });
+  const optionsErr = dispatchAdvancedOptions({ input });
+  return [optionsErr].filter((err) => err);
 };
 
 export const inputToNumber = (value) => {

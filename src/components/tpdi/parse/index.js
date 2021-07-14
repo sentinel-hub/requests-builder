@@ -5,6 +5,7 @@ import omit from 'lodash.omit';
 import { constellationToStateConstellation } from '../utils';
 import mapSlice from '../../../store/map';
 import { crsUrlToCrsKey } from '../../../utils/const/constMap';
+
 const dispatchBounds = (bounds) => {
   if (bounds.bbox) {
     const bbox = bounds.bbox;

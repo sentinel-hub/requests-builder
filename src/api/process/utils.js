@@ -20,16 +20,18 @@ const byocLocationToBaseUrl = (location) => {
   }
 };
 
-const getUrlForCollection = (type) => {
+const getUrlForCollection = (type, location) => {
   if (type === CUSTOM) {
-    return byocLocationToBaseUrl(type) + 'api/v1/process';
+    return byocLocationToBaseUrl(location) + 'api/v1/process';
   }
   return DATASOURCES[type].url + '/process';
 };
 
-export const getUrl = (requestState) => {
-  return getUrlForCollection(requestState.dataCollections[0].type);
-};
+export const getUrl = (requestState) =>
+  getUrlForCollection(
+    requestState.dataCollections[0].type,
+    requestState.dataCollections[0].byocCollectionLocation,
+  );
 
 export const getJSONRequestBody = (reqState, mapState, formated = true) => {
   const requestBody = getRequestObject(reqState, mapState);

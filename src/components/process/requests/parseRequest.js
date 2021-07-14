@@ -1,5 +1,6 @@
 import omit from 'lodash.omit';
 import store from '../../../store';
+import { addWarningAlert } from '../../../store/alert';
 import mapSlice from '../../../store/map';
 import requestSlice from '../../../store/request';
 import {
@@ -10,15 +11,12 @@ import {
 } from '../../../utils/const/const';
 import { CRS } from '../../../utils/const/constMap';
 import { calculateMaxMetersPerPixel } from '../../common/Map/utils/bboxRatio';
+import { isValidBbox, isValidGeometry } from '../../common/Map/utils/crsTransform';
 
 const dispatchEvalscript = (parsedBody) => {
-  try {
-    const { evalscript } = parsedBody;
-    if (evalscript) {
-      store.dispatch(requestSlice.actions.setEvalscript(evalscript));
-    }
-  } catch (err) {
-    console.error('Error while parsing evalscript', err);
+  const { evalscript } = parsedBody;
+  if (evalscript) {
+    store.dispatch(requestSlice.actions.setEvalscript(evalscript));
   }
 };
 
@@ -26,9 +24,9 @@ export const crsByUrl = (url) => Object.keys(CRS).find((key) => CRS[key].url ===
 
 export const dispatchBounds = (parsedBody) => {
   try {
-    let bounds = parsedBody.input.bounds;
+    let bounds = parsedBody.input?.bounds;
     //crs
-    const crsUrl = bounds.properties?.crs ?? undefined;
+    const crsUrl = bounds?.properties?.crs ?? undefined;
     let selectedCrs;
     if (crsUrl) {
       selectedCrs = crsByUrl(crsUrl);
@@ -39,38 +37,49 @@ export const dispatchBounds = (parsedBody) => {
     //is bbox
     if (bounds.bbox) {
       let geometry = bounds.bbox;
-      store.dispatch(mapSlice.actions.setConvertedGeometryWithCrs({ geometry, crs: selectedCrs }));
+      if (isValidBbox(bounds.bbox)) {
+        store.dispatch(mapSlice.actions.setConvertedGeometryWithCrs({ geometry, crs: selectedCrs }));
+      } else {
+        throw Error('Unvalid bbox');
+      }
     }
     //polygon
     else if (bounds.geometry) {
-      let geometry = bounds.geometry;
-      store.dispatch(mapSlice.actions.setConvertedGeometryWithCrs({ geometry, crs: selectedCrs }));
+      if (isValidGeometry(bounds.geometry)) {
+        let geometry = bounds.geometry;
+        store.dispatch(mapSlice.actions.setConvertedGeometryWithCrs({ geometry, crs: selectedCrs }));
+      } else {
+        throw Error('Unable to parse geometry');
+      }
     }
   } catch (err) {
-    console.error('Error while parsing geometry', err);
+    return err.message ?? 'Error while parsing geometry';
   }
 };
 
 const dispatchTimeRange = (parsedBody) => {
   try {
-    const validTimeRanges = parsedBody.input.data
-      .map((bodyInputData) => {
-        let timeRange = bodyInputData.dataFilter?.timeRange;
-        let timeTo = timeRange?.to;
-        let timeFrom = timeRange?.from;
-        if (timeTo && timeFrom) {
-          return { timeTo, timeFrom };
-        }
-        return undefined;
-      })
-      .filter((t) => t);
-    if (validTimeRanges.length > 0) {
+    const validTimeRanges = parsedBody.input?.data
+      ? parsedBody.input?.data
+          .map((bodyInputData) => {
+            let timeRange = bodyInputData.dataFilter?.timeRange;
+            let timeTo = timeRange?.to;
+            let timeFrom = timeRange?.from;
+            if (timeTo && timeFrom) {
+              return { timeTo, timeFrom };
+            }
+            return undefined;
+          })
+          .filter((t) => t)
+      : undefined;
+    if (validTimeRanges && validTimeRanges.length > 0) {
       store.dispatch(requestSlice.actions.setTimeRanges(validTimeRanges));
     } else {
       store.dispatch(requestSlice.actions.disableTimerange(true));
     }
   } catch (err) {
-    console.error('Error while parsing timerange', err);
+    const errMsg = 'Error while parsing timerange';
+    return errMsg;
   }
 };
 
@@ -146,14 +155,19 @@ const shouldKeepRatio = (geometry, width, height) => {
 };
 
 const dispatchDimensions = (parsedBody) => {
-  try {
-    const {
-      output,
-      input: { bounds },
-    } = parsedBody;
-    const width = output.width;
-    const height = output.height;
-    const geometry = bounds.geometry ? bounds.geometry : bounds.bbox;
+  const output = parsedBody.output;
+  const bounds = parsedBody.input?.bounds;
+  if (output === undefined) {
+    return;
+  }
+  const width = output.width;
+  const height = output.height;
+  const geometry = bounds.geometry ? bounds.geometry : bounds.bbox;
+
+  if (height && width && typeof height === 'number' && typeof width === 'number') {
+    store.dispatch(requestSlice.actions.setHeightOrRes('HEIGHT'));
+    store.dispatch(requestSlice.actions.setWidth(width));
+    store.dispatch(requestSlice.actions.setHeight(height));
     const keepRatio = shouldKeepRatio(geometry, width, height);
 
     if (keepRatio) {
@@ -161,23 +175,16 @@ const dispatchDimensions = (parsedBody) => {
     } else {
       store.dispatch(requestSlice.actions.setIsAutoRatio(false));
     }
-    if (height && width) {
-      store.dispatch(requestSlice.actions.setHeightOrRes('HEIGHT'));
-      store.dispatch(requestSlice.actions.setWidth(width));
-      store.dispatch(requestSlice.actions.setHeight(height));
-    }
+  }
 
-    const resx = output.resx;
-    const resy = output.resy;
+  const resx = output.resx;
+  const resy = output.resy;
 
-    if (resx && resy) {
-      store.dispatch(requestSlice.actions.setIsOnAutoRes(false));
-      store.dispatch(requestSlice.actions.setHeightOrRes('RES'));
-      store.dispatch(requestSlice.actions.setWidth(resx));
-      store.dispatch(requestSlice.actions.setHeight(resy));
-    }
-  } catch (err) {
-    console.error('Error while parsing dimensions', err);
+  if (resx && resy && typeof resx === 'number' && typeof resy === 'number') {
+    store.dispatch(requestSlice.actions.setIsOnAutoRes(false));
+    store.dispatch(requestSlice.actions.setHeightOrRes('RES'));
+    store.dispatch(requestSlice.actions.setWidth(resx));
+    store.dispatch(requestSlice.actions.setHeight(resy));
   }
 };
 
@@ -186,23 +193,20 @@ const dispatchResponses = (parsedBody) => {
   const validFormat = (formatString) => {
     return Boolean(OUTPUT_FORMATS.find((format) => format.value === formatString));
   };
-
-  try {
-    const responses = parsedBody.output.responses;
-    if (responses && responses.length > 0) {
-      const validResponses = responses
-        .map((resp, idx) => {
-          if (validFormat(resp.format.type)) {
-            return { identifier: resp.identifier, format: resp.format.type, idx: idx };
-          } else {
-            return undefined;
-          }
-        })
-        .filter((n) => n);
+  const responses = parsedBody.output?.responses;
+  if (responses && responses.length > 0) {
+    const validResponses = responses
+      .map((resp, idx) => {
+        if (validFormat(resp.format.type)) {
+          return { identifier: resp.identifier, format: resp.format.type, idx: idx };
+        } else {
+          return undefined;
+        }
+      })
+      .filter((n) => n);
+    if (validResponses.length > 0) {
       store.dispatch(requestSlice.actions.setResponses(validResponses));
     }
-  } catch (err) {
-    console.error('Error while parsing responses', err);
   }
 };
 
@@ -210,7 +214,7 @@ export const dispatchAdvancedOptions = (parsedBody) => {
   // timeRange and collectionId are handled somewhere else.
   const omittedDataFilterProperties = ['collectionId', 'timeRange'];
   try {
-    if (parsedBody.input.data.length > 0) {
+    if (parsedBody.input?.data?.length > 0) {
       parsedBody.input.data.forEach((data, idx) => {
         const dataFilterOptions = omit(data.dataFilter, omittedDataFilterProperties);
 
@@ -227,19 +231,30 @@ export const dispatchAdvancedOptions = (parsedBody) => {
       });
     }
   } catch (err) {
-    console.error('Error while parsing advanced options', err);
+    const errMsg = 'Error while parsing advanced options';
+    console.error(errMsg, err);
+    return errMsg;
   }
 };
 
 export const dispatchChanges = (parsedBody, resetMode = false) => {
   store.dispatch(requestSlice.actions.resetState({ resetMode }));
+  let errors = [];
   dispatchEvalscript(parsedBody);
-  dispatchBounds(parsedBody);
-  dispatchTimeRange(parsedBody);
+  errors.push(dispatchBounds(parsedBody));
+  errors.push(dispatchTimeRange(parsedBody));
+
   dispatchDatasource(parsedBody);
+
   dispatchDimensions(parsedBody);
+
   dispatchResponses(parsedBody);
-  dispatchAdvancedOptions(parsedBody);
+
+  errors.push(dispatchAdvancedOptions(parsedBody));
+  errors = errors.filter((err) => err);
+  if (errors.length > 0) {
+    addWarningAlert(errors.join('\n'), 5000);
+  }
 };
 
 // Return the json body of a curl command.
