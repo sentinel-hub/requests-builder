@@ -6,12 +6,13 @@ import alertSlice, { addSuccessAlert, addWarningAlert } from './store/alert';
 import authSlice from './store/auth';
 import paramsSlice from './store/params';
 import savedRequestsSlice from './store/savedRequests';
-import { setBaseUrlAxiosInterpector } from './utils/configureAxios';
 
 export const configureParams = async (params) => {
   if (params['set-url']) {
-    store.dispatch(paramsSlice.actions.setCustomUrl(params['set-url']));
-    setBaseUrlAxiosInterpector(params['set-url']);
+    store.dispatch(paramsSlice.actions.setUrl(params['set-url']));
+  }
+  if (params['set-auth-url']) {
+    store.dispatch(paramsSlice.actions.setOAuthUrl(params['set-auth-url']));
   }
   if (params['collection-link']) {
     const link = params['collection-link'];

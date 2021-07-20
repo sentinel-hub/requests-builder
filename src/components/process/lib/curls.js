@@ -2,9 +2,9 @@ import omit from 'lodash.omit';
 import {
   getJSONRequestBody,
   getRequestObject,
-  getUrl,
   getEvalscriptDebuggerHelper,
 } from '../../../api/process/utils';
+import { getProcessUrl } from '../../../api/url';
 
 const getToken = (token) => {
   if (token) {
@@ -32,7 +32,7 @@ const generateHeadersForMultipartCurl = (reqState, token) => {
 
 export const generateProcessCurlCommand = (reqState, mapState, token) => {
   const body = getJSONRequestBody(reqState, mapState);
-  const curlCommand = `curl -X POST ${getUrl(reqState)} \n ${generateHeadersForCurl(
+  const curlCommand = `curl -X POST ${getProcessUrl(reqState)} \n ${generateHeadersForCurl(
     reqState,
     token,
   )} \n -d '${body}'`;
@@ -42,7 +42,7 @@ export const generateProcessCurlCommand = (reqState, mapState, token) => {
 export const generateProcessMultipartCurl = (reqState, mapState, token) => {
   const request = JSON.stringify(omit(getRequestObject(reqState, mapState), ['evalscript']), null, 2);
   const evalscript = getEvalscriptDebuggerHelper(reqState.evalscript);
-  const curlCommand = `curl -X POST ${getUrl(reqState)} \\\n${generateHeadersForMultipartCurl(
+  const curlCommand = `curl -X POST ${getProcessUrl(reqState)} \\\n${generateHeadersForMultipartCurl(
     reqState,
     token,
     true,

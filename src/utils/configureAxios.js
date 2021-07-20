@@ -71,28 +71,6 @@ Axios.interceptors.request.use(
   },
 );
 
-export const setBaseUrlAxiosInterpector = (url) => {
-  Axios.interceptors.request.use(
-    (config) => {
-      const originalUrl = new URL(config.url);
-      let newUrl;
-      if (url.slice(-1) === '/') {
-        newUrl = url + originalUrl.pathname.slice(1);
-      } else {
-        newUrl = url + originalUrl.pathname;
-      }
-      if (originalUrl.search) {
-        newUrl = newUrl + originalUrl.search;
-      }
-      config.url = newUrl;
-      return config;
-    },
-    (error) => {
-      return Promise.reject(error);
-    },
-  );
-};
-
 export const edcResponseInterceptor = () => {
   Axios.interceptors.response.use(
     (response) => {

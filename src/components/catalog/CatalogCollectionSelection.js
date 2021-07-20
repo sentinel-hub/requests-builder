@@ -5,7 +5,7 @@ import catalogSlice from '../../store/catalog';
 import Axios from 'axios';
 import { addWarningAlert } from '../../store/alert';
 import CatalogResource from '../../api/catalog/CatalogResource';
-import { CATALOG_OPTIONS } from './const';
+import { getCatalogOptions } from './const';
 import Select from '../common/Select';
 
 const generateCollectionsOptions = (collections) =>
@@ -84,7 +84,7 @@ const CatalogCollectionSelection = ({ token, selectedCollection, deploymentUrl }
           label="Deployment"
           options={[
             { name: 'Select a deployment', value: '' },
-            ...CATALOG_OPTIONS.map((opt) => ({
+            ...getCatalogOptions().map((opt) => ({
               value: opt.url,
               name: opt.name,
             })),

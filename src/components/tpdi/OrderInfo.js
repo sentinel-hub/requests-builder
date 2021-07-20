@@ -16,6 +16,7 @@ import { addSuccessAlert, addWarningAlert } from '../../store/alert';
 import CopyIcon from '../common/CopyIcon';
 import TpdiResource from '../../api/tpdi/TpdiResource';
 import { formatNumber } from '../../utils/commonUtils';
+import { getMessageFromApiError } from '../../api';
 
 const getColorByStatus = (status) => {
   if (status === 'PARTIAL') {
@@ -26,6 +27,7 @@ const getColorByStatus = (status) => {
   }
   return undefined;
 };
+
 const TooltipInfo = ({ isGeneral }) => {
   return (
     <div>
@@ -188,6 +190,9 @@ const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder, expandO
                   responseHandler={handleConfirm}
                   useConfirmation={true}
                   dialogText="Are you sure you want to confirm this order?"
+                  errorHandler={(err) => {
+                    addWarningAlert(getMessageFromApiError(err));
+                  }}
                 />
               )}
               <button className="secondary-button" onClick={handleSeeGeometry}>
@@ -203,6 +208,9 @@ const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder, expandO
                   useConfirmation={true}
                   dialogText="Are you sure you want to delete this order?"
                   validation={true}
+                  errorHandler={(err) => {
+                    addWarningAlert(getMessageFromApiError(err));
+                  }}
                 />
               )}
               <button className="secondary-button" onClick={handleParseRequest}>

@@ -12,6 +12,9 @@ import {
   CUSTOM,
   LTML1,
   LTML2,
+  LETML1,
+  LMSSL1,
+  LETML2,
 } from '../../../utils/const/const';
 import { generateSHBbox } from './generateShjsRequest';
 import { isBbox, isPolygon } from '../../common/Map/utils/crsTransform';
@@ -101,6 +104,10 @@ const datasourceToSHPYDatasource = (dataCollection, requestState) => {
       return 'DataCollection.SENTINEL5P';
     case CUSTOM:
       return `DataCollection.define_byoc('${dataCollection.byocCollectionId}')`;
+    case LETML1:
+    case LETML2:
+    case LMSSL1:
+      return '<Not yet supported>';
     default:
       return '';
   }

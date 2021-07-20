@@ -37,6 +37,7 @@ export const tpdiCreateOrderBodyViaDataFilter = (state) => {
     requestBody.input = getAirbusSearchRequestBody(state);
   } else if (state.tpdi.provider === 'PLANET') {
     requestBody.input = getPlanetSearchRequestBody(state);
+    requestBody.input.planetApiKey = state.planet.planetApiKey;
     requestBody.input.data[0].harmonizeTo = state.planet.harmonizeTo;
   } else if (state.tpdi.provider === 'MAXAR') {
     requestBody.input = getMaxarSearchRequestBody(state);

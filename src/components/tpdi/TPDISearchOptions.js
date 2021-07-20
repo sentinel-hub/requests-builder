@@ -21,13 +21,7 @@ const generateProviderRelatedOptions = (provider) => {
   }
 };
 
-const validateSearch = (token, state) => {
-  if (state.tpdi.provider === 'PLANET') {
-    return Boolean(token && state.planet.planetApiKey);
-  } else {
-    return Boolean(token);
-  }
-};
+const validateSearch = (token, state) => Boolean(token);
 
 const getDisabledTitle = (token, state) => {
   if (!token) {

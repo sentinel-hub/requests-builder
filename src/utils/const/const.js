@@ -36,6 +36,9 @@ export const OLD_S3OLCI = 'S3OLCI';
 export const OLD_S3SLSTR = 'S3SLSTR';
 export const OLD_S5PL2 = 'S5PL2';
 export const OLD_CUSTOM = 'CUSTOM';
+export const OLD_LMSSL1 = 'LMSSL1';
+export const OLD_LETML1 = 'LETML1';
+export const OLD_LETML2 = 'LETML2';
 
 export const S2L1C = 'sentinel-2-l1c';
 export const S2L2A = 'sentinel-2-l2a';
@@ -49,6 +52,9 @@ export const S3SLSTR = 'sentinel-3-slstr';
 export const S5PL2 = 'sentinel-5p-l2';
 export const LTML1 = 'landsat-tm-l1';
 export const LTML2 = 'landsat-tm-l2';
+export const LMSSL1 = 'landsat-mss-l1';
+export const LETML1 = 'landsat-etm-l1';
+export const LETML2 = 'landsat-etm-l2';
 export const CUSTOM = 'custom';
 
 export const OLD_DATASOURCES_TO_NEW_MAP = {
@@ -62,6 +68,9 @@ export const OLD_DATASOURCES_TO_NEW_MAP = {
   [OLD_S3OLCI]: S3OLCI,
   [OLD_S3SLSTR]: S3SLSTR,
   [OLD_S5PL2]: S5PL2,
+  [OLD_LMSSL1]: LMSSL1,
+  [OLD_LETML1]: LETML1,
+  [OLD_LETML2]: LETML2,
   [OLD_CUSTOM]: CUSTOM,
 };
 
@@ -110,6 +119,27 @@ export const DATASOURCES = {
     url: 'https://services-uswest2.sentinel-hub.com/api/v1',
     ogcUrl: 'https://services-uswest2.sentinel-hub.com/ogc/',
     defaultDatafusionId: 'ltml2',
+    isBatchSupported: false,
+    isStatApiSupported: true,
+  },
+  [LMSSL1]: {
+    url: 'https://services-uswest2.sentinel-hub.com/api/v1',
+    ogcUrl: 'https://services-uswest2.sentinel-hub.com/ogc/',
+    defaultDatafusionId: 'lmssl1',
+    isBatchSupported: false,
+    isStatApiSupported: true,
+  },
+  [LETML1]: {
+    url: 'https://services-uswest2.sentinel-hub.com/api/v1',
+    ogcUrl: 'https://services-uswest2.sentinel-hub.com/ogc/',
+    defaultDatafusionId: 'letml1',
+    isBatchSupported: false,
+    isStatApiSupported: true,
+  },
+  [LETML2]: {
+    url: 'https://services-uswest2.sentinel-hub.com/api/v1',
+    ogcUrl: 'https://services-uswest2.sentinel-hub.com/ogc/',
+    defaultDatafusionId: 'letml2',
     isBatchSupported: false,
     isStatApiSupported: true,
   },
@@ -216,6 +246,9 @@ export const getStatisticalDefaultEvalscript = (datasource) => {
       return DEFAULT_STATISTICAL_LANDSAT_EVALSCRIPT;
     case LTML1:
     case LTML2:
+    case LETML1:
+    case LETML2:
+    case LMSSL1:
       return DEFAULT_STATISTICAL_LTML_EVALSCRIPT;
     case MODIS:
       return DEFAULT_STATISTICAL_MODIS_EVALSCRIPT;
@@ -245,6 +278,9 @@ export const getProcessDefaultEvalscript = (datasource) => {
       return DEFAULT_LANDSAT_EVALSCRIPT;
     case LTML1:
     case LTML2:
+    case LETML1:
+    case LETML2:
+    case LMSSL1:
       return DEFAULT_LTML_EVALSCRIPT;
     case MODIS:
       return DEFAULT_MODIS_EVALSCRIPT;

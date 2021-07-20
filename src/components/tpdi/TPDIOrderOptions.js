@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { MinusCircleIcon } from '@heroicons/react/outline';
+import { MinusCircleIcon, PlusCircleIcon } from '@heroicons/react/outline';
 import store from '../../store';
 import alertSlice from '../../store/alert';
 import TPDIPlaceOrderButton from './TPDIPlaceOrderButton';
@@ -67,6 +67,7 @@ const TPDIOrderOptions = ({
   amountOfFoundProducts,
   harmonizeTo,
   productBundle,
+  apiKey,
 }) => {
   const [limit, setLimit] = useState(10.0);
 
@@ -92,7 +93,7 @@ const TPDIOrderOptions = ({
             type="text"
             className="form__input"
             autoComplete="off"
-            readOnly
+            onChange={(e) => handleProductIdChange(e, prod.idx)}
           />
           {prod.idx !== 0 ? (
             <MinusCircleIcon value={prod.idx} onClick={removeProductId} className="cursor-pointer w-5 ml-3" />
@@ -135,6 +136,22 @@ const TPDIOrderOptions = ({
     } else {
       store.dispatch(planetSlice.actions.setHarmonizeTo('PS2'));
     }
+  };
+  const handleApiKeyChange = (e) => {
+    store.dispatch(planetSlice.actions.setApiKey(e.target.value));
+  };
+
+  const handleProductIdChange = (e, idx) => {
+    store.dispatch(
+      tpdiSlice.actions.setProductId({
+        idx,
+        id: e.target.value,
+      }),
+    );
+  };
+
+  const handleAddEmptyProduct = () => {
+    store.dispatch(tpdiSlice.actions.addEmptyProduct());
   };
   return (
     <>
@@ -231,19 +248,24 @@ const TPDIOrderOptions = ({
           ></Tooltip>
         </div>
 
-        {!isUsingQuery && <label className="form__label inline-block">Added Products (by ID)</label>}
+        {!isUsingQuery && (
+          <div className="flex flex-between w-full">
+            <label className="form__label inline-block">Added Products (by ID)</label>
+            <PlusCircleIcon className="ml-auto cursor-pointer w-6" onClick={handleAddEmptyProduct} />
+          </div>
+        )}
 
         {!isUsingQuery && generateProductIdInputs(products)}
 
         {canClear ? (
-          <button className="secondary-button mb-2" onClick={handleClearProducts}>
+          <button className="secondary-button mb-2 w-fit" onClick={handleClearProducts}>
             Clear Products
           </button>
         ) : null}
 
         {provider === 'PLANET' && (
           <>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-2">
               <div className="flex items-center">
                 <label className="form__label mr-1">Harmonize data</label>
                 <Toggle
@@ -254,6 +276,24 @@ const TPDIOrderOptions = ({
               </div>
               <Tooltip
                 content="Harmonization is not yet supported for surface reflectance products, thus this field must be explicitly set to NONE if productBundle is analytic_sr or analytic_sr_udm2."
+                direction="right"
+              />
+            </div>
+            <label htmlFor="planet-api-key" className="form__label">
+              Planet API Key
+            </label>
+            <div className="flex items-center justify-between">
+              <input
+                id="planet-api-key"
+                placeholder="Your Planet API key"
+                value={apiKey}
+                required
+                type="text"
+                className="form__input mb-2"
+                onChange={handleApiKeyChange}
+              />
+              <Tooltip
+                content="Enter a Planet API key, that you received via email after purchasing a PlanetScope Sentinel Hub Package"
                 direction="right"
               />
             </div>
@@ -282,6 +322,7 @@ const mapStateToProps = (state) => ({
   isUsingQuery: state.tpdi.isUsingQuery,
   harmonizeTo: state.planet.harmonizeTo,
   productBundle: state.planet.productBundle,
+  apiKey: state.planet.planetApiKey,
 });
 
 export default connect(mapStateToProps)(TPDIOrderOptions);

@@ -1,3 +1,4 @@
+import { getBaseUrl, isOnDefaultUrl } from '../../api/url';
 import { S2L2A, S2L1C, S1GRD, S5PL2, S3SLSTR, S3OLCI } from '../../utils/const/const';
 
 export const S2L1C_CATALOG_ID = 'sentinel-2-l1c';
@@ -100,20 +101,21 @@ export const collectionToOptions = {
   [S3SLSTR_CATALOG_ID]: S3SLSTR_CATALOG_OPTIONS,
 };
 
-export const CATALOG_BASE_URL = 'https://services.sentinel-hub.com/api/v1/catalog/';
+export const CATALOG_BASE_URL = () =>
+  isOnDefaultUrl() ? 'https://services.sentinel-hub.com/api/v1/catalog/' : `${getBaseUrl()}/api/v1/catalog/`;
 export const CATALOG_CREO_URL = 'https://creodias.sentinel-hub.com/api/v1/catalog/';
 export const CATALOG_WEST_URL = 'https://services-uswest2.sentinel-hub.com/api/v1/catalog/';
 
-export const CATALOG_OPTIONS = [
-  { url: CATALOG_BASE_URL, name: 'EU' },
+export const getCatalogOptions = () => [
+  { url: CATALOG_BASE_URL(), name: 'EU' },
   { url: CATALOG_CREO_URL, name: 'CREO' },
   { url: CATALOG_WEST_URL, name: 'US-WEST' },
 ];
 
 export const collectionIdToUrl = {
-  [S2L1C_CATALOG_ID]: CATALOG_BASE_URL,
-  [S2L2A_CATALOG_ID]: CATALOG_BASE_URL,
-  [S1GRD_CATALOG_ID]: CATALOG_BASE_URL,
+  [S2L1C_CATALOG_ID]: CATALOG_BASE_URL(),
+  [S2L2A_CATALOG_ID]: CATALOG_BASE_URL(),
+  [S1GRD_CATALOG_ID]: CATALOG_BASE_URL(),
   [LANDSAT_8_CATALOG_ID]: CATALOG_WEST_URL,
   [S5PL2_CATALOG_ID]: CATALOG_WEST_URL,
   [S3OLCI_CATALOG_ID]: CATALOG_CREO_URL,

@@ -1,11 +1,11 @@
 import Api from '..';
 
-const BYOC_BASE_URL = 'https://services.sentinel-hub.com/api/v1/byoc';
+const BYOC_PATH = '/api/v1/byoc';
 
 const { GET } = Api;
 
 const ByocResource = {
-  getCollections: GET(`${BYOC_BASE_URL}/global`),
+  getCollections: GET(`${BYOC_PATH}/global`),
 };
 
 export default ByocResource;

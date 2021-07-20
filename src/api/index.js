@@ -1,10 +1,12 @@
 import axios from 'axios';
+import store from '../store';
 import { isEmpty } from '../utils/commonUtils';
 
 const DEFAULT_ENDPOINT_CONFIG = {
   authenticated: true,
   endpointHeaders: {},
 };
+
 const injectParameters = (urlTemplate, data, hasBody) => {
   if (!urlTemplate.includes(':')) {
     return urlTemplate;
@@ -52,9 +54,9 @@ class Api {
   };
 
   makeMethod(method, hasBody = false) {
-    return (urlTemplate, endpointConfig = DEFAULT_ENDPOINT_CONFIG, contentType = 'application/json') => {
+    return (path, endpointConfig = DEFAULT_ENDPOINT_CONFIG, contentType = 'application/json', isFullUrl) => {
       return (data = undefined, fetchConfig = {}) => {
-        const url = injectParameters(urlTemplate, data, hasBody);
+        const pathWithParams = injectParameters(path, data, hasBody);
         const { authenticated, endpointHeaders } = endpointConfig;
         let headers = {
           Accept: contentType,
@@ -70,27 +72,28 @@ class Api {
           headers = { ...headers, ...authHeaders };
         }
 
-        return this.makeRequest(method, url, headers, data, fetchConfig);
+        return this.makeRequest(method, pathWithParams, headers, data, fetchConfig, isFullUrl);
       };
     };
   }
 
-  makeRequest(method, url, headers, data, extraConfig) {
+  makeRequest(method, pathOrUrl, headers, data, extraConfig, isFullUrl) {
     const config = {
       headers,
       ...extraConfig,
     };
+    const reqUrl = isFullUrl ? pathOrUrl : store.getState().params.url + pathOrUrl;
     switch (method) {
       case 'GET':
-        return axios.get(url, config);
+        return axios.get(reqUrl, config);
       case 'POST':
-        return axios.post(url, data, config);
+        return axios.post(reqUrl, data, config);
       case 'PATCH':
-        return axios.patch(url, data, config);
+        return axios.patch(reqUrl, data, config);
       case 'PUT':
-        return axios.put(url, data, config);
+        return axios.put(reqUrl, data, config);
       case 'DELETE':
-        return axios.delete(url, config);
+        return axios.delete(reqUrl, config);
       default:
         throw Error('UNVALID API METHOD');
     }

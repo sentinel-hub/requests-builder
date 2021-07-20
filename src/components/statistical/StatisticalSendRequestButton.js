@@ -7,9 +7,9 @@ import RequestButton from '../common/RequestButton';
 import { statisticalRequestStateSelector } from './utils/utils';
 import StatisticalResource from '../../api/statistical/StatisticalResource';
 import { getStatisticalRequestBody } from '../../api/statistical/utils';
-import { DATASOURCES } from '../../utils/const/const';
 import { getMessageFromApiError } from '../../api';
 import { isInvalidDatafusionState } from '../../store/request';
+import { getStatisticalUrl } from '../../api/url';
 
 export const statisticsResponseHandler = (response, stringRequest) => {
   if (response === '') {
@@ -66,7 +66,7 @@ const StatisticalSendRequestButton = ({
     <RequestButton
       className="button"
       buttonText="Send Request"
-      request={StatisticalResource.statisticalRequest(DATASOURCES[dataCollections[0].type]?.url)}
+      request={StatisticalResource.statisticalRequest(getStatisticalUrl(dataCollections[0]))}
       additionalClassNames={['mr-2']}
       args={[
         getStatisticalRequestBody(

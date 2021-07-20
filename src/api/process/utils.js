@@ -2,36 +2,8 @@ import axios from 'axios';
 import { isBbox, isMultiPolygon, isPolygon } from '../../components/common/Map/utils/crsTransform';
 import { getRequestBody, getUrlFromCurl } from '../../components/process/requests/parseRequest';
 import { isEmpty } from '../../utils/commonUtils';
-import { CUSTOM, DATASOURCES } from '../../utils/const/const';
+import { CUSTOM } from '../../utils/const/const';
 import { CRS } from '../../utils/const/constMap';
-
-const byocLocationToBaseUrl = (location) => {
-  switch (location) {
-    case 'aws-eu-central-1':
-      return 'https://services.sentinel-hub.com/';
-    case 'aws-us-west-2':
-      return 'https://services-uswest2.sentinel-hub.com/';
-    case 'creo':
-      return 'https://creodias.sentinel-hub.com/';
-    case 'codede':
-      return 'https://code-de.sentinel-hub.com';
-    default:
-      return 'https://services.sentinel-hub.com/';
-  }
-};
-
-const getUrlForCollection = (type, location) => {
-  if (type === CUSTOM) {
-    return byocLocationToBaseUrl(location) + 'api/v1/process';
-  }
-  return DATASOURCES[type].url + '/process';
-};
-
-export const getUrl = (requestState) =>
-  getUrlForCollection(
-    requestState.dataCollections[0].type,
-    requestState.dataCollections[0].byocCollectionLocation,
-  );
 
 export const getJSONRequestBody = (reqState, mapState, formated = true) => {
   const requestBody = getRequestObject(reqState, mapState);

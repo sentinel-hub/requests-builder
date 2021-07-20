@@ -37,7 +37,13 @@ const getProcessingOptionsFromLayer = (layer) => {
 
 const layerToRequestState = (layer, requestState) => {
   const finalReqState = {
-    datasource: layer.datasource,
+    dataCollections: [
+      {
+        type: layer.datasource,
+        byocCollectionType: layer.otherDefaults?.subType ? 'BYOC' : '',
+        byocCollectionId: layer.otherDefaults?.collectionId ?? '',
+      },
+    ],
     timeFrom: requestState.timeFrom,
     timeTo: requestState.timeTo,
     isTimeRangeDisabled: requestState.isTimeRangeDisabled,
@@ -48,8 +54,6 @@ const layerToRequestState = (layer, requestState) => {
     isAutoRatio: requestState.isAutoRatio,
     dataFilterOptions: [{ options: getDataFilterOptionsFromLayer(layer), idx: 0 }],
     processingOptions: [{ options: getProcessingOptionsFromLayer(layer), idx: 0 }],
-    byocCollectionType: layer.otherDefaults?.subType ?? 'BYOC',
-    byocCollectionId: layer.otherDefaults?.collectionId,
     evalscript: layer.styles[0]?.evalScript ?? '',
   };
   return finalReqState;

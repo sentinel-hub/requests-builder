@@ -87,7 +87,7 @@ const TPDIOrdersContainer = ({ token, setGetOrdersResponse, orders, setOrders, p
   const { FINISHED, CREATED, RUNNING } = groupBy(orders, groupAggregator);
 
   const maxHeight = useMemo(() => {
-    return 550 + productsLength * 55 + 'px';
+    return 620 + productsLength * 55 + 'px';
   }, [productsLength]);
   return (
     <>

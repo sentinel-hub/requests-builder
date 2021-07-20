@@ -2,6 +2,7 @@ import axios from 'axios';
 import { isBbox } from '../common/Map/utils/crsTransform';
 import BBox from '@turf/bbox';
 import { DATASOURCES } from '../../utils/const/const';
+import { getBaseUrl, isOnDefaultUrl } from '../../api/url';
 
 const getConfigHelper = (token, reqConfig) => {
   return {
@@ -10,20 +11,6 @@ const getConfigHelper = (token, reqConfig) => {
     },
     ...reqConfig,
   };
-};
-
-const BASE_WMS_URL = 'https://services.sentinel-hub.com/configuration/v1/wms/instances/';
-
-export const getAllInstances = (token, reqConfig) => {
-  const url = BASE_WMS_URL;
-  const config = getConfigHelper(token, reqConfig);
-  return axios.get(url, config);
-};
-
-export const getLayersByInstanceId = (token, instanceId) => {
-  const url = `${BASE_WMS_URL}${instanceId}/layers`;
-  const config = getConfigHelper(token);
-  return axios.get(url, config);
 };
 
 const getPolygonWKT = (geoJsonPolygon) => {
@@ -126,7 +113,12 @@ const getWcsParams = (wmsState) => {
 };
 
 const getServicesEndpoint = (datasource) => {
-  return DATASOURCES[datasource] ? DATASOURCES[datasource].ogcUrl : 'https://services.sentinel-hub.com/ogc/';
+  if (isOnDefaultUrl()) {
+    return DATASOURCES[datasource]
+      ? DATASOURCES[datasource].ogcUrl
+      : 'https://services.sentinel-hub.com/ogc/';
+  }
+  return `${getBaseUrl()}/ogc/`;
 };
 
 export const getWmsUrl = (wmsState, requestState, mapState) => {

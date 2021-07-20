@@ -28,13 +28,6 @@ const tpdiSlice = createSlice({
     setCollectionId: (state, action) => {
       state.collectionId = action.payload;
     },
-    setProduct: (state, action) => {
-      const toChange = state.products.find((prod) => prod.idx === parseInt(action.payload.idx));
-      toChange.id = action.payload.id;
-      if (toChange.geometry) {
-        toChange.geometry = '';
-      }
-    },
     setProducts: (state, action) => {
       const products = action.payload.map((product, i) => ({ id: product, idx: i }));
       state.products = products;
@@ -57,6 +50,9 @@ const tpdiSlice = createSlice({
         state.products.push({ idx: lastItem.idx + 1, id: '', geometry: '' });
       }
     },
+    addEmptyProduct: (state) => {
+      state.products.push({ id: '', geometry: undefined, idx: state.products.length });
+    },
     clearProducts: (state) => {
       state.products = [
         {
@@ -68,6 +64,9 @@ const tpdiSlice = createSlice({
     },
     removeProductId: (state, action) => {
       state.products = state.products.filter((prod) => prod.idx !== parseInt(action.payload));
+    },
+    setProductId: (state, action) => {
+      state.products[action.payload.idx].id = action.payload.id;
     },
     setExtraMapGeometry: (state, action) => {
       state.extraMapGeometry = action.payload;
@@ -124,7 +123,7 @@ export const planetSlice = createSlice({
     planetApiKey: '',
     maxCloudCoverage: 100,
     harmonizeTo: 'PS2',
-    productBundle: 'analytic',
+    productBundle: 'analytic_udm2',
   },
   reducers: {
     setApiKey: (state, action) => {

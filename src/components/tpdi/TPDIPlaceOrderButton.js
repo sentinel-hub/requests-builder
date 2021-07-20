@@ -6,13 +6,6 @@ import Tooltip from '../common/Tooltip/Tooltip';
 import TpdiResource from '../../api/tpdi/TpdiResource';
 import { tpdiCreateOrderBodyViaDataFilter, tpdiCreateOrderBodyViaProducts } from '../../api/tpdi/common';
 
-const validateCreateOrderWithProducts = (products) => {
-  for (let prod of products) {
-    return Boolean(prod.id && prod.id !== '');
-  }
-  return false;
-};
-
 const DIALOG_TEXT =
   'Are you sure you want to create an order without a Collection ID?\nWhen you confirm your order a new collection will be created automatically.';
 
@@ -43,7 +36,7 @@ const TPDIPlaceOrderButton = ({
     maxar,
     map,
   };
-  const { isUsingQuery } = tpdi;
+  const { isUsingQuery, provider } = tpdi;
 
   const handleCreateOrderSuccess = (response) => {
     if (isUsingQuery) {
@@ -55,6 +48,7 @@ const TPDIPlaceOrderButton = ({
   };
 
   const shouldConfirm = !Boolean(collectionId);
+
   const getOrderQueryDisabledTitle = () => {
     if (!token) {
       return 'Log in to use this';
@@ -65,19 +59,44 @@ const TPDIPlaceOrderButton = ({
     if (amountOfFoundProducts > ORDER_BY_QUERY_LIMIT) {
       return `Order by query can only be used when there's less than ${ORDER_BY_QUERY_LIMIT} products returned by the search.`;
     }
+    if (provider === 'PLANET' && planet.planetApiKey === '') {
+      return 'Input an Api Key to proceed';
+    }
     return undefined;
   };
 
-  const getRequestButton = () => {
-    if (isUsingQuery) {
-      return (
+  const validateCreateOrderWithProducts = () => {
+    const areAllProductsValid = products.reduce((acc, cv) => {
+      if (cv === '') {
+        acc = false;
+      }
+      return acc;
+    }, true);
+    const validation = areAllProductsValid && areaSelected <= limit && Boolean(token);
+    if (provider === 'PLANET') {
+      return validation && planet.planetApiKey !== '';
+    }
+    return validation;
+  };
+
+  const validateCreateOrdersWithQuery = () => {
+    const validation =
+      Boolean(token) && areaSelected <= limit && amountOfFoundProducts <= ORDER_BY_QUERY_LIMIT;
+    if (provider === 'PLANET') {
+      return validation && planet.planetApiKey !== '';
+    }
+    return validation;
+  };
+
+  return (
+    <div className="flex items-center mt-2" style={{ justifyContent: 'space-between' }}>
+      <div />
+      {isUsingQuery ? (
         <RequestButton
           request={TpdiResource.createOrder}
           args={[tpdiCreateOrderBodyViaDataFilter(state)]}
           buttonText="Prepare Order"
-          validation={
-            Boolean(token) && areaSelected <= limit && amountOfFoundProducts <= ORDER_BY_QUERY_LIMIT
-          }
+          validation={validateCreateOrdersWithQuery()}
           className="secondary-button"
           responseHandler={handleCreateOrderSuccess}
           errorHandler={errorHandlerTPDI}
@@ -85,27 +104,20 @@ const TPDIPlaceOrderButton = ({
           useConfirmation={shouldConfirm}
           dialogText={DIALOG_TEXT}
         />
-      );
-    }
-    return (
-      <RequestButton
-        request={TpdiResource.createOrder}
-        args={[tpdiCreateOrderBodyViaProducts(state)]}
-        buttonText="Prepare Order"
-        validation={validateCreateOrderWithProducts(products) && areaSelected <= limit && Boolean(token)}
-        className="secondary-button"
-        responseHandler={handleCreateOrderSuccess}
-        errorHandler={errorHandlerTPDI}
-        disabledTitle="Add products and check the limit"
-        useConfirmation={shouldConfirm}
-        dialogText={DIALOG_TEXT}
-      />
-    );
-  };
-  return (
-    <div className="flex items-center mt-2" style={{ justifyContent: 'space-between' }}>
-      <div />
-      {getRequestButton()}
+      ) : (
+        <RequestButton
+          request={TpdiResource.createOrder}
+          args={[tpdiCreateOrderBodyViaProducts(state)]}
+          buttonText="Prepare Order"
+          validation={validateCreateOrderWithProducts()}
+          className="secondary-button"
+          responseHandler={handleCreateOrderSuccess}
+          errorHandler={errorHandlerTPDI}
+          disabledTitle="Add products, check the limit and use an api-key"
+          useConfirmation={shouldConfirm}
+          dialogText={DIALOG_TEXT}
+        />
+      )}
       <div className="flex items-center" style={{ justifyContent: 'flex-end' }}>
         <Tooltip
           direction="right"

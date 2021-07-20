@@ -91,7 +91,7 @@ export const parseTPDIRequest = (order) => {
 };
 
 export const parseSearchRequest = (parsedRequest) => {
-  const { provider, bounds, data, planetApiKey } = parsedRequest;
+  const { provider, bounds, data } = parsedRequest;
   const { constellation, dataFilter } = data[0];
   const { timeRange } = dataFilter;
   if (provider === 'AIRBUS') {
@@ -103,9 +103,6 @@ export const parseSearchRequest = (parsedRequest) => {
     store.dispatch(airbusSlice.actions.setDataFilterOptions({ ...dataFilterOptions }));
   } else {
     store.dispatch(tpdiSlice.actions.setProvider('PLANET'));
-    if (planetApiKey) {
-      store.dispatch(planetSlice.actions.setApiKey(planetApiKey));
-    }
     if (dataFilter.maxCloudCoverage) {
       store.dispatch(planetSlice.actions.setMaxCloudCoverage(dataFilter.maxCloudCoverage));
     }

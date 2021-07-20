@@ -3,14 +3,16 @@ import {
   tpdiCreateOrderBodyViaDataFilter,
   tpdiCreateOrderBodyViaProducts,
 } from '../../../api/tpdi/common';
+import { TPDI_PATH } from '../../../api/tpdi/TpdiResource';
+import { getBaseUrl } from '../../../api/url';
 
-const BASE_TPDI_URL = 'https://services.sentinel-hub.com/api/v1/dataimport';
+const getTpdiUrl = () => getBaseUrl() + TPDI_PATH;
 
 // curl commands
 export const getCreateViaProductsTpdiCurlCommand = (state) => {
   const body = JSON.stringify(tpdiCreateOrderBodyViaProducts(state), null, 2);
   const token = state.auth.user.access_token;
-  const url = BASE_TPDI_URL + '/orders';
+  const url = getTpdiUrl() + '/orders';
   const curlCommand = `curl -X POST ${url} \n -H 'Content-Type: application/json' \n -H 'Authorization: Bearer ${
     token ? token : '<your token here>'
   }' \n -d '${body}'`;
@@ -21,7 +23,7 @@ export const getCreateViaProductsTpdiCurlCommand = (state) => {
 export const getCreateViaDataFilterTpdiCurlCommand = (state) => {
   const body = JSON.stringify(tpdiCreateOrderBodyViaDataFilter(state), null, 2);
   const token = state.auth.user.access_token;
-  const url = BASE_TPDI_URL + '/orders';
+  const url = getTpdiUrl() + '/orders';
   const curlCommand = `curl -X POST ${url} \n -H 'Content-Type: application/json' \n -H 'Authorization: Bearer ${
     token ? token : '<your token here>'
   }' \n -d '${body}'`;
@@ -32,7 +34,7 @@ export const getCreateViaDataFilterTpdiCurlCommand = (state) => {
 export const getSearchTpdiCurlCommand = (state) => {
   const body = JSON.stringify(getSearchTpdiBody(state), null, 2);
   const token = state.auth.user.access_token;
-  const url = BASE_TPDI_URL + '/search';
+  const url = getTpdiUrl() + '/search';
   const curlCommand = `curl -X POST ${url} \n -H 'Content-Type: application/json' \n -H 'Authorization: Bearer ${
     token ? token : '<your token here>'
   }' \n -d '${body}'`;
@@ -41,7 +43,7 @@ export const getSearchTpdiCurlCommand = (state) => {
 };
 
 export const getAllOrdersTpdiCurlCommand = (state) => {
-  const url = BASE_TPDI_URL + '/orders';
+  const url = getTpdiUrl() + '/orders';
   const token = state.auth.user.access_token;
   const curlCommand = `curl -X GET ${url} \n -H 'Content-Type: application/json' \n -H 'Authorization: Bearer ${
     token ? token : '<your token here>'
@@ -51,7 +53,7 @@ export const getAllOrdersTpdiCurlCommand = (state) => {
 };
 
 export const getConfirmOrderTpdiCurlCommand = (state) => {
-  const url = BASE_TPDI_URL + '/orders/<your orderId>/confirm';
+  const url = getTpdiUrl() + '/orders/<your orderId>/confirm';
   const token = state.auth.user.access_token;
   const curlCommand = `curl -X POST ${url} \n -H 'Content-Type: application/json' \n -H 'Authorization: Bearer ${
     token ? token : '<your token here>'
@@ -61,7 +63,7 @@ export const getConfirmOrderTpdiCurlCommand = (state) => {
 };
 
 export const getDeleteOrderTpdiCurlCommand = (state) => {
-  const url = BASE_TPDI_URL + '/orders/<your orderId>/';
+  const url = getTpdiUrl() + '/orders/<your orderId>/';
   const token = state.auth.user.access_token;
   const curlCommand = `curl -X DELETE ${url} \n -H 'Content-Type: application/json' \n -H 'Authorization: Bearer ${
     token ? token : '<your token here>'
@@ -71,6 +73,6 @@ export const getDeleteOrderTpdiCurlCommand = (state) => {
 };
 
 export const getQuotaCurlCommand = (token) => {
-  const url = BASE_TPDI_URL + '/quotas';
+  const url = getTpdiUrl() + '/quotas';
   return `curl -X GET ${url} \n -H 'Authorization: Bearer ${token ? token : '<your-token-here>'}'\n`;
 };

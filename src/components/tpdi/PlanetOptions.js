@@ -5,10 +5,7 @@ import { connect } from 'react-redux';
 import Tooltip from '../common/Tooltip/Tooltip';
 import TargetBlankLink from '../common/TargetBlankLink';
 
-const PlanetOptions = ({ apiKey, maxCC, productBundle, harmonizeTo }) => {
-  const handleApiKeyChange = (e) => {
-    store.dispatch(planetSlice.actions.setApiKey(e.target.value));
-  };
+const PlanetOptions = ({ maxCC, productBundle, harmonizeTo }) => {
   const handleMaxCCChange = (e) => {
     store.dispatch(planetSlice.actions.setMaxCloudCoverage(e.target.value));
   };
@@ -21,24 +18,6 @@ const PlanetOptions = ({ apiKey, maxCC, productBundle, harmonizeTo }) => {
 
   return (
     <div className="flex flex-col">
-      <label htmlFor="planet-api-key" className="form__label">
-        Planet API Key
-      </label>
-      <div className="flex items-center justify-between">
-        <input
-          id="planet-api-key"
-          placeholder="Your Planet API key"
-          value={apiKey}
-          required
-          type="text"
-          className="form__input mb-2"
-          onChange={handleApiKeyChange}
-        />
-        <Tooltip
-          content="Enter a Planet API key, that you received via email after purchasing a PlanetScope Sentinel Hub Package"
-          direction="right"
-        />
-      </div>
       <label className="form__label" htmlFor="planet-product-bundle">
         Product Bundle
       </label>
@@ -58,9 +37,9 @@ const PlanetOptions = ({ apiKey, maxCC, productBundle, harmonizeTo }) => {
           content={
             <p>
               PlanetScope data can be ordered through SH either as scaled top of the atmosphere reflectance or
-              surface reflectance, according to the requested asset type. Furthermore, ordering usable data
-              mask bands (UDM2) is optional. The value of the productBundle parameter specifies what will be
-              ordered. Check the{' '}
+              surface reflectance, according to the requested asset type. Furthermore, ordering without usable
+              data mask bands (UDM2) is optional. The value of the productBundle parameter specifies what will
+              be ordered. Check the{' '}
               <TargetBlankLink
                 href="https://docs.sentinel-hub.com/api/latest/data/planet-scope/#productbundle-parameter"
                 children="docs"
@@ -88,7 +67,6 @@ const PlanetOptions = ({ apiKey, maxCC, productBundle, harmonizeTo }) => {
 };
 
 const mapStateToProps = (state) => ({
-  apiKey: state.planet.planetApiKey,
   maxCC: state.planet.maxCloudCoverage,
   productBundle: state.planet.productBundle,
   harmonizeTo: state.planet.harmonizeTo,

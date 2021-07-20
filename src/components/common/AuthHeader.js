@@ -110,7 +110,7 @@ const AuthHeader = ({ user, isEdcUser, customUrl, isImpersonating }) => {
 const mapStateToProps = (store) => ({
   user: store.auth.user,
   isEdcUser: store.auth.isEDC,
-  customUrl: store.params.customUrl,
+  customUrl: store.params.oauthUrl,
   isImpersonating: store.auth.isImpersonating,
 });
 

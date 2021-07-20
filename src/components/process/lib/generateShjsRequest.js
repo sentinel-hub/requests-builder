@@ -14,6 +14,9 @@ import {
   CUSTOM,
   LTML1,
   LTML2,
+  LETML1,
+  LETML2,
+  LMSSL1,
 } from '../../../utils/const/const';
 import { isBbox, isPolygon } from '../../common/Map/utils/crsTransform';
 
@@ -24,6 +27,9 @@ const datasourceToSHJSLayer = {
   [LOTL2]: 'Landsat8AWSLOTL2Layer',
   [LTML1]: 'Landsat45AWSLTML1Layer',
   [LTML2]: 'Landsat45AWSLTML2Layer',
+  [LETML1]: '<Not yet supported>',
+  [LETML2]: '<Not yet supported>',
+  [LMSSL1]: '<Not yet supported>',
   [S1GRD]: 'S1GRDAWSEULayer',
   [S3OLCI]: 'S3OLCILayer',
   [S3SLSTR]: 'S3SLSTRLayer',

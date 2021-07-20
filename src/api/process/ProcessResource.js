@@ -1,5 +1,5 @@
 import Api from '..';
-import { getUrl } from './utils';
+import { getProcessUrl } from '../url';
 
 const { POST } = Api;
 
@@ -15,7 +15,7 @@ const getTarHeader = (responses) => {
 const ProcessResource = {
   stateRequest: (requestState) =>
     POST(
-      getUrl(requestState),
+      getProcessUrl(requestState),
       {
         authenticated: true,
         endpointHeaders: {
@@ -23,6 +23,7 @@ const ProcessResource = {
         },
       },
       '*/*',
+      true,
     ),
 };
 

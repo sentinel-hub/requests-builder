@@ -20,6 +20,9 @@ import {
   LTML2,
   batchDataCollectionNames,
   statisticalDataCollectionNames,
+  LETML1,
+  LETML2,
+  LMSSL1,
 } from '../../utils/const/const';
 import BasicOptions from './DataSourceSpecificOptions/BasicOptions';
 import S2L1COptions from './DataSourceSpecificOptions/S2L1COptions';
@@ -61,6 +64,9 @@ const generateDataCollectionAdvancedOptions = (datasource, idx = 0) => {
     case LOTL2:
     case LTML1:
     case LTML2:
+    case LETML1:
+    case LETML2:
+    case LMSSL1:
       return <BasicOptions idx={idx} />;
     case MODIS:
       return <BaseOptionsNoCC idx={idx} />;

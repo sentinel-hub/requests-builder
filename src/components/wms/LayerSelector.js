@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { fetchEvalscripts, getLayersByInstanceId } from './wmsRequests';
+import { fetchEvalscripts } from './wmsRequests';
 import store from '../../store';
 import wmsSlice from '../../store/wms';
 import { useDidMountEffect } from '../../utils/hooks';
+import WmsResource from '../../api/wms/WmsResource';
 
 const generateLayersOptions = (layers) => {
   return layers.map((lay) => (
@@ -24,7 +25,7 @@ const LayerSelector = ({ layerId, instanceId, shouldFetchLayers, token }) => {
         return;
       }
       try {
-        const res = await getLayersByInstanceId(token, instanceId);
+        const res = await WmsResource.getLayers({ instanceId });
         if (res.data) {
           // run through layers and fetch evalscripts if needed (dataproduct);
           const layersWithEvalscripts = await fetchEvalscripts(res.data, token);

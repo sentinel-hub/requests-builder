@@ -11,9 +11,11 @@ import mapSlice from '../../store/map';
 const TPDIThumbnail = ({ collectionId, productId, geometry }) => {
   const [isFetchingThumbnail, setIsFetchingThumbnail] = useState(true);
   const [srcUrl, setSrcUrl] = useState();
+  const [hasBeenAdded, setHasBeenAdded] = useState(false);
   const handleAddToMap = () => {
     const uuid = uuidv4();
     store.dispatch(mapSlice.actions.addAdditionalLayer({ url: srcUrl, geometry: geometry, uuid }));
+    setHasBeenAdded(true);
   };
 
   useEffect(() => {
@@ -66,8 +68,8 @@ const TPDIThumbnail = ({ collectionId, productId, geometry }) => {
             content={
               <div className="flex flex-col items-center">
                 <img src={srcUrl} style={{ maxHeight: '70vh' }} alt={`${productId}-thumbnail`} />
-                <button className="secondary-button mt-2" onClick={handleAddToMap}>
-                  Add to map
+                <button className="secondary-button mt-2" disabled={hasBeenAdded} onClick={handleAddToMap}>
+                  {hasBeenAdded ? 'Added to map' : 'Add to map'}
                 </button>
                 <p className="text text--warning mt-2">
                   Thumbnail is not georeferenced so the resulting map layer is just an approximation. <br />

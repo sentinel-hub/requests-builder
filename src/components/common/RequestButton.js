@@ -68,15 +68,15 @@ const RequestButton = ({
           }
         }
       } catch (err) {
+        if (shouldTriggerIsRunningRequest) {
+          store.dispatch(requestSlice.actions.setIsRunningRequest(false));
+        }
         if (!Axios.isCancel(err)) {
           setIsFetching(false);
           if (errorHandler) {
             errorHandler(err);
           } else {
             console.error(err);
-          }
-          if (shouldTriggerIsRunningRequest) {
-            store.dispatch(requestSlice.actions.setIsRunningRequest(false));
           }
         }
       }

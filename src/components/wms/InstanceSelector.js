@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { connect } from 'react-redux';
-import { getAllInstances } from './wmsRequests';
 import store from '../../store';
 import wmsSlice from '../../store/wms';
 import Axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSync } from '@fortawesome/free-solid-svg-icons';
+import WmsResource from '../../api/wms/WmsResource';
 
 const generateInstanceOptions = (instances) => {
   return instances
@@ -25,7 +25,7 @@ const InstanceSelector = ({ token, instanceId }) => {
   const loadInstances = useCallback(async () => {
     sourceRef.current = Axios.CancelToken.source();
     try {
-      const res = await getAllInstances(token, { cancelToken: sourceRef.current.token });
+      const res = await WmsResource.getInstances({ cancelToken: sourceRef.current.token });
       if (res.data) {
         setInstances(
           res.data.map((instance) => ({
@@ -40,7 +40,7 @@ const InstanceSelector = ({ token, instanceId }) => {
         console.error(err);
       }
     }
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     if (token) {

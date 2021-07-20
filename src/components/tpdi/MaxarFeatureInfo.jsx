@@ -18,7 +18,7 @@ const MaxarFeatureInfo = ({ feature, geometry, isDisabled }) => {
         expandedInfo={expandedInfo}
       />
       {expandedInfo && (
-        <div className="u-flex-aligned" style={{ paddingLeft: '2rem' }}>
+        <div className="flex items-center" style={{ paddingLeft: '2rem' }}>
           <div>
             <p className="text" style={{ margin: '0.5rem 0' }}>
               <span>Product geometry coverage: </span>
