@@ -1,6 +1,8 @@
 import React from 'react';
 import { faAngleDoubleDown, faAngleDoubleUp, faGlobeEurope } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { connect } from 'react-redux';
+
 import store from '../../store';
 import mapSlice from '../../store/map';
 import tpdiSlice from '../../store/tpdi';
@@ -74,4 +76,8 @@ export const TpdiSearchResultHeader = ({
   );
 };
 
-export default TpdiSearchResultHeader;
+const mapStateToProps = (state, ownProps) => ({
+  // computed ppty
+  isDisabled: Boolean(state.tpdi.products.find((product) => product.id === ownProps.id)),
+});
+export default connect(mapStateToProps)(TpdiSearchResultHeader);

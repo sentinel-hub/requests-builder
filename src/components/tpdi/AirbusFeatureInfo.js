@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { formatPercentage } from '../../utils/stringUtils';
-import { getAreaCoverPercentage } from '../common/Map/utils/crsTransform';
 import TPDIThumbnail from './TPDIThumbnail';
 import TpdiSearchResultHeader from './TpdiSearchResultHeader';
 
@@ -9,7 +8,7 @@ const airbusConstellationToProvider = {
   SPOT: 'AIRBUS_SPOT',
 };
 
-const AirbusFeatureInfo = ({ feature, geometry, isDisabled }) => {
+const AirbusFeatureInfo = ({ feature }) => {
   const [expandedInfo, setExpandedInfo] = useState(false);
   const {
     cloudCover,
@@ -24,7 +23,6 @@ const AirbusFeatureInfo = ({ feature, geometry, isDisabled }) => {
       <TpdiSearchResultHeader
         date={feature.properties?.acquisitionDate}
         id={feature.properties.id}
-        isDisabled={isDisabled}
         featureGeometry={feature.geometry}
         setExpandedInfo={setExpandedInfo}
         expandedInfo={expandedInfo}
@@ -38,7 +36,7 @@ const AirbusFeatureInfo = ({ feature, geometry, isDisabled }) => {
             </p>
             <p className="text">
               <span>Product geometry coverage: </span>
-              {formatPercentage(getAreaCoverPercentage(geometry, feature.geometry))}
+              {formatPercentage(feature.areaCoverage)}
             </p>
             {cloudCover !== undefined && (
               <p className="text">

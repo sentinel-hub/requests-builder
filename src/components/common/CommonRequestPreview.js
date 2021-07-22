@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Controlled } from 'react-codemirror2';
 import store from '../../store';
 import alertSlice from '../../store/alert';
+import paramsSlice from '../../store/params';
+import { getUrlFromCurl } from '../process/requests/parseRequest';
 import RequestButton from './RequestButton';
 import Select from './Select';
 import Toggle from './Toggle';
@@ -28,6 +30,25 @@ this requires to pass token as props.
 
 const isFunction = (arg) => {
   return typeof arg === 'function';
+};
+
+function isValidHttpUrl(string) {
+  let url;
+  try {
+    url = new URL(string);
+  } catch (_) {
+    return false;
+  }
+
+  return url.protocol === 'http:' || url.protocol === 'https:';
+}
+
+const parseUrl = (text) => {
+  const url = getUrlFromCurl(text);
+  if (url && isValidHttpUrl(url)) {
+    const validUrl = new URL(url);
+    store.dispatch(paramsSlice.actions.setUrl(validUrl.origin));
+  }
 };
 
 const CommonRequestPreview = ({
@@ -92,6 +113,11 @@ const CommonRequestPreview = ({
   const handleToggleChange = () => {
     setToggled(!toggled);
   };
+
+  const handleParseRequest = () => {
+    onParse(text);
+    parseUrl(text);
+  };
   return (
     <>
       {options.length > 1 && (
@@ -137,7 +163,7 @@ const CommonRequestPreview = ({
           </button>
         )}
         {onParse !== undefined && hasTextChanged && supportedParseNames?.includes(selectedOption.name) && (
-          <button className="secondary-button" style={{ margin: '0 1rem' }} onClick={() => onParse(text)}>
+          <button className="secondary-button" style={{ margin: '0 1rem' }} onClick={handleParseRequest}>
             Parse
           </button>
         )}

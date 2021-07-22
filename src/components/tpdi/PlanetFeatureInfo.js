@@ -1,17 +1,15 @@
 import React, { useState } from 'react';
 import { formatPercentage } from '../../utils/stringUtils';
-import { getAreaCoverPercentage } from '../common/Map/utils/crsTransform';
 import TPDIThumbnail from './TPDIThumbnail';
 import TpdiSearchResultHeader from './TpdiSearchResultHeader';
 
-const PlanetFeatureInfo = ({ feature, geometry, isDisabled }) => {
+const PlanetFeatureInfo = ({ feature }) => {
   const [expandedInfo, setExpandedInfo] = useState(false);
   return (
     <div className="tpdi-feature">
       <TpdiSearchResultHeader
         date={feature.properties?.acquired}
         id={feature.id}
-        isDisabled={isDisabled}
         featureGeometry={feature.geometry}
         setExpandedInfo={setExpandedInfo}
         expandedInfo={expandedInfo}
@@ -25,7 +23,7 @@ const PlanetFeatureInfo = ({ feature, geometry, isDisabled }) => {
             </p>
             <p className="text">
               <span>Product geometry coverage: </span>
-              {formatPercentage(getAreaCoverPercentage(geometry, feature.geometry))}
+              {formatPercentage(feature.areaCoverage)}
             </p>
             {feature.properties?.cloud_cover !== undefined && (
               <p className="text">

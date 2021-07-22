@@ -297,5 +297,9 @@ export const getEvalscript = (evalscriptString) => {
 };
 
 export const getUrlFromCurl = (curlCommand) => {
-  return curlCommand.split(' ')[3];
+  try {
+    return curlCommand.split(' ')[3];
+  } catch (err) {
+    return undefined;
+  }
 };

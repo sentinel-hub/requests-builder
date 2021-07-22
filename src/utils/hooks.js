@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useLayoutEffect } from 'react';
+import { useEffect, useState, useRef, useLayoutEffect, useCallback } from 'react';
 import Mousetrap from 'mousetrap';
 
 // Hook
@@ -183,3 +183,23 @@ export function useWindowSize() {
 
   return windowSize;
 }
+
+export const useScrollGenerationContainer = (listOfElements, containerRef) => {
+  const [currentLimit, setCurrentLimit] = useState(50);
+  const scrollCallback = useCallback((e) => {
+    const bottom = e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight;
+    if (bottom) {
+      setCurrentLimit((prev) => prev + 50);
+    }
+  }, []);
+  useEffect(() => {
+    const element = containerRef.current;
+    element.addEventListener('scroll', scrollCallback);
+    return () => {
+      element.removeEventListener('scroll', scrollCallback);
+    };
+    // eslint-disable-next-line
+  }, []);
+
+  return listOfElements.slice(0, currentLimit);
+};

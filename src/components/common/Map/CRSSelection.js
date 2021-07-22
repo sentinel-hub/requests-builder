@@ -27,11 +27,7 @@ const generateCRSOptions = (crs) => {
     if (group === 'DEFAULT') {
       return optionsForGroup(grouped[group]);
     }
-    return (
-      // <optgroup label={group} key={group}>
-      optionsForGroup(grouped[group])
-      // </optgroup>
-    );
+    return optionsForGroup(grouped[group]);
   });
 };
 
@@ -40,26 +36,13 @@ const CRSSelection = ({ selectedCrs }) => {
     store.dispatch(mapSlice.actions.setSelectedCrs(value));
   };
   return (
-    <div className="flex items-center">
-      {/* <label htmlFor="crs" className="form__label" style={{ marginBottom: '0' }}>
-        CRS:{' '}
-      </label> */}
+    <div className="flex items-center w-52">
       <Select
-        buttonClassNames="mr-2 w-fit"
+        buttonClassNames="mr-2"
         onChange={handleCRSChange}
         selected={selectedCrs}
         options={generateCRSOptions(CRS).flat()}
-        optionsClassNames="w-fit"
       />
-      {/* <select
-        id="crs"
-        className="form__input"
-        style={{ marginLeft: '1rem' }}
-        onChange={handleCRSChange}
-        value={selectedCrs}
-      >
-        {generateCRSOptions(CRS)}
-      </select> */}
     </div>
   );
 };

@@ -1,18 +1,16 @@
 import React, { useState } from 'react';
 import { formatPercentage } from '../../utils/stringUtils';
 import DisplayableProperties from '../common/DisplayableProperties';
-import { getAreaCoverPercentage } from '../common/Map/utils/crsTransform';
 import TpdiSearchResultHeader from './TpdiSearchResultHeader';
 import TPDIThumbnail from './TPDIThumbnail';
 
-const MaxarFeatureInfo = ({ feature, geometry, isDisabled }) => {
+const MaxarFeatureInfo = ({ feature }) => {
   const [expandedInfo, setExpandedInfo] = useState(false);
   return (
     <div className="tpdi-feature">
       <TpdiSearchResultHeader
         date={feature.acquisitionDateStart}
         id={feature.catalogID}
-        isDisabled={isDisabled}
         featureGeometry={feature.geometry}
         setExpandedInfo={setExpandedInfo}
         expandedInfo={expandedInfo}
@@ -22,7 +20,7 @@ const MaxarFeatureInfo = ({ feature, geometry, isDisabled }) => {
           <div>
             <p className="text" style={{ margin: '0.5rem 0' }}>
               <span>Product geometry coverage: </span>
-              {formatPercentage(getAreaCoverPercentage(geometry, feature.geometry))}
+              {formatPercentage(feature.areaCoverage)}
             </p>
             <DisplayableProperties
               properties={feature}

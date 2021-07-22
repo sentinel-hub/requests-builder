@@ -30,6 +30,7 @@
     "jshint": "^2.11.1",
     "jwt-decode": "^2.2.0",
     "leaflet": "^1.6.0",
+    "lodash.get": "^4.4.2",
     "lodash.omit": "^4.5.0",
     "moment": "^2.27.0",
     "mousetrap": "^1.6.5",
