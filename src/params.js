@@ -24,13 +24,13 @@ export const configureParams = async (params) => {
             creationTime: req.creationTime,
             request: req.request,
             name: req.name,
+            mode: req.mode,
           }))
           .filter((a) => a);
         store.dispatch(savedRequestsSlice.actions.setCollection(requests));
         store.dispatch(
           alertSlice.actions.addAlert({ type: 'SUCCESS', text: 'Collection successfully loaded' }),
         );
-        removeParams(['collection-link']);
       }
     } catch (err) {
       console.error(err);
@@ -63,10 +63,10 @@ export const getUrlParams = () => {
   return Object.fromEntries(urlParams.entries());
 };
 
-const removeParams = (loParams) => {
-  const urlParams = new URLSearchParams(window.location.search);
-  loParams.forEach((param) => {
-    urlParams.delete(param);
-  });
-  window.history.replaceState({}, 'Requests Builder', `?${urlParams.toString()}`);
-};
+// const removeParams = (loParams) => {
+//   const urlParams = new URLSearchParams(window.location.search);
+//   loParams.forEach((param) => {
+//     urlParams.delete(param);
+//   });
+//   window.history.replaceState({}, 'Requests Builder', `?${urlParams.toString()}`);
+// };
