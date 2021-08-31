@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import DataSourceSelect from '../components/common/DataSourceSelect';
 import EvalscriptEditor from '../components/common/Evalscript/EvalscriptEditor';
 import MapContainer from '../components/common/Map/MapContainer';
@@ -7,9 +7,14 @@ import TimeRangeContainer from '../components/common/TimeRange/TimeRangeContaine
 import StatisticalCalculations from '../components/statistical/StatisticalCalculations';
 import StatisticalOutput from '../components/statistical/StatisticalOutput';
 import StatisticalRequestPreview from '../components/statistical/StatisticalRequestPreview';
+import { statisticsAnalyticsPage } from '../utils/initAnalytics';
 
 const StatisticalRequestForm = () => {
   const [requestResponse, setRequestResponse] = useState();
+
+  useEffect(() => {
+    statisticsAnalyticsPage();
+  }, []);
   return (
     <div>
       <div className="statistical-first-row">

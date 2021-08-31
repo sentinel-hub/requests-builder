@@ -203,3 +203,20 @@ export const useScrollGenerationContainer = (listOfElements, containerRef) => {
 
   return listOfElements.slice(0, currentLimit);
 };
+
+export const useDownloadLink = (response, type = 'application/json') => {
+  const [downloadLink, setDownloadLink] = useState('');
+  useEffect(() => {
+    let srcUrl;
+    if (response) {
+      srcUrl = URL.createObjectURL(new Blob([JSON.stringify(response, null, 2)], { type }));
+      setDownloadLink(srcUrl);
+    }
+    return () => {
+      URL.revokeObjectURL(srcUrl);
+    };
+    // eslint-disable-next-line
+  }, []);
+
+  return downloadLink;
+};

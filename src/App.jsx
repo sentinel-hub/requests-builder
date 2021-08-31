@@ -1,7 +1,10 @@
 import React, { useEffect, lazy, Suspense } from 'react';
+
 import configureAxios, { edcResponseInterceptor } from './utils/configureAxios';
 import ModeSelector from './components/common/ModeSelector';
 import { connect } from 'react-redux';
+import { getFID, getLCP } from 'web-vitals';
+
 import ProcessHeaderButtons from './components/process/ProcessHeaderButtons';
 import BatchHeaderButtons from './components/batch/BatchHeaderButtons';
 import WMSHeaderButtons from './components/wms/WMSHeaderButtons';
@@ -19,6 +22,7 @@ import { configureParams, getUrlParams } from './params';
 import StatisticalRequestForm from './forms/StatisticalRequestForm';
 import StatisticalAuthHeader from './components/statistical/StatisticalAuthHeader';
 import SavedRequests from './components/process/Collections/SavedRequests';
+import { sendToGoogleAnalytics } from './utils/initAnalytics';
 
 const BatchRequestForm = lazy(() => import('./forms/BatchRequestForm'));
 const TPDIRequestForm = lazy(() => import('./forms/TPDIRequestForm'));
@@ -87,9 +91,14 @@ function App({ mode }) {
     const setParams = async () => {
       await configureParams(getUrlParams());
     };
+    const sendWebVitals = () => {
+      getLCP(sendToGoogleAnalytics);
+      getFID(sendToGoogleAnalytics);
+    };
     fetchTokenEdc();
     configureAxios();
     setParams();
+    sendWebVitals();
   }, []);
 
   return (

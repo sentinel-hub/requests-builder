@@ -1,10 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getMapWms, getFisStats, getCoverageWcs } from './wmsRequests';
+import { getMapWms, getFisStats, getCoverageWcs, getFeaturesWfs, getTileWmts } from './wmsRequests';
 import RequestButton from '../common/RequestButton';
 import store from '../../store';
 import responsesSlice from '../../store/responses';
 import { calculatePixelSize } from '../common/Map/utils/bboxRatio';
+import { errorOgcReqEvent, successfulOgcReqEvent } from '../../utils/initAnalytics';
 
 const SendWmsRequest = ({ wmsState, requestState, mapState, token, mode }) => {
   const validateWmsSendRequest = () => {
@@ -12,6 +13,7 @@ const SendWmsRequest = ({ wmsState, requestState, mapState, token, mode }) => {
   };
 
   const responseHandler = async (response) => {
+    successfulOgcReqEvent(mode);
     const responseUrl = URL.createObjectURL(response);
     let dimensions;
     if (requestState.heightOrRes === 'HEIGHT') {
@@ -38,14 +40,22 @@ const SendWmsRequest = ({ wmsState, requestState, mapState, token, mode }) => {
   };
 
   const responseHandlerFis = (response, stringRequest) => {
+    successfulOgcReqEvent('FIS');
     store.dispatch(responsesSlice.actions.setFisResponse({ response, stringRequest, displayResponse: true }));
     store.dispatch(responsesSlice.actions.setDisplayResponse(true));
   };
 
   const errorHandler = (err) => {
+    errorOgcReqEvent(mode);
     store.dispatch(responsesSlice.actions.setError('Something went wrong'));
     store.dispatch(responsesSlice.actions.setDisplayResponse(true));
     console.error('Something went wrong', err);
+  };
+
+  const responseHandleWfs = (response) => {
+    successfulOgcReqEvent('WFS');
+    store.dispatch(responsesSlice.actions.setWfsResponse(response));
+    store.dispatch(responsesSlice.actions.setDisplayResponse(true));
   };
 
   const request = (() => {
@@ -56,10 +66,26 @@ const SendWmsRequest = ({ wmsState, requestState, mapState, token, mode }) => {
         return getFisStats;
       case 'WCS':
         return getCoverageWcs;
+      case 'WFS':
+        return getFeaturesWfs;
+      case 'WMTS':
+        return getTileWmts;
       default:
         return getMapWms;
     }
   })();
+
+  const responseHandlerDispatcher = () => {
+    if (mode === 'WMS' || mode === 'WCS' || mode === 'WMTS') {
+      return responseHandler;
+    }
+    if (mode === 'FIS') {
+      return responseHandlerFis;
+    }
+    if (mode === 'WFS') {
+      return responseHandleWfs;
+    }
+  };
 
   return (
     <RequestButton
@@ -69,7 +95,7 @@ const SendWmsRequest = ({ wmsState, requestState, mapState, token, mode }) => {
       request={request}
       args={[wmsState, requestState, mapState, token]}
       validation={validateWmsSendRequest()}
-      responseHandler={mode === 'WMS' || mode === 'WCS' ? responseHandler : responseHandlerFis}
+      responseHandler={responseHandlerDispatcher()}
       errorHandler={errorHandler}
       useShortcut
       shouldTriggerIsRunningRequest

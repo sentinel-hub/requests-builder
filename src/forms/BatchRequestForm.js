@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import BatchRequestPreview from '../components/batch/BatchRequestPreview';
 import DataSourceSelect from '../components/common/DataSourceSelect';
 import EvalscriptEditor from '../components/common/Evalscript/EvalscriptEditor';
@@ -8,6 +8,7 @@ import BatchInformation from '../components/batch/BatchInformation';
 import TimeRangeContainer from '../components/common/TimeRange/TimeRangeContainer';
 import BatchOutput from '../components/batch/BatchOutput';
 import RunningRequestIndicator from '../components/common/RunningRequestIndicator';
+import { batchAnalyticsPage } from '../utils/initAnalytics';
 
 const BatchRequestForm = () => {
   const [fetchedRequests, setFetchedRequests] = useState([]);
@@ -23,6 +24,9 @@ const BatchRequestForm = () => {
     setOpenedContainers([true, false, false]);
   }, []);
 
+  useEffect(() => {
+    batchAnalyticsPage();
+  }, []);
   return (
     <div>
       <div className="process-first-row">

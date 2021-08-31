@@ -1,9 +1,10 @@
 import React from 'react';
-import { getWmsUrl, getFisUrl, getWcsUrl } from './wmsRequests';
+import { getWmsUrl, getFisUrl, getWcsUrl, getWfsUrl, getWmtsUrl } from './wmsRequests';
 import { connect } from 'react-redux';
 import wmsLayerToProcessRequest, { wmsLayerToCurl } from './wmsToProcess';
 import CommonRequestPreview from '../common/CommonRequestPreview';
 import { dispatchChanges } from '../process/requests/parseRequest';
+import parseWmsText from './wmsParsing';
 
 const WmsRequestPreview = ({ wmsState, requestState, mapState, mode, token }) => {
   const url = (() => {
@@ -14,6 +15,10 @@ const WmsRequestPreview = ({ wmsState, requestState, mapState, mode, token }) =>
         return getFisUrl(wmsState, requestState, mapState);
       case 'WCS':
         return getWcsUrl(wmsState, requestState, mapState);
+      case 'WFS':
+        return getWfsUrl(wmsState, requestState, mapState);
+      case 'WMTS':
+        return getWmtsUrl(wmsState, requestState);
       default:
         return getWmsUrl(wmsState, requestState, mapState);
     }
@@ -67,9 +72,11 @@ const WmsRequestPreview = ({ wmsState, requestState, mapState, mode, token }) =>
           className="process-editor"
           id="wms-request-preview"
           additionalCodeMirrorOptions={{ lineWrapping: true }}
+          onParse={parseWmsText}
+          supportedParseNames={['OGC - GetMap', 'Ogc Request']}
         />
         {wmsState.layer.id && mode === 'WMS' && (
-          <button className="secondary-button w-fit" onClick={handleSeeOnProcess}>
+          <button className="secondary-button w-fit mt-2" onClick={handleSeeOnProcess}>
             See on Process Mode
           </button>
         )}

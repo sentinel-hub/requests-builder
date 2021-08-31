@@ -20,7 +20,7 @@ const WmsModeSelector = ({ mode }) => {
           value="WMS"
           checked={mode === 'WMS'}
         />
-        <label htmlFor="wms-mode" className="form__label mr-2">
+        <label htmlFor="wms-mode" className="form__label cursor-pointer mr-2 ml-1">
           WMS
         </label>
         <input
@@ -31,7 +31,7 @@ const WmsModeSelector = ({ mode }) => {
           value="FIS"
           checked={mode === 'FIS'}
         />
-        <label htmlFor="fis" className="form__label mr-2">
+        <label htmlFor="fis" className="form__label cursor-pointer mr-2 ml-1">
           FIS
         </label>
         <input
@@ -42,8 +42,32 @@ const WmsModeSelector = ({ mode }) => {
           value="WCS"
           checked={mode === 'WCS'}
         />
-        <label htmlFor="wcs" className="form__label mr-2">
+        <label htmlFor="wcs" className="form__label cursor-pointer mr-2 ml-1">
           WCS
+        </label>
+
+        <input
+          id="wfs"
+          onChange={handleWmsModeChange}
+          className="form__input w-fit"
+          type="radio"
+          value="WFS"
+          checked={mode === 'WFS'}
+        />
+        <label htmlFor="wfs" className="form__label cursor-pointer mr-2 ml-1">
+          WFS
+        </label>
+
+        <input
+          id="wmts"
+          onChange={handleWmsModeChange}
+          className="form__input w-fit"
+          type="radio"
+          value="WMTS"
+          checked={mode === 'WMTS'}
+        />
+        <label htmlFor="wmts" className="form__label cursor-pointer mr-2 ml-1">
+          WMTS
         </label>
       </div>
     </>

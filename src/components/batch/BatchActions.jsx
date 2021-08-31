@@ -15,6 +15,7 @@ const BatchActions = ({
   setFetchedRequests,
   setOpenedContainers,
   fetchTiles,
+  orderDeploy,
 }) => {
   const curriyedUpdater = useCallback(
     (newItem, collapseAllExceptNew = true) => (requestId) => {
@@ -42,6 +43,7 @@ const BatchActions = ({
             token={token}
             analyseRequest={curriyedUpdater({ userAction: 'ANALYSE', status: 'ANALYSING' })}
             setOpenedContainers={setOpenedContainers}
+            orderDeploy={orderDeploy}
           />
           <Tooltip
             direction="right"
@@ -56,6 +58,7 @@ const BatchActions = ({
             token={token}
             startRequest={curriyedUpdater({ userAction: 'START' })}
             setOpenedContainers={setOpenedContainers}
+            orderDeploy={orderDeploy}
           />
           <Tooltip
             direction="bottom"
@@ -68,11 +71,12 @@ const BatchActions = ({
           requestId={requestId}
           token={token}
           cancelRequest={curriyedUpdater({ userAction: 'CANCEL' })}
+          orderDeploy={orderDeploy}
         />
       )}
       {canRestart(status) && (
         <div className="flex justify-between items-center">
-          <RestartPartialRequestButton requestId={requestId} token={token} />
+          <RestartPartialRequestButton requestId={requestId} token={token} orderDeploy={orderDeploy} />
           <Tooltip
             direction="bottom"
             content="Restarting will retry the request in case it's partially processed"
@@ -86,6 +90,7 @@ const BatchActions = ({
         curriyedUpdater={curriyedUpdater}
         setOpenedContainers={setOpenedContainers}
         fetchTiles={fetchTiles}
+        orderDeploy={orderDeploy}
       />
     </div>
   );

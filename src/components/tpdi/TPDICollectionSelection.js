@@ -64,6 +64,7 @@ const TPDICollectionSelection = ({ token, collectionId }) => {
     return collectionId;
   };
 
+  // TODO: Simplify manual entry field using FieldWithManualEntry
   return (
     <>
       <select

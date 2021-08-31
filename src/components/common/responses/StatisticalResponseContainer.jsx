@@ -1,30 +1,17 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef } from 'react';
 
 import DownloadLink from '../DownloadLink';
 import OgcFisResponse from '../../wms/FisResponse';
 import StatisticalResponse from '../../statistical/response/StatisticalResponse';
 import { isEmpty } from '../../../utils/commonUtils';
+import { useDownloadLink } from '../../../utils/hooks';
 
 const StatisticalResponseContainer = ({ statisticalResponse, mode }) => {
   const containerRef = useRef();
-  const [downloadUrl, setDownloadUrl] = useState();
+  const downloadUrl = useDownloadLink(statisticalResponse);
   const isEmptyResponse = isEmpty(statisticalResponse);
   const isValidStatApiResponse = Boolean(statisticalResponse?.data?.length);
   const isFisResponse = mode === 'WMS';
-
-  useEffect(() => {
-    let srcUrl;
-    if (!isEmptyResponse) {
-      srcUrl = URL.createObjectURL(
-        new Blob([JSON.stringify(statisticalResponse, null, 2)], { type: 'application/json' }),
-      );
-      setDownloadUrl(srcUrl);
-    }
-    return () => {
-      URL.revokeObjectURL(srcUrl);
-    };
-    // eslint-disable-next-line
-  }, []);
 
   if (isFisResponse) {
     return <OgcFisResponse statisticalResponse={statisticalResponse} url={downloadUrl} />;

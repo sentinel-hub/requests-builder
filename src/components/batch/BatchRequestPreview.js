@@ -81,32 +81,32 @@ const BatchRequestPreview = ({
             },
             {
               name: 'analyse',
-              value: analyseBatchRequestCurlCommand(token, batchState.selectedBatchId),
+              value: analyseBatchRequestCurlCommand(requestState, token, batchState.selectedBatchId),
               nonToggle: true,
             },
             {
               name: 'start',
-              value: startBatchRequestCurlCommand(token, batchState.selectedBatchId),
+              value: startBatchRequestCurlCommand(requestState, token, batchState.selectedBatchId),
               nonToggle: true,
             },
             {
               name: 'cancel',
-              value: cancelBatchRequestCurlCommand(token, batchState.selectedBatchId),
+              value: cancelBatchRequestCurlCommand(requestState, token, batchState.selectedBatchId),
               nonToggle: true,
             },
             {
               name: 'get all',
-              value: getAllBatchRequestsCurlCommand(token),
+              value: getAllBatchRequestsCurlCommand(requestState, token),
               toggledValue: getAllResponse,
             },
             {
               name: 'get single',
-              value: getSingleBatchRequestCurlCommand(token, batchState.selectedBatchId),
+              value: getSingleBatchRequestCurlCommand(requestState, token, batchState.selectedBatchId),
               toggledValue: singleResponse,
             },
             {
               name: 'tiles status',
-              value: getTileStatusBatchRequestCurlCommand(token, batchState.selectedBatchId),
+              value: getTileStatusBatchRequestCurlCommand(requestState, token, batchState.selectedBatchId),
               toggledValue: tilesResponse,
             },
             {

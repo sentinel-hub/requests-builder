@@ -3,6 +3,7 @@ import { isBbox } from '../common/Map/utils/crsTransform';
 import BBox from '@turf/bbox';
 import { DATASOURCES } from '../../utils/const/const';
 import { getBaseUrl, isOnDefaultUrl } from '../../api/url';
+import { typenameForCollection } from './WfsAdvancedOptions';
 
 const getConfigHelper = (token, reqConfig) => {
   return {
@@ -31,9 +32,14 @@ const getPolygonWKT = (geoJsonPolygon) => {
   }
 };
 
-const crsToWMSCrs = {
+export const crsToWMSCrs = {
   'EPSG:3857': 'EPSG:3857',
   'EPSG:4326': 'CRS:84',
+};
+
+export const WmsCrsToCrs = {
+  'EPSG:3857': 'EPSG:3857',
+  'CRS:84': 'EPSG:4326',
 };
 
 const getWMSBbox = (mapState, mode = 'WMS') => {
@@ -79,7 +85,7 @@ const getOGCAdvancedOptions = (wmsState) => {
   let advancedOptionsString = '';
   Object.keys(wmsState.advancedOptions).forEach((key) => {
     if (wmsState.advancedOptions[key]) {
-      advancedOptionsString += `&${key}=${wmsState.advancedOptions[key]}`;
+      advancedOptionsString += `&${key.toUpperCase()}=${wmsState.advancedOptions[key]}`;
     }
   });
   return advancedOptionsString;
@@ -99,7 +105,7 @@ const getWmsRequestParams = (requestState, wmsState, mapState, request = 'GetMap
 
 const getFisParams = (requestState, wmsState, mapState) => {
   let params = '';
-  params += `LAYER=${wmsState.layer.id}&`;
+  params += `LAYER=${wmsState.layer.id ?? '<layer>'}&`;
   params += `CRS=${crsToWMSCrs[mapState.selectedCrs]}&`;
   params += `${getWMSBbox(mapState, 'FIS')}&`;
   params += `${getWidthOrResWms(requestState)}`;
@@ -108,8 +114,37 @@ const getFisParams = (requestState, wmsState, mapState) => {
   return params;
 };
 
+const getWfsRequestParams = (requestState, wmsState, mapState) => {
+  let params = '';
+  params += `REQUEST=GetFeature&`;
+  params += `LAYER=${wmsState.layer.id ?? '<layer>'}&`;
+  params += `CRS=${crsToWMSCrs[mapState.selectedCrs]}&`;
+  params += `${getWMSBbox(mapState)}`;
+  params += `${getWmsTime(requestState)}`;
+  params += getOGCAdvancedOptions(wmsState);
+  return params;
+};
+
+const getWmtsRequestParams = (requestState, wmsState) => {
+  let params = '';
+  params += `REQUEST=GetTile&`;
+  params += `LAYER=${wmsState.layer.id ?? '<layer>'}`;
+  params += `${getWmsTime(requestState)}`;
+  params += getOGCAdvancedOptions(wmsState);
+  params += `&FORMAT=${requestState.responses[0].format}`;
+  return params;
+};
+
 const getWcsParams = (wmsState) => {
   return `&COVERAGE=${wmsState.layer.id}`;
+};
+
+const getWfsParams = (wmsState) => {
+  return `&TYPENAMES=${typenameForCollection(
+    wmsState.datasource,
+    wmsState.byocCollectionType,
+    wmsState.byocCollection,
+  )}&OUTPUTFORMAT=application/json`;
 };
 
 const getServicesEndpoint = (datasource) => {
@@ -139,6 +174,18 @@ export const getWcsUrl = (wmsState, requestState, mapState) => {
   }?${getWmsRequestParams(requestState, wmsState, mapState, 'GetCoverage')}${getWcsParams(wmsState)}`;
 };
 
+export const getWfsUrl = (wmsState, requestState, mapState) => {
+  return `${getServicesEndpoint(wmsState.datasource)}wfs/${
+    wmsState.instanceId ?? '<your instance id>'
+  }?${getWfsRequestParams(requestState, wmsState, mapState)}${getWfsParams(wmsState)}`;
+};
+
+export const getWmtsUrl = (wmsState, requestState) => {
+  return `${getServicesEndpoint(wmsState.datasource)}wmts/${
+    wmsState.instanceId ?? '<your instance id>'
+  }?${getWmtsRequestParams(requestState, wmsState)}`;
+};
+
 export const getMapWms = (wmsState, requestState, mapState, token, reqConfig) => {
   const url = getWmsUrl(wmsState, requestState, mapState);
   const config = getConfigHelper(token, reqConfig);
@@ -154,6 +201,20 @@ export const getFisStats = (wmsState, requestState, mapState, token, reqConfig) 
 
 export const getCoverageWcs = (wmsState, requestState, mapState, token, reqConfig) => {
   const url = getWcsUrl(wmsState, requestState, mapState);
+  const config = getConfigHelper(token, reqConfig);
+  config.responseType = 'blob';
+  return axios.get(url, config);
+};
+
+export const getFeaturesWfs = (wmsState, requestState, mapState, token, reqConfig) => {
+  const url = getWfsUrl(wmsState, requestState, mapState);
+  const config = getConfigHelper(token, reqConfig);
+  config.responseType = 'application/json';
+  return axios.get(url, config);
+};
+
+export const getTileWmts = (wmsState, requestState, mapState, token, reqConfig) => {
+  const url = getWmtsUrl(wmsState, requestState);
   const config = getConfigHelper(token, reqConfig);
   config.responseType = 'blob';
   return axios.get(url, config);

@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { connect } from 'react-redux';
 import RequestButton from '../common/RequestButton';
 import { errorHandlerTPDI } from './TPDIOrderOptions';
 import Tooltip from '../common/Tooltip/Tooltip';
 import TpdiResource from '../../api/tpdi/TpdiResource';
 import { tpdiCreateOrderBodyViaDataFilter, tpdiCreateOrderBodyViaProducts } from '../../api/tpdi/common';
+import { errorTpdiCreationEvent, successfulTpdiCreationEvent } from '../../utils/initAnalytics';
 
 const DIALOG_TEXT =
   'Are you sure you want to create an order without a Collection ID?\nWhen you confirm your order a new collection will be created automatically.';
@@ -39,6 +40,7 @@ const TPDIPlaceOrderButton = ({
   const { isUsingQuery, provider } = tpdi;
 
   const handleCreateOrderSuccess = (response) => {
+    successfulTpdiCreationEvent();
     if (isUsingQuery) {
       setCreateQueryResponse(JSON.stringify(response, null, 2));
     } else {
@@ -88,6 +90,11 @@ const TPDIPlaceOrderButton = ({
     return validation;
   };
 
+  const tpdiCreateErrorHandler = useCallback((err) => {
+    errorHandlerTPDI(err);
+    errorTpdiCreationEvent();
+  }, []);
+
   return (
     <div className="flex items-center mt-2" style={{ justifyContent: 'space-between' }}>
       <div />
@@ -99,7 +106,7 @@ const TPDIPlaceOrderButton = ({
           validation={validateCreateOrdersWithQuery()}
           className="secondary-button"
           responseHandler={handleCreateOrderSuccess}
-          errorHandler={errorHandlerTPDI}
+          errorHandler={tpdiCreateErrorHandler}
           disabledTitle={getOrderQueryDisabledTitle()}
           useConfirmation={shouldConfirm}
           dialogText={DIALOG_TEXT}
@@ -112,7 +119,7 @@ const TPDIPlaceOrderButton = ({
           validation={validateCreateOrderWithProducts()}
           className="secondary-button"
           responseHandler={handleCreateOrderSuccess}
-          errorHandler={errorHandlerTPDI}
+          errorHandler={tpdiCreateErrorHandler}
           disabledTitle="Add products, check the limit and use an api-key"
           useConfirmation={shouldConfirm}
           dialogText={DIALOG_TEXT}

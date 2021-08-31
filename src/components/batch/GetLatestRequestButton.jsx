@@ -7,24 +7,33 @@ import store from '../../store';
 import batchSlice from '../../store/batch';
 import BatchResource from '../../api/batch/BatchResource';
 
-const GetLatestRequestButton = ({ token, setFetchedRequests, handleExpandContainer }) => {
+const GetLatestRequestButton = ({
+  token,
+  setFetchedRequests,
+  handleExpandContainer,
+  batchSelectedDeployment,
+}) => {
   const responseHandler = (response) => {
     const sortedAndExpanded = response.data
       .sort((a, b) => new Date(b.created) - new Date(a.created))
       .map((req) => ({ ...req, isExpanded: true }));
     const latest = sortedAndExpanded[0];
 
-    // open appropriate container
-    const { status } = latest;
-    if (isFinishedStatus(status)) {
-      handleExpandContainer(2)(true);
-    } else if (isRunningStatus(status)) {
-      handleExpandContainer(1)(true);
-    } else {
-      handleExpandContainer(0)(true);
-    }
+    if (latest) {
+      // open appropriate container
+      const { status } = latest;
+      if (isFinishedStatus(status)) {
+        handleExpandContainer(2)(true);
+      } else if (isRunningStatus(status)) {
+        handleExpandContainer(1)(true);
+      } else {
+        handleExpandContainer(0)(true);
+      }
 
-    setFetchedRequests([latest]);
+      setFetchedRequests([latest]);
+    } else {
+      setFetchedRequests([]);
+    }
     store.dispatch(batchSlice.actions.setExtraInfo(''));
   };
   return (
@@ -35,7 +44,7 @@ const GetLatestRequestButton = ({ token, setFetchedRequests, handleExpandContain
       buttonText="Get Latest"
       responseHandler={responseHandler}
       errorHandler={addAlertOnError}
-      request={BatchResource.getLatestOrders}
+      request={BatchResource.getLatestOrders(batchSelectedDeployment)}
       args={[]}
       additionalClassNames={['mt-0', 'mr-2', 'wrapped']}
     />

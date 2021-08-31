@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import TPDISourcesAndOptions from '../components/tpdi/TPDISearchOptions';
 import MapContainer from '../components/common/Map/MapContainer';
 import TPDIOrderOptions from '../components/tpdi/TPDIOrderOptions';
@@ -10,6 +10,8 @@ import TPDITimerange from '../components/tpdi/TPDITimerange';
 import TPDISearchRequestPreview from '../components/tpdi/TPDISearchRequestPreview';
 import store from '../store';
 import alertSlice from '../store/alert';
+import TpdiForbiddenMultiPolygon from '../components/tpdi/TpdiForbiddenMultiPolygon';
+import { tpdiAnalyticsPage } from '../utils/initAnalytics';
 
 // Components needed to do TPDI Requests:
 // Timerange + AOI
@@ -35,6 +37,9 @@ const TPDIRequestForm = () => {
       }),
     );
   };
+  useEffect(() => {
+    tpdiAnalyticsPage();
+  }, []);
   return (
     <div>
       <div className="tpdi-first-row">
@@ -43,7 +48,7 @@ const TPDIRequestForm = () => {
           <QuotaContainer />
         </div>
         <div className="tpdi-first-row-second-item">
-          <MapContainer />
+          <MapContainer ExtraHeaderComponents={TpdiForbiddenMultiPolygon} />
         </div>
       </div>
       <div className="tpdi-second-row">

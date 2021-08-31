@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import '@geoman-io/leaflet-geoman-free';
@@ -8,7 +8,40 @@ import store from '../../../store';
 import mapSlice from '../../../store/map';
 
 //Get as props the reference to the map, the created layers and the drawn items.
-const Map = ({ mapRef, drawnItemsRef, setHasUsedMap, mapOverrideStyles }) => {
+const Map = ({
+  mapRef,
+  layersRef,
+  isDrawingMultiPolygon,
+  drawnItemsRef,
+  mapOverrideStyles,
+  setHasUsedMap,
+}) => {
+  const normalEventHandler = useCallback(
+    (e) => {
+      const layer = e.layer;
+      layer.removeFrom(mapRef.current);
+      const shape = e.shape;
+      const geoJSONFeature = layer.toGeoJSON();
+      setHasUsedMap(true);
+      if (shape === 'Rectangle') {
+        store.dispatch(mapSlice.actions.setWgs84Geometry(bbox(geoJSONFeature)));
+      } else if (shape === 'Polygon') {
+        store.dispatch(mapSlice.actions.setWgs84Geometry(geoJSONFeature.geometry));
+      }
+    },
+    [mapRef, setHasUsedMap],
+  );
+
+  const multipolygonEventHandler = useCallback(
+    (e) => {
+      const layer = e.layer;
+      layer.removeFrom(mapRef.current);
+      const geoJsonLayer = layer.toGeoJSON();
+      store.dispatch(mapSlice.actions.appendWgs84Polygon(geoJsonLayer.geometry));
+    },
+    [mapRef],
+  );
+
   //equivalent to ComponentDidMount
   //Creates a map and adds neccesary configuration
   useEffect(() => {
@@ -35,20 +68,19 @@ const Map = ({ mapRef, drawnItemsRef, setHasUsedMap, mapOverrideStyles }) => {
       removalMode: false,
     });
 
-    mapRef.current.on('pm:create', (e) => {
-      const layer = e.layer;
-      layer.removeFrom(mapRef.current);
-      const shape = e.shape;
-      const geoJSONFeature = layer.toGeoJSON();
-      setHasUsedMap(true);
-      if (shape === 'Rectangle') {
-        store.dispatch(mapSlice.actions.setWgs84Geometry(bbox(geoJSONFeature)));
-      } else if (shape === 'Polygon') {
-        store.dispatch(mapSlice.actions.setWgs84Geometry(geoJSONFeature.geometry));
-      }
-    });
-    // eslint-disable-next-line
-  }, []);
+    mapRef.current.on('pm:create', normalEventHandler);
+  }, [drawnItemsRef, layersRef, mapRef, normalEventHandler]);
+
+  // takes care of setting appropriate create layer handler in case of drawing multipolygons
+  useEffect(() => {
+    if (isDrawingMultiPolygon) {
+      mapRef.current.off('pm:create', normalEventHandler);
+      mapRef.current.on('pm:create', multipolygonEventHandler);
+    } else {
+      mapRef.current.off('pm:create', multipolygonEventHandler);
+      mapRef.current.on('pm:create', normalEventHandler);
+    }
+  }, [isDrawingMultiPolygon, mapRef, multipolygonEventHandler, normalEventHandler]);
 
   return <div className="map" id="map" style={mapOverrideStyles}></div>;
 };

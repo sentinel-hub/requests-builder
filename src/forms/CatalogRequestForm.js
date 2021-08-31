@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import CatalogCollectionSelection from '../components/catalog/CatalogCollectionSelection';
 import CatalogQueryOptions from '../components/catalog/CatalogQueryOptions';
 import MapContainer from '../components/common/Map/MapContainer';
@@ -8,6 +8,7 @@ import CatalogSendRequest from '../components/catalog/CatalogSendRequest';
 import CatalogResults from '../components/catalog/CatalogResults';
 // import CatalogDistinctSelection from '../catalog/CatalogDistinctSelection';
 import CatalogFields from '../components/catalog/CatalogFields';
+import { catalogAnalyticsPage } from '../utils/initAnalytics';
 
 const CatalogRequestForm = () => {
   // type is needed to render the results.
@@ -17,6 +18,10 @@ const CatalogRequestForm = () => {
   });
   const [catalogSearchResponse, setCatalogSearchResponse] = useState();
   const [usedCollection, setUsedCollection] = useState();
+
+  useEffect(() => {
+    catalogAnalyticsPage();
+  }, []);
   return (
     <div>
       <div className="catalog-first-row">

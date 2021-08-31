@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { connect } from 'react-redux';
+import store from '../../store';
+import batchSlice from '../../store/batch';
 import { groupBy } from '../../utils/commonUtils';
+import { BATCH_SUPPORTED_DEPLOYMENTS } from '../../utils/const/const';
+import Select from '../common/Select';
 import BatchStatusRequestsContainer from './BatchStatusRequestsContainer';
 import GetAllBatchRequestsButton from './GetAllBatchRequestsButton';
 import GetLatestRequestButton from './GetLatestRequestButton';
@@ -50,6 +54,7 @@ const BatchInformation = ({
   setSingleResponse,
   openedContainers,
   setOpenedContainers,
+  batchSelectedDeployment,
 }) => {
   const [searchText, setSearchText] = useState('');
   const [filteredRequests, setFilteredRequests] = useState(fetchedRequests);
@@ -98,17 +103,33 @@ const BatchInformation = ({
     [setOpenedContainers],
   );
 
+  const handleBatchDeploymentChange = (value) => {
+    store.dispatch(batchSlice.actions.setSelectedBatchDeployment(value));
+  };
+
   return (
     <>
       <h2 className="heading-secondary">Batch Information</h2>
       <div className="form" style={{ minHeight: '800px' }}>
         <div className="flex items-center">
+          <div className="w-60">
+            <Select
+              selected={batchSelectedDeployment}
+              options={BATCH_SUPPORTED_DEPLOYMENTS.map((deploy) => ({
+                value: deploy,
+                name: deploy,
+              }))}
+              onChange={handleBatchDeploymentChange}
+            />
+          </div>
           <GetAllBatchRequestsButton
+            batchSelectedDeployment={batchSelectedDeployment}
             setFetchedRequests={setFetchedRequests}
             setGetAllResponse={setGetAllResponse}
           />
 
           <GetLatestRequestButton
+            batchSelectedDeployment={batchSelectedDeployment}
             setFetchedRequests={setFetchedRequests}
             handleExpandContainer={handleExpandContainer}
           />
@@ -144,6 +165,7 @@ const BatchInformation = ({
           isContainerOpen={openedContainers[0]}
           handleExpandContainer={handleExpandContainer(0)}
           setOpenedContainers={setOpenedContainers}
+          batchSelectedDeployment={batchSelectedDeployment}
         />
 
         <BatchStatusRequestsContainer
@@ -159,6 +181,7 @@ const BatchInformation = ({
           handleExpandContainer={handleExpandContainer(1)}
           isContainerOpen={openedContainers[1]}
           setOpenedContainers={setOpenedContainers}
+          batchSelectedDeployment={batchSelectedDeployment}
         />
 
         <BatchStatusRequestsContainer
@@ -174,6 +197,7 @@ const BatchInformation = ({
           isContainerOpen={openedContainers[2]}
           containerTitle="Finished Requests"
           setOpenedContainers={setOpenedContainers}
+          batchSelectedDeployment={batchSelectedDeployment}
         />
       </div>
     </>
@@ -184,6 +208,7 @@ const mapStateToProps = (state) => ({
   extraInfo: state.batch.extraInfo,
   token: state.auth.user.access_token,
   specifyingCogParams: state.batch.specifyingCogParams,
+  batchSelectedDeployment: state.batch.batchSelectedDeployment,
 });
 
 export default connect(mapStateToProps)(BatchInformation);

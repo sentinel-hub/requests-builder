@@ -44,4 +44,4 @@ export const canStart = (status) => status !== 'DONE' && status !== 'CANCELED';
 
 export const canCancel = (status) => status !== 'DONE';
 
-export const canRestart = (status) => status !== 'DONE';
+export const canRestart = (status) => status === 'PARTIAL';

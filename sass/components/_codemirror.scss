@@ -70,3 +70,9 @@
     height: 414px !important;
   }
 }
+
+.evaluatepixel-editor {
+  .CodeMirror-scroll { /* stylelint-disable-line */
+    height: 200px;
+  }
+}

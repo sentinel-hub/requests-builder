@@ -7,8 +7,8 @@ import store from '../../store';
 import batchSlice from '../../store/batch';
 import BatchResource from '../../api/batch/BatchResource';
 
-export const getAllBatchRequests = async (_, reqConfig) => {
-  let res = await BatchResource.getOrders(null, reqConfig);
+const getAllBatchRequests = (batchDeployment) => async (_, reqConfig) => {
+  let res = await BatchResource.getOrders(batchDeployment)(null, reqConfig);
   let requests = res.data.data;
   while (res.data.links.next) {
     res = await BatchResource.getNextOrders(res.data.links.next)(null, reqConfig);
@@ -19,7 +19,12 @@ export const getAllBatchRequests = async (_, reqConfig) => {
   });
 };
 
-const GetAllBatchRequestsButton = ({ token, setFetchedRequests, setGetAllResponse }) => {
+const GetAllBatchRequestsButton = ({
+  token,
+  setFetchedRequests,
+  setGetAllResponse,
+  batchSelectedDeployment,
+}) => {
   const responseHandler = (response) => {
     setGetAllResponse(JSON.stringify(response, null, 2));
     setFetchedRequests(
@@ -37,7 +42,7 @@ const GetAllBatchRequestsButton = ({ token, setFetchedRequests, setGetAllRespons
       buttonText="Get All Batch Requests"
       responseHandler={responseHandler}
       errorHandler={addAlertOnError}
-      request={getAllBatchRequests}
+      request={getAllBatchRequests(batchSelectedDeployment)}
       args={[]}
       additionalClassNames={['mt-0', 'mr-2', 'wrapped']}
     />

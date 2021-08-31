@@ -5,7 +5,7 @@ import store from '../../store';
 import batchSlice from '../../store/batch';
 import BatchResource from '../../api/batch/BatchResource';
 
-const RestartPartialRequestButton = ({ requestId, token }) => {
+const RestartPartialRequestButton = ({ requestId, token, orderDeploy }) => {
   const responseHandler = () => {
     store.dispatch(
       batchSlice.actions.setExtraInfo('Request with id ' + requestId + ' successfully restarted'),
@@ -23,7 +23,7 @@ const RestartPartialRequestButton = ({ requestId, token }) => {
       errorHandler={errorHandler}
       validation={batchIdValidation(token, requestId)}
       disabledTitle="Log in and set a batch request id to use this"
-      request={BatchResource.restartOrder}
+      request={BatchResource.restartOrder(orderDeploy)}
       args={[{ orderId: requestId }]}
       className="secondary-button"
       additionalClassNames={['wrapped', 'h-fit', 'mt-0']}

@@ -1,15 +1,36 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
+import { connect } from 'react-redux';
 import InstanceSelector from '../components/wms/InstanceSelector';
 import LayerSelector from '../components/wms/LayerSelector';
 import WmsRequestPreview from '../components/wms/WmsRequestPreview';
 import MapContainer from '../components/common/Map/MapContainer';
 import Output from '../components/common/Output';
 import WmsModeSelector from '../components/wms/WmsModeSelector';
-import OGCAdvancedOptions from '../components/wms/OGCAdvancedOptions';
 import TimeRangeContainer from '../components/common/TimeRange/TimeRangeContainer';
 import RunningRequestIndicator from '../components/common/RunningRequestIndicator';
+import { ogcAnalyticsPage } from '../utils/initAnalytics';
+import FisAdvancedOptions from '../components/wms/FisAdvancedOptions';
+import WfsAdvancedOptions from '../components/wms/WfsAdvancedOptions';
+import WmtsAdvancedOptions from '../components/wms/WmtsAdvancedOptions';
 
-const WMSRequestForm = () => {
+const WMSRequestForm = ({ wmsMode }) => {
+  useEffect(() => {
+    ogcAnalyticsPage();
+  }, []);
+
+  const advancedOptions = useMemo(() => {
+    if (wmsMode === 'FIS') {
+      return <FisAdvancedOptions />;
+    }
+    if (wmsMode === 'WFS') {
+      return <WfsAdvancedOptions />;
+    }
+    if (wmsMode === 'WMTS') {
+      return <WmtsAdvancedOptions />;
+    }
+    return null;
+  }, [wmsMode]);
+
   return (
     <div className="wms-request-form">
       <div>
@@ -21,14 +42,12 @@ const WMSRequestForm = () => {
           <div className="form">
             <InstanceSelector />
             <LayerSelector />
-            <OGCAdvancedOptions />
+            {advancedOptions}
           </div>
         </div>
         <div className="wms-request-form-first-row-second-item">
           <TimeRangeContainer />
-          <div className="output mt-2">
-            <Output />
-          </div>
+          <div className="output mt-2">{wmsMode !== 'WFS' && <Output />}</div>
         </div>
         <div className="wms-request-form-first-row-third-item">
           <MapContainer />
@@ -45,4 +64,8 @@ const WMSRequestForm = () => {
   );
 };
 
-export default WMSRequestForm;
+const mapStateToProps = (state) => ({
+  wmsMode: state.wms.mode,
+});
+
+export default connect(mapStateToProps)(WMSRequestForm);

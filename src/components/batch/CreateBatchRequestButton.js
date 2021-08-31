@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { connect } from 'react-redux';
 import RequestButton from '../common/RequestButton';
 import { addAlertOnError } from './lib/utils';
@@ -6,6 +6,7 @@ import { validateRequestState } from '../../utils/validator';
 import BatchResource from '../../api/batch/BatchResource';
 import { generateBatchBodyRequest } from '../../api/batch/utils';
 import { isInvalidDatafusionState } from '../../store/request';
+import { errorBatchCreationEvent, successfulBatchCreationEvent } from '../../utils/initAnalytics';
 
 const isCreatePossible = (batchState, requestState, token) => {
   const { tillingGrid, resolution, bucketName } = batchState;
@@ -24,6 +25,7 @@ const CreateBatchRequestButton = ({
   openOnlyCreateContainer,
 }) => {
   const createResponseHandler = (response) => {
+    successfulBatchCreationEvent();
     setCreateResponse(JSON.stringify(response, null, 2));
     // open new one and close rest.
     setFetchedRequests((prev) => [
@@ -32,16 +34,21 @@ const CreateBatchRequestButton = ({
     ]);
     openOnlyCreateContainer();
   };
+  const errorHandler = useCallback((err) => {
+    addAlertOnError(err, 'Something went wrong while creating a batch request');
+    errorBatchCreationEvent();
+  }, []);
+
   const isInvalidDatafusion = isInvalidDatafusionState(requestState);
   return (
     <RequestButton
       validation={isCreatePossible(batchState, requestState, token) && !isInvalidDatafusion}
       className="secondary-button"
       buttonText="Create"
-      request={BatchResource.createOrder}
+      request={BatchResource.createOrder(requestState)}
       args={[generateBatchBodyRequest(requestState, batchState, mapState)]}
       responseHandler={createResponseHandler}
-      errorHandler={addAlertOnError}
+      errorHandler={errorHandler}
     />
   );
 };

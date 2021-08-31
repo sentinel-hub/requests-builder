@@ -6,6 +6,7 @@ import catalogSlice from '../../store/catalog';
 import { catalogErrorHandler } from './CatalogSendRequestButton';
 import CatalogResource from '../../api/catalog/CatalogResource';
 import { getCatalogRequestBody } from '../../api/catalog/utils';
+import { successfulCatalogReqEvent } from '../../utils/initAnalytics';
 
 const CatalogSendRequestNextButton = ({
   catalogState,
@@ -18,6 +19,7 @@ const CatalogSendRequestNextButton = ({
   const { next } = catalogState;
 
   const responseHandler = (response) => {
+    successfulCatalogReqEvent();
     if (response.context.next) {
       store.dispatch(catalogSlice.actions.setNext(response.context.next));
     } else {

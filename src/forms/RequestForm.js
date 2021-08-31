@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import DataSourceSelect from '../components/common/DataSourceSelect';
 import Output from '../components/common/Output';
 import EvalscriptEditor from '../components/common/Evalscript/EvalscriptEditor';
@@ -6,8 +6,12 @@ import RequestPreview from '../components/process/RequestPreview';
 import MapContainer from '../components/common/Map/MapContainer';
 import TimeRangeContainer from '../components/common/TimeRange/TimeRangeContainer';
 import RunningRequestIndicator from '../components/common/RunningRequestIndicator';
+import { processAnalyticsPage } from '../utils/initAnalytics';
 
 const RequestForm = () => {
+  useEffect(() => {
+    processAnalyticsPage();
+  }, []);
   return (
     <div>
       <div className="process-first-row">

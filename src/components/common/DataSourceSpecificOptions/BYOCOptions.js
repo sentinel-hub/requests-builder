@@ -8,6 +8,12 @@ import { faSync } from '@fortawesome/free-solid-svg-icons';
 import ByocResource from '../../../api/byoc/ByocResource';
 import { checkValidUuid } from '../../../utils/stringUtils';
 import Select from '../Select';
+import {
+  CODEDE_DEPLOYMENT,
+  CREODIAS_DEPLOYMENT,
+  EU_CENTRAL_DEPLOYMENT,
+  US_WEST_DEPLOYMENT,
+} from '../../../utils/const/const';
 
 const generateCollectionDatalist = (collections) => {
   return (
@@ -25,19 +31,26 @@ const byocTypeOptions = [
   { value: 'BATCH', name: 'BATCH' },
 ];
 
+const BLANK_LOCATION_OPTION = {
+  value: '',
+  name: 'Select a deployment',
+};
+
 const AWS_LOCATION_OPTION = {
-  value: 'aws-eu-central-1',
+  value: EU_CENTRAL_DEPLOYMENT,
   name: 'AWS eu-central-1',
 };
 
 const OTHER_LOCATION_OPTIONS = [
-  { value: 'aws-us-west-2', name: 'AWS us-west-2' },
-  { value: 'creo', name: 'Creodias' },
-  { value: 'codede', name: 'Code-de' },
+  { value: US_WEST_DEPLOYMENT, name: 'AWS us-west-2' },
+  { value: CREODIAS_DEPLOYMENT, name: 'Creodias' },
+  { value: CODEDE_DEPLOYMENT, name: 'Code-de' },
 ];
 
+const ALL_OPTIONS = [BLANK_LOCATION_OPTION, AWS_LOCATION_OPTION, ...OTHER_LOCATION_OPTIONS];
+
 const isByocLocationSupported = (location, appMode) => {
-  return appMode === 'PROCESS' || location === 'aws-eu-central-1';
+  return appMode === 'PROCESS' || location === EU_CENTRAL_DEPLOYMENT;
 };
 const BYOCOptions = ({
   token,
@@ -155,9 +168,7 @@ const BYOCOptions = ({
         selected={byocCollectionLocation}
         onChange={handleByocLocationChange}
         buttonClassNames="mb-2"
-        options={
-          appMode === 'PROCESS' ? [AWS_LOCATION_OPTION, ...OTHER_LOCATION_OPTIONS] : [AWS_LOCATION_OPTION]
-        }
+        options={ALL_OPTIONS}
       />
       <Select
         label="Collection Type"

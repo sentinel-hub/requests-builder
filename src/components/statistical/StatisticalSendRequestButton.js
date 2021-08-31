@@ -10,8 +10,10 @@ import { getStatisticalRequestBody } from '../../api/statistical/utils';
 import { getMessageFromApiError } from '../../api';
 import { isInvalidDatafusionState } from '../../store/request';
 import { getStatisticalUrl } from '../../api/url';
+import { errorStatReqEvent, successfulStatReqEvent } from '../../utils/initAnalytics';
 
 export const statisticsResponseHandler = (response, stringRequest) => {
+  successfulStatReqEvent();
   if (response === '') {
     store.dispatch(responsesSlice.actions.setError('No content returned, 204'));
     return;
@@ -27,6 +29,7 @@ export const statisticsResponseHandler = (response, stringRequest) => {
 };
 
 const statisticsErrorHandler = (err) => {
+  errorStatReqEvent();
   const msg = getMessageFromApiError(err);
   store.dispatch(alertSlice.actions.addAlert({ type: 'WARNING', text: msg }));
 };

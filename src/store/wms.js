@@ -6,6 +6,8 @@ const wmsSlice = createSlice({
     instanceId: '',
     layer: {},
     datasource: '',
+    byocCollection: undefined,
+    byocCollectionType: undefined,
     mode: 'WMS',
     shouldFetchLayers: false,
     advancedOptions: {},
@@ -31,6 +33,10 @@ const wmsSlice = createSlice({
     },
     setShouldFetchLayers: (state, action) => {
       state.shouldFetchLayers = action.payload;
+    },
+    setByocCollection: (state, action) => {
+      state.byocCollection = action.payload.id;
+      state.byocCollectionType = action.payload.type;
     },
   },
 });

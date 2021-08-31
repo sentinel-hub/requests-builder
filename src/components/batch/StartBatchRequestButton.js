@@ -6,7 +6,7 @@ import store from '../../store';
 import batchSlice from '../../store/batch';
 import BatchResource from '../../api/batch/BatchResource';
 
-const StartBatchRequestButton = ({ requestId, token, startRequest, setOpenedContainers }) => {
+const StartBatchRequestButton = ({ requestId, token, startRequest, setOpenedContainers, orderDeploy }) => {
   const startResponseHandler = () => {
     store.dispatch(batchSlice.actions.setExtraInfo('Successfully Started request with Id: ' + requestId));
     startRequest(requestId);
@@ -21,7 +21,7 @@ const StartBatchRequestButton = ({ requestId, token, startRequest, setOpenedCont
       buttonText="Start"
       responseHandler={startResponseHandler}
       errorHandler={addAlertOnError}
-      request={BatchResource.startOrder}
+      request={BatchResource.startOrder(orderDeploy)}
       args={[{ orderId: requestId }]}
       style={{ width: '70%', marginTop: '0' }}
     />

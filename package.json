@@ -41,7 +41,8 @@
     "react-debounce-render": "^6.0.0",
     "react-dom": "^16.13.1",
     "react-redux": "^7.2.0",
-    "react-scripts": "^4.0.3"
+    "react-scripts": "^4.0.3",
+    "web-vitals": "^2.1.0"
   },
   "scripts": {
     "start": "craco start",

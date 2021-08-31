@@ -6,6 +6,7 @@ import { useBind, useOnClickOutside, useScrollBlock } from '../../../utils/hooks
 import StatisticalResponseContainer from './StatisticalResponseContainer';
 import SaveRequestForm from '../../process/Collections/SaveRequestForm';
 import ImageResponse from './ImageResponse';
+import WfsResponse from './WfsResponse';
 
 const SUPPORTED_SAVE_MODES = ['PROCESS', 'STATISTICAL'];
 
@@ -20,6 +21,7 @@ const OverlayResponse = ({
   stringRequest,
   mode,
   isFromCollections,
+  wfsResponse,
 }) => {
   const ref = useRef();
 
@@ -48,9 +50,19 @@ const OverlayResponse = ({
       return (
         <>
           <h2 className="heading-secondary mb-2">Something went wrong</h2>
-          <p className="text">{error}</p>
+          <p className="text">
+            {error.split('\n').map((errorLine, idx) => (
+              <span>
+                <br key={`errorLine-${idx}`} />
+                {errorLine}
+              </span>
+            ))}
+          </p>
         </>
       );
+    }
+    if (wfsResponse) {
+      return <WfsResponse response={wfsResponse} />;
     }
     if (fisResponse) {
       return <StatisticalResponseContainer statisticalResponse={fisResponse} mode={mode} />;
@@ -100,6 +112,7 @@ const mapStateToProps = ({ response }) => ({
   stringRequest: response.stringRequest,
   mode: response.mode,
   isFromCollections: response.isFromCollections,
+  wfsResponse: response.wfsResponse,
 });
 
 export default connect(mapStateToProps)(OverlayResponse);

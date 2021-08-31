@@ -13,8 +13,8 @@ import CopyIcon from '../common/CopyIcon';
 import BatchResource from '../../api/batch/BatchResource';
 import TileResource from '../../api/batch/TileResource';
 
-export const fetchTilesBatchRequest = async (id) => {
-  let res = await TileResource.getTiles({ orderId: id });
+export const fetchTilesBatchRequest = async (id, deployment) => {
+  let res = await TileResource.getTiles(deployment)({ orderId: id });
   let tiles = res.data.data;
   while (res.data.links.next) {
     res = await TileResource.getNextTiles(res.data.links.next)();
@@ -95,9 +95,11 @@ const BatchRequestSummary = ({
   setFetchedRequests,
   handleExpand,
   setOpenedContainers,
+  batchSelectedDeployment,
 }) => {
   const { id, status, description, tileCount, valueEstimate, created, processRequest, isExpanded } = props;
   const bucketName = getBucketName(props);
+  const [orderDeploy] = useState(batchSelectedDeployment);
   const requestRef = useRef();
 
   // const [showAllInfo, setShowAllInfo] = useState(false);
@@ -112,11 +114,11 @@ const BatchRequestSummary = ({
   });
   const fetchTiles = useCallback(async () => {
     setIsFetchingTiles(true);
-    const res = await fetchTilesBatchRequest(id);
+    const res = await fetchTilesBatchRequest(id, orderDeploy);
     setFetchedTiles(updateTileInfo(res));
     setTilesResponse(JSON.stringify(res, null, 2));
     setIsFetchingTiles(false);
-  }, [id, setTilesResponse]);
+  }, [id, setTilesResponse, orderDeploy]);
 
   useEffect(() => {
     if (isExpanded && validStatus(status)) {
@@ -265,34 +267,38 @@ const BatchRequestSummary = ({
               setOpenedContainers={setOpenedContainers}
               status={status}
               fetchTiles={fetchTiles}
+              orderDeploy={orderDeploy}
             />
             <div className="w-full lg:w-1/2 grid grid-cols-2 gap-1 mr-1 h-fit">
               <button
                 onClick={handleSeeGeometry}
                 className="secondary-button wrapped"
                 style={{ width: '70%' }}
+                title="Display the geometry on the map as an extra layer"
               >
-                See geometry on map
+                Display geometry
               </button>
               <button
                 onClick={handleSetGeometry}
                 className="secondary-button wrapped"
                 style={{ width: '70%' }}
+                title="Use this geometry for your requests"
               >
-                Set geometry on map
+                Set geometry
               </button>
               <button
                 onClick={handleParseBatch}
                 className="secondary-button wrapped"
                 style={{ width: '70%' }}
+                title="Update the app to use all requests parameters (parse request)"
               >
-                Parse Batch Request
+                Update UI
               </button>
               {isValidDeleteStatus(status) && (
                 <RequestButton
-                  request={BatchResource.deleteOrder}
+                  request={BatchResource.deleteOrder(orderDeploy)}
                   args={[{ orderId: id }]}
-                  buttonText="Delete Batch Request"
+                  buttonText="Delete Request"
                   additionalClassNames={['secondary-button--cancel', 'wrapped']}
                   className="secondary-button"
                   validation={true}

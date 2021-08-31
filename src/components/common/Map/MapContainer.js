@@ -42,8 +42,10 @@ const getLeafletLayer = (wgs84Geometry, layerConfig, currentLayers, mapRef) => {
       e.layer.removeFrom(mapRef);
       e.originalLayer.removeFrom(mapRef);
       let geo = e.layer.toGeoJSON().geometry;
-      geo.type = 'MultiPolygon';
-      geo.coordinates = [geo.coordinates];
+      if (!isMultiPolygon(geo)) {
+        geo.type = 'MultiPolygon';
+        geo.coordinates = [geo.coordinates];
+      }
       store.dispatch(mapSlice.actions.setWgs84Geometry(geo));
     });
   };
@@ -101,7 +103,14 @@ if (!window.proj4) {
   window.proj4 = proj4;
 }
 
-const MapContainer = ({ wgs84Geometry, selectedCrs, textGeometry, extraGeometry, additionalLayers }) => {
+const MapContainer = ({
+  wgs84Geometry,
+  selectedCrs,
+  textGeometry,
+  extraGeometry,
+  additionalLayers,
+  ExtraHeaderComponents,
+}) => {
   const mapRef = useRef();
   const layersRef = useRef([]);
   const drawnItemsRef = useRef();
@@ -111,6 +120,7 @@ const MapContainer = ({ wgs84Geometry, selectedCrs, textGeometry, extraGeometry,
   const [mapError, setMapError] = useState(false);
   const [hasUsedMap, setHasUsedMap] = useState(false);
   const { isOverlayExpanded, openOverlay } = useOverlayComponent(mapContainerRef, 'overlayed-map');
+  const [isDrawingMultiPolygon, setIsDrawingMultiPolygon] = useState(false);
 
   useEffect(() => {
     if (hasUsedMap && selectedCrs !== 'EPSG:4326') {
@@ -140,11 +150,14 @@ const MapContainer = ({ wgs84Geometry, selectedCrs, textGeometry, extraGeometry,
 
   const deleteLayerIfPossible = () => {
     if (layersRef.current.length > 0) {
-      const layerToBeRemoved = layersRef.current.pop().layer;
-      drawnItemsRef.current.removeLayer(layerToBeRemoved);
-      mapRef.current.removeLayer(layerToBeRemoved);
+      while (layersRef.current.length > 0) {
+        const layerToBeRemoved = layersRef.current.pop().layer;
+        drawnItemsRef.current.removeLayer(layerToBeRemoved);
+        mapRef.current.removeLayer(layerToBeRemoved);
+      }
     }
   };
+
   const deleteExtraLayerIfPossible = () => {
     if (extraLayersRef.current.length > 0) {
       const layerToBeRemoved = extraLayersRef.current.pop().layer;
@@ -273,7 +286,6 @@ const MapContainer = ({ wgs84Geometry, selectedCrs, textGeometry, extraGeometry,
       }
     };
   }, []);
-
   return (
     <div>
       <div className="flex items-center">
@@ -305,6 +317,19 @@ const MapContainer = ({ wgs84Geometry, selectedCrs, textGeometry, extraGeometry,
             </button>
           )}
           <ByocDataFinder />
+
+          <button
+            className="secondary-button ml-3"
+            onClick={() => setIsDrawingMultiPolygon((prev) => !prev)}
+            title={
+              isDrawingMultiPolygon
+                ? 'New drawn geometries will be added as a MultiPolygon'
+                : 'New drawn geometries will replace the existing one'
+            }
+          >
+            {isDrawingMultiPolygon ? 'Drawing MultiPolygon' : 'Drawing Single Polygon'}
+          </button>
+          {ExtraHeaderComponents && <ExtraHeaderComponents />}
         </div>
         {(parsedError || mapError) && (
           <div className="mb-1">
@@ -329,6 +354,7 @@ const MapContainer = ({ wgs84Geometry, selectedCrs, textGeometry, extraGeometry,
             layersRef={layersRef}
             setHasUsedMap={setHasUsedMap}
             mapOverrideStyles={isOverlayExpanded ? { height: '100%' } : undefined}
+            isDrawingMultiPolygon={isDrawingMultiPolygon}
           />
 
           <MapTextarea

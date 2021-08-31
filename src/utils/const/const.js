@@ -20,10 +20,30 @@ import {
   DEFAULT_STATISTICAL_LTML_EVALSCRIPT,
 } from './constEvalscript';
 
-const EU_CENTRAL_LOCATION = 'aws-eu-central-1';
-const US_WEST_LOCATION = 'aws-us-west-2';
-const CREODIAS_LOCATION = 'creo';
-// const CODEDE_LOCATION = 'codede';
+export const EU_CENTRAL_DEPLOYMENT = 'aws-eu-central-1';
+export const US_WEST_DEPLOYMENT = 'aws-us-west-2';
+export const CREODIAS_DEPLOYMENT = 'creo';
+export const CODEDE_DEPLOYMENT = 'codede';
+
+export const BATCH_SUPPORTED_DEPLOYMENTS = [EU_CENTRAL_DEPLOYMENT, US_WEST_DEPLOYMENT];
+
+export const getBaseUrlByDeployment = (deployment) => {
+  if (!deployment) {
+    return 'https://services.sentinel-hub.com/';
+  }
+  switch (deployment) {
+    case EU_CENTRAL_DEPLOYMENT:
+      return 'https://services.sentinel-hub.com/';
+    case US_WEST_DEPLOYMENT:
+      return 'https://services-uswest2.sentinel-hub.com/';
+    case CREODIAS_DEPLOYMENT:
+      return 'https://creodias.sentinel-hub.com/';
+    case CODEDE_DEPLOYMENT:
+      return 'https://services.sentinel-hub.com/';
+    default:
+      throw new Error('Invalid argument' + deployment);
+  }
+};
 
 export const OLD_S2L1C = 'S2L1C';
 export const OLD_S2L2A = 'S2L2A';
@@ -35,10 +55,12 @@ export const OLD_S1GRD = 'S1GRD';
 export const OLD_S3OLCI = 'S3OLCI';
 export const OLD_S3SLSTR = 'S3SLSTR';
 export const OLD_S5PL2 = 'S5PL2';
-export const OLD_CUSTOM = 'CUSTOM';
+export const OLD_LTML1 = 'LTML1';
+export const OLD_LTML2 = 'LTML2';
 export const OLD_LMSSL1 = 'LMSSL1';
 export const OLD_LETML1 = 'LETML1';
 export const OLD_LETML2 = 'LETML2';
+export const OLD_CUSTOM = 'CUSTOM';
 
 export const S2L1C = 'sentinel-2-l1c';
 export const S2L2A = 'sentinel-2-l2a';
@@ -72,6 +94,8 @@ export const OLD_DATASOURCES_TO_NEW_MAP = {
   [OLD_LETML1]: LETML1,
   [OLD_LETML2]: LETML2,
   [OLD_CUSTOM]: CUSTOM,
+  [OLD_LTML1]: LTML1,
+  [OLD_LTML2]: LTML2,
 };
 
 export const DATASOURCES = {
@@ -81,7 +105,7 @@ export const DATASOURCES = {
     defaultDatafusionId: 'l1c',
     isBatchSupported: true,
     isStatApiSupported: true,
-    region: EU_CENTRAL_LOCATION,
+    region: EU_CENTRAL_DEPLOYMENT,
   },
   [S2L2A]: {
     url: 'https://services.sentinel-hub.com/api/v1',
@@ -89,67 +113,67 @@ export const DATASOURCES = {
     defaultDatafusionId: 'l2a',
     isBatchSupported: true,
     isStatApiSupported: true,
-    region: EU_CENTRAL_LOCATION,
+    region: EU_CENTRAL_DEPLOYMENT,
   },
   [LOTL1]: {
     url: 'https://services-uswest2.sentinel-hub.com/api/v1',
     ogcUrl: 'https://services-uswest2.sentinel-hub.com/ogc/',
     defaultDatafusionId: 'lotl1',
-    isBatchSupported: false,
+    isBatchSupported: true,
     isStatApiSupported: true,
-    region: US_WEST_LOCATION,
+    region: US_WEST_DEPLOYMENT,
   },
   [LOTL2]: {
     url: 'https://services-uswest2.sentinel-hub.com/api/v1',
     ogcUrl: 'https://services-uswest2.sentinel-hub.com/ogc/',
     defaultDatafusionId: 'lotl2',
-    isBatchSupported: false,
+    isBatchSupported: true,
     isStatApiSupported: true,
-    region: US_WEST_LOCATION,
+    region: US_WEST_DEPLOYMENT,
   },
   [LTML1]: {
     url: 'https://services-uswest2.sentinel-hub.com/api/v1',
     ogcUrl: 'https://services-uswest2.sentinel-hub.com/ogc/',
     defaultDatafusionId: 'ltml1',
-    isBatchSupported: false,
+    isBatchSupported: true,
     isStatApiSupported: true,
-    region: US_WEST_LOCATION,
+    region: US_WEST_DEPLOYMENT,
   },
   [LTML2]: {
     url: 'https://services-uswest2.sentinel-hub.com/api/v1',
     ogcUrl: 'https://services-uswest2.sentinel-hub.com/ogc/',
     defaultDatafusionId: 'ltml2',
-    isBatchSupported: false,
+    isBatchSupported: true,
     isStatApiSupported: true,
   },
   [LMSSL1]: {
     url: 'https://services-uswest2.sentinel-hub.com/api/v1',
     ogcUrl: 'https://services-uswest2.sentinel-hub.com/ogc/',
     defaultDatafusionId: 'lmssl1',
-    isBatchSupported: false,
+    isBatchSupported: true,
     isStatApiSupported: true,
   },
   [LETML1]: {
     url: 'https://services-uswest2.sentinel-hub.com/api/v1',
     ogcUrl: 'https://services-uswest2.sentinel-hub.com/ogc/',
     defaultDatafusionId: 'letml1',
-    isBatchSupported: false,
+    isBatchSupported: true,
     isStatApiSupported: true,
   },
   [LETML2]: {
     url: 'https://services-uswest2.sentinel-hub.com/api/v1',
     ogcUrl: 'https://services-uswest2.sentinel-hub.com/ogc/',
     defaultDatafusionId: 'letml2',
-    isBatchSupported: false,
+    isBatchSupported: true,
     isStatApiSupported: true,
   },
   [MODIS]: {
     url: 'https://services-uswest2.sentinel-hub.com/api/v1',
     ogcUrl: 'https://services-uswest2.sentinel-hub.com/ogc/',
     defaultDatafusionId: 'modis',
-    isBatchSupported: false,
+    isBatchSupported: true,
     isStatApiSupported: true,
-    region: US_WEST_LOCATION,
+    region: US_WEST_DEPLOYMENT,
   },
   [DEM]: {
     url: 'https://services.sentinel-hub.com/api/v1',
@@ -157,7 +181,7 @@ export const DATASOURCES = {
     defaultDatafusionId: 'dem',
     isBatchSupported: true,
     isStatApiSupported: false,
-    region: EU_CENTRAL_LOCATION,
+    region: EU_CENTRAL_DEPLOYMENT,
   },
   [S1GRD]: {
     url: 'https://services.sentinel-hub.com/api/v1',
@@ -165,7 +189,7 @@ export const DATASOURCES = {
     defaultDatafusionId: 's1',
     isBatchSupported: true,
     isStatApiSupported: true,
-    region: EU_CENTRAL_LOCATION,
+    region: EU_CENTRAL_DEPLOYMENT,
   },
   [S3OLCI]: {
     url: 'https://creodias.sentinel-hub.com/api/v1',
@@ -173,7 +197,7 @@ export const DATASOURCES = {
     defaultDatafusionId: 'olci',
     isBatchSupported: false,
     isStatApiSupported: false,
-    region: CREODIAS_LOCATION,
+    region: CREODIAS_DEPLOYMENT,
   },
   [S3SLSTR]: {
     url: 'https://creodias.sentinel-hub.com/api/v1',
@@ -181,7 +205,7 @@ export const DATASOURCES = {
     defaultDatafusionId: 'slstr',
     isBatchSupported: false,
     isStatApiSupported: false,
-    region: CREODIAS_LOCATION,
+    region: CREODIAS_DEPLOYMENT,
   },
   [S5PL2]: {
     url: 'https://creodias.sentinel-hub.com/api/v1',
@@ -189,7 +213,7 @@ export const DATASOURCES = {
     defaultDatafusionId: 's5pl2',
     isBatchSupported: false,
     isStatApiSupported: false,
-    region: CREODIAS_LOCATION,
+    region: CREODIAS_DEPLOYMENT,
   },
   [CUSTOM]: {
     url: 'https://services.sentinel-hub.com/api/v1',

@@ -28,6 +28,13 @@ const getColorByStatus = (status) => {
   return undefined;
 };
 
+const getDialogTextByProvider = (provider) => {
+  if (provider === 'PLANET') {
+    return `Note that it is technically possible to order more PlanetScope data than what you have already purchased. Make sure to check your area under management is in line with the HUM model" in order to avoid overage fees.\nAre you sure you want to confirm the order?`;
+  }
+  return 'Are you sure you want to confirm this order?';
+};
+
 const TooltipInfo = ({ isGeneral }) => {
   return (
     <div>
@@ -189,7 +196,7 @@ const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder, expandO
                   validation={Boolean(token)}
                   responseHandler={handleConfirm}
                   useConfirmation={true}
-                  dialogText="Are you sure you want to confirm this order?"
+                  dialogText={getDialogTextByProvider(order.provider)}
                   errorHandler={(err) => {
                     addWarningAlert(getMessageFromApiError(err));
                   }}

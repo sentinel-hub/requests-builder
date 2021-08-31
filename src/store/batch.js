@@ -1,10 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { EU_CENTRAL_DEPLOYMENT } from '../utils/const/const';
 
 const batchInitialState = {
   tillingGrid: 0,
   resolution: 10,
   description: '',
   bucketName: '',
+  batchSelectedDeployment: EU_CENTRAL_DEPLOYMENT,
   cogOutput: false,
   defaultTilePath: '',
   // bucketName -> true, if defaultTilePath -> false
@@ -62,6 +64,9 @@ const batchSlice = createSlice({
     },
     setOverwrite: (state, action) => {
       state.overwrite = action.payload;
+    },
+    setSelectedBatchDeployment: (state, action) => {
+      state.batchSelectedDeployment = action.payload;
     },
   },
 });

@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import store from '../../../store';
 import requestSlice from '../../../store/request';
 import BaseOptionsNoCC from './BaseOptionsNoCC';
 import { connect } from 'react-redux';
 import Select from '../Select';
+import FieldWithManualEntry from '../FieldWithManualEntry';
 
 const getOrthorectifyValue = (orthorectify, demInstance) => {
   if (!Boolean(orthorectify)) {
@@ -21,8 +22,11 @@ const S1GRDOptions = ({
   reduxOrthorectify,
   reduxTimeliness,
   reduxDemInstance,
+  reduxSpeckleFilter,
   idx,
 }) => {
+  const [speckleWindowInput, setSpeckleWindowInput] = useState('');
+
   const handleResolutionChange = (value) => {
     store.dispatch(requestSlice.actions.setDataFilterOptions({ resolution: value, idx: idx }));
   };
@@ -54,6 +58,33 @@ const S1GRDOptions = ({
       store.dispatch(requestSlice.actions.setProcessingOptions({ demInstance: value, idx: idx }));
     } else {
       store.dispatch(requestSlice.actions.setProcessingOptions({ demInstance: 'DEFAULT', idx: idx }));
+    }
+  };
+
+  const handleSpeckleFilterTypeChange = (value) => {
+    if (value === '') {
+      store.dispatch(requestSlice.actions.setProcessingOptions({ speckleFilter: undefined, idx }));
+      setSpeckleWindowInput('');
+    } else {
+      store.dispatch(
+        requestSlice.actions.setProcessingOptions({
+          speckleFilter: { ...reduxSpeckleFilter, type: value },
+          idx,
+        }),
+      );
+    }
+  };
+
+  const handleSpeckleFilterWindowChange = (value) => {
+    setSpeckleWindowInput(value);
+    if (/\b[0-7]x[0-7]\b/.test(value)) {
+      const [windowSizeX, windowSizeY] = value.split('x').map(Number);
+      store.dispatch(
+        requestSlice.actions.setProcessingOptions({
+          idx,
+          speckleFilter: { ...reduxSpeckleFilter, windowSizeX, windowSizeY },
+        }),
+      );
     }
   };
 
@@ -156,7 +187,32 @@ const S1GRDOptions = ({
           { value: 'COPERNICUS_30', name: 'Yes - using Copernicus 30m DEM' },
           { value: 'COPERNICUS_90', name: 'Yes - using Copernicus 90m DEM' },
         ]}
+        buttonClassNames="mb-2"
       />
+      <Select
+        label="Speckle Filter"
+        selected={reduxSpeckleFilter?.type ?? ''}
+        onChange={handleSpeckleFilterTypeChange}
+        options={[
+          { value: '', name: 'NONE' },
+          { value: 'LEE', name: 'Lee' },
+        ]}
+        buttonClassNames="mb-2"
+      />
+
+      {reduxSpeckleFilter?.type && (
+        <FieldWithManualEntry
+          label="Speckle Filter Window Size"
+          inputPlaceholder="e.g: 5x5"
+          onChange={handleSpeckleFilterWindowChange}
+          options={[
+            { value: '3x3', name: '3x3' },
+            { value: '5x5', name: '5x5' },
+            { value: '7x7', name: '7x7' },
+          ]}
+          value={speckleWindowInput}
+        />
+      )}
     </>
   );
 };
@@ -170,6 +226,7 @@ const mapStateToProps = (store, ownProps) => ({
   reduxOrthorectify: store.request.processingOptions[ownProps.idx].options.orthorectify,
   reduxTimeliness: store.request.dataFilterOptions[ownProps.idx].options.timeliness,
   reduxDemInstance: store.request.processingOptions[ownProps.idx].options.demInstance,
+  reduxSpeckleFilter: store.request.processingOptions[ownProps.idx].options.speckleFilter,
 });
 
 export default connect(mapStateToProps)(S1GRDOptions);

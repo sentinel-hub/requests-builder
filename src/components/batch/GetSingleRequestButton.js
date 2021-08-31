@@ -13,6 +13,7 @@ const GetSingleRequestButton = ({
   curriyedUpdater,
   setOpenedContainers,
   fetchTiles,
+  orderDeploy,
 }) => {
   const getSingleBatchHandler = (response) => {
     fetchTiles();
@@ -35,7 +36,7 @@ const GetSingleRequestButton = ({
       buttonText="Refresh request"
       responseHandler={getSingleBatchHandler}
       errorHandler={addAlertOnError}
-      request={BatchResource.getSingleOrder}
+      request={BatchResource.getSingleOrder(orderDeploy)}
       args={[{ orderId: requestId }]}
       additionalClassNames={['wrapped']}
       style={{ width: '70%', marginTop: '0' }}

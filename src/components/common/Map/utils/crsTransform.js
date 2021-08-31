@@ -2,7 +2,6 @@ import bboxPolygon from '@turf/bbox-polygon';
 import proj4 from 'proj4';
 import area from '@turf/area';
 import intersect from '@turf/intersect';
-import { addWarningAlert } from '../../../../store/alert';
 import { CRS } from '../../../../utils/const/constMap';
 
 export const getAreaFromGeometry = (geometry) => {
@@ -55,7 +54,6 @@ export const transformGeometryToNewCrs = (geometry, toCrs, fromCrs) => {
       return transformMultiPolygonToNewCrs(geometry, CRS[toCrs].projection, CRS[fromCrs].projection);
     }
   } catch (err) {
-    addWarningAlert("Couldn't transform geometry, check the console for more details");
     console.error('Invalid geometry', err);
   }
 };
@@ -169,3 +167,18 @@ export const isValidBbox = (bbox) => bbox.length === 4 && areAllNumbers(bbox);
 
 export const isValidGeometry = (geometry) =>
   (isPolygon(geometry) || isMultiPolygon(geometry)) && areAllNumbers(geometry.coordinates?.flat(Infinity));
+
+// currentGeometry: GeoJson, newPolygon: GeoJson (Polygon)
+export const appendPolygon = (currentGeometry, newPolygon) => {
+  if (isPolygon(currentGeometry)) {
+    return {
+      type: 'MultiPolygon',
+      coordinates: [currentGeometry.coordinates, newPolygon.coordinates],
+    };
+  }
+  // multiPolygon
+  return {
+    type: 'MultiPolygon',
+    coordinates: currentGeometry.coordinates.concat([newPolygon.coordinates]),
+  };
+};

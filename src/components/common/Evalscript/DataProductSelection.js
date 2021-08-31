@@ -1,7 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import Axios from 'axios';
 import store from '../../../store';
 import requestSlice from '../../../store/request';
+import { CUSTOM } from '../../../utils/const/const';
 import Select from '../Select';
+import { fetchDataProducts } from './utils';
+import Toggle from '../Toggle';
 
 // Search by id, name, description.
 const filterDataProducts = (dataproducts, filterText) => {
@@ -18,12 +22,17 @@ const filterDataProducts = (dataproducts, filterText) => {
   }
 };
 
-const DataProductSelection = ({ dataproducts }) => {
+const canUseDataProducts = (datasource, token) => token && datasource !== CUSTOM;
+
+const DataProductSelection = ({ token, dataCollection }) => {
   const [selectedDataProduct, setSelectedDataProduct] = useState({
     id: '',
   });
   const [filterText, setFilterText] = useState('');
+  const [dataproducts, setDataProducts] = useState([]);
   const filteredDataProducts = filterDataProducts(dataproducts, filterText);
+  const [isFetchingDataProducts, setIsFetchingDataProducts] = useState(false);
+  const [useDataProduct, setUseDataProduct] = useState(false);
 
   const handleChangeFilterText = (e) => {
     setFilterText(e.target.value);
@@ -42,6 +51,11 @@ const DataProductSelection = ({ dataproducts }) => {
     setSelectedDataProduct({ id: '' });
   }, [filterText]);
 
+  // Reset Data Products when datasource changes.
+  useEffect(() => {
+    setDataProducts([]);
+  }, [dataCollection]);
+
   // set evalscript auto
   useEffect(() => {
     if (selectedDataProduct.id) {
@@ -49,9 +63,51 @@ const DataProductSelection = ({ dataproducts }) => {
     }
   }, [selectedDataProduct]);
 
+  const handleUseDataProductChange = () => {
+    setUseDataProduct(!useDataProduct);
+  };
+
+  const fetchAndSetDataProducts = useCallback(async (dataCollection, token, reqConfig) => {
+    try {
+      setIsFetchingDataProducts(true);
+      const dataproducts = await fetchDataProducts(dataCollection, token, reqConfig);
+      setDataProducts(dataproducts);
+      setIsFetchingDataProducts(false);
+    } catch (error) {
+      if (!Axios.isCancel(error)) {
+        console.error(error);
+      }
+    }
+  }, []);
+
+  // Fetch Data Products if needed.
+  useEffect(() => {
+    let source = Axios.CancelToken.source();
+    if (useDataProduct && dataproducts.length === 0 && canUseDataProducts(dataCollection, token)) {
+      fetchAndSetDataProducts(dataCollection, token, { cancelToken: source.token });
+    }
+    return () => {
+      if (source) {
+        source.cancel();
+      }
+    };
+  }, [dataCollection, useDataProduct, token, dataproducts.length, fetchAndSetDataProducts]);
+
+  if (!canUseDataProducts(dataCollection, token)) {
+    return null;
+  }
+
   return (
     <>
-      {dataproducts.length > 0 ? (
+      <div className="flex items-center mb-2">
+        <label htmlFor="use-dataproduct" className="form__label cursor-pointer mr-2">
+          Use Data Product
+        </label>
+        <Toggle checked={useDataProduct} onChange={handleUseDataProductChange} id="use-dataproduct" />
+      </div>
+      {isFetchingDataProducts ? (
+        <p className="text mb-2">Loading Data Products...</p>
+      ) : useDataProduct && dataproducts.length > 0 ? (
         <>
           <div className="flex items-center mb-3">
             <input

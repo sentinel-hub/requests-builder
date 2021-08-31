@@ -13,6 +13,7 @@ const renderBatchRequestSummary = (
   setFetchedRequests,
   handleExpand,
   setOpenedContainers,
+  batchSelectedDeployment,
 ) => {
   let res = [];
   for (let i = 0; i < requests.length; i++) {
@@ -30,6 +31,7 @@ const renderBatchRequestSummary = (
         setFetchedRequests={setFetchedRequests}
         handleExpand={handleExpand}
         setOpenedContainers={setOpenedContainers}
+        batchSelectedDeployment={batchSelectedDeployment}
       />,
     );
   }
@@ -49,6 +51,7 @@ const BatchStatusRequestsContainer = ({
   isContainerOpen,
   handleExpandContainer,
   setOpenedContainers,
+  batchSelectedDeployment,
 }) => {
   const [limit, setLimit] = useState(50);
 
@@ -94,6 +97,7 @@ const BatchStatusRequestsContainer = ({
               setFetchedRequests,
               handleExpand,
               setOpenedContainers,
+              batchSelectedDeployment,
             )
           )}
         </div>

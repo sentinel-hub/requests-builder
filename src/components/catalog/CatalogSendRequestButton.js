@@ -6,8 +6,10 @@ import catalogSlice from '../../store/catalog';
 import alertSlice from '../../store/alert';
 import CatalogResource from '../../api/catalog/CatalogResource';
 import { getCatalogRequestBody } from '../../api/catalog/utils';
+import { errorCatalogReqEvent, successfulCatalogReqEvent } from '../../utils/initAnalytics';
 
 export const catalogErrorHandler = (error) => {
+  errorCatalogReqEvent();
   if (error.response && error.response.data) {
     store.dispatch(
       alertSlice.actions.addAlert({
@@ -33,6 +35,7 @@ const CatalogSendRequestButton = ({
   let type = catalogState.selectedCollection;
 
   const responseHandler = (response) => {
+    successfulCatalogReqEvent();
     if (response.context.next) {
       store.dispatch(catalogSlice.actions.setNext(response.context.next));
     } else {

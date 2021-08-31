@@ -104,6 +104,7 @@ const CatalogCollectionSelection = ({ token, selectedCollection, deploymentUrl }
                 { name: 'Select a collection', value: '' },
                 ...generateCollectionsOptions(collections),
               ]}
+              optionsClassNames="w-fit"
               onChange={handleSelectedCollectionChange}
             />
           )

@@ -1,11 +1,18 @@
 import Api from '..';
-import { BATCH_PATH } from './BatchResource';
+import { getBaseUrlByDeployment } from '../../utils/const/const';
 
 const { GET } = Api;
 
 const TileResource = {
-  getTiles: GET(`${BATCH_PATH}/process/:orderId/tiles`),
-  retryTile: GET(`${BATCH_PATH}/process/:orderId/tiles/restart`),
+  getTiles: (deployment) =>
+    GET(
+      `${getBaseUrlByDeployment(deployment)}api/v1/batch/process/:orderId/tiles`,
+      undefined,
+      undefined,
+      true,
+    ),
+  retryTile: (deployment) =>
+    GET(`${getBaseUrlByDeployment(deployment)}api/v1/batch/process/:orderId/tiles/restart`),
   getNextTiles: (url) => GET(url, undefined, undefined, true),
 };
 

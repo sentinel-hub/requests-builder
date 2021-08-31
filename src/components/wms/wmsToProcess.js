@@ -1,4 +1,5 @@
 import { getJSONRequestBody } from '../../api/process/utils';
+import { OLD_DATASOURCES_TO_NEW_MAP } from '../../utils/const/const';
 import { generateProcessCurlCommand } from '../process/lib/curls';
 
 const DATAFILTER_KEYS = [
@@ -39,8 +40,8 @@ const layerToRequestState = (layer, requestState) => {
   const finalReqState = {
     dataCollections: [
       {
-        type: layer.datasource,
-        byocCollectionType: layer.otherDefaults?.subType ? 'BYOC' : '',
+        type: OLD_DATASOURCES_TO_NEW_MAP[layer.datasource],
+        byocCollectionType: layer.otherDefaults?.subType ?? 'BYOC',
         byocCollectionId: layer.otherDefaults?.collectionId ?? '',
       },
     ],

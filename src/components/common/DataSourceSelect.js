@@ -35,6 +35,7 @@ import BYOCOptions from './DataSourceSpecificOptions/BYOCOptions';
 import Toggle from './Toggle';
 import OverlayButton from './OverlayButton';
 import Select from './Select';
+import LandsatOptions from './DataSourceSpecificOptions/LandsatOptions';
 
 const getDataCollectionNamesByMode = (appMode) => {
   let filteredDatasourcesKeys = DATASOURCES_NAMES;
@@ -67,7 +68,7 @@ const generateDataCollectionAdvancedOptions = (datasource, idx = 0) => {
     case LETML1:
     case LETML2:
     case LMSSL1:
-      return <BasicOptions idx={idx} />;
+      return <LandsatOptions idx={idx} dataCollection={datasource} />;
     case MODIS:
       return <BaseOptionsNoCC idx={idx} />;
     case S3OLCI:
@@ -108,11 +109,7 @@ const DataSourceSelect = ({ dataCollections, appMode }) => {
           <OverlayButton elementRef={overlayRef} />
         </div>
       </h2>
-      <div
-        className="form"
-        ref={overlayRef}
-        style={isOnDatafusion ? { maxHeight: '730px', overflowY: 'scroll' } : {}}
-      >
+      <div className="form" ref={overlayRef} style={{ maxHeight: '730px', overflowY: 'scroll' }}>
         {dataCollections.map((dataCol, idx) => (
           <SingleDataCollection
             key={`data-collection-${idx}`}

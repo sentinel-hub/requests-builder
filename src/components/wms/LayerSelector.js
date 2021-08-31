@@ -3,25 +3,24 @@ import { connect } from 'react-redux';
 import { fetchEvalscripts } from './wmsRequests';
 import store from '../../store';
 import wmsSlice from '../../store/wms';
-import { useDidMountEffect } from '../../utils/hooks';
 import WmsResource from '../../api/wms/WmsResource';
+import { CUSTOM, OLD_DATASOURCES_TO_NEW_MAP } from '../../utils/const/const';
+import FieldWithManualEntry from '../common/FieldWithManualEntry';
+import { checkValidUuid } from '../../utils/stringUtils';
 
 const generateLayersOptions = (layers) => {
-  return layers.map((lay) => (
-    <option key={lay.id} value={lay.id}>
-      {lay.title}
-    </option>
-  ));
+  return layers.map((lay) => ({
+    name: lay.title,
+    value: lay.id,
+  }));
 };
 
 const LayerSelector = ({ layerId, instanceId, shouldFetchLayers, token }) => {
   const [layers, setLayers] = useState([]);
-  const [layerIdInput, setLayerIdInput] = useState(layerId);
-  const [isOnManualInput, setIsOnManualInput] = useState(false);
 
   useEffect(() => {
     const loadLayers = async () => {
-      if (!token || !instanceId || !shouldFetchLayers) {
+      if (!token || !instanceId || !checkValidUuid(instanceId)) {
         return;
       }
       try {
@@ -29,68 +28,49 @@ const LayerSelector = ({ layerId, instanceId, shouldFetchLayers, token }) => {
         if (res.data) {
           // run through layers and fetch evalscripts if needed (dataproduct);
           const layersWithEvalscripts = await fetchEvalscripts(res.data, token);
-          setLayers(
-            layersWithEvalscripts.map((lay) => ({
-              id: lay.id,
-              description: lay.description,
-              title: lay.title,
-              datasource: lay.datasourceDefaults.type,
-              otherDefaults: lay.datasourceDefaults,
-              styles: lay.styles,
-            })),
-          );
+          const resLayers = layersWithEvalscripts.map((lay) => ({
+            id: lay.id,
+            description: lay.description,
+            title: lay.title,
+            datasource: lay.datasourceDefaults.type,
+            otherDefaults: lay.datasourceDefaults,
+            styles: lay.styles,
+          }));
+          setLayers(resLayers);
+          // in case of parsing
+          const currentLayer = resLayers.find((lay) => lay.id === layerId);
+          if (currentLayer) {
+            selectLayerStateChanges(currentLayer);
+          }
         }
       } catch (err) {
         console.error('Something went wrong loading layers', err);
       }
     };
     loadLayers();
-  }, [instanceId, token, shouldFetchLayers]);
+    // eslint-disable-next-line
+  }, [instanceId, token]);
 
-  useDidMountEffect(() => {
-    setLayerIdInput('');
-    store.dispatch(wmsSlice.actions.setLayer({}));
-  }, [instanceId]);
-
-  const handleLayerIdChange = (e) => {
-    setLayerIdInput(e.target.value);
-    const foundLayer = layers.find((lay) => lay.id === e.target.value);
+  const selectLayerStateChanges = (layer) => {
+    store.dispatch(wmsSlice.actions.setLayer(layer));
+    const id = OLD_DATASOURCES_TO_NEW_MAP[layer.datasource];
+    if (id === CUSTOM) {
+      store.dispatch(
+        wmsSlice.actions.setByocCollection({
+          type: layer.otherDefaults.subType ?? 'BYOC',
+          id: layer.otherDefaults.collectionId,
+        }),
+      );
+    }
+    store.dispatch(wmsSlice.actions.setDatasource(id));
+  };
+  const handleLayerIdChange = (value) => {
+    const foundLayer = layers.find((lay) => lay.id === value);
     if (foundLayer !== undefined) {
-      store.dispatch(wmsSlice.actions.setLayer(foundLayer));
+      selectLayerStateChanges(foundLayer);
     } else {
-      store.dispatch(wmsSlice.actions.setLayer({ id: e.target.value }));
+      store.dispatch(wmsSlice.actions.setLayer({ id: value }));
     }
-  };
-
-  const handleSelectLayerChange = (e) => {
-    if (e.target.value === 'MANUAL') {
-      setIsOnManualInput(true);
-      setLayerIdInput('');
-      store.dispatch(wmsSlice.actions.setLayer({}));
-    } else if (e.target.value === 'SELECT') {
-      setIsOnManualInput(false);
-      setLayerIdInput('');
-      store.dispatch(wmsSlice.actions.setLayer({}));
-    } else {
-      setIsOnManualInput(false);
-      setLayerIdInput(e.target.value);
-      const layer = layers.find((lay) => lay.id === e.target.value);
-      if (layer) {
-        store.dispatch(wmsSlice.actions.setDatasource(layer.datasource));
-        store.dispatch(wmsSlice.actions.setLayer(layer));
-      }
-    }
-  };
-
-  const layerIdToSelectValue = (layerId) => {
-    if (isOnManualInput) {
-      return 'MANUAL';
-    }
-    if (layerId === '') {
-      return 'SELECT';
-    }
-
-    return layerId;
   };
 
   return (
@@ -98,26 +78,11 @@ const LayerSelector = ({ layerId, instanceId, shouldFetchLayers, token }) => {
       <label htmlFor="layer" className="form__label mt-2">
         Layer
       </label>
-      <select
-        id="instance-layers"
-        className="form__input"
-        value={layerIdToSelectValue(layerId)}
-        onChange={handleSelectLayerChange}
-      >
-        <option value="SELECT">Select an instance layer</option>
-        <option value="MANUAL">Manual Entry</option>
-        {layers.length > 0 && <optgroup label="Instance layers">{generateLayersOptions(layers)}</optgroup>}
-      </select>
-      {isOnManualInput && (
-        <input
-          id="layer"
-          type="text"
-          className="form__input my-2"
-          placeholder="Layer id"
-          value={layerIdInput}
-          onChange={handleLayerIdChange}
-        />
-      )}
+      <FieldWithManualEntry
+        options={generateLayersOptions(layers)}
+        value={layerId}
+        onChange={handleLayerIdChange}
+      />
     </>
   );
 };

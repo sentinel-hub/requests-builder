@@ -17,6 +17,8 @@ import {
   LETML1,
   LETML2,
   LMSSL1,
+  EU_CENTRAL_DEPLOYMENT,
+  US_WEST_DEPLOYMENT,
 } from '../../../utils/const/const';
 import { isBbox, isPolygon } from '../../common/Map/utils/crsTransform';
 
@@ -60,8 +62,8 @@ const formatToSHJS = {
 };
 
 const locationToSHJSLocation = {
-  'aws-eu-central-1': 'awsEuCentral1',
-  'aws-us-west-2': 'awsUsWest2',
+  [EU_CENTRAL_DEPLOYMENT]: 'awsEuCentral1',
+  [US_WEST_DEPLOYMENT]: 'awsUsWest2',
 };
 
 const getSHJSImports = (reqState, selectedCrs) => {

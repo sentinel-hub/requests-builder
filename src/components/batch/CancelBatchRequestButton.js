@@ -6,7 +6,7 @@ import store from '../../store';
 import batchSlice from '../../store/batch';
 import BatchResource from '../../api/batch/BatchResource';
 
-const CancelBatchRequestButton = ({ requestId, token, cancelRequest }) => {
+const CancelBatchRequestButton = ({ requestId, token, cancelRequest, orderDeploy }) => {
   const cancelResponseHandler = () => {
     store.dispatch(batchSlice.actions.setExtraInfo('Successfully Cancelled request with Id: ' + requestId));
     cancelRequest(requestId);
@@ -19,7 +19,7 @@ const CancelBatchRequestButton = ({ requestId, token, cancelRequest }) => {
       buttonText="Cancel"
       responseHandler={cancelResponseHandler}
       errorHandler={addAlertOnError}
-      request={BatchResource.cancelOrder}
+      request={BatchResource.cancelOrder(orderDeploy)}
       args={[{ orderId: requestId }]}
       additionalClassNames={['mt-0', 'h-fit']}
       style={{ width: '70%', marginTop: '0' }}

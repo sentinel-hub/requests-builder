@@ -5,7 +5,13 @@ import store from '../../store';
 import batchSlice from '../../store/batch';
 import BatchResource from '../../api/batch/BatchResource';
 
-const AnalyseBatchRequestButton = ({ requestId, token, analyseRequest, setOpenedContainers }) => {
+const AnalyseBatchRequestButton = ({
+  requestId,
+  token,
+  analyseRequest,
+  setOpenedContainers,
+  orderDeploy,
+}) => {
   const analyseResponseHandler = () => {
     store.dispatch(
       batchSlice.actions.setExtraInfo('Analysis of request with id: ' + requestId + ' successfully started.'),
@@ -22,7 +28,7 @@ const AnalyseBatchRequestButton = ({ requestId, token, analyseRequest, setOpened
       buttonText="Analyse"
       responseHandler={analyseResponseHandler}
       errorHandler={addAlertOnError}
-      request={BatchResource.analyseOrder}
+      request={BatchResource.analyseOrder(orderDeploy)}
       args={[{ orderId: requestId }]}
       style={{ width: '70%', marginTop: '0' }}
     />

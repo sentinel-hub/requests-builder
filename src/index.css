@@ -84,8 +84,8 @@
 @layer utilities {
   @variants responsive {
     .w-fit {
-      width: fit-content;
-      width: -moz-fit-content;
+      width: fit-content !important;
+      width: -moz-fit-content !important;
     }
     .h-fit {
       height: fit-content;

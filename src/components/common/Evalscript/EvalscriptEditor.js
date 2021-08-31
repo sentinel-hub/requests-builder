@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import store from '../../../store';
 import requestSlice from '../../../store/request';
 import { Controlled as CodeMirror } from 'react-codemirror2';
 import { CUSTOM, datasourceToCustomRepoLink, getDefaultEvalscript } from '../../../utils/const/const';
-import { fetchDataProducts } from './utils';
 import { JSHINT } from 'jshint';
 import Toggle from '../Toggle';
 import DataProductSelection from './DataProductSelection';
-import Axios from 'axios';
 import Tooltip from '../Tooltip/Tooltip';
+import EvalscriptGui from './EvalscriptGui/index';
+import { addWarningAlert } from '../../../store/alert';
 
 require('codemirror/lib/codemirror.css');
 require('codemirror/theme/eclipse.css');
@@ -25,26 +25,19 @@ require('codemirror/addon/selection/active-line.js');
 
 window.JSHINT = JSHINT;
 
-const canUseDataProducts = (datasource, token) => token && datasource !== CUSTOM;
+const canUseEvalscriptGui = (dataCollection, isOnDatafusion) => !isOnDatafusion && dataCollection !== CUSTOM;
 
-const EvalscriptEditor = ({ dataCollection, mode, evalscript, token, consoleValue, className }) => {
+const EvalscriptEditor = ({
+  dataCollection,
+  mode,
+  evalscript,
+  token,
+  consoleValue,
+  className,
+  isOnDatafusion,
+}) => {
   const [toggledConsole, setToggledConsole] = useState(false);
-  const [useDataProduct, setUseDataProduct] = useState(false);
-  const [dataProducts, setDataProducts] = useState([]);
-  const [isFetchingDataProducts, setIsFetchingDataProducts] = useState(false);
-
-  const fetchAndSetDataProducts = useCallback(async (dataCollection, token, reqConfig) => {
-    try {
-      setIsFetchingDataProducts(true);
-      const dataproducts = await fetchDataProducts(dataCollection, token, reqConfig);
-      setDataProducts(dataproducts);
-      setIsFetchingDataProducts(false);
-    } catch (error) {
-      if (!Axios.isCancel(error)) {
-        console.error(error);
-      }
-    }
-  }, []);
+  const [usingEvalscriptGui, setUsingEvalscriptGui] = useState(false);
 
   useEffect(() => {
     if (consoleValue) {
@@ -52,23 +45,12 @@ const EvalscriptEditor = ({ dataCollection, mode, evalscript, token, consoleValu
     }
   }, [consoleValue]);
 
-  // Fetch Data Products if needed.
   useEffect(() => {
-    let source = Axios.CancelToken.source();
-    if (useDataProduct && dataProducts.length === 0 && canUseDataProducts(dataCollection, token)) {
-      fetchAndSetDataProducts(dataCollection, token, { cancelToken: source.token });
+    if (usingEvalscriptGui && !canUseEvalscriptGui(dataCollection, isOnDatafusion)) {
+      setUsingEvalscriptGui(false);
+      addWarningAlert('Evalscript GUI generation does not support BYOC or Data Fusion');
     }
-    return () => {
-      if (source) {
-        source.cancel();
-      }
-    };
-  }, [dataCollection, useDataProduct, token, dataProducts.length, fetchAndSetDataProducts]);
-
-  // Reset Data Products when datasource changes.
-  useEffect(() => {
-    setDataProducts([]);
-  }, [dataCollection]);
+  }, [usingEvalscriptGui, dataCollection, isOnDatafusion]);
 
   const handleTextChange = (editor, data, code) => {
     store.dispatch(requestSlice.actions.setEvalscript(code));
@@ -77,10 +59,6 @@ const EvalscriptEditor = ({ dataCollection, mode, evalscript, token, consoleValu
   const handleSetDefaultEvalscript = () => {
     const defaultEvalscript = getDefaultEvalscript(mode, dataCollection);
     store.dispatch(requestSlice.actions.setEvalscript(defaultEvalscript));
-  };
-
-  const handleUseDataProductChange = () => {
-    setUseDataProduct(!useDataProduct);
   };
 
   const handleToggleConsole = () => {
@@ -109,52 +87,54 @@ const EvalscriptEditor = ({ dataCollection, mode, evalscript, token, consoleValu
       </div>
 
       <div className="form">
-        {canUseDataProducts(dataCollection, token) ? (
-          <div className="flex items-center mb-2">
-            <label htmlFor="use-dataproduct" className="form__label">
-              Use Dataproduct
+        {!usingEvalscriptGui && <DataProductSelection token={token} dataCollection={dataCollection} />}
+
+        {canUseEvalscriptGui(dataCollection, isOnDatafusion) && (
+          <div className="flex">
+            <label className="form__label cursor-pointer mr-2 mb-3" htmlFor="evalscript-gui">
+              Use Evalscript GUI
             </label>
-            <Toggle checked={useDataProduct} onChange={handleUseDataProductChange} id="use-dataproduct" />
+            <Toggle
+              checked={usingEvalscriptGui}
+              onChange={() => setUsingEvalscriptGui(!usingEvalscriptGui)}
+              id="evalscript-gui"
+            />
           </div>
-        ) : null}
+        )}
 
-        {canUseDataProducts(dataCollection, token) && useDataProduct ? (
-          isFetchingDataProducts ? (
-            <p className="text mb-2">Loading Data Products...</p>
-          ) : (
-            <DataProductSelection dataproducts={dataProducts} />
-          )
-        ) : null}
-
-        <CodeMirror
-          value={evalscript}
-          options={{
-            mode: 'javascript',
-            theme: 'eclipse',
-            lint: {
-              esversion: 6,
-            },
-            lineNumbers: true,
-            matchBrackets: true,
-            autoCloseBrackets: true,
-            gutters: ['CodeMirror-lint-markers'],
-            styleActiveLine: true,
-            extraKeys: {
-              Tab: (cm) => {
-                var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
-                cm.replaceSelection(spaces);
+        {usingEvalscriptGui ? (
+          <EvalscriptGui setUsingEvalscriptGui={setUsingEvalscriptGui} />
+        ) : (
+          <CodeMirror
+            value={evalscript}
+            options={{
+              mode: 'javascript',
+              theme: 'eclipse',
+              lint: {
+                esversion: 6,
               },
-            },
-          }}
-          onBeforeChange={handleTextChange}
-          className={
-            className
-              ? className
-              : `process-editor process-editor--evalscript ${
-                  !toggledConsole ? 'process-editor--console' : ''
-                }`
-          }
-        />
+              lineNumbers: true,
+              matchBrackets: true,
+              autoCloseBrackets: true,
+              gutters: ['CodeMirror-lint-markers'],
+              styleActiveLine: true,
+              extraKeys: {
+                Tab: (cm) => {
+                  var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
+                  cm.replaceSelection(spaces);
+                },
+              },
+            }}
+            onBeforeChange={handleTextChange}
+            className={
+              className
+                ? className
+                : `process-editor process-editor--evalscript ${
+                    !toggledConsole ? 'process-editor--console' : ''
+                  }`
+            }
+          />
+        )}
 
         <div className="flex items-center mb-2 mt-1">
           <label className="form__label cursor-pointer mr-2" htmlFor="console">
@@ -189,6 +169,7 @@ const mapStateToProps = (store) => ({
   token: store.auth.user.access_token,
   consoleValue: store.request.consoleValue,
   mode: store.request.mode,
+  isOnDatafusion: store.request.dataCollections.length > 1,
 });
 
 export default connect(mapStateToProps, null)(EvalscriptEditor);

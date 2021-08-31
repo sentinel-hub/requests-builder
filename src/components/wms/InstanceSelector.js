@@ -6,20 +6,20 @@ import Axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSync } from '@fortawesome/free-solid-svg-icons';
 import WmsResource from '../../api/wms/WmsResource';
+import FieldWithManualEntry from '../common/FieldWithManualEntry';
+import { checkValidUuid } from '../../utils/stringUtils';
 
 const generateInstanceOptions = (instances) => {
   return instances
     .sort((a, b) => new Date(b.created) - new Date(a.created))
-    .map((instance) => (
-      <option value={instance.id} key={instance.id}>
-        {instance.name}
-      </option>
-    ));
+    .map((instance) => ({
+      name: instance.name,
+      value: instance.id,
+    }));
 };
 
 const InstanceSelector = ({ token, instanceId }) => {
   const [instances, setInstances] = useState([]);
-  const [isManualEntry, setIsManualEntry] = useState(false);
   const sourceRef = useRef();
 
   const loadInstances = useCallback(async () => {
@@ -53,22 +53,10 @@ const InstanceSelector = ({ token, instanceId }) => {
     };
   }, [token, loadInstances]);
 
-  const handleInstanceIdChange = (e) => {
-    store.dispatch(wmsSlice.actions.setInstanceId(e.target.value));
-  };
-
-  const handleSelectInstanceId = (e) => {
-    if (e.target.value === 'MANUAL') {
-      setIsManualEntry(true);
-      store.dispatch(wmsSlice.actions.setShouldFetchLayers(false));
-    } else if (e.target.value === 'SELECT') {
-      setIsManualEntry(false);
-      store.dispatch(wmsSlice.actions.setInstanceId(''));
-      store.dispatch(wmsSlice.actions.setShouldFetchLayers(false));
-    } else {
-      setIsManualEntry(false);
-      store.dispatch(wmsSlice.actions.setInstanceId(e.target.value));
-      store.dispatch(wmsSlice.actions.setShouldFetchLayers(true));
+  const handleInstanceIdChange = (value) => {
+    store.dispatch(wmsSlice.actions.setInstanceId(value));
+    if (checkValidUuid(value)) {
+      store.dispatch(wmsSlice.actions.setLayer({}));
     }
   };
 
@@ -76,53 +64,31 @@ const InstanceSelector = ({ token, instanceId }) => {
     if (token) {
       setInstances([]);
       store.dispatch(wmsSlice.actions.setInstanceId(''));
+      store.dispatch(wmsSlice.actions.setLayer({}));
+      store.dispatch(wmsSlice.actions.setDatasource(''));
       loadInstances();
     }
   };
 
-  const instanceIdToSelectValue = (instanceId) => {
-    if (isManualEntry) {
-      return 'MANUAL';
-    }
-    if (instanceId === '') {
-      return 'SELECT';
-    }
-    return instanceId;
-  };
   return (
     <>
-      <label htmlFor="instance" className="form__label">
-        Instance
-      </label>
-      <div className="flex items-center mb-1">
-        <select
-          id="personal-instances"
-          onChange={handleSelectInstanceId}
-          value={instanceIdToSelectValue(instanceId)}
-          className="form__input"
-        >
-          <option value="MANUAL">Manual Entry</option>
-          <option value="SELECT">Select an instance</option>
-          {instances.length > 0 && (
-            <optgroup label="Personal Instances">{generateInstanceOptions(instances)}</optgroup>
-          )}
-        </select>
+      <div className="flex justify-between">
+        <label htmlFor="instance" className="form__label">
+          Instance
+        </label>
         {token && (
           <button className="secondary-button ml-1" onClick={handleRefreshInstances}>
             <FontAwesomeIcon icon={faSync} />
           </button>
         )}
       </div>
-      {isManualEntry && (
-        <input
-          id="instance"
-          className="form__input"
-          placeholder="Enter your instance id"
-          type="text"
+      <div className="flex mb-2 flex-col">
+        <FieldWithManualEntry
+          options={generateInstanceOptions(instances)}
           onChange={handleInstanceIdChange}
           value={instanceId}
         />
-      )}
+      </div>
     </>
   );
 };

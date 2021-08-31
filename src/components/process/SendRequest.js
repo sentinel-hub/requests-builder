@@ -19,6 +19,18 @@ const getDebugError = (responseString) => {
   return debugMessage.trim();
 };
 
+const getErrorFromProcessApi = (error) => {
+  let errorMsg = error.error.message;
+  if (error.error.errors && error.error.errors.length > 0) {
+    for (let err of error.error.errors) {
+      if (err.parameter && err.violation) {
+        errorMsg += `\nparameter ${err.parameter} ${err.violation}\n`;
+      }
+    }
+  }
+  return errorMsg;
+};
+
 export const createFileReader = () => {
   const fr = new FileReader();
   fr.onload = function () {
@@ -27,7 +39,7 @@ export const createFileReader = () => {
     if (debugError(resultString)) {
       store.dispatch(requestSlice.actions.setConsoleValue(getDebugError(resultString)));
     } else {
-      store.dispatch(responsesSlice.actions.setError(parsed.error.message));
+      store.dispatch(responsesSlice.actions.setError(getErrorFromProcessApi(parsed)));
       store.dispatch(responsesSlice.actions.setDisplayResponse(true));
     }
   };

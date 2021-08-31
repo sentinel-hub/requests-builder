@@ -1,5 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
+import bboxPolygon from '@turf/bbox-polygon';
 import {
+  appendPolygon,
+  isBbox,
   transformGeometryToNewCrs,
   transformGeometryToWGS84IfNeeded,
 } from '../components/common/Map/utils/crsTransform';
@@ -67,6 +70,19 @@ const mapSlice = createSlice({
     removeAdditionalLayer: (state, action) => {
       const uuidToDelete = action.payload;
       state.additionalLayers = state.additionalLayers.filter((lay) => lay.uuid !== uuidToDelete);
+    },
+    appendWgs84Polygon: (state, action) => {
+      const currGeo = isBbox(state.wgs84Geometry)
+        ? bboxPolygon(state.wgs84Geometry).geometry
+        : state.wgs84Geometry;
+      const newGeo = appendPolygon(currGeo, action.payload);
+      state.wgs84Geometry = newGeo;
+      if (isWgs84(state.selectedCrs)) {
+        state.convertedGeometry = newGeo;
+      } else {
+        const transformedGeo = transformGeometryToNewCrs(newGeo, state.selectedCrs);
+        state.convertedGeometry = transformedGeo;
+      }
     },
   },
 });

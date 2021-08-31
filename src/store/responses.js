@@ -20,6 +20,7 @@ const responsesSlice = createSlice({
     stringRequest: undefined,
     mode: undefined,
     isFromCollections: undefined,
+    wfsResponse: undefined,
   },
   reducers: {
     setDisplayResponse: (state, action) => {
@@ -31,6 +32,7 @@ const responsesSlice = createSlice({
         state.isFromCollections = undefined;
         state.imageResponse = iniImageResponse;
         state.mode = undefined;
+        state.wfsResponse = undefined;
       }
       state.displayResponse = action.payload;
     },
@@ -77,6 +79,9 @@ const responsesSlice = createSlice({
       state.mode = mode;
       state.displayResponse = displayResponse;
       state.isFromCollections = isFromCollections;
+    },
+    setWfsResponse: (state, action) => {
+      state.wfsResponse = action.payload;
     },
   },
 });

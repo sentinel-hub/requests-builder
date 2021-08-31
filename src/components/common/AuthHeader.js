@@ -12,6 +12,7 @@ import store from '../../store';
 import alertSlice from '../../store/alert';
 import authSlice from '../../store/auth';
 import Api from '../../api';
+import { loginEvent, logoutEvent } from '../../utils/initAnalytics';
 
 export const doLogin = (customUrl) => {
   const AUTH_BASE_URL = customUrl ?? process.env.REACT_APP_AUTH_BASEURL;
@@ -93,11 +94,23 @@ const AuthHeader = ({ user, isEdcUser, customUrl, isImpersonating }) => {
       {!isEdcUser ? (
         <div>
           {user.userdata !== null ? (
-            <button onClick={doLogout} className="button button--inactive">
+            <button
+              onClick={() => {
+                doLogout();
+                logoutEvent();
+              }}
+              className="button button--inactive"
+            >
               Logout
             </button>
           ) : (
-            <button onClick={() => doLogin(customUrl)} className="button button--inactive">
+            <button
+              onClick={() => {
+                doLogin(customUrl);
+                loginEvent();
+              }}
+              className="button button--inactive"
+            >
               Login
             </button>
           )}
