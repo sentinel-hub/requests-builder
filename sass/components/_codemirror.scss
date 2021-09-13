@@ -73,6 +73,7 @@
 
 .evaluatepixel-editor {
   .CodeMirror-scroll { /* stylelint-disable-line */
-    height: 200px;
+    min-height: 200px;
+    max-height: 600px;
   }
 }

@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import { useDidMountEffect } from '../../../../utils/hooks';
 import { OUTPUT_DOCS } from './const';
 import TabBox from './TabBox';
 
@@ -9,18 +10,24 @@ export const INITIAL_OUTPUT_STATE = {
 };
 
 export const buildFullOutputState = (outputState, filteredResponses) => {
-  return filteredResponses.map((output, idx) => ({ ...outputState[idx], id: output['identifier'] }));
+  return Array.from({ length: Math.min(outputState.length, filteredResponses.length) }).map((_, idx) => ({
+    ...outputState[idx],
+    id: filteredResponses[idx]['identifier'],
+  }));
 };
 
 const EvalscriptOutput = ({ outputState, setOutputState, filteredResponses }) => {
-  useEffect(() => {
+  useDidMountEffect(() => {
     if (filteredResponses.length > outputState.length) {
       setOutputState((prev) => [...prev, INITIAL_OUTPUT_STATE]);
     } else if (filteredResponses.length < outputState.length) {
       setOutputState((prev) => prev.slice(0, -1));
     }
   }, [filteredResponses.length, outputState.length, setOutputState]);
-  const handleOutputChange = (idx) => (field) => (e) => {
+  const handleOutputChange = (idx) => (field) => (validation) => (e) => {
+    if (validation && validation(e) === false) {
+      return;
+    }
     const val = e.target.value;
     setOutputState((prev) => {
       const newOutput = { ...prev[idx], [field]: val };
@@ -44,8 +51,8 @@ const EvalscriptOutput = ({ outputState, setOutputState, filteredResponses }) =>
             <label className="form__label mr-3">bands *</label>
             <input
               className="form__input w-32"
-              type="text"
-              onChange={handleOutputChange(idx)('bands')}
+              type="number"
+              onChange={handleOutputChange(idx)('bands')((e) => e.target.value >= 0)}
               value={outputState[idx]['bands']}
             />
           </div>
@@ -56,7 +63,7 @@ const EvalscriptOutput = ({ outputState, setOutputState, filteredResponses }) =>
                 <input
                   type="radio"
                   value="UINT8"
-                  onChange={handleOutputChange(idx)('sampleType')}
+                  onChange={handleOutputChange(idx)('sampleType')()}
                   id={`uint8-${idx}`}
                   checked={outputState[idx]['sampleType'] === 'UINT8'}
                   className="mr-2"
@@ -69,7 +76,7 @@ const EvalscriptOutput = ({ outputState, setOutputState, filteredResponses }) =>
                 <input
                   type="radio"
                   value="UINT16"
-                  onChange={handleOutputChange(idx)('sampleType')}
+                  onChange={handleOutputChange(idx)('sampleType')()}
                   id={`uint16-${idx}`}
                   checked={outputState[idx]['sampleType'] === 'UINT16'}
                   className="mr-2"
@@ -82,7 +89,7 @@ const EvalscriptOutput = ({ outputState, setOutputState, filteredResponses }) =>
                 <input
                   type="radio"
                   value="FLOAT32"
-                  onChange={handleOutputChange(idx)('sampleType')}
+                  onChange={handleOutputChange(idx)('sampleType')()}
                   id={`float32-${idx}`}
                   checked={outputState[idx]['sampleType'] === 'FLOAT32'}
                   className="mr-2"
@@ -95,7 +102,7 @@ const EvalscriptOutput = ({ outputState, setOutputState, filteredResponses }) =>
                 <input
                   type="radio"
                   value="AUTO"
-                  onChange={handleOutputChange(idx)('sampleType')}
+                  onChange={handleOutputChange(idx)('sampleType')()}
                   id={`sampletype-auto-${idx}`}
                   checked={outputState[idx]['sampleType'] === 'AUTO'}
                   className="mr-2"
@@ -114,7 +121,7 @@ const EvalscriptOutput = ({ outputState, setOutputState, filteredResponses }) =>
             <input
               className="form__input w-32"
               type="text"
-              onChange={handleOutputChange(idx)('noDataValue')}
+              onChange={handleOutputChange(idx)('noDataValue')()}
               value={outputState[idx]['noDataValue']}
             />
           </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { connect } from 'react-redux';
 import store from '../../../store';
 import requestSlice from '../../../store/request';
@@ -10,6 +10,8 @@ import DataProductSelection from './DataProductSelection';
 import Tooltip from '../Tooltip/Tooltip';
 import EvalscriptGui from './EvalscriptGui/index';
 import { addWarningAlert } from '../../../store/alert';
+import { debounce } from '../../../utils/debounceAndThrottle';
+import { useDidMountEffect } from '../../../utils/hooks';
 
 require('codemirror/lib/codemirror.css');
 require('codemirror/theme/eclipse.css');
@@ -22,10 +24,32 @@ require('codemirror/addon/lint/lint.css');
 require('codemirror/addon/lint/lint.js');
 require('codemirror/addon/edit/closebrackets.js');
 require('codemirror/addon/selection/active-line.js');
+require('codemirror/addon/hint/anyword-hint.js');
+require('codemirror/addon/hint/show-hint.css');
+require('codemirror/addon/hint/show-hint.js');
+require('codemirror/addon/hint/javascript-hint.js');
 
 window.JSHINT = JSHINT;
 
-const canUseEvalscriptGui = (dataCollection, isOnDatafusion) => !isOnDatafusion && dataCollection !== CUSTOM;
+const evaluatePixelParams = {
+  inputMetadata: {
+    serviceVersion: 0,
+    normalizationFactor: 0,
+  },
+  outputMetadata: {},
+  scenes: {},
+};
+
+const scope = {
+  sample: {
+    B02: 0,
+    B03: 0,
+    B04: 0,
+  },
+};
+
+const canUseEvalscriptGui = (dataCollection, mode) =>
+  dataCollection !== CUSTOM && (mode === 'PROCESS' || mode === 'BATCH');
 
 const EvalscriptEditor = ({
   dataCollection,
@@ -38,6 +62,8 @@ const EvalscriptEditor = ({
 }) => {
   const [toggledConsole, setToggledConsole] = useState(false);
   const [usingEvalscriptGui, setUsingEvalscriptGui] = useState(false);
+  const [globalScope, setGlobalScope] = useState({ ...scope });
+  const [lintingErrors, setLintingErrors] = useState(false);
 
   useEffect(() => {
     if (consoleValue) {
@@ -46,13 +72,13 @@ const EvalscriptEditor = ({
   }, [consoleValue]);
 
   useEffect(() => {
-    if (usingEvalscriptGui && !canUseEvalscriptGui(dataCollection, isOnDatafusion)) {
+    if (usingEvalscriptGui && !canUseEvalscriptGui(dataCollection, mode, mode)) {
       setUsingEvalscriptGui(false);
       addWarningAlert('Evalscript GUI generation does not support BYOC or Data Fusion');
     }
-  }, [usingEvalscriptGui, dataCollection, isOnDatafusion]);
+  }, [usingEvalscriptGui, dataCollection, isOnDatafusion, mode]);
 
-  const handleTextChange = (editor, data, code) => {
+  const handleTextChange = (_, __, code) => {
     store.dispatch(requestSlice.actions.setEvalscript(code));
   };
 
@@ -64,6 +90,47 @@ const EvalscriptEditor = ({
   const handleToggleConsole = () => {
     setToggledConsole(!toggledConsole);
   };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleUpdateScope = useCallback(
+    debounce((evalscript) => {
+      try {
+        const res = eval(evalscript + '\n setup()'); // eslint-disable-line
+        if (Array.isArray(res?.input)) {
+          setGlobalScope({
+            sample: res.input.reduce((acc, band) => {
+              acc[band] = 0;
+              return acc;
+            }, {}),
+          });
+        }
+      } catch (err) {
+        // fail silently
+      }
+    }, 500),
+    [],
+  );
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleLintingErrors = useCallback(
+    debounce((lintStuff) => {
+      const errors = lintStuff && lintStuff.filter((lintWarn) => lintWarn.severity === 'error');
+      if (errors && errors.length > 0 && !lintingErrors) {
+        setLintingErrors(true);
+        return;
+      }
+      if ((!errors || errors.length === 0) && lintingErrors) {
+        setLintingErrors(false);
+      }
+    }, 500),
+    [lintingErrors],
+  );
+
+  useDidMountEffect(() => {
+    if (!lintingErrors) {
+      handleUpdateScope(evalscript);
+    }
+  }, [lintingErrors, evalscript]);
 
   return (
     <>
@@ -89,7 +156,7 @@ const EvalscriptEditor = ({
       <div className="form">
         {!usingEvalscriptGui && <DataProductSelection token={token} dataCollection={dataCollection} />}
 
-        {canUseEvalscriptGui(dataCollection, isOnDatafusion) && (
+        {canUseEvalscriptGui(dataCollection, mode) && (
           <div className="flex">
             <label className="form__label cursor-pointer mr-2 mb-3" htmlFor="evalscript-gui">
               Use Evalscript GUI
@@ -112,6 +179,8 @@ const EvalscriptEditor = ({
               theme: 'eclipse',
               lint: {
                 esversion: 6,
+                onUpdateLinting: handleLintingErrors,
+                options: {},
               },
               lineNumbers: true,
               matchBrackets: true,
@@ -123,6 +192,14 @@ const EvalscriptEditor = ({
                   var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
                   cm.replaceSelection(spaces);
                 },
+                'Ctrl-Space': 'autocomplete',
+              },
+              hintOptions: {
+                globalScope: {
+                  ...globalScope,
+                  ...evaluatePixelParams,
+                },
+                completeSingle: false,
               },
             }}
             onBeforeChange={handleTextChange}

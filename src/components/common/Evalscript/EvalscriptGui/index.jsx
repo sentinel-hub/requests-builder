@@ -5,23 +5,31 @@ import requestSlice from '../../../../store/request';
 import { SETUP_DOCS } from './const';
 import EvalscriptAdditionalFunctions from './EvalscriptAdditionalFunctions';
 import EvalscriptEvaluatePixel, { getDefaultEvaluatePixelFromResponses } from './EvalscriptEvaluatePixel';
-import EvalscriptInput from './EvalscriptInput';
+import EvalscriptInput from './EvalscriptInput/index';
 import EvalscriptMosaicking from './EvalscriptMosaicking';
 import EvalscriptOutput, { buildFullOutputState, INITIAL_OUTPUT_STATE } from './EvalscriptOutput';
 import generateEvalscript from './generateEvalscript';
 import TabBox from './TabBox';
 
-const EvalscriptGui = ({ responses, setUsingEvalscriptGui }) => {
+const EvalscriptGui = ({ responses, setUsingEvalscriptGui, dataCollections }) => {
   const filteredResponses = useMemo(() => responses.filter((resp) => resp.identifier !== 'userdata'), [
     responses,
   ]);
   const [evaluatePixel, setEvaluatePixel] = useState(getDefaultEvaluatePixelFromResponses(filteredResponses));
   const [additionalFunctions, setAdditionalFunctions] = useState([]);
   const [selectedMosaicking, setSelectedMosaicking] = useState('SIMPLE');
-  const [outputState, setOutputState] = useState([INITIAL_OUTPUT_STATE]);
-  const [selectedBands, setSelectedBands] = useState([]);
-  const [units, setUnits] = useState('REFLECTANCE');
-  const [metadataBounds, setMetadataBounds] = useState(false);
+  const [outputState, setOutputState] = useState(
+    Array.from({ length: responses.length }).fill(INITIAL_OUTPUT_STATE),
+  );
+  const [selectedBands, setSelectedBands] = useState(
+    dataCollections.reduce((acc, dc) => {
+      acc.push([]);
+      return acc;
+    }, []),
+  );
+
+  const [units, setUnits] = useState(dataCollections.map((dc) => 'REFLECTANCE'));
+  const [metadataBounds, setMetadataBounds] = useState([false]);
 
   const fullOutputState = useMemo(() => buildFullOutputState(outputState, filteredResponses), [
     outputState,
@@ -29,13 +37,21 @@ const EvalscriptGui = ({ responses, setUsingEvalscriptGui }) => {
   ]);
 
   const handleGenerateEvalscript = () => {
-    const input = {
-      bands: selectedBands,
-      units,
-      metadataBounds,
-      mosaicking: selectedMosaicking,
-    };
-    const evalscript = generateEvalscript(input, fullOutputState, evaluatePixel, additionalFunctions);
+    const isOnDf = dataCollections.length > 1;
+    const inputs = dataCollections.map((dc, idx) => ({
+      bands: selectedBands[idx],
+      units: units[idx],
+      metadataBounds: metadataBounds[idx],
+      id: isOnDf ? dc.id : undefined,
+    }));
+
+    const evalscript = generateEvalscript(
+      inputs,
+      selectedMosaicking,
+      fullOutputState,
+      evaluatePixel,
+      additionalFunctions,
+    );
 
     store.dispatch(requestSlice.actions.setEvalscript(evalscript));
     setUsingEvalscriptGui(false);
@@ -55,6 +71,7 @@ const EvalscriptGui = ({ responses, setUsingEvalscriptGui }) => {
           setUnits={setUnits}
           metadataBounds={metadataBounds}
           setMetadataBounds={setMetadataBounds}
+          dataCollections={dataCollections}
         />
         <EvalscriptOutput
           outputState={fullOutputState}
@@ -70,6 +87,7 @@ const EvalscriptGui = ({ responses, setUsingEvalscriptGui }) => {
         evaluatePixel={evaluatePixel}
         setEvaluatePixel={setEvaluatePixel}
         filteredResponses={filteredResponses}
+        selectedBands={selectedBands}
       />
       <EvalscriptAdditionalFunctions
         additionalFunctions={additionalFunctions}
@@ -92,6 +110,7 @@ const EvalscriptGui = ({ responses, setUsingEvalscriptGui }) => {
 
 const mapStateToProps = (state) => ({
   responses: state.request.responses,
+  dataCollections: state.request.dataCollections,
 });
 
 export default connect(mapStateToProps)(EvalscriptGui);

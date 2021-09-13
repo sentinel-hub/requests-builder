@@ -13,21 +13,42 @@ ${filteredResponses.map((resp) => `      ${resp.identifier}: [],`).join('\n')}
   }`;
 };
 
-const EvalscriptEvaluatePixel = ({ evaluatePixel, setEvaluatePixel, filteredResponses }) => {
-  const [edited, setEdited] = useState(false);
+const generateGlobalScope = (bands) => {
+  if (bands.length > 1) {
+    // data fusion
+    return {
+      samples: [],
+    };
+  }
+  return {
+    samples: bands.flat().reduce((acc, band) => {
+      acc[band] = 0;
+      return acc;
+    }, {}),
+  };
+};
+
+const EvalscriptEvaluatePixel = ({ evaluatePixel, setEvaluatePixel, filteredResponses, selectedBands }) => {
+  const [isEdited, setIsEdited] = useState(false);
+  const [globalScope, setGlobalScope] = useState(generateGlobalScope(selectedBands));
+
   const handleEvaluatePixelChange = (_, __, code) => {
-    if (!edited) {
-      setEdited(true);
+    if (!isEdited) {
+      setIsEdited(true);
     }
     setEvaluatePixel(code);
   };
 
   // update evaluate pixel as long as user has not edited it with new
   useDidMountEffect(() => {
-    if (!edited) {
+    if (!isEdited) {
       setEvaluatePixel(getDefaultEvaluatePixelFromResponses(filteredResponses));
     }
-  }, [filteredResponses, edited]);
+  }, [filteredResponses, isEdited]);
+
+  useDidMountEffect(() => {
+    setGlobalScope(generateGlobalScope(selectedBands));
+  }, [selectedBands]);
 
   return (
     <div className="flex flex-col">
@@ -51,6 +72,13 @@ const EvalscriptEvaluatePixel = ({ evaluatePixel, setEvaluatePixel, filteredResp
                 var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
                 cm.replaceSelection(spaces);
               },
+              'Ctrl-Space': 'autocomplete',
+            },
+            hintOptions: {
+              globalScope: {
+                ...globalScope,
+              },
+              completeSingle: false,
             },
           }}
           className="evaluatepixel-editor"

@@ -19,8 +19,12 @@ export default function Select({
   );
 
   useDidMountEffect(() => {
-    const newName = options.find((opt) => opt.value === selected).name;
-    setSelectedName(newName);
+    const newName = options.find((opt) => opt.value === selected)?.name;
+    if (newName) {
+      setSelectedName(newName);
+    } else {
+      setSelectedName(options[0].name);
+    }
   }, [selected]);
 
   return (

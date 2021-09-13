@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback, useLayoutEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useLayoutEffect, useRef, useMemo } from 'react';
 import store from '../../store';
 import alertSlice from '../../store/alert';
 import { getTransformedGeometryFromBounds, focusMap } from '../common/Map/utils/crsTransform';
 import RequestButton from '../common/RequestButton';
-import { dispatchChanges } from '../process/requests/parseRequest';
+import { dispatchChanges, getProperDataCollectionType } from '../process/requests/parseRequest';
 import { parseBatchRequest, getBucketName } from './parse';
 import mapSlice from '../../store/map';
 import BatchActions from './BatchActions';
@@ -12,6 +12,7 @@ import { faAngleDoubleDown, faAngleDoubleUp } from '@fortawesome/free-solid-svg-
 import CopyIcon from '../common/CopyIcon';
 import BatchResource from '../../api/batch/BatchResource';
 import TileResource from '../../api/batch/TileResource';
+import { DATASOURCES, EU_CENTRAL_DEPLOYMENT } from '../../utils/const/const';
 
 export const fetchTilesBatchRequest = async (id, deployment) => {
   let res = await TileResource.getTiles(deployment)({ orderId: id });
@@ -87,7 +88,7 @@ const getPathToCopyFromTilePath = (tilePath) => {
 };
 
 const BatchRequestSummary = ({
-  props,
+  request,
   token,
   setTilesResponse,
   handleDeleteBatchRequest,
@@ -95,12 +96,15 @@ const BatchRequestSummary = ({
   setFetchedRequests,
   handleExpand,
   setOpenedContainers,
-  batchSelectedDeployment,
 }) => {
-  const { id, status, description, tileCount, valueEstimate, created, processRequest, isExpanded } = props;
-  const bucketName = getBucketName(props);
-  const [orderDeploy] = useState(batchSelectedDeployment);
+  const { id, status, description, tileCount, valueEstimate, created, processRequest, isExpanded } = request;
+  const bucketName = getBucketName(request);
   const requestRef = useRef();
+  const orderDeploy = useMemo(() => {
+    const dataType = processRequest.input.data[0].type;
+    const properDataType = getProperDataCollectionType(dataType);
+    return DATASOURCES[properDataType]?.region ?? EU_CENTRAL_DEPLOYMENT;
+  }, [processRequest]);
 
   // const [showAllInfo, setShowAllInfo] = useState(false);
   const [isFetchingTiles, setIsFetchingTiles] = useState(false);
@@ -133,21 +137,21 @@ const BatchRequestSummary = ({
   }, [isExpanded]);
 
   const generateCopyCommand = useCallback(() => {
-    if (props.output && props.output.defaultTilePath) {
-      const path = getPathToCopyFromTilePath(props.output.defaultTilePath);
+    if (request.output && request.output.defaultTilePath) {
+      const path = getPathToCopyFromTilePath(request.output.defaultTilePath);
       return `aws s3 sync ${path} ./`;
     }
     return `aws s3 sync s3://${bucketName}/${id}/ ./`;
-  }, [bucketName, props.output, id]);
+  }, [bucketName, request.output, id]);
 
   const handleSeeGeometry = () => {
-    const transformedGeo = getTransformedGeometryFromBounds(props.processRequest.input.bounds);
+    const transformedGeo = getTransformedGeometryFromBounds(request.processRequest.input.bounds);
     store.dispatch(mapSlice.actions.setExtraGeometry(transformedGeo));
     focusMap();
   };
 
   const handleSetGeometry = () => {
-    const transformedGeo = getTransformedGeometryFromBounds(props.processRequest.input.bounds);
+    const transformedGeo = getTransformedGeometryFromBounds(request.processRequest.input.bounds);
     store.dispatch(mapSlice.actions.setWgs84Geometry(transformedGeo));
     focusMap();
   };
@@ -155,7 +159,7 @@ const BatchRequestSummary = ({
   const handleParseBatch = () => {
     try {
       dispatchChanges(processRequest);
-      parseBatchRequest(props);
+      parseBatchRequest(request);
       store.dispatch(alertSlice.actions.addAlert({ type: 'SUCCESS', text: 'Request successfully parsed' }));
     } catch (err) {
       console.error(err);
@@ -218,9 +222,9 @@ const BatchRequestSummary = ({
               <p className="text mr-1 mb-1">
                 <span className="font-bold">Status:</span> {status}
               </p>
-              {props.error !== undefined ? (
+              {request.error !== undefined ? (
                 <p className="text mr-1 mb-1 text-red-700">
-                  <span className="font-bold">Error:</span> {props.error}
+                  <span className="font-bold">Error:</span> {request.error}
                 </p>
               ) : null}
               {description ? (
@@ -248,13 +252,13 @@ const BatchRequestSummary = ({
                 </p>
               ) : null} */}
               <p className="text mr-1 mb-1">
-                <span className="font-bold">Tiling Grid:</span> {tillingGridIdToName(props.tilingGrid.id)}
+                <span className="font-bold">Tiling Grid:</span> {tillingGridIdToName(request.tilingGrid.id)}
               </p>
               <p className="text mr-1 mb-1">
-                <span className="font-bold">Resolution:</span> {props.tilingGrid.resolution}
+                <span className="font-bold">Resolution:</span> {request.tilingGrid.resolution}
               </p>
               <p className="text mr-1 mb-1">
-                <span className="font-bold">Last user Action:</span> {props.userAction}
+                <span className="font-bold">Last user Action:</span> {request.userAction}
               </p>
             </>
           </div>

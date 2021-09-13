@@ -1,12 +1,17 @@
-const generateSetup = (input, output) => {
+const generateSetup = (inputs, mosaicking, output) => {
+  const isOnDatafusion = inputs.length > 1;
   return `function setup() {
   return {
-    input: [{
-      bands: [${input.bands.map((band) => `"${band}"`)}],
-      units: "${input.units}",
-      mosaicking: "${input.mosaicking}",\
-      ${input.metadataBounds ? '\n      metadata: ["bounds"],' : ''}
-    }],
+    input: [${inputs.map(
+      (input) =>
+        `\n      {
+        bands: [${input.bands.map((band) => `"${band}"`)}],\
+      ${input.units !== '' ? `\n        units: "${input.units}",` : ''}\
+      ${input.metadataBounds ? '\n        metadata: ["bounds"],' : ''}\
+      ${isOnDatafusion ? `\n        datasource:"${input.id}"` : ''}
+      }`,
+    )}
+    ],
     output: [${output
       .map(
         (outputObject) => `
@@ -20,7 +25,8 @@ const generateSetup = (input, output) => {
       )
       .join('')}
     ],
-  }
+    mosaicking: "${mosaicking}",
+  };
 }
 `;
 };
@@ -47,10 +53,10 @@ const generateAdditionalFunctions = (additionalFunctions) => {
   }
   return additionalFunctions.map(additionalFunctionToCode).join('\n');
 };
-const generateEvalscript = (input, output, evaluatePixel, additionalFunctions) => {
+const generateEvalscript = (inputs, mosaicking, output, evaluatePixel, additionalFunctions) => {
   return `//VERSION=3
 
-${generateSetup(input, output)}
+${generateSetup(inputs, mosaicking, output)}
 
 ${evaluatePixel}
 

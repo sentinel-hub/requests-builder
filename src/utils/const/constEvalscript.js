@@ -154,7 +154,7 @@ function setup(){
     output: [
       {
         id: "data",
-        bands: 2,
+        bands: 3,
       },
       {
         id: "dataMask",
@@ -183,7 +183,7 @@ function setup() {
     output: [
       {
       id: "data",
-      bands: 2,
+      bands: 3,
       },
       {
         id: "dataMask",
@@ -267,7 +267,7 @@ function setup() {
     output: [
       {
         id: "data",
-        bands: 2
+        bands: 3
       },
       {
         id: "dataMask",
@@ -298,7 +298,7 @@ function setup() {
     output: [
       {
         id: "data",
-        bands: 2,
+        bands: 3,
       },
       {
         id: "dataMask",
@@ -397,7 +397,7 @@ function setup() {
     output: [
       {
         id: "data",
-        bands: 2
+        bands: 3
       },
       {
         id: "dataMask",
