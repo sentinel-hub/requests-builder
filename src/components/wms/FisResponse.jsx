@@ -4,7 +4,7 @@ import DownloadLink from '../common/DownloadLink';
 const OgcFisResponse = ({ url, statisticalResponse }) => {
   return (
     <>
-      <DownloadLink url={url} />
+      <DownloadLink url={url} format="json" />
       <textarea
         rows="30"
         cols="50"

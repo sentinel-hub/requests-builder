@@ -16,11 +16,12 @@ const ProcessRequestOverlayButton = ({
   className,
   additionalClassNames,
   requestState,
-  collectionRequestIdx,
+  collectionRequestInfo,
   wgs84Geometry,
   reqConfig,
   skipSaving = true,
   useShortcut,
+  disabledTitle,
 }) => {
   const readerRef = useRef();
   const shouldDisplayDimensions =
@@ -38,7 +39,7 @@ const ProcessRequestOverlayButton = ({
     if (shouldDisplayDimensions) {
       dimensions = calculatePixelSize(wgs84Geometry, [requestState.width, requestState.height]);
     }
-    const isFromCollections = collectionRequestIdx !== undefined ? true : false;
+    const isFromCollections = collectionRequestInfo?.primaryKey !== undefined ? true : false;
     let arrayBuffer;
     if (response.type.includes('tif')) {
       arrayBuffer = await response.arrayBuffer();
@@ -58,7 +59,11 @@ const ProcessRequestOverlayButton = ({
     );
     if (isFromCollections) {
       store.dispatch(
-        savedRequestsSlice.actions.setResponse({ idx: collectionRequestIdx, response: responseUrl }),
+        savedRequestsSlice.actions.setResponse({
+          idx: collectionRequestInfo?.idx,
+          response: responseUrl,
+          primaryKey: collectionRequestInfo?.primaryKey,
+        }),
       );
     }
   };
@@ -85,6 +90,7 @@ const ProcessRequestOverlayButton = ({
       useShortcut={useShortcut}
       requestConfiguration={reqConfig}
       shouldTriggerIsRunningRequest
+      disabledTitle={disabledTitle}
     />
   );
 };

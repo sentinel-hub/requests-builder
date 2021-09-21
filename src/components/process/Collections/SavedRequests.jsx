@@ -2,14 +2,56 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDoubleLeft, faAngleDoubleRight } from '@fortawesome/free-solid-svg-icons';
+import { SaveIcon } from '@heroicons/react/solid';
 import store from '../../../store';
 import savedRequestsSlice from '../../../store/savedRequests';
-import alertSlice from '../../../store/alert';
+import alertSlice, { addWarningAlert } from '../../../store/alert';
+import { insertCollections } from '../../../indexeddb';
+import SavedCollection from './SavedCollection';
 import ExportCollection from './ExportCollection';
-import ProcessSavedRequestEntry from './ProcessSavedRequestEntry';
-import StatisticalSavedRequestEntry from './StatisticalSavedRequestEntry';
+
+export const isUnnamedCollectionName = (collectionName) =>
+  collectionName.toLowerCase().includes('unnamed collection');
+
+const getUnnamedCollectionName = (collections) => {
+  const amount = collections.filter((c) => isUnnamedCollectionName(c.collectionName)).length;
+  if (amount === 0) {
+    return 'Unnamed Collection';
+  }
+  return `Unnamed Collection ${amount + 1}`;
+};
 
 const doesModeSupportSaving = (mode) => mode === 'PROCESS' || mode === 'STATISTICAL' || mode === 'BATCH';
+
+const handleUploadedCollectionParsing = (parsedData, savedRequests) => {
+  const overridedCollections = [];
+  // New format
+  if (parsedData[0]?.requests !== undefined) {
+    parsedData.forEach((parsedCollection) => {
+      const { primaryKey, collectionName } = parsedCollection;
+      if (primaryKey && collectionName) {
+        if (savedRequests.find((collection) => collection.primaryKey === primaryKey)) {
+          // override collection
+          store.dispatch(savedRequestsSlice.actions.setCollection({ collection: parsedCollection }));
+          overridedCollections.push(parsedCollection.collectionName);
+        } else {
+          store.dispatch(savedRequestsSlice.actions.appendCollection({ collection: parsedCollection }));
+        }
+      }
+    });
+  } else {
+    // Old format
+    const name = getUnnamedCollectionName(savedRequests);
+    store.dispatch(
+      savedRequestsSlice.actions.addOldFormatCollection({
+        requests: parsedData,
+        collectionName: name,
+      }),
+    );
+  }
+
+  return overridedCollections;
+};
 
 const SavedRequests = ({ savedRequests, mode, expandedSidebar, token }) => {
   const handleExpand = () => {
@@ -25,18 +67,25 @@ const SavedRequests = ({ savedRequests, mode, expandedSidebar, token }) => {
     fileEl.click();
   };
 
+  const hasUnnamedCollections = savedRequests.find((col) => isUnnamedCollectionName(col.collectionName));
+
   const handleImport = async () => {
     const fileEl = document.getElementById('collection-file-input');
     const file = fileEl.files[0];
+    if (!file) {
+      return;
+    }
     const text = await file.text();
     try {
       if (text) {
         const parsed = JSON.parse(text);
         if (Array.isArray(parsed)) {
-          store.dispatch(savedRequestsSlice.actions.setCollection(parsed));
+          handleUploadedCollectionParsing(parsed, savedRequests);
           store.dispatch(
             alertSlice.actions.addAlert({ type: 'SUCCESS', text: 'Collection upload successfully' }),
           );
+        } else {
+          addWarningAlert('Invalid collections content');
         }
       }
     } catch (err) {
@@ -50,6 +99,14 @@ const SavedRequests = ({ savedRequests, mode, expandedSidebar, token }) => {
     }
   };
 
+  const handleSaveToIndexedDb = () => {
+    if (hasUnnamedCollections) {
+      addWarningAlert('Rename unnammed collections to proceed');
+      return;
+    }
+    insertCollections(savedRequests);
+  };
+
   return (
     <div className="saved-requests-container">
       <div className="saved-requests-toggle">
@@ -58,62 +115,44 @@ const SavedRequests = ({ savedRequests, mode, expandedSidebar, token }) => {
           <FontAwesomeIcon icon={expandedSidebar ? faAngleDoubleRight : faAngleDoubleLeft} />
         </div>
         {expandedSidebar && (
-          <div className="saved-requests-body">
-            {savedRequests.map((savedReq, idx) => {
-              if (savedReq.mode === 'STATISTICAL') {
-                return (
-                  <StatisticalSavedRequestEntry
-                    creationTime={savedReq.creationTime}
-                    key={idx}
-                    mode={savedReq.mode}
-                    name={savedReq.name}
-                    request={savedReq.request}
-                    response={savedReq.response}
-                    token={token}
-                    idx={idx}
-                  />
-                );
-              }
-              if (savedReq.mode === 'PROCESS') {
-                return (
-                  <ProcessSavedRequestEntry
-                    creationTime={savedReq.creationTime}
-                    key={idx}
-                    mode={savedReq.mode}
-                    name={savedReq.name}
-                    request={savedReq.request}
-                    response={savedReq.response}
-                    idx={idx}
-                    token={token}
-                  />
-                );
-              }
-              return null;
-            })}
+          <div className="block fixed right-0 w-96 h-96 p-2 text-black bg-primary-lighter overflow-y-scroll">
+            <button className="tertiary-button my-2 flex items-center" onClick={handleSaveToIndexedDb}>
+              <SaveIcon className="w-6 mr-1" /> Save locally
+            </button>
+            {savedRequests.map((collection) => (
+              <SavedCollection collection={collection} token={token} key={collection.primaryKey} />
+            ))}
             {savedRequests.length === 0 && (
               <p className="text">
-                <span>Save a request to see it here!</span>
+                <span>Send a request and save it to see it here!</span>
               </p>
             )}
             <p className="text mt-1 mb-1">
-              <span>
-                <i>Note: Saved requests will disappear after refreshing or closing the page</i>
+              <span className="block">
+                <i>Note: Saved request are stored locally and can be removed by deleting the cache.</i>
               </span>
-              <span style={{ display: 'block' }}>
-                <i> Export them to a local file to to save them.</i>
+              <span className="block">
+                <i>Saved requests are not tied to your account but to your browser.</i>
+              </span>
+              <span className="block" style={{ display: 'block' }}>
+                <i>
+                  Remember to click the <b>Save locally</b> to persist them or export them to a local file.
+                </i>
               </span>
             </p>
-            <div className="flex items-center">
-              <ExportCollection savedRequests={savedRequests} />
-              <input
-                type="file"
-                id="collection-file-input"
-                onChange={handleImport}
-                style={{ display: 'none' }}
-              />
-              <button className="tertiary-button" onClick={handleImportButtonClick}>
-                Upload collection
-              </button>
+            <div className="flex flex-col">
+              <div className="flex items-center">
+                {!hasUnnamedCollections && <ExportCollection savedCollections={savedRequests} />}
+                <input
+                  type="file"
+                  id="collection-file-input"
+                  onChange={handleImport}
+                  style={{ display: 'none' }}
+                />
+                <button className="tertiary-button mt-2" onClick={handleImportButtonClick}>
+                  Upload collection
+                </button>
+              </div>
             </div>
           </div>
         )}

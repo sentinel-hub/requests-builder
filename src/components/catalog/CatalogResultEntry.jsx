@@ -11,7 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import store from '../../store';
 import mapSlice from '../../store/map';
-import { focusMap } from '../common/Map/utils/crsTransform';
+import { focusMap } from '../common/Map/utils/geoUtils';
 import requestSlice from '../../store/request';
 import { addSuccessAlert, addWarningAlert } from '../../store/alert';
 import CopyIcon from '../common/CopyIcon';

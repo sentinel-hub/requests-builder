@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { isBbox, isMultiPolygon, isPolygon } from '../../components/common/Map/utils/crsTransform';
+import { isBbox, isMultiPolygon, isPolygon } from '../../components/common/Map/utils/geoUtils';
 import { getRequestBody, getUrlFromCurl } from '../../components/process/requests/parseRequest';
 import { isEmpty } from '../../utils/commonUtils';
 import { CUSTOM } from '../../utils/const/const';

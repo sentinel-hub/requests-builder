@@ -1,6 +1,6 @@
 import bbox from '@turf/bbox';
 import { datasourceToCollection } from '../../components/catalog/const';
-import { isBbox } from '../../components/common/Map/utils/crsTransform';
+import { isBbox } from '../../components/common/Map/utils/geoUtils';
 
 const shouldIntersect = (geometry) => !isBbox(geometry);
 

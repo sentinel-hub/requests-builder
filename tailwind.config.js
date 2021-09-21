@@ -8,6 +8,7 @@ module.exports = {
           light: '#c9d754',
           DEFAULT: '#b2c22d',
           dark: '#8e9b24',
+          lighter: '#dde693'
         },
       },
       outline: {

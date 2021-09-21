@@ -16,7 +16,7 @@ import {
   S3SLSTR,
   S5PL2,
 } from '../../../utils/const/const';
-import { isBbox } from '../../common/Map/utils/crsTransform';
+import { isBbox } from '../../common/Map/utils/geoUtils';
 import { getSHPYCredentials, getSHPYBounds, versionComment } from '../../process/lib/generateShPyRequest';
 
 const catalogCollectionToShPy = (collection) => {

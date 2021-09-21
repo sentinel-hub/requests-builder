@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { isBbox } from '../common/Map/utils/crsTransform';
+import { isBbox } from '../common/Map/utils/geoUtils';
 import BBox from '@turf/bbox';
 import { DATASOURCES } from '../../utils/const/const';
 import { getBaseUrl, isOnDefaultUrl } from '../../api/url';

@@ -1,26 +1,45 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import store from '../../../store';
 import { uuidv4 } from '../../../store/alert';
 import mapSlice from '../../../store/map';
+import { triggerDownload } from '../../statistical/response/HistogramChart';
 
+const getProperFormat = (format) => {
+  if (format === 'image/jpeg') {
+    return 'jpeg';
+  }
+  if (format === 'image/png') {
+    return 'png';
+  }
+  if (format === 'image/tiff') {
+    return 'tiff';
+  }
+  if (format === 'application/x-tar' || format.includes('tar')) {
+    return 'tar';
+  }
+  return format;
+};
 const ImageResponse = ({ imageResponse, hasBeenAddedToMap, setHasBeenAddedToMap }) => {
   const { src, format, wgs84Geometry, dimensions, arrayBuffer } = imageResponse;
   const isTiff = format.includes('tif');
   const isTar = format.includes('tar');
   const shouldNotDisplayFormat = format.includes('tar') || isTiff;
-  const uuid = uuidv4();
+  const uuid = useMemo(() => uuidv4(), []);
   const handleAddImageToMap = () => {
     store.dispatch(
       mapSlice.actions.addAdditionalLayer({ url: src, geometry: wgs84Geometry, arrayBuffer, uuid }),
     );
     setHasBeenAddedToMap(true);
   };
+  const handleDownloadImage = () => {
+    triggerDownload(src, `${uuid}.${getProperFormat(format)}`);
+  };
   return (
     <>
       {shouldNotDisplayFormat ? null : <img src={src} alt="response" />}
-      <a href={src} download className="underline my-2 text-lg">
+      <p className="underline cursor-pointer text-lg my-2" onClick={handleDownloadImage}>
         Click to download the response
-      </a>
+      </p>
       {dimensions !== undefined && (
         <>
           <p className="text">

@@ -65,7 +65,7 @@ const TPDIThumbnail = ({ collectionId, productId, geometry }) => {
                 <FontAwesomeIcon icon={faExpandArrowsAlt} style={{ marginLeft: '1rem', fontSize: '2rem' }} />
               </div>
             }
-            content={
+            content={(handleClose) => (
               <div className="flex flex-col items-center">
                 <img src={srcUrl} style={{ maxHeight: '70vh' }} alt={`${productId}-thumbnail`} />
                 <button className="secondary-button mt-2" disabled={hasBeenAdded} onClick={handleAddToMap}>
@@ -76,7 +76,7 @@ const TPDIThumbnail = ({ collectionId, productId, geometry }) => {
                   Check the product geometry to see the exact polygon that will be ordered.
                 </p>
               </div>
-            }
+            )}
           />
         </>
       )}

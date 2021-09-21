@@ -5,6 +5,8 @@ import mapSlice from '../../../store/map';
 import { addWarningAlert } from '../../../store/alert';
 import { crsByUrl } from '../../process/requests/parseRequest';
 import Tooltip from '../Tooltip/Tooltip';
+import SaveGeometry from './SaveGeometry';
+import { getFeatureCollectionMultiPolygon } from './utils/geoUtils';
 
 const isFeatureCollection = (parsedGeometry) => parsedGeometry.type === 'FeatureCollection';
 const isFeature = (parsedGeometry) => parsedGeometry.type === 'Feature';
@@ -34,7 +36,9 @@ const MapTextarea = ({ fitToMainBounds, extraGeometry, geometry, setParsedError,
           }
         }
         if (isFeatureCollection(parsedGeo)) {
-          parsedGeo = parsedGeo.features[0].geometry;
+          const multiPolygon = getFeatureCollectionMultiPolygon(parsedGeo);
+          console.log(multiPolygon);
+          parsedGeo = multiPolygon;
         }
         if (isFeature(parsedGeo)) {
           parsedGeo = parsedGeo.geometry;
@@ -105,6 +109,7 @@ const MapTextarea = ({ fitToMainBounds, extraGeometry, geometry, setParsedError,
         spellCheck="false"
       />
       <div className="flex items-center justify-center w-full mt-2">
+        <SaveGeometry />
         <button onClick={handleParseGeometryClick} className="secondary-button w-fit mr-2">
           Parse
         </button>

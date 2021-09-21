@@ -8,6 +8,7 @@ import { DATASOURCES } from '../../../utils/const/const';
 import ProcessRequestOverlayButton from '../../common/ProcessRequestOverlayButton';
 import { dispatchChanges, getProperDataCollectionType } from '../requests/parseRequest';
 import { CommonSavedRequestEntryFields } from './CommonSavedRequestEntry';
+import savedRequestsSlice from '../../../store/savedRequests';
 
 const sendProcessBody = (token, body, url, reqConfig) => {
   const config = {
@@ -53,7 +54,16 @@ const getUrlOnDatafusion = (dataArray) => {
   return urls[0];
 };
 
-const ProcessSavedRequestEntry = ({ request, response, creationTime, mode, name, token, idx }) => {
+const ProcessSavedRequestEntry = ({
+  request,
+  response,
+  primaryKey,
+  creationTime,
+  mode,
+  name,
+  token,
+  idx,
+}) => {
   const handleCopyRequest = () => {
     navigator.clipboard.writeText(request);
   };
@@ -61,13 +71,16 @@ const ProcessSavedRequestEntry = ({ request, response, creationTime, mode, name,
     store.dispatch(requestSlice.actions.setMode('PROCESS'));
     dispatchChanges(JSON.parse(request));
   };
+  const handleDeleteRequest = () => {
+    store.dispatch(savedRequestsSlice.actions.deleteRequest({ idx, primaryKey }));
+  };
   return (
-    <div>
+    <>
       <CommonSavedRequestEntryFields creationTime={creationTime} mode={mode} name={name} />
       {response && (
         <p className="text">
           <span>Response: </span>
-          <a href={response} target="_blank" rel="noopener noreferrer">
+          <a href={response} target="_blank" className="underline" rel="noopener noreferrer">
             Link
           </a>
         </p>
@@ -76,23 +89,26 @@ const ProcessSavedRequestEntry = ({ request, response, creationTime, mode, name,
         <button className="tertiary-button mr-1" onClick={handleCopyRequest}>
           Copy
         </button>
-        <button className="tertiary-button tertiary-button--wrapped mr-1" onClick={handleParse}>
+        <button className="tertiary-button wrapped mr-1" onClick={handleParse}>
           Update UI
         </button>
         <ProcessRequestOverlayButton
-          className="tertiary-button tertiary-button--wrapped"
+          className="tertiary-button wrapped mr-1"
           validation={Boolean(token)}
           disabledTitle="Log in to use this"
           buttonText="Send"
           request={sendRequest}
           args={[request, token]}
-          collectionRequestIdx={idx}
+          collectionRequestInfo={{ idx, primaryKey }}
           skipSaving={false}
           useShortcut={false}
         />
+        <button className="tertiary-button bg-red-600" onClick={handleDeleteRequest}>
+          Delete
+        </button>
       </div>
       <hr className="mt-1 mb-1" />
-    </div>
+    </>
   );
 };
 

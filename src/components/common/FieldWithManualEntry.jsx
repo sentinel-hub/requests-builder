@@ -3,7 +3,14 @@ import Select from './Select';
 
 // onChange: value -> void
 // options : {value: string, name: string}[]
-const FieldWithManualEntry = ({ options, onChange, value, label, inputPlaceholder = '' }) => {
+const FieldWithManualEntry = ({
+  options,
+  onChange,
+  value,
+  label,
+  inputPlaceholder = '',
+  optionsClassNames,
+}) => {
   const [isOnManualEntry, setIsOnManualEntry] = useState(false);
 
   const handleInputChange = (e) => {
@@ -55,6 +62,7 @@ const FieldWithManualEntry = ({ options, onChange, value, label, inputPlaceholde
         onChange={handleSelectChange}
         buttonClassNames="mb-2"
         label={label}
+        optionsClassNames={optionsClassNames}
       />
       {isOnManualEntry && (
         <input

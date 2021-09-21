@@ -14,7 +14,7 @@ export const margin = {
   bottom: 60,
 };
 
-const triggerDownload = (imgURI, fileName) => {
+export const triggerDownload = (imgURI, fileName) => {
   const evt = new MouseEvent('click', {
     view: window,
     bubbles: false,

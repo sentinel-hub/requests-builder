@@ -1,11 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 import bboxPolygon from '@turf/bbox-polygon';
 import {
-  appendPolygon,
-  isBbox,
   transformGeometryToNewCrs,
   transformGeometryToWGS84IfNeeded,
 } from '../components/common/Map/utils/crsTransform';
+import { appendPolygon, isBbox } from '../components/common/Map/utils/geoUtils';
 
 const isWgs84 = (crs) => crs === 'EPSG:4326';
 

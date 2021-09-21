@@ -23,13 +23,22 @@ const sendStatisticalRequest = (request, token, reqConfig) => {
   }
 };
 
-const responseHandler = (response, request, idx) => {
+const responseHandler = (response, request, idx, primaryKey) => {
   // request to undefined to not show the save form.
   statisticsResponseHandler(response, undefined);
-  store.dispatch(savedRequestsSlice.actions.setResponse({ idx, response }));
+  store.dispatch(savedRequestsSlice.actions.setResponse({ idx, response, primaryKey }));
 };
 
-const StatisticalSavedRequestEntry = ({ request, response, creationTime, mode, name, token, idx }) => {
+const StatisticalSavedRequestEntry = ({
+  request,
+  primaryKey,
+  response,
+  creationTime,
+  mode,
+  name,
+  token,
+  idx,
+}) => {
   const handleDisplay = () => {
     store.dispatch(
       responsesSlice.actions.setFisResponse({
@@ -49,8 +58,12 @@ const StatisticalSavedRequestEntry = ({ request, response, creationTime, mode, n
     navigator.clipboard.writeText(request);
   };
 
+  const handleDeleteRequest = () => {
+    store.dispatch(savedRequestsSlice.actions.deleteRequest({ idx, primaryKey }));
+  };
+
   return (
-    <div>
+    <>
       <CommonSavedRequestEntryFields creationTime={creationTime} mode={mode} name={name} />
       {response && (
         <p className="text">
@@ -64,7 +77,7 @@ const StatisticalSavedRequestEntry = ({ request, response, creationTime, mode, n
         <button className="tertiary-button mr-1" onClick={handleCopyRequest}>
           Copy
         </button>
-        <button className="tertiary-button tertiary-button--wrapped mr-1" onClick={handleParse}>
+        <button className="tertiary-button wrapped mr-1" onClick={handleParse}>
           Update UI
         </button>
         <RequestButton
@@ -73,12 +86,15 @@ const StatisticalSavedRequestEntry = ({ request, response, creationTime, mode, n
           buttonText="Send"
           request={sendStatisticalRequest}
           args={[request, token]}
-          className="tertiary-button tertiary-button--wrapped"
-          responseHandler={(resp, req) => responseHandler(resp, req, idx)}
+          className="tertiary-button wrapped mr-1"
+          responseHandler={(resp, req) => responseHandler(resp, req, idx, primaryKey)}
         />
+        <button className="tertiary-button bg-red-600" onClick={handleDeleteRequest}>
+          Delete
+        </button>
       </div>
       <hr className="mt-1 mb-1" />
-    </div>
+    </>
   );
 };
 

@@ -14,28 +14,6 @@ export const configureParams = async (params) => {
   if (params['set-auth-url']) {
     store.dispatch(paramsSlice.actions.setOAuthUrl(params['set-auth-url']));
   }
-  if (params['collection-link']) {
-    const link = params['collection-link'];
-    try {
-      const data = await Axios.get(link);
-      if (Array.isArray(data.data)) {
-        const requests = data.data
-          .map((req) => ({
-            creationTime: req.creationTime,
-            request: req.request,
-            name: req.name,
-            mode: req.mode,
-          }))
-          .filter((a) => a);
-        store.dispatch(savedRequestsSlice.actions.setCollection(requests));
-        store.dispatch(
-          alertSlice.actions.addAlert({ type: 'SUCCESS', text: 'Collection successfully loaded' }),
-        );
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }
   if (params['extended-settings'] !== undefined) {
     store.dispatch(paramsSlice.actions.setExtendedSettings());
   }
@@ -61,6 +39,32 @@ export const configureParams = async (params) => {
 export const getUrlParams = () => {
   const urlParams = new URLSearchParams(window.location.search);
   return Object.fromEntries(urlParams.entries());
+};
+
+export const loadUrlCollection = async (params) => {
+  if (!params['collection-link']) {
+    return;
+  }
+  const link = params['collection-link'];
+  try {
+    const data = await Axios.get(link);
+    if (Array.isArray(data.data)) {
+      const requests = data.data
+        .map((req) => ({
+          creationTime: req.creationTime,
+          request: req.request,
+          name: req.name,
+          mode: req.mode,
+        }))
+        .filter((a) => a);
+      store.dispatch(savedRequestsSlice.actions.addOldFormatCollection({ collectionName: link, requests }));
+      store.dispatch(
+        alertSlice.actions.addAlert({ type: 'SUCCESS', text: 'Collection successfully loaded' }),
+      );
+    }
+  } catch (err) {
+    console.error(err);
+  }
 };
 
 // const removeParams = (loParams) => {

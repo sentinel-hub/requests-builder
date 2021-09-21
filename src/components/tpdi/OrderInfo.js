@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDoubleDown, faAngleDoubleUp } from '@fortawesome/free-solid-svg-icons';
 import store from '../../store';
 import RequestButton from '../common/RequestButton';
-import { getTransformedGeometryFromBounds, focusMap } from '../common/Map/utils/crsTransform';
+import { getTransformedGeometryFromBounds } from '../common/Map/utils/crsTransform';
 import GetDeliveriesButton from './GetDeliveriesButton';
 import { parseTPDIRequest } from './parse';
 import Tooltip from '../common/Tooltip/Tooltip';
@@ -17,6 +17,7 @@ import CopyIcon from '../common/CopyIcon';
 import TpdiResource from '../../api/tpdi/TpdiResource';
 import { formatNumber } from '../../utils/commonUtils';
 import { getMessageFromApiError } from '../../api';
+import { focusMap } from '../common/Map/utils/geoUtils';
 
 const getColorByStatus = (status) => {
   if (status === 'PARTIAL') {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useLayoutEffect, useRef, useMemo } from 'react';
 import store from '../../store';
 import alertSlice from '../../store/alert';
-import { getTransformedGeometryFromBounds, focusMap } from '../common/Map/utils/crsTransform';
+import { getTransformedGeometryFromBounds } from '../common/Map/utils/crsTransform';
 import RequestButton from '../common/RequestButton';
 import { dispatchChanges, getProperDataCollectionType } from '../process/requests/parseRequest';
 import { parseBatchRequest, getBucketName } from './parse';
@@ -13,6 +13,7 @@ import CopyIcon from '../common/CopyIcon';
 import BatchResource from '../../api/batch/BatchResource';
 import TileResource from '../../api/batch/TileResource';
 import { DATASOURCES, EU_CENTRAL_DEPLOYMENT } from '../../utils/const/const';
+import { focusMap } from '../common/Map/utils/geoUtils';
 
 export const fetchTilesBatchRequest = async (id, deployment) => {
   let res = await TileResource.getTiles(deployment)({ orderId: id });

@@ -115,7 +115,7 @@ const generateHistogramContent = (histogram) => {
   return resHist;
 };
 
-const getStatisticalCalculations = (statisticalState) => {
+export const getStatisticalCalculations = (statisticalState) => {
   return {
     calculations: statisticalState.calculations.reduce((acc1, calculation) => {
       const histograms = calculation.histograms.reduce((acc2, histogram) => {

@@ -6,7 +6,7 @@ import PlanetFeatureInfo from './PlanetFeatureInfo';
 import AirbusFeatureInfo from './AirbusFeatureInfo';
 import MaxarFeatureInfo from './MaxarFeatureInfo';
 import { isAirbus } from './utils';
-import { getAreaCoverPercentage } from '../common/Map/utils/crsTransform';
+import { getAreaCoverPercentage } from '../common/Map/utils/geoUtils';
 import { useDebounce, useScrollGenerationContainer } from '../../utils/hooks';
 
 const sortFeaturesByDate = (path, featuresWithProvider) => {

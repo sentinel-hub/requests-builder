@@ -20,7 +20,7 @@ const BaseModal = ({ trigger, content }) => {
             <span className="absolute top-3 right-2 cursor-pointer text-lg font-bold" onClick={handleHide}>
               &#x2715;
             </span>
-            {content}
+            {content(handleHide)}
           </div>
         </div>
       )}

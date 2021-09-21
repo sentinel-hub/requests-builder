@@ -7,8 +7,8 @@ import store from '../../store';
 import mapSlice from '../../store/map';
 import tpdiSlice from '../../store/tpdi';
 import CopyIcon from '../common/CopyIcon';
-import { focusMap } from '../common/Map/utils/crsTransform';
 import { getFormattedDatetime } from './utils';
+import { focusMap } from '../common/Map/utils/geoUtils';
 
 export const TpdiSearchResultHeader = ({
   id,

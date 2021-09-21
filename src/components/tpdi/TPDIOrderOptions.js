@@ -5,7 +5,7 @@ import store from '../../store';
 import alertSlice from '../../store/alert';
 import TPDIPlaceOrderButton from './TPDIPlaceOrderButton';
 import TPDICollectionSelection from './TPDICollectionSelection';
-import { getAreaCoverPercentage, getAreaFromGeometry } from '../common/Map/utils/crsTransform';
+import { getAreaCoverPercentage, getAreaFromGeometry } from '../common/Map/utils/geoUtils';
 import Tooltip from '../common/Tooltip/Tooltip';
 import Toggle from '../common/Toggle';
 import tpdiSlice, { planetSlice } from '../../store/tpdi';
@@ -219,7 +219,7 @@ const TPDIOrderOptions = ({
           <p className="text">
             {!isUsingQuery ? (
               <span>
-                {areaSelected} km<sup>2</sup>
+                {areaSelected} km<sup>2</sup>, {(areaSelected * 100).toFixed(0)} hectares
               </span>
             ) : (
               <span>You will see the estimate cost once you prepare the order.</span>

@@ -112,11 +112,11 @@ const TimeRangeContainer = ({
         {canHaveMultipleTimeRanges && timeToArray.length < dataCollections.length ? (
           <>
             <button className="secondary-button mt-2 w-fit" onClick={handleAddTimerange}>
-              Add Timerange
+              Add Time Range
             </button>
 
             <p className="text mt-2">
-              <i>Note: Data collections that don't have a timerange defined will use the first one</i>
+              <i>Note: Data collections that don't have a time range defined will use the first one</i>
             </p>
           </>
         ) : null}

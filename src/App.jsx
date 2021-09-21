@@ -23,6 +23,7 @@ import StatisticalRequestForm from './forms/StatisticalRequestForm';
 import StatisticalAuthHeader from './components/statistical/StatisticalAuthHeader';
 import SavedRequests from './components/process/Collections/SavedRequests';
 import { sendToGoogleAnalytics } from './utils/initAnalytics';
+import { configureIndexedDb } from './indexeddb';
 
 const BatchRequestForm = lazy(() => import('./forms/BatchRequestForm'));
 const TPDIRequestForm = lazy(() => import('./forms/TPDIRequestForm'));
@@ -97,6 +98,7 @@ function App({ mode }) {
     };
     fetchTokenEdc();
     configureAxios();
+    configureIndexedDb();
     setParams();
     sendWebVitals();
   }, []);

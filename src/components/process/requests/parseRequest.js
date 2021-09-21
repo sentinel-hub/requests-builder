@@ -11,7 +11,7 @@ import {
 } from '../../../utils/const/const';
 import { CRS } from '../../../utils/const/constMap';
 import { calculateMaxMetersPerPixel } from '../../common/Map/utils/bboxRatio';
-import { isValidBbox, isValidGeometry } from '../../common/Map/utils/crsTransform';
+import { isValidBbox, isValidGeometry } from '../../common/Map/utils/geoUtils';
 
 const dispatchEvalscript = (parsedBody) => {
   const { evalscript } = parsedBody;

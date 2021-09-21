@@ -73,7 +73,11 @@
   }
 
   .tertiary-button {
-    @apply bg-transparent border border-black py-1 px-2 cursor-pointer font-bold hover:bg-primary-dark active:bg-primary-light;
+    @apply bg-transparent border border-black py-1 px-2 cursor-pointer font-bold hover:bg-primary-dark active:bg-primary-light overflow-hidden;
+  }
+
+  .tertiary-button:disabled {
+    @apply cursor-not-allowed bg-gray-400;
   }
 
   .info-banner {

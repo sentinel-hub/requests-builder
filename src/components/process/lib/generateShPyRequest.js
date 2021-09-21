@@ -17,7 +17,7 @@ import {
   LETML2,
 } from '../../../utils/const/const';
 import { generateSHBbox } from './generateShjsRequest';
-import { isBbox, isPolygon } from '../../common/Map/utils/crsTransform';
+import { isBbox, isPolygon } from '../../common/Map/utils/geoUtils';
 import { isEmpty } from '../../../utils/commonUtils';
 
 const formatToSHPY = {
@@ -73,7 +73,7 @@ const getSHPYS1Datasource = (reqState) => {
   return possibleOptions.length > 0 ? possibleOptions[0] : 'SENTINEL1_IW';
 };
 
-const datasourceToSHPYDatasource = (dataCollection, requestState) => {
+export const datasourceToSHPYDatasource = (dataCollection, requestState) => {
   const { type } = dataCollection;
   switch (type) {
     case S1GRD:
@@ -113,7 +113,7 @@ const datasourceToSHPYDatasource = (dataCollection, requestState) => {
   }
 };
 
-const getDimensionsSHPY = (requestState) => {
+export const getDimensionsSHPY = (requestState) => {
   if (requestState.heightOrRes === 'HEIGHT' || requestState.isOnAutoRes === true) {
     return `size=[${requestState.width}, ${requestState.height}],`;
   } else {
@@ -176,26 +176,18 @@ export const getSHPYBounds = (mapState, oneOrTheOther = false) => {
 };
 
 const generateSHPYInputs = (reqState) => {
-  // Datafusion
-  const isOnDatafusion = reqState.dataCollections.length > 1;
-  if (isOnDatafusion) {
-    let datafusionString = '';
-    reqState.dataCollections.forEach((source, idx) => {
-      datafusionString += `${idx !== 0 ? `       ` : ''}SentinelHubRequest.input_data(
-            data_collection=${datasourceToSHPYDatasource(source, reqState)},
-            identifier="${source.id}",
+  const { dataCollections } = reqState;
+  const isOnDatafusion = dataCollections.length > 1;
+  return dataCollections.reduce((acc, dataCollection, idx) => {
+    const advancedOptions = getSHPYAdvancedOptions(reqState, idx);
+    acc += `${idx > 0 ? '\n       ' : ''}SentinelHubRequest.input_data(
+            data_collection=${datasourceToSHPYDatasource(dataCollection, reqState)},\
+          ${isOnDatafusion ? `\n            identifier=${dataCollection.id},` : ''}
             ${getSHPYTimerange(reqState, idx)}\
-${getSHPYAdvancedOptions(reqState, idx)}
-        ),\n`;
-    });
-    return datafusionString;
-  }
-
-  return `SentinelHubRequest.input_data(
-            data_collection=${datasourceToSHPYDatasource(reqState.dataCollections[0], reqState)},
-            ${getSHPYTimerange(reqState)}\
-${getSHPYAdvancedOptions(reqState)}
-        )\n`;
+          ${advancedOptions ? `\n            ${advancedOptions}` : ''}
+        ),`;
+    return acc;
+  }, '');
 };
 
 const getSHPYTimerange = (reqState, idx = 0) => {
@@ -207,7 +199,7 @@ const getSHPYTimerange = (reqState, idx = 0) => {
   return `time_interval=('${timeFrom.split('T')[0]}', '${timeTo.split('T')[0]}'),`;
 };
 
-const getSHPYAdvancedOptions = (reqState, idx = 0) => {
+export const getSHPYAdvancedOptions = (reqState, idx = 0) => {
   const initialDataFilterOptions = reqState.dataFilterOptions[idx].options;
   const initialProcessingOptions = reqState.processingOptions[idx].options;
   const dataFilterOptions = {};
@@ -250,9 +242,7 @@ const getSHPYAdvancedOptions = (reqState, idx = 0) => {
     resultObject.processing = processing;
   }
 
-  let resultString = !isEmpty(resultObject)
-    ? `\n            other_args = ${JSON.stringify(resultObject)}`
-    : '';
+  let resultString = !isEmpty(resultObject) ? `other_args = ${JSON.stringify(resultObject)}` : '';
 
   return resultString;
 };
@@ -286,7 +276,7 @@ export const getSHPYCode = (requestState, mapState) => {
   shpyCode += `\nrequest = SentinelHubRequest(
     evalscript=evalscript,
     input_data=[
-        ${generateSHPYInputs(requestState)}\
+        ${generateSHPYInputs(requestState)}
     ],
     responses=[
         ${getSHPYResponses(requestState)}\

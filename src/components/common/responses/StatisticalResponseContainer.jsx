@@ -28,7 +28,7 @@ const StatisticalResponseContainer = ({ statisticalResponse, mode }) => {
   return (
     <div className="p-4 w-full h-full" ref={containerRef}>
       <div className="flex items-center">
-        <DownloadLink url={downloadUrl} />
+        <DownloadLink url={downloadUrl} format="json" />
       </div>
       <StatisticalResponse response={statisticalResponse} containerRef={containerRef} />
     </div>

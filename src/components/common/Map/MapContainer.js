@@ -9,14 +9,8 @@ import proj4 from 'proj4';
 
 import Map from './Map';
 import store from '../../../store';
-import {
-  getAreaFromGeometry,
-  getLatLngFromBbox,
-  isBbox,
-  isMultiPolygon,
-  isPolygon,
-  transformGeometryToWGS84IfNeeded,
-} from './utils/crsTransform';
+import { transformGeometryToWGS84IfNeeded } from './utils/crsTransform';
+import { getLatLngFromBbox, isBbox, isMultiPolygon, isPolygon, getAreaFromGeometry } from './utils/geoUtils';
 import CRSSelection from './CRSSelection';
 import MapTextarea from './MapTextarea';
 import mapSlice from '../../../store/map';

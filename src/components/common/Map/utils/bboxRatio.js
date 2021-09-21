@@ -1,5 +1,5 @@
 import convertToBbox from '@turf/bbox';
-import { isBbox } from './crsTransform';
+import { isBbox } from './geoUtils';
 
 export const calculateAutoDimensions = (geometry, maxWidth, maxHeight) => {
   try {

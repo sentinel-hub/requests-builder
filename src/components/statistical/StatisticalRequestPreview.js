@@ -8,6 +8,7 @@ import { getStatisticalCurlCommand } from './utils/curls';
 import { handleStatisticalParse, statisticalRequestStateSelector } from './utils/utils';
 import { getRequestBody, getUrlFromCurl } from '../process/requests/parseRequest';
 import { getStatisticalAuthConfig } from '../../api/statistical/utils';
+import getStatisticalShPyRequest from './utils/shpy';
 
 const sendEditedStatisticalRequest = (token, text, reqConfig) => {
   try {
@@ -69,7 +70,7 @@ const StatisticalRequestPreview = ({
         <CommonRequestPreview
           options={[
             {
-              name: 'request',
+              name: 'curl',
               value: getStatisticalCurlCommand(
                 token,
                 dataCollections,
@@ -83,15 +84,30 @@ const StatisticalRequestPreview = ({
               ),
               toggledValue: requestResponse,
             },
+            {
+              name: 'sh-py',
+              value: () =>
+                getStatisticalShPyRequest(
+                  dataCollections,
+                  dataFilterOptions,
+                  processingOptions,
+                  bounds,
+                  dimensions,
+                  evalscript,
+                  timeRange,
+                  statisticalState,
+                ),
+              toggledValue: requestResponse,
+            },
           ]}
           canCopy
           className="process-editor"
           sendEditedRequest={(text, reqConfig) => sendEditedStatisticalRequest(token, text, reqConfig)}
           onSendEdited={statisticsResponseHandler}
-          supportedSendEditedNames={['request']}
+          supportedSendEditedNames={['curl']}
           id="statistical-req-preview"
           onParse={handleStatisticalParse}
-          supportedParseNames={['request']}
+          supportedParseNames={['curl']}
         />
       </div>
     </>

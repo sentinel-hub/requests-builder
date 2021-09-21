@@ -35,9 +35,9 @@ const RadioModeSelector = ({ options, appMode }) => {
     store.dispatch(requestSlice.actions.setMode(e.target.value));
   };
   return (
-    <div className="flex items-center">
+    <div className="flex-col flex items-start md:items-center md:flex-row">
       {options.map((opt) => (
-        <div key={`mode-${opt.value}`}>
+        <div key={`mode-${opt.value}`} className="mb-2 md:mb-0">
           <input
             type="radio"
             className="hidden"

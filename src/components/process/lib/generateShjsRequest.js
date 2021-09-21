@@ -20,7 +20,7 @@ import {
   EU_CENTRAL_DEPLOYMENT,
   US_WEST_DEPLOYMENT,
 } from '../../../utils/const/const';
-import { isBbox, isPolygon } from '../../common/Map/utils/crsTransform';
+import { isBbox, isPolygon } from '../../common/Map/utils/geoUtils';
 
 const datasourceToSHJSLayer = {
   [S2L2A]: 'S2L2ALayer',

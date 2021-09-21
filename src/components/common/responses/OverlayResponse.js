@@ -22,6 +22,7 @@ const OverlayResponse = ({
   mode,
   isFromCollections,
   wfsResponse,
+  savedRequests,
 }) => {
   const ref = useRef();
 
@@ -94,6 +95,7 @@ const OverlayResponse = ({
                 response={mode === 'PROCESS' ? src : fisResponse}
                 hasSavedRequest={hasSavedRequest}
                 setHasSavedRequest={setHasSavedRequest}
+                savedRequests={savedRequests}
               />
             )}
             {generateOverlayContents()}
@@ -104,7 +106,7 @@ const OverlayResponse = ({
   );
 };
 
-const mapStateToProps = ({ response }) => ({
+const mapStateToProps = ({ response, savedRequests }) => ({
   displayResponse: response.displayResponse,
   error: response.error,
   imageResponse: response.imageResponse,
@@ -113,6 +115,7 @@ const mapStateToProps = ({ response }) => ({
   mode: response.mode,
   isFromCollections: response.isFromCollections,
   wfsResponse: response.wfsResponse,
+  savedRequests: savedRequests.savedRequests,
 });
 
 export default connect(mapStateToProps)(OverlayResponse);
