@@ -30,7 +30,6 @@ export const getMaxarOrderBody = (state) => {
   const requestBody = {};
   requestBody.input = getMaxarSearchRequestBody(state);
   requestBody.name = state.tpdi.name;
-  requestBody.collectionId = state.tpdi.collectionId;
   delete requestBody.input.data[0].dataFilter;
   requestBody.input.data[0].selectedImages = state.tpdi.products.map((product) => product.id);
   return requestBody;

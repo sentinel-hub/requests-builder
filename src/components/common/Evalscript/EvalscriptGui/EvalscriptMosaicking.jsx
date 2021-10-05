@@ -1,6 +1,13 @@
 import React from 'react';
+import RadioSelector from '../../RadioSelector';
 import { MOSAICKING_DOCS } from './const';
 import TabBox from './TabBox';
+
+const MOSAICKING_OPTIONS = [
+  { value: 'SIMPLE', name: 'Simple' },
+  { value: 'ORBIT', name: 'Orbit' },
+  { value: 'Tile', name: 'Tile' },
+];
 
 const EvalscriptMosaicking = ({ selectedMosaicking, setSelectedMosaicking }) => {
   const handleMosaickingChange = (e) => {
@@ -8,39 +15,11 @@ const EvalscriptMosaicking = ({ selectedMosaicking, setSelectedMosaicking }) => 
   };
   return (
     <TabBox title="mosaicking" className="mb-2" documentationLink={MOSAICKING_DOCS}>
-      <input
-        value="SIMPLE"
-        type="radio"
+      <RadioSelector
         onChange={handleMosaickingChange}
-        className="mr-1"
-        id="mosaicking-simple"
-        checked={selectedMosaicking === 'SIMPLE'}
+        value={selectedMosaicking}
+        options={MOSAICKING_OPTIONS}
       />
-      <label className="form__label cursor-pointer mr-4" htmlFor="mosaicking-simple">
-        SIMPLE
-      </label>
-      <input
-        value="ORBIT"
-        type="radio"
-        onChange={handleMosaickingChange}
-        className="mr-1"
-        id="mosaicking-orbit"
-        checked={selectedMosaicking === 'ORBIT'}
-      />
-      <label className="form__label cursor-pointer mr-4" htmlFor="mosaicking-orbit">
-        ORBIT
-      </label>
-      <input
-        value="TILE"
-        type="radio"
-        onChange={handleMosaickingChange}
-        className="mr-1"
-        id="mosaicking-tile"
-        checked={selectedMosaicking === 'TILE'}
-      />
-      <label className="form__label cursor-pointer mr-4" htmlFor="mosaicking-tile">
-        TILE
-      </label>
     </TabBox>
   );
 };

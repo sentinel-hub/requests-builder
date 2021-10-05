@@ -22,9 +22,9 @@ const getInputs = (dataCollections, dataFilterOptions, processingOptions) => {
       idx,
     );
     acc += `${idx > 0 ? '\n        ' : ''}SentinelHubStatistical.input_data(
-        ${datasourceToSHPYDatasource(dataCollection, reqState)},\
-        ${advancedOptions ? `\n        ${advancedOptions},` : ''}\
-        ${isOnDatafusion ? `\n        identifier='${dataCollection.id}'` : ''}
+            ${datasourceToSHPYDatasource(dataCollection, reqState)},\
+            ${advancedOptions ? `\n            ${advancedOptions},` : ''}\
+            ${isOnDatafusion ? `\n            identifier='${dataCollection.id}'` : ''}
       ),`;
     return acc;
   }, '');
@@ -57,7 +57,7 @@ ${getSHPYCredentials()}
 evalscript = """
 ${evalscript}
 """
-${!areCalculationsEmpty ? `\ncalculations = ${JSON.stringify(calculations.calculations, null, 2)}\n` : ''}
+${!areCalculationsEmpty ? `\ncalculations = ${JSON.stringify(calculations.calculations, null, 4)}\n` : ''}
 ${getSHPYBounds(bounds)}
 request = SentinelHubStatistical(
     aggregation=SentinelHubStatistical.aggregation(

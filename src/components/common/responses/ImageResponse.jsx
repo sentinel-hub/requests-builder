@@ -17,6 +17,9 @@ const getProperFormat = (format) => {
   if (format === 'application/x-tar' || format.includes('tar')) {
     return 'tar';
   }
+  if (format === 'application/json' || format.includes('json')) {
+    return 'json';
+  }
   return format;
 };
 const ImageResponse = ({ imageResponse, hasBeenAddedToMap, setHasBeenAddedToMap }) => {

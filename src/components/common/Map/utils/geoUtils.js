@@ -20,6 +20,12 @@ export const appendPolygon = (currentGeometry, newPolygon) => {
     };
   }
   // multiPolygon
+  if (isPolygon(newPolygon)) {
+    return {
+      type: 'MultiPolygon',
+      coordinates: currentGeometry.coordinates.concat([newPolygon.coordinates]),
+    };
+  }
   return {
     type: 'MultiPolygon',
     coordinates: currentGeometry.coordinates.concat(newPolygon.coordinates),

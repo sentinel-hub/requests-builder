@@ -6,6 +6,7 @@ import Toggle from '../Toggle';
 
 import { connect } from 'react-redux';
 import { isWritingDecimal, validFloatInput } from '../../../utils/stringUtils';
+import RadioSelector from '../RadioSelector';
 
 const generatePlaceholder = (heightOrRes, input) => {
   if (heightOrRes === 'HEIGHT') {
@@ -33,6 +34,10 @@ const dispatchNewDimensions = (newDimensions) => {
   }
 };
 
+const DIMENSIONS_OPTIONS = [
+  { name: 'Height / Width', value: 'HEIGHT' },
+  { name: 'Resolution', value: 'RES' },
+];
 const OutputDimensions = ({
   geometry,
   heightOrRes,
@@ -116,35 +121,10 @@ const OutputDimensions = ({
 
   return (
     <>
-      <div className="flex items-center mb-4">
-        <input
-          className="form__input mb-1 w-fit mr-1 cursor-pointer"
-          onChange={handleRadioChange}
-          checked={heightOrRes === 'HEIGHT'}
-          type="radio"
-          id="height"
-          value="HEIGHT"
-          name="format"
-        />
-        <label className="form__label mb-1 cursor-pointer mr-3" htmlFor="height">
-          Height/width
-        </label>
-        <input
-          className="form__input mb-1 w-fit mr-1 cursor-pointer"
-          onChange={handleRadioChange}
-          checked={heightOrRes === 'RES'}
-          type="radio"
-          id="res"
-          value="RES"
-          name="format"
-        />
-        <label className="form__label mb-1 cursor-pointer" htmlFor="res">
-          Resolution
-        </label>
-      </div>
+      <RadioSelector options={DIMENSIONS_OPTIONS} onChange={handleRadioChange} value={heightOrRes} />
 
       {heightOrRes === 'RES' && useAutoResMode && (
-        <div className="flex items-center mb-2">
+        <div className="flex items-center my-2">
           <label htmlFor="res-in-meters" className="form__label cursor-pointer mr-2">
             Resolution in meters
           </label>
@@ -156,7 +136,7 @@ const OutputDimensions = ({
         <AutoResFields geometry={geometry} appMode={appMode} height={height} width={width} />
       ) : (
         <>
-          <label htmlFor="width-input" className="form__label">
+          <label htmlFor="width-input" className="form__label mt-2">
             {heightOrRes === 'HEIGHT' ? 'Width' : 'Res X (in CRS units)'}
           </label>
           <input

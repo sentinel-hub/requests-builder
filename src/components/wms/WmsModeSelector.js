@@ -2,75 +2,27 @@ import React from 'react';
 import { connect } from 'react-redux';
 import store from '../../store';
 import wmsSlice from '../../store/wms';
+import RadioSelector from '../common/RadioSelector';
+
+const WMS_MODE_OPTIONS = [
+  { name: 'WMS', value: 'WMS' },
+  { name: 'FIS', value: 'FIS' },
+  { name: 'WCS', value: 'WCS' },
+  { name: 'WFS', value: 'WFS' },
+  { name: 'WMTS', value: 'WMTS' },
+];
 
 const WmsModeSelector = ({ mode }) => {
   const handleWmsModeChange = (e) => {
+    console.log(e.target.value);
     store.dispatch(wmsSlice.actions.setMode(e.target.value));
   };
 
   return (
-    <>
+    <div className="mb-4">
       <h2 className="heading-secondary">Service</h2>
-      <div className="flex items-center mb-2">
-        <input
-          id="wms-mode"
-          onChange={handleWmsModeChange}
-          className="form__input w-fit"
-          type="radio"
-          value="WMS"
-          checked={mode === 'WMS'}
-        />
-        <label htmlFor="wms-mode" className="form__label cursor-pointer mr-2 ml-1">
-          WMS
-        </label>
-        <input
-          id="fis"
-          onChange={handleWmsModeChange}
-          className="form__input w-fit"
-          type="radio"
-          value="FIS"
-          checked={mode === 'FIS'}
-        />
-        <label htmlFor="fis" className="form__label cursor-pointer mr-2 ml-1">
-          FIS
-        </label>
-        <input
-          id="wcs"
-          onChange={handleWmsModeChange}
-          className="form__input w-fit"
-          type="radio"
-          value="WCS"
-          checked={mode === 'WCS'}
-        />
-        <label htmlFor="wcs" className="form__label cursor-pointer mr-2 ml-1">
-          WCS
-        </label>
-
-        <input
-          id="wfs"
-          onChange={handleWmsModeChange}
-          className="form__input w-fit"
-          type="radio"
-          value="WFS"
-          checked={mode === 'WFS'}
-        />
-        <label htmlFor="wfs" className="form__label cursor-pointer mr-2 ml-1">
-          WFS
-        </label>
-
-        <input
-          id="wmts"
-          onChange={handleWmsModeChange}
-          className="form__input w-fit"
-          type="radio"
-          value="WMTS"
-          checked={mode === 'WMTS'}
-        />
-        <label htmlFor="wmts" className="form__label cursor-pointer mr-2 ml-1">
-          WMTS
-        </label>
-      </div>
-    </>
+      <RadioSelector options={WMS_MODE_OPTIONS} onChange={handleWmsModeChange} value={mode} />
+    </div>
   );
 };
 

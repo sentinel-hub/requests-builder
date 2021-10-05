@@ -26,7 +26,6 @@ export const getPlanetOrderBody = (state) => {
   requestBody.input = getPlanetSearchRequestBody(state);
   requestBody.name = state.tpdi.name;
   requestBody.input.planetApiKey = state.planet.planetApiKey;
-  requestBody.collectionId = state.tpdi.collectionId;
   delete requestBody.input.data[0].dataFilter;
   requestBody.input.data[0].productBundle = state.planet.productBundle;
   requestBody.input.data[0].itemIds = state.tpdi.products.map((product) => product.id);

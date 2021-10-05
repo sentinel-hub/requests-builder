@@ -38,7 +38,6 @@ export const getAirbusOrderBody = (state) => {
   const requestBody = {};
   requestBody.input = getAirbusSearchRequestBody(state);
   requestBody.name = state.tpdi.name;
-  requestBody.collectionId = state.tpdi.collectionId;
   delete requestBody.input.data[0].dataFilter;
   requestBody.input.data[0].products = state.tpdi.products.map((product) => ({
     id: product.id,

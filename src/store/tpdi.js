@@ -16,6 +16,7 @@ const tpdiSlice = createSlice({
     isParsing: false,
     isSingleDate: false,
     isUsingQuery: false,
+    isCreatingCollection: false,
     extraMapGeometry: null,
   },
   reducers: {
@@ -79,6 +80,9 @@ const tpdiSlice = createSlice({
     },
     setIsUsingQuery: (state, action) => {
       state.isUsingQuery = action.payload;
+    },
+    setIsCreatingCollection: (state, action) => {
+      state.isCreatingCollection = action.payload;
     },
   },
 });

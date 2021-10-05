@@ -9,6 +9,7 @@ import { getAreaCoverPercentage, getAreaFromGeometry } from '../common/Map/utils
 import Tooltip from '../common/Tooltip/Tooltip';
 import Toggle from '../common/Toggle';
 import tpdiSlice, { planetSlice } from '../../store/tpdi';
+import RadioSelector from '../common/RadioSelector';
 
 export const errorHandlerTPDI = (error) => {
   if (error.response?.status === 403) {
@@ -127,8 +128,12 @@ const TPDIOrderOptions = ({
 
   const canClear = Boolean(products.length > 1 || products.find((p) => p.id));
 
-  const handleOrderTypeChange = () => {
-    store.dispatch(tpdiSlice.actions.setIsUsingQuery(!isUsingQuery));
+  const handleOrderTypeChange = (e) => {
+    if (e.target.value === 'PRODUCTS') {
+      store.dispatch(tpdiSlice.actions.setIsUsingQuery(false));
+    } else {
+      store.dispatch(tpdiSlice.actions.setIsUsingQuery(true));
+    }
   };
   const handleHarmonizeChange = () => {
     if (harmonizeTo === 'PS2') {
@@ -192,27 +197,18 @@ const TPDIOrderOptions = ({
           />
         </div>
 
-        <div className="flex items-center mb-2 ml-2">
-          <label className="form__label cursor-pointer mr-2">
-            <input
-              type="radio"
-              style={{ marginRight: '1rem' }}
-              checked={!isUsingQuery}
-              onChange={handleOrderTypeChange}
-            />
-            Order Product IDs
-          </label>
-        </div>
-        <div className="flex items-center mb-2 ml-2">
-          <label className="form__label cursor-pointer mr-2">
-            <input type="radio" className="mr-2" checked={isUsingQuery} onChange={handleOrderTypeChange} />
-            Order using query
-          </label>
-        </div>
-        <label htmlFor="tpdi-collection-id" className="form__label">
-          Collection ID
+        <RadioSelector
+          options={[
+            { name: 'Using Product Ids', value: 'PRODUCTS' },
+            { name: 'Using Query', value: 'QUERY' },
+          ]}
+          onChange={handleOrderTypeChange}
+          value={isUsingQuery ? 'QUERY' : 'PRODUCTS'}
+        />
+        <label htmlFor="tpdi-collection-id" className="form__label mt-3">
+          Target Collection
         </label>
-        <TPDICollectionSelection />
+        <TPDICollectionSelection provider={provider} productBundle={productBundle} />
 
         <label className="form__label mb-2">Order size{!isAreaExact ? ' (approx)' : ''}</label>
         <div className="flex items-center justify-between mb-2">

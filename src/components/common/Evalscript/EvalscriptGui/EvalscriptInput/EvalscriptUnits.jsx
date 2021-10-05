@@ -1,7 +1,13 @@
 import React, { useEffect, useMemo } from 'react';
 import { S2L1C, S2L2A } from '../../../../../utils/const/const';
+import RadioSelector from '../../../RadioSelector';
 
 const shouldDisplayUnits = (dataCollection) => dataCollection === S2L2A || dataCollection === S2L1C;
+
+const UNITS_OPTIONS = [
+  { name: 'Digital Numbers', value: 'DN' },
+  { name: 'Reflectance', value: 'REFLECTANCE' },
+];
 
 const EvalscriptUnits = ({ dataCollection, units, setUnits, idx }) => {
   const shouldDisplay = useMemo(() => shouldDisplayUnits(dataCollection.type), [dataCollection.type]);
@@ -40,28 +46,7 @@ const EvalscriptUnits = ({ dataCollection, units, setUnits, idx }) => {
   return (
     <div className="flex items-center">
       <label className="form__label mr-3">units (optional)</label>
-      <input
-        type="radio"
-        value="DN"
-        checked={units[idx] === 'DN'}
-        onChange={handleUnitsChange}
-        className="mr-1"
-        id={`DN-${idx}`}
-      />
-      <label className="form__label mr-2 cursor-pointer" htmlFor={`DN-${idx}`}>
-        DN
-      </label>
-      <input
-        type="radio"
-        checked={units[idx] === 'REFLECTANCE'}
-        onChange={handleUnitsChange}
-        value="REFLECTANCE"
-        className="mr-1"
-        id={`REFLECTANCE-${idx}`}
-      />
-      <label className="form__label cursor-pointer" htmlFor={`REFLECTANCE-${idx}`}>
-        Reflectance
-      </label>
+      <RadioSelector options={UNITS_OPTIONS} value={units[idx]} onChange={handleUnitsChange} />
     </div>
   );
 };

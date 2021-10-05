@@ -1,5 +1,6 @@
 import React from 'react';
 import { useDidMountEffect } from '../../../../utils/hooks';
+import RadioSelector from '../../RadioSelector';
 import { OUTPUT_DOCS } from './const';
 import TabBox from './TabBox';
 
@@ -9,6 +10,12 @@ export const INITIAL_OUTPUT_STATE = {
   noDataValue: '',
 };
 
+const SAMPLE_TYPE_OPTIONS = [
+  { name: 'UINT8', value: 'UINT8' },
+  { name: 'UINT16', value: 'UINT16' },
+  { name: 'FLOAT32', value: 'FLOAT32' },
+  { name: 'AUTO (default)', value: 'AUTO' },
+];
 export const buildFullOutputState = (outputState, filteredResponses) => {
   return Array.from({ length: Math.min(outputState.length, filteredResponses.length) }).map((_, idx) => ({
     ...outputState[idx],
@@ -58,62 +65,12 @@ const EvalscriptOutput = ({ outputState, setOutputState, filteredResponses }) =>
           </div>
           <div className="flex mt-2">
             <label className="form__label mr-5">sampleType</label>
-            <div className="grid grid-cols-2">
-              <div className="flex items-center">
-                <input
-                  type="radio"
-                  value="UINT8"
-                  onChange={handleOutputChange(idx)('sampleType')()}
-                  id={`uint8-${idx}`}
-                  checked={outputState[idx]['sampleType'] === 'UINT8'}
-                  className="mr-2"
-                />
-                <label className="form__label" htmlFor={`uint8-${idx}`}>
-                  UINT8
-                </label>
-              </div>
-              <div className="flex items-center">
-                <input
-                  type="radio"
-                  value="UINT16"
-                  onChange={handleOutputChange(idx)('sampleType')()}
-                  id={`uint16-${idx}`}
-                  checked={outputState[idx]['sampleType'] === 'UINT16'}
-                  className="mr-2"
-                />
-                <label className="form__label" htmlFor={`uint16-${idx}`}>
-                  UINT16
-                </label>
-              </div>
-              <div className="flex items-center">
-                <input
-                  type="radio"
-                  value="FLOAT32"
-                  onChange={handleOutputChange(idx)('sampleType')()}
-                  id={`float32-${idx}`}
-                  checked={outputState[idx]['sampleType'] === 'FLOAT32'}
-                  className="mr-2"
-                />
-                <label className="form__label" htmlFor={`float32-${idx}`}>
-                  FLOAT32
-                </label>
-              </div>
-              <div className="flex items-center">
-                <input
-                  type="radio"
-                  value="AUTO"
-                  onChange={handleOutputChange(idx)('sampleType')()}
-                  id={`sampletype-auto-${idx}`}
-                  checked={outputState[idx]['sampleType'] === 'AUTO'}
-                  className="mr-2"
-                />
-                <label className="form__label" htmlFor={`sampletype-auto-${idx}`}>
-                  AUTO (default)
-                </label>
-              </div>
-            </div>
+            <RadioSelector
+              options={SAMPLE_TYPE_OPTIONS}
+              onChange={handleOutputChange(idx)('sampleType')()}
+              value={outputState[idx]['sampleType']}
+            />
           </div>
-
           <div className="flex items-center my-2">
             <label className="form__label mr-3" htmlFor="nodatavalue">
               noDataValue (optional)

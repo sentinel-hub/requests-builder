@@ -242,7 +242,9 @@ export const getSHPYAdvancedOptions = (reqState, idx = 0) => {
     resultObject.processing = processing;
   }
 
-  let resultString = !isEmpty(resultObject) ? `other_args = ${JSON.stringify(resultObject)}` : '';
+  let resultString = !isEmpty(resultObject)
+    ? `other_args=${JSON.stringify(resultObject).replaceAll('":', '": ')}`
+    : '';
 
   return resultString;
 };

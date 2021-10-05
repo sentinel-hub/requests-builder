@@ -110,6 +110,7 @@ const MapContainer = ({
   const drawnItemsRef = useRef();
   const tiffLayersRef = useRef([]);
   const mapContainerRef = useRef();
+  const geoRasterRef = useRef();
   const [parsedError, setParsedError] = useState(false);
   const [mapError, setMapError] = useState(false);
   const [hasUsedMap, setHasUsedMap] = useState(false);
@@ -232,6 +233,11 @@ const MapContainer = ({
           opacity: 1,
           resolution: 256,
         });
+        console.log(georaster);
+        geoRasterRef.current = georaster;
+        // georaster.getValues({left:0, top:0, right:100,bottom:100, width:10, height:10 }).then((vals) => {
+        //   console.log(vals);
+        // })
         const bounds = getBoundsForAdditionalLayer(geometry);
         const overlayLayer = L.rectangle(bounds, { opacity: 0.0, fillOpacity: 0.0, interactive: true });
         const btn = getDeleteLayerButton(() => {

@@ -10,6 +10,7 @@ const TpdiResource = {
   search: POST(`${TPDI_PATH}/search`),
   searchRest: (nextUrl) => POST(nextUrl, undefined, undefined, true),
   createOrder: POST(`${TPDI_PATH}/orders`),
+  searchCompatibleCollections: POST(`${TPDI_PATH}/orders/searchcompatiblecollections`),
   deleteOrder: DELETE(`${TPDI_PATH}/orders/:orderId`),
   confirmOrder: POST(`${TPDI_PATH}/orders/:orderId/confirm`),
   getDeliveries: GET(`${TPDI_PATH}/orders/:orderId/deliveries`),

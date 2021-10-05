@@ -37,7 +37,7 @@ const TPDIPlaceOrderButton = ({
     maxar,
     map,
   };
-  const { isUsingQuery, provider } = tpdi;
+  const { isUsingQuery, provider, isCreatingCollection } = tpdi;
 
   const handleCreateOrderSuccess = (response) => {
     successfulTpdiCreationEvent();
@@ -49,7 +49,7 @@ const TPDIPlaceOrderButton = ({
     afterOrderCreationAction(response);
   };
 
-  const shouldConfirm = !Boolean(collectionId);
+  const shouldConfirm = collectionId === '' || isCreatingCollection;
 
   const getOrderQueryDisabledTitle = () => {
     if (!token) {

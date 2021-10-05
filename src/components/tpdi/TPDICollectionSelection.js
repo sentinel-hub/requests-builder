@@ -3,20 +3,58 @@ import { connect } from 'react-redux';
 import store from '../../store';
 import tpdiSlice from '../../store/tpdi';
 import Axios from 'axios';
-import ByocResource from '../../api/byoc/ByocResource';
+import TpdiResource from '../../api/tpdi/TpdiResource';
+import { isAirbus } from './utils';
+import FieldWithManualEntry from '../common/FieldWithManualEntry';
+import Toggle from '../common/Toggle';
 
-const TPDICollectionSelection = ({ token, collectionId }) => {
+const SEARCH_COLLECTIONS_PAYLOAD = {
+  input: {
+    bounds: {
+      bbox: [12.44693, 41.870072, 12.541001, 41.917096],
+    },
+    data: [
+      {
+        dataFilter: {
+          timeRange: {
+            from: '2021-08-29T00:00:00Z',
+            to: '2021-09-29T23:59:59Z',
+          },
+        },
+      },
+    ],
+  },
+};
+
+const buildSearchCompatibleCollectionsPayload = (provider, productBundle) => {
+  const payload = Object.assign({}, SEARCH_COLLECTIONS_PAYLOAD);
+
+  if (isAirbus(provider)) {
+    payload.input.provider = 'AIRBUS';
+    payload.input.data[0].constellation = provider.split('_').slice(-1)[0];
+  }
+  if (provider === 'PLANET') {
+    payload.input.data[0].productBundle = productBundle;
+    payload.input.data[0].itemType = 'PSScene4Band';
+  }
+
+  return payload;
+};
+
+const TPDICollectionSelection = ({ provider, token, collectionId, isCreatingCollection }) => {
   const [tpdiCollections, setTpdiCollections] = useState([]);
-  const [isOnManualEntry, setIsOnManualEntry] = useState(true);
 
   useEffect(() => {
     let source = Axios.CancelToken.source();
     const fetchTpdiCollections = async () => {
       try {
-        let res = await ByocResource.getCollections(null, { cancelToken: source.token });
+        let res = await TpdiResource.searchCompatibleCollections(
+          buildSearchCompatibleCollectionsPayload(provider),
+          { cancelToken: source.token },
+        );
         if (res.data) {
-          let collections = res.data.data.filter((col) => col.s3Bucket === 'sh.tpdi.byoc.eu-central-1');
-          if (collections.length > 0) {
+          let collections = res.data.data;
+          if (collections !== undefined) {
             setTpdiCollections(collections);
           }
         }
@@ -34,68 +72,32 @@ const TPDICollectionSelection = ({ token, collectionId }) => {
         source.cancel();
       }
     };
-  }, [token]);
+  }, [token, provider]);
 
-  const handleTpdiCollectionChange = (e) => {
-    if (e.target.value === 'MANUAL') {
-      setIsOnManualEntry(true);
-      store.dispatch(tpdiSlice.actions.setCollectionId(''));
-    } else {
-      setIsOnManualEntry(false);
-      if (e.target.value === 'CREATE') {
-        store.dispatch(tpdiSlice.actions.setCollectionId(''));
-      } else {
-        store.dispatch(tpdiSlice.actions.setCollectionId(e.target.value));
-      }
-    }
+  const handleTpdiCollectionChange = (value) => {
+    store.dispatch(tpdiSlice.actions.setCollectionId(value));
   };
 
-  const handleTpdiInputCollectionChange = (e) => {
-    store.dispatch(tpdiSlice.actions.setCollectionId(e.target.value));
-  };
-
-  const stateCollectionIdToValue = (collectionId) => {
-    if (isOnManualEntry) {
-      return 'MANUAL';
-    }
-    if (collectionId === '') {
-      return 'CREATE';
-    }
-    return collectionId;
-  };
-
-  // TODO: Simplify manual entry field using FieldWithManualEntry
   return (
     <>
-      <select
-        value={stateCollectionIdToValue(collectionId)}
-        onChange={handleTpdiCollectionChange}
-        className="form__input mb-2"
-      >
-        <option value="CREATE">Create a new collection</option>
-        <option value="MANUAL">Manual Entry</option>
-        {tpdiCollections.length > 0 && (
-          <optgroup label="Your collections">
-            {tpdiCollections.map((col) => (
-              <option key={col.id} value={col.id}>
-                {col.name}
-              </option>
-            ))}
-          </optgroup>
-        )}
-      </select>
-
-      {isOnManualEntry && (
-        <input
-          id="tpdi-collection-id"
+      {!isCreatingCollection && (
+        <FieldWithManualEntry
+          onChange={handleTpdiCollectionChange}
           value={collectionId}
-          placeholder="Enter your collection Id"
-          type="text"
-          className="form__input mb-2"
-          onChange={handleTpdiInputCollectionChange}
-          autoComplete="off"
+          options={tpdiCollections.map((col) => ({ name: col.name, value: col.id }))}
+          inputPlaceholder="Write your collection id"
         />
       )}
+      <div className="flex items-center mb-2 ml-1">
+        <label className="form__label mr-2 cursor-pointer font-normal" htmlFor="is-creating-tpdi-collection">
+          {isCreatingCollection ? 'Creating new collection' : 'or create a new collection'}
+        </label>
+        <Toggle
+          checked={isCreatingCollection}
+          onChange={() => store.dispatch(tpdiSlice.actions.setIsCreatingCollection(!isCreatingCollection))}
+          id="is-creating-tpdi-collection"
+        />
+      </div>
     </>
   );
 };
@@ -103,6 +105,7 @@ const TPDICollectionSelection = ({ token, collectionId }) => {
 const mapStateToProps = (state) => ({
   token: state.auth.user.access_token,
   collectionId: state.tpdi.collectionId,
+  isCreatingCollection: state.tpdi.isCreatingCollection,
 });
 
 export default connect(mapStateToProps)(TPDICollectionSelection);

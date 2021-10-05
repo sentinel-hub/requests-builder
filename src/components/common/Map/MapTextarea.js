@@ -6,7 +6,7 @@ import { addWarningAlert } from '../../../store/alert';
 import { crsByUrl } from '../../process/requests/parseRequest';
 import Tooltip from '../Tooltip/Tooltip';
 import SaveGeometry from './SaveGeometry';
-import { getFeatureCollectionMultiPolygon } from './utils/geoUtils';
+import { appendPolygon, getFeatureCollectionMultiPolygon } from './utils/geoUtils';
 
 const isFeatureCollection = (parsedGeometry) => parsedGeometry.type === 'FeatureCollection';
 const isFeature = (parsedGeometry) => parsedGeometry.type === 'Feature';
@@ -14,6 +14,18 @@ const isGeojson = (parsedGeometry) =>
   isFeatureCollection(parsedGeometry) || isFeature(parsedGeometry) === 'Feature';
 const containsCrs = (parsedGeometry) => parsedGeometry.properties?.crs !== undefined;
 const getCrsUrl = (parsedGeometry) => parsedGeometry.properties.crs;
+
+const getKmlFeatureGeometry = (feature) => {
+  // multipolygon
+  if (feature.geometry?.type === 'GeometryCollection') {
+    let currentGeo = feature.geometry.geometries[0];
+    for (let geo of feature.geometry.geometries.slice(1)) {
+      currentGeo = appendPolygon(currentGeo, geo);
+    }
+    return currentGeo;
+  }
+  return feature.geometry;
+};
 
 const MapTextarea = ({ fitToMainBounds, extraGeometry, geometry, setParsedError, selectedCrs }) => {
   const [geometryText, setGeometryText] = useState('');
@@ -75,7 +87,13 @@ const MapTextarea = ({ fitToMainBounds, extraGeometry, geometry, setParsedError,
         let parser = new DOMParser();
         let doc = parser.parseFromString(text, 'text/xml');
         let converted = kml(doc);
-        store.dispatch(mapSlice.actions.setTextGeometry(converted.features[0].geometry));
+        let geometry = getKmlFeatureGeometry(converted.features[0]);
+        if (converted.features?.length > 1) {
+          for (let feature of converted.features.slice(1)) {
+            geometry = appendPolygon(geometry, getKmlFeatureGeometry(feature));
+          }
+        }
+        store.dispatch(mapSlice.actions.setTextGeometry(geometry));
       } else {
         handleParseGeometry(text);
       }

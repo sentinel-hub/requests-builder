@@ -43,7 +43,9 @@ export const tpdiCreateOrderBodyViaDataFilter = (state) => {
     requestBody.input = getMaxarSearchRequestBody(state);
   }
   requestBody.name = state.tpdi.name;
-  requestBody.collectionId = state.tpdi.collectionId;
+  if (!state.tpdi.isCreatingCollection && state.tpdi.collectionId !== '') {
+    requestBody.collectionId = state.tpdi.collectionId;
+  }
 
   return requestBody;
 };
@@ -56,6 +58,10 @@ export const tpdiCreateOrderBodyViaProducts = (state) => {
     requestBody = getPlanetOrderBody(state);
   } else if (state.tpdi.provider === 'MAXAR') {
     requestBody = getMaxarOrderBody(state);
+  }
+
+  if (!state.tpdi.isCreatingCollection && state.tpdi.collectionId !== '') {
+    requestBody.collectionId = state.tpdi.collectionId;
   }
   return requestBody;
 };
