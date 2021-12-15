@@ -54,9 +54,9 @@ const SendRequest = ({ token, requestState, mapState }) => {
   });
   return (
     <ProcessRequestOverlayButton
-      className="button"
+      className="primary-button"
       additionalClassNames={['mr-2 mb-2 lg:mb-0']}
-      buttonText="Send Request"
+      buttonText={!token ? 'Log in to send a request' : 'Send request'}
       request={ProcessResource.stateRequest(requestState)}
       args={[getRequestObject(requestState, mapState)]}
       validation={Boolean(isValid && token && !isInvalidDatafusion)}

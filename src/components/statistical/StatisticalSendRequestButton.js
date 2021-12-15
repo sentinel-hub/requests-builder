@@ -67,7 +67,7 @@ const StatisticalSendRequestButton = ({
 
   return (
     <RequestButton
-      className="button"
+      className="primary-button"
       buttonText="Send Request"
       request={StatisticalResource.statisticalRequest(getStatisticalUrl(dataCollections[0]))}
       additionalClassNames={['mr-2']}

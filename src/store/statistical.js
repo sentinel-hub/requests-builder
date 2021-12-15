@@ -24,11 +24,15 @@ const statisticalSlice = createSlice({
   name: 'statistical',
   initialState: {
     aggregationInterval: 'P30D',
+    lastIntervalBehavior: '',
     calculations: [initialCalcState],
   },
   reducers: {
     setAggregationInterval: (state, action) => {
       state.aggregationInterval = action.payload;
+    },
+    setLastIntervalBehavior: (state, action) => {
+      state.lastIntervalBehavior = action.payload;
     },
     addEmptyCalculation: (state) => {
       state.calculations.push({ ...initialCalcState, outputName: '' });

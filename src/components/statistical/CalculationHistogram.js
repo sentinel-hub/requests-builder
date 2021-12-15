@@ -53,12 +53,15 @@ const CalculationHistogram = ({ histogram, histIdx, idx }) => {
     }
   };
 
-  const handleHistogramNumberParamChange = (e) => {
+  const handleHistogramNumberParamChange = (e, toNumber = false) => {
     const { value } = e.target;
-    if (!isWritingDecimal(value) && !validFloatInput(value) && value !== '') {
+    if (!isWritingDecimal(value) && !validFloatInput(value) && value !== '' && value !== '-') {
       return;
     }
-    const dispatchedValue = inputToNumber(value);
+    let dispatchedValue = value;
+    if (toNumber) {
+      dispatchedValue = inputToNumber(value);
+    }
     store.dispatch(
       statisticalSlice.actions.setHistogramParam({
         param: e.target.name,
@@ -135,9 +138,9 @@ const CalculationHistogram = ({ histogram, histIdx, idx }) => {
             className="form__input mb-2"
             value={histogram.nBins}
             name="nBins"
-            type="text"
             placeholder="Specify number of bins"
-            onChange={handleHistogramNumberParamChange}
+            onChange={(e) => handleHistogramNumberParamChange(e, true)}
+            type="number"
           />
         </>
       )}

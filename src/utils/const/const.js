@@ -25,7 +25,7 @@ export const US_WEST_DEPLOYMENT = 'aws-us-west-2';
 export const CREODIAS_DEPLOYMENT = 'creo';
 export const CODEDE_DEPLOYMENT = 'codede';
 
-export const BATCH_SUPPORTED_DEPLOYMENTS = [EU_CENTRAL_DEPLOYMENT, US_WEST_DEPLOYMENT];
+export const BATCH_SUPPORTED_DEPLOYMENTS = [EU_CENTRAL_DEPLOYMENT, US_WEST_DEPLOYMENT, CREODIAS_DEPLOYMENT];
 
 export const getBaseUrlByDeployment = (deployment) => {
   if (!deployment) {
@@ -195,7 +195,7 @@ export const DATASOURCES = {
     url: 'https://creodias.sentinel-hub.com/api/v1',
     ogcUrl: 'https://creodias.sentinel-hub.com/ogc/',
     defaultDatafusionId: 'olci',
-    isBatchSupported: false,
+    isBatchSupported: true,
     isStatApiSupported: false,
     region: CREODIAS_DEPLOYMENT,
   },
@@ -203,7 +203,7 @@ export const DATASOURCES = {
     url: 'https://creodias.sentinel-hub.com/api/v1',
     ogcUrl: 'https://creodias.sentinel-hub.com/ogc/',
     defaultDatafusionId: 'slstr',
-    isBatchSupported: false,
+    isBatchSupported: true,
     isStatApiSupported: false,
     region: CREODIAS_DEPLOYMENT,
   },
@@ -211,7 +211,7 @@ export const DATASOURCES = {
     url: 'https://creodias.sentinel-hub.com/api/v1',
     ogcUrl: 'https://creodias.sentinel-hub.com/ogc/',
     defaultDatafusionId: 's5pl2',
-    isBatchSupported: false,
+    isBatchSupported: true,
     isStatApiSupported: false,
     region: CREODIAS_DEPLOYMENT,
   },

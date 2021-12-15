@@ -13,6 +13,7 @@ import alertSlice from '../../store/alert';
 import authSlice from '../../store/auth';
 import Api from '../../api';
 import { loginEvent, logoutEvent } from '../../utils/initAnalytics';
+import LogoutExpandable from '../LogoutExpandable';
 
 export const doLogin = (customUrl) => {
   const AUTH_BASE_URL = customUrl ?? process.env.REACT_APP_AUTH_BASEURL;
@@ -92,24 +93,16 @@ const AuthHeader = ({ user, isEdcUser, customUrl, isImpersonating }) => {
   return (
     <>
       {!isEdcUser ? (
-        <div>
+        <div className="flex items-center">
           {user.userdata !== null ? (
-            <button
-              onClick={() => {
-                doLogout();
-                logoutEvent();
-              }}
-              className="button button--inactive"
-            >
-              Logout
-            </button>
+            <LogoutExpandable userdata={user.userdata} logoutEvent={logoutEvent} doLogout={doLogout} />
           ) : (
             <button
               onClick={() => {
                 doLogin(customUrl);
                 loginEvent();
               }}
-              className="button button--inactive"
+              className="primary-button button--inactive"
             >
               Login
             </button>

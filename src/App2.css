@@ -109,11 +109,22 @@
     background-color: #c7d64c; }
     .alert--success .alert-first-item {
       background-color: #8c9923; }
+      .alert--success .alert-first-item svg {
+        color: white; }
   .alert--warning {
     display: flex;
     background-color: #e74c4c; }
     .alert--warning .alert-first-item {
       background-color: #881212; }
+      .alert--warning .alert-first-item svg {
+        color: white; }
+  .alert--info {
+    display: flex;
+    background-color: #baf5f7; }
+    .alert--info .alert-first-item {
+      background-color: #75ebef; }
+      .alert--info .alert-first-item svg {
+        color: white; }
   .alert-second-item {
     display: flex;
     padding: 1rem 1rem;

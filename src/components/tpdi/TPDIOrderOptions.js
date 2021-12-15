@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { MinusCircleIcon, PlusCircleIcon } from '@heroicons/react/outline';
 import store from '../../store';
-import alertSlice from '../../store/alert';
+import { addWarningAlert } from '../../store/alert';
 import TPDIPlaceOrderButton from './TPDIPlaceOrderButton';
 import TPDICollectionSelection from './TPDICollectionSelection';
 import { getAreaCoverPercentage, getAreaFromGeometry } from '../common/Map/utils/geoUtils';
@@ -10,36 +10,10 @@ import Tooltip from '../common/Tooltip/Tooltip';
 import Toggle from '../common/Toggle';
 import tpdiSlice, { planetSlice } from '../../store/tpdi';
 import RadioSelector from '../common/RadioSelector';
+import { getMessageFromApiError } from '../../api';
 
 export const errorHandlerTPDI = (error) => {
-  if (error.response?.status === 403) {
-    store.dispatch(
-      alertSlice.actions.addAlert({
-        type: 'WARNING',
-        text: "You don't have enough permissions to use this",
-      }),
-    );
-  } else {
-    try {
-      const err = error.response.data.error;
-      let errorMsg = err.message;
-      if (err.errors) {
-        const subErr = err.errors;
-        if (subErr.violation) {
-          errorMsg += '\n' + subErr.violation;
-        }
-        if (subErr.invalidValue && subErr.parameter) {
-          errorMsg += '\nInvalid Value ' + subErr.invalidValue + 'on ' + subErr.parameter;
-        }
-      }
-      store.dispatch(alertSlice.actions.addAlert({ type: 'WARNING', text: errorMsg, time: 5000 }));
-    } catch (exc) {
-      store.dispatch(
-        alertSlice.actions.addAlert({ type: 'WARNING', text: 'Something went wrong', time: 5000 }),
-      );
-      console.error(error);
-    }
-  }
+  addWarningAlert(getMessageFromApiError(error), 7000);
 };
 
 const getTpdiAreaSelected = (products, selectedGeometry) => {

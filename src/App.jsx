@@ -24,6 +24,7 @@ import StatisticalAuthHeader from './components/statistical/StatisticalAuthHeade
 import SavedRequests from './components/process/Collections/SavedRequests';
 import { sendToGoogleAnalytics } from './utils/initAnalytics';
 import { configureIndexedDb } from './indexeddb';
+import { addInfoAlert } from './store/alert';
 
 const BatchRequestForm = lazy(() => import('./forms/BatchRequestForm'));
 const TPDIRequestForm = lazy(() => import('./forms/TPDIRequestForm'));
@@ -101,6 +102,12 @@ function App({ mode }) {
     configureIndexedDb();
     setParams();
     sendWebVitals();
+    setTimeout(() => {
+      addInfoAlert(
+        'A friendly reminder! \n If you find any problem with the app or any suggestions to further improve it, please create a ticket to the forum!',
+        10 * 1000,
+      );
+    }, 5 * 60 * 1000);
   }, []);
 
   return (

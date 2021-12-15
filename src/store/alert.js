@@ -40,12 +40,16 @@ const alertSlice = createSlice({
   },
 });
 
-export const addSuccessAlert = (text) => {
-  store.dispatch(alertSlice.actions.addAlert({ type: 'SUCCESS', text }));
+export const addSuccessAlert = (text, time) => {
+  store.dispatch(alertSlice.actions.addAlert({ type: 'SUCCESS', text, time }));
 };
 
 export const addWarningAlert = (text, time = undefined) => {
   store.dispatch(alertSlice.actions.addAlert({ type: 'WARNING', text, time }));
+};
+
+export const addInfoAlert = (text, time) => {
+  store.dispatch(alertSlice.actions.addAlert({ type: 'INFO', text, time }));
 };
 
 export default alertSlice;

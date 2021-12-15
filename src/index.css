@@ -56,19 +56,19 @@
     @apply bg-red-600 text-black hover:bg-red-400;
   }
 
-  .button {
-    @apply rounded-md font-bold cursor-pointer py-3 px-4 text-lg border-primary border;
+  .primary-button {
+    @apply rounded-md font-bold cursor-pointer py-3 px-4 text-lg border-primary border bg-primary;
   }
 
-  .button--active {
+  .primary-button--active {
     @apply bg-primary;
   }
 
-  .button--disabled {
-    @apply cursor-not-allowed;
+  .primary-button--disabled {
+    @apply cursor-not-allowed bg-gray-300 border-gray-300;
   }
   
-  .button--cancel {
+  .primary-button--cancel {
     @apply bg-red-600;
   }
 

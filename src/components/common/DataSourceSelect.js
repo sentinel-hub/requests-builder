@@ -164,12 +164,14 @@ const SingleDataCollection = ({ dataCollection, idx, appMode, isOnDatafusion }) 
           Data Collection {idx + 1}
         </label>
       )}
-      <Select
-        options={generateDataCollectionSelectOptions(appMode)}
-        selected={type}
-        onChange={handleDataCollectionChange}
-        buttonClassNames="mb-2"
-      />
+      <div className="w-52">
+        <Select
+          options={generateDataCollectionSelectOptions(appMode)}
+          selected={type}
+          onChange={handleDataCollectionChange}
+          buttonClassNames="mb-2"
+        />
+      </div>
       {isOnDatafusion && (
         <>
           <label className="form__label" htmlFor={`data-collection-id-${idx}`}>

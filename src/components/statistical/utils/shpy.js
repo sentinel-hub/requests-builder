@@ -39,6 +39,13 @@ const checkIfEmptyCalculations = (calculationsObj) => {
   return true;
 };
 
+const getAggregationOtherArgs = (lastIntervalBehavior) => {
+  if (lastIntervalBehavior !== '') {
+    return `\n        other_args={ "lastIntervalBehavior": "${lastIntervalBehavior}" }`;
+  }
+  return '';
+};
+
 const getStatisticalShPyRequest = (
   dataCollections,
   dataFilterOptions,
@@ -64,7 +71,8 @@ request = SentinelHubStatistical(
         evalscript=evalscript,
         time_interval=('${timeRange.timeFrom}', '${timeRange.timeTo}'),
         aggregation_interval='${statisticalState.aggregationInterval}',
-        ${getDimensionsSHPY(dimensions)}
+        ${getDimensionsSHPY(dimensions)}\
+        ${getAggregationOtherArgs(statisticalState.lastIntervalBehavior)}
     ),
     input_data=[
         ${getInputs(dataCollections, dataFilterOptions, processingOptions)}

@@ -35,6 +35,10 @@
 
     .alert-first-item {
       background-color: darken(#b2c22d, 10);
+
+      svg {
+        color: white;
+      }
     }
   }
 
@@ -44,6 +48,23 @@
 
     .alert-first-item {
       background-color: darken(#b51818, 10);
+
+      svg {
+        color: white;
+      }
+    }
+  }
+
+  &--info {
+    display: flex;
+    background-color: #baf5f7;
+
+    .alert-first-item {
+      background-color: darken(#baf5f7, 15);
+
+      svg {
+        color: white;
+      }
     }
   }
 

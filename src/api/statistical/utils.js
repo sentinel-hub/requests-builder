@@ -74,6 +74,11 @@ const getStatisticalAggregation = (timeRange, dimensions, statisticalState) => {
     },
     ...getStatisticalDimensions(dimensions),
   };
+
+  if (statisticalState.lastIntervalBehavior !== '') {
+    aggregation.aggregationInterval.lastIntervalBehavior = statisticalState.lastIntervalBehavior;
+  }
+
   return aggregation;
 };
 

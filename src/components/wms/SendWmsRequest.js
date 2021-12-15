@@ -90,7 +90,7 @@ const SendWmsRequest = ({ wmsState, requestState, mapState, token, mode }) => {
   return (
     <RequestButton
       buttonText="Send Request"
-      className="button"
+      className="primary-button"
       additionalClassNames={['mr-2']}
       request={request}
       args={[wmsState, requestState, mapState, token]}

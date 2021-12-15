@@ -60,8 +60,17 @@ const dispatchAggregation = (aggregation) => {
     );
     store.dispatch(requestSlice.actions.disableTimerange(false));
   }
-  if (aggregation.aggregationInterval && aggregation.aggregationInterval.of) {
-    store.dispatch(statisticalSlice.actions.setAggregationInterval(aggregation.aggregationInterval.of));
+  if (aggregation.aggregationInterval) {
+    if (aggregation.aggregationInterval.of) {
+      store.dispatch(statisticalSlice.actions.setAggregationInterval(aggregation.aggregationInterval.of));
+    }
+    if (aggregation.aggregationInterval.lastIntervalBehavior) {
+      store.dispatch(
+        statisticalSlice.actions.setLastIntervalBehavior(
+          aggregation.aggregationInterval.lastIntervalBehavior,
+        ),
+      );
+    }
   }
   // Dimensions
   if (aggregation.resx && aggregation.resy) {
@@ -150,8 +159,9 @@ export const inputArrayChangeHandler = (e) => {
   // clear input
   if (e.target.value === '') {
     dispatchedValue = '';
-    // allow only using [0-9] , and .
-  } else if (/[0-9]|[,]|(?<!\.)\.(?!\.)/.test(lastChar) === false) {
+  }
+  // allow only using [0-9] , and .
+  else if (!/^[0-9.,]/.test(lastChar)) {
     return;
   } else {
     dispatchedValue = e.target.value.split(',').map(inputToNumber);

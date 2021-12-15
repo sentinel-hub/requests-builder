@@ -104,5 +104,22 @@ const instance = new Api();
 
 export default instance;
 
-export const getMessageFromApiError = (error, defaultErrorText = 'Something went wrong') =>
-  error.body?.error?.message ?? defaultErrorText;
+export const getMessageFromApiError = (error, defaultErrorText = 'Something went wrong') => {
+  const message = error.response?.data?.error?.message ?? defaultErrorText;
+  let errors = error.response?.data?.error?.errors;
+  if (!errors) {
+    return message;
+  }
+
+  if (!errors.length) {
+    errors = [errors];
+  }
+  const len = errors.length;
+  const errMessages = errors
+    .filter((err) => err.parameter !== undefined && err.violation !== undefined)
+    .map(
+      (error, idx) =>
+        `parameter: ${error.parameter} has an invalid value. ${error.violation}${idx < len - 1 ? '\n' : ''}`,
+    );
+  return `${message}\n${errMessages}`;
+};
