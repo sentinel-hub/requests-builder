@@ -4,6 +4,7 @@ import CommonRequestPreview from '../common/CommonRequestPreview';
 import { getRequestBody } from '../process/requests/parseRequest';
 import { getSearchTpdiCurlCommand } from './utils/curls';
 import { parseSearchRequest } from './parse';
+import { addWarningAlert } from '../../store/alert';
 
 const TPDISearchRequestPreview = ({ state, searchResponse }) => {
   const handleParseSearch = (text) => {
@@ -11,6 +12,9 @@ const TPDISearchRequestPreview = ({ state, searchResponse }) => {
       const parsed = JSON.parse(getRequestBody(text));
       parseSearchRequest(parsed);
     } catch (err) {
+      addWarningAlert(
+        'Error while parsing!\nRemember that only the body of the request and the generated curl commands by the app can be parsed.',
+      );
       console.error(err);
     }
   };

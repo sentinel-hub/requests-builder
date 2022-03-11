@@ -12,8 +12,22 @@ import store from '../../store';
 import alertSlice from '../../store/alert';
 import authSlice from '../../store/auth';
 import Api from '../../api';
-import { loginEvent, logoutEvent } from '../../utils/initAnalytics';
 import LogoutExpandable from '../LogoutExpandable';
+
+const LOGIN_MARGINS = (mode) => {
+  switch (mode) {
+    case 'PROCESS':
+      return '345px';
+    case 'STATISTICAL':
+      return '355px';
+    case 'WMS':
+      return '160px';
+    case 'BATCH':
+      return '130px';
+    default:
+      return 0;
+  }
+};
 
 export const doLogin = (customUrl) => {
   const AUTH_BASE_URL = customUrl ?? process.env.REACT_APP_AUTH_BASEURL;
@@ -65,7 +79,7 @@ export const doLogout = () => {
     });
 };
 
-const AuthHeader = ({ user, isEdcUser, customUrl, isImpersonating }) => {
+const AuthHeader = ({ user, isEdcUser, customUrl, isImpersonating, mode }) => {
   useEffect(() => {
     if (!isEdcUser && !isImpersonating) {
       // edc token won't be saved on localstorage since a call to the /token_sentinel_hub needs to be done to know if it's deployed on EDC or not.
@@ -93,21 +107,25 @@ const AuthHeader = ({ user, isEdcUser, customUrl, isImpersonating }) => {
   return (
     <>
       {!isEdcUser ? (
-        <div className="flex items-center">
+        <>
           {user.userdata !== null ? (
-            <LogoutExpandable userdata={user.userdata} logoutEvent={logoutEvent} doLogout={doLogout} />
+            <LogoutExpandable
+              userdata={user.userdata}
+              doLogout={doLogout}
+              marginRight={LOGIN_MARGINS(mode)}
+            />
           ) : (
             <button
               onClick={() => {
                 doLogin(customUrl);
-                loginEvent();
               }}
               className="primary-button button--inactive"
+              style={{ marginRight: LOGIN_MARGINS(mode) }}
             >
               Login
             </button>
           )}
-        </div>
+        </>
       ) : null}
     </>
   );
@@ -115,6 +133,7 @@ const AuthHeader = ({ user, isEdcUser, customUrl, isImpersonating }) => {
 
 const mapStateToProps = (store) => ({
   user: store.auth.user,
+  mode: store.request.mode,
   isEdcUser: store.auth.isEDC,
   customUrl: store.params.oauthUrl,
   isImpersonating: store.auth.isImpersonating,

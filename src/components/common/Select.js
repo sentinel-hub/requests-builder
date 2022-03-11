@@ -28,7 +28,7 @@ export default function Select({
   }, [selected]);
 
   return (
-    <div className="w-4/5 z-1">
+    <div className="xl:w-4/5 z-1 w-full">
       <Listbox value={selected} onChange={onChange} disabled={disabled}>
         {label && typeof label === 'string' ? (
           <Listbox.Label className="form__label">{label}</Listbox.Label>

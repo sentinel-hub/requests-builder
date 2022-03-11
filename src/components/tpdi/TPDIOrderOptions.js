@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { MinusCircleIcon, PlusCircleIcon } from '@heroicons/react/outline';
 import store from '../../store';
@@ -11,6 +11,8 @@ import Toggle from '../common/Toggle';
 import tpdiSlice, { planetSlice } from '../../store/tpdi';
 import RadioSelector from '../common/RadioSelector';
 import { getMessageFromApiError } from '../../api';
+import TpdiNameField from './TpdiNameField';
+import PlanetApiKeyField from './PlanetApiKeyField';
 
 export const errorHandlerTPDI = (error) => {
   addWarningAlert(getMessageFromApiError(error), 7000);
@@ -34,7 +36,6 @@ const TPDIOrderOptions = ({
   name,
   geometry,
   provider,
-  isParsing,
   isUsingQuery,
   setCreateQueryResponse,
   setCreateProductsResponse,
@@ -45,15 +46,6 @@ const TPDIOrderOptions = ({
   apiKey,
 }) => {
   const [limit, setLimit] = useState(10.0);
-
-  useEffect(() => {
-    if (!isParsing) {
-      handleClearProducts();
-    } else {
-      store.dispatch(tpdiSlice.actions.setTpdiParsing(false));
-    }
-    // eslint-disable-next-line
-  }, [geometry, provider]);
 
   //Generate product Inputs depeneding on internal redux state (one input per product)
   const generateProductIdInputs = (products) => {
@@ -84,10 +76,6 @@ const TPDIOrderOptions = ({
     store.dispatch(tpdiSlice.actions.removeProductId(e.target.getAttribute('value')));
   };
 
-  const handleOrderNameChange = (e) => {
-    store.dispatch(tpdiSlice.actions.setName(e.target.value));
-  };
-
   const handleLimitChange = (e) => {
     if (e.target.value === '') {
       setLimit(Infinity);
@@ -116,9 +104,6 @@ const TPDIOrderOptions = ({
       store.dispatch(planetSlice.actions.setHarmonizeTo('PS2'));
     }
   };
-  const handleApiKeyChange = (e) => {
-    store.dispatch(planetSlice.actions.setApiKey(e.target.value));
-  };
 
   const handleProductIdChange = (e, idx) => {
     store.dispatch(
@@ -136,18 +121,7 @@ const TPDIOrderOptions = ({
     <>
       <h2 className="heading-secondary">Order Options</h2>
       <div className="form">
-        <label htmlFor="tpdi-name" className="form__label">
-          Name
-        </label>
-        <input
-          id="tpdi-name"
-          placeholder="e.g: My planet"
-          type="text"
-          value={name}
-          className="form__input mb-2"
-          onChange={handleOrderNameChange}
-          autoComplete="off"
-        />
+        <TpdiNameField name={name} />
         <div className="flex items-center" style={{ justifyContent: 'space-between' }}>
           <label className="form__label mb-1">Choose order type</label>
           <Tooltip
@@ -176,6 +150,8 @@ const TPDIOrderOptions = ({
             { name: 'Using Product Ids', value: 'PRODUCTS' },
             { name: 'Using Query', value: 'QUERY' },
           ]}
+          containerClassName="md:flex-col"
+          labelClassName="md:mb-2"
           onChange={handleOrderTypeChange}
           value={isUsingQuery ? 'QUERY' : 'PRODUCTS'}
         />
@@ -215,7 +191,7 @@ const TPDIOrderOptions = ({
           <Tooltip
             content="Set an approximate order limit to prevent undesired large area requests."
             direction="right"
-          ></Tooltip>
+          />
         </div>
 
         {!isUsingQuery && (
@@ -249,24 +225,7 @@ const TPDIOrderOptions = ({
                 direction="right"
               />
             </div>
-            <label htmlFor="planet-api-key" className="form__label">
-              Planet API Key
-            </label>
-            <div className="flex items-center justify-between">
-              <input
-                id="planet-api-key"
-                placeholder="Your Planet API key"
-                value={apiKey}
-                required
-                type="text"
-                className="form__input mb-2"
-                onChange={handleApiKeyChange}
-              />
-              <Tooltip
-                content="Enter a Planet API key, that you received via email after purchasing a PlanetScope Sentinel Hub Package"
-                direction="right"
-              />
-            </div>
+            <PlanetApiKeyField planetApiKey={apiKey} />
           </>
         )}
 
@@ -288,7 +247,6 @@ const mapStateToProps = (state) => ({
   name: state.tpdi.name,
   geometry: state.map.wgs84Geometry,
   provider: state.tpdi.provider,
-  isParsing: state.tpdi.isParsing,
   isUsingQuery: state.tpdi.isUsingQuery,
   harmonizeTo: state.planet.harmonizeTo,
   productBundle: state.planet.productBundle,

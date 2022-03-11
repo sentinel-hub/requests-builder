@@ -51,7 +51,11 @@ const handleParseRequest = (text) => {
     parseBatchRequest(omit(request, ['processRequest']));
   } catch (err) {
     store.dispatch(
-      alertSlice.actions.addAlert({ type: 'WARNING', text: 'Something went wrong parsing the request.' }),
+      alertSlice.actions.addAlert({
+        type: 'WARNING',
+        text:
+          'Something went wrong parsing the request.\nRemember that only the body of the request and the generated curl commands by the app work when parsing!',
+      }),
     );
     console.error('Something went wrong parsing the request', err);
   }

@@ -5,7 +5,7 @@ import { errorHandlerTPDI } from './TPDIOrderOptions';
 import Tooltip from '../common/Tooltip/Tooltip';
 import TpdiResource from '../../api/tpdi/TpdiResource';
 import { tpdiCreateOrderBodyViaDataFilter, tpdiCreateOrderBodyViaProducts } from '../../api/tpdi/common';
-import { errorTpdiCreationEvent, successfulTpdiCreationEvent } from '../../utils/initAnalytics';
+import { successfulTpdiCreationEvent } from '../../utils/initAnalytics';
 
 const DIALOG_TEXT =
   'Are you sure you want to create an order without a Collection ID?\nWhen you confirm your order a new collection will be created automatically.';
@@ -92,7 +92,6 @@ const TPDIPlaceOrderButton = ({
 
   const tpdiCreateErrorHandler = useCallback((err) => {
     errorHandlerTPDI(err);
-    errorTpdiCreationEvent();
   }, []);
 
   return (

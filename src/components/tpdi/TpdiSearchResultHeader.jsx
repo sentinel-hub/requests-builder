@@ -9,6 +9,7 @@ import tpdiSlice from '../../store/tpdi';
 import CopyIcon from '../common/CopyIcon';
 import { getFormattedDatetime } from './utils';
 import { focusMap } from '../common/Map/utils/geoUtils';
+import { ORDERS_MODE } from '../../forms/TPDIRequestForm';
 
 export const TpdiSearchResultHeader = ({
   id,
@@ -17,6 +18,7 @@ export const TpdiSearchResultHeader = ({
   featureGeometry,
   expandedInfo,
   setExpandedInfo,
+  tpdiMode,
 }) => {
   const handleExpand = () => {
     setExpandedInfo((prev) => !prev);
@@ -60,14 +62,16 @@ export const TpdiSearchResultHeader = ({
           <FontAwesomeIcon className="icon" icon={faAngleDoubleDown} />
         )}
       </div>
-      <div className="flex flex-col lg:flex-row items-center justify-between w-1/2 lg:w-1/3">
-        <button
-          className={`secondary-button ${isDisabled ? 'secondary-button--disabled' : ''}`}
-          onClick={handleAddToOrder}
-          disabled={isDisabled}
-        >
-          {isDisabled ? 'Added to orders' : 'Add to order'}
-        </button>
+      <div className="flex flex-col lg:flex-row items-center justify-between w-3/4 lg:w-1/3">
+        {tpdiMode === ORDERS_MODE && (
+          <button
+            className={`secondary-button wrapped ${isDisabled ? 'secondary-button--disabled' : ''}`}
+            onClick={handleAddToOrder}
+            disabled={isDisabled}
+          >
+            {isDisabled ? 'Added to orders' : 'Add to order'}
+          </button>
+        )}
         <button className="secondary-button" onClick={handleParseExtraGeometry}>
           <FontAwesomeIcon icon={faGlobeEurope} />
         </button>
@@ -79,5 +83,6 @@ export const TpdiSearchResultHeader = ({
 const mapStateToProps = (state, ownProps) => ({
   // computed ppty
   isDisabled: Boolean(state.tpdi.products.find((product) => product.id === ownProps.id)),
+  tpdiMode: state.tpdi.mode,
 });
 export default connect(mapStateToProps)(TpdiSearchResultHeader);

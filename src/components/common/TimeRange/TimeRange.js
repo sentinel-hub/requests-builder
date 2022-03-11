@@ -20,7 +20,7 @@ export const utcDateToYYYYMMDDFormat = (utcDate) => utcDate.split('T')[0];
 // TODO: add here LETML1, LETML2, LMSSL1 once catalog deployed
 const shouldFetchDates = (datasource, mode) =>
   [S1GRD, S2L2A, S2L1C, S3OLCI, S3SLSTR, S5PL2].includes(datasource) &&
-  (mode === 'BATCH' || mode === 'PROCESS');
+  (mode === 'BATCH' || mode === 'PROCESS' || mode === 'STATISTICAL');
 
 const getStartOfMonth = (dateString) => {
   return moment(dateString).utc().startOf('month').format();

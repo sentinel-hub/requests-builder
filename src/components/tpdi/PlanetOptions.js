@@ -4,8 +4,23 @@ import { planetSlice } from '../../store/tpdi';
 import { connect } from 'react-redux';
 import Tooltip from '../common/Tooltip/Tooltip';
 import TargetBlankLink from '../common/TargetBlankLink';
+import { SUBSCRIPTIONS_MODE } from '../../forms/TPDIRequestForm';
 
-const PlanetOptions = ({ maxCC, productBundle, harmonizeTo }) => {
+const generateProductBundleOptions = (tpdiMode) => {
+  if (tpdiMode === SUBSCRIPTIONS_MODE) {
+    return <option value="analytic_sr_udm2">analytic_sr_udm2</option>;
+  }
+  return (
+    <>
+      <option value="analytic">analytic</option>
+      <option value="analytic_udm2">analytic_udm2</option>
+      <option value="analytic_sr">analytic_sr</option>
+      <option value="analytic_sr_udm2">analytic_sr_udm2</option>
+    </>
+  );
+};
+
+const PlanetOptions = ({ maxCC, productBundle, harmonizeTo, tpdiMode }) => {
   const handleMaxCCChange = (e) => {
     store.dispatch(planetSlice.actions.setMaxCloudCoverage(e.target.value));
   };
@@ -28,10 +43,7 @@ const PlanetOptions = ({ maxCC, productBundle, harmonizeTo }) => {
           value={productBundle}
           onChange={handleProductBundleChange}
         >
-          <option value="analytic">analytic</option>
-          <option value="analytic_udm2">analytic_udm2</option>
-          <option value="analytic_sr">analytic_sr</option>
-          <option value="analytic_sr_udm2">analytic_sr_udm2</option>
+          {generateProductBundleOptions(tpdiMode)}
         </select>
         <Tooltip
           content={
@@ -45,6 +57,8 @@ const PlanetOptions = ({ maxCC, productBundle, harmonizeTo }) => {
                 children="docs"
               />{' '}
               for more information.
+              <br />
+              For subscriptions only <i>analytic_sr_udm2</i> is available
             </p>
           }
           direction="right"
@@ -70,6 +84,7 @@ const mapStateToProps = (state) => ({
   maxCC: state.planet.maxCloudCoverage,
   productBundle: state.planet.productBundle,
   harmonizeTo: state.planet.harmonizeTo,
+  tpdiMode: state.tpdi.mode,
 });
 
 export default connect(mapStateToProps)(PlanetOptions);

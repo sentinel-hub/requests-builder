@@ -14,17 +14,14 @@ const getTarHeader = (responses) => {
 
 const ProcessResource = {
   stateRequest: (requestState) =>
-    POST(
-      getProcessUrl(requestState),
-      {
-        authenticated: true,
-        endpointHeaders: {
-          ...getTarHeader(requestState.responses),
-        },
+    POST(getProcessUrl(requestState), {
+      authenticated: true,
+      endpointHeaders: {
+        ...getTarHeader(requestState.responses),
       },
-      '*/*',
-      true,
-    ),
+      contentType: '*/*',
+      isFullUrl: true,
+    }),
 };
 
 export default ProcessResource;

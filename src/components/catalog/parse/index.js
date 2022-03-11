@@ -12,7 +12,9 @@ export const parseCatalogBody = (str) => {
     dispatchCatalogChanges(parsedJson);
     addSuccessAlert('Request parsed successfully!');
   } catch (err) {
-    addWarningAlert('Something went wrong, check the console for more details!');
+    addWarningAlert(
+      'Something went wrong while parsing.\nRemember that only the body of the request and the generated curl commands by the app can be parsed.',
+    );
     console.error(err);
   }
 };

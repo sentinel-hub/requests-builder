@@ -7,7 +7,8 @@ import { addWarningAlert } from '../../../store/alert';
 import mapSlice from '../../../store/map';
 import RequestButton from '../RequestButton';
 import CatalogResource from '../../../api/catalog/CatalogResource';
-import { CUSTOM } from '../../../utils/const/const';
+import { CUSTOM, EU_CENTRAL_DEPLOYMENT } from '../../../utils/const/const';
+import { getMessageFromApiError } from '../../../api';
 
 const ByocDataFinder = ({ dataCollections, token, appMode, wmsCollectionId, wmsCollectionType }) => {
   const [foundFeatures, setFoundFeatures] = useState([]);
@@ -18,6 +19,7 @@ const ByocDataFinder = ({ dataCollections, token, appMode, wmsCollectionId, wmsC
 
   const collectionId = appMode === 'WMS' ? wmsCollectionId : byocDataCollection?.byocCollectionId;
   const collectionType = appMode === 'WMS' ? wmsCollectionType : byocDataCollection?.byocCollectionType;
+  const location = appMode === 'WMS' ? EU_CENTRAL_DEPLOYMENT : byocDataCollection?.byocCollectionLocation;
 
   useEffect(() => {
     setFoundFeatures([]);
@@ -40,8 +42,7 @@ const ByocDataFinder = ({ dataCollections, token, appMode, wmsCollectionId, wmsC
   };
 
   const errorHandler = (err) => {
-    addWarningAlert('Something went wrong when searching for BYOC tiles');
-    console.error(err);
+    addWarningAlert(getMessageFromApiError(err, 'Something went wrong fetching tiles for the collection.'));
   };
 
   const handleSetGeometry = () => {
@@ -67,7 +68,7 @@ const ByocDataFinder = ({ dataCollections, token, appMode, wmsCollectionId, wmsC
       {selectedFeatureIndex === null ? (
         <RequestButton
           buttonText="Find BYOC Data"
-          request={CatalogResource.fetchBounds}
+          request={CatalogResource.fetchBounds(location)}
           args={[{ collectionType: collectionType.toLowerCase(), collectionId }]}
           className="secondary-button"
           validation={Boolean(collectionId, collectionType, token)}

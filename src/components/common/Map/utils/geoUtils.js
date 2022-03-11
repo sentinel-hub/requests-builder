@@ -1,6 +1,7 @@
 import area from '@turf/area';
 import bboxPolygon from '@turf/bbox-polygon';
 import intersect from '@turf/intersect';
+import union from '@turf/union';
 
 export const getFeatureCollectionMultiPolygon = (featureCollection) => {
   const { features } = featureCollection;
@@ -64,11 +65,19 @@ export const getBboxFromCoords = (coords) => {
 };
 
 export const getAreaFromGeometry = (geometry) => {
+  if (!isValidGeometry(geometry)) {
+    return null;
+  }
   if (isBbox(geometry)) {
     return area(bboxPolygon(geometry));
   } else {
     return area(geometry);
   }
+};
+
+export const getAreaFromBounds = (bounds) => {
+  const geo = bounds.geometry ?? bounds.bbox;
+  return getAreaFromGeometry(geo);
 };
 
 const getIntersection = (geo1, geo2) => {
@@ -82,6 +91,20 @@ const getIntersection = (geo1, geo2) => {
     return intersect(geo2, bboxPolygon(geo1));
   }
   return intersect(geo1, geo2);
+};
+
+export const getProperGeometry = (bounds) => bounds.geometry ?? bboxPolygon(bounds.bbox).geometry;
+
+export const getUnion = (geo1, geo2) => {
+  try {
+    const res = union(geo1, geo2);
+    if (res) {
+      return res.geometry;
+    }
+    return null;
+  } catch (err) {
+    return null;
+  }
 };
 
 export const getAreaCoverPercentage = (selectedGeometry, coverGeometry) => {

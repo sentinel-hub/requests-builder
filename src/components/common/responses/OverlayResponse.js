@@ -80,7 +80,7 @@ const OverlayResponse = ({
   return (
     <>
       {displayResponse ? (
-        <div className="fixed top-0 left-0 right-0 bottom-0 w-full h-full cursor-pointer flex justify-center items-center z-50 bg-gray-700 bg-opacity-50">
+        <div className="overlay-container">
           <div ref={ref} className="overlay-image-container">
             <span
               className="absolute top-5 right-0 cursor-pointer font-bold text-xl"

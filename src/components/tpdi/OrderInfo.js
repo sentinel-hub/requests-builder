@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDoubleDown, faAngleDoubleUp } from '@fortawesome/free-solid-svg-icons';
 import store from '../../store';
 import RequestButton from '../common/RequestButton';
 import { getTransformedGeometryFromBounds } from '../common/Map/utils/crsTransform';
-import GetDeliveriesButton from './GetDeliveriesButton';
 import { parseTPDIRequest } from './parse';
-import Tooltip from '../common/Tooltip/Tooltip';
 import { getFormattedDatetime } from './utils';
 import { CUSTOM } from '../../utils/const/const';
 import mapSlice from '../../store/map';
@@ -18,6 +16,8 @@ import TpdiResource from '../../api/tpdi/TpdiResource';
 import { formatNumber } from '../../utils/commonUtils';
 import { getMessageFromApiError } from '../../api';
 import { focusMap } from '../common/Map/utils/geoUtils';
+import Tooltip from '../common/Tooltip/Tooltip';
+import OrderDeliveriesModal from './OrderDeliveriesModal';
 
 const getColorByStatus = (status) => {
   if (status === 'PARTIAL') {
@@ -70,11 +70,10 @@ const TooltipInfo = ({ isGeneral }) => {
 };
 
 export const OrdersTooltip = ({ isGeneral = false }) => (
-  <Tooltip direction="bottom" content={<TooltipInfo isGeneral={isGeneral} />} width="400px" />
+  <Tooltip direction="right" content={<TooltipInfo isGeneral={isGeneral} />} wrapperClassName="w-96" />
 );
 
 const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder, expandOrder, updateToFinished }) => {
-  const [deliveries, setDeliveries] = useState([]);
   const handleSeeGeometry = () => {
     const transformedGeo = getTransformedGeometryFromBounds(order.input.bounds);
     store.dispatch(mapSlice.actions.setExtraGeometry(transformedGeo));
@@ -173,19 +172,10 @@ const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder, expandO
             <span>Created at: </span>
             {getFormattedDatetime(order.created)}
           </p>
-          {deliveries.length > 0 ? (
-            <>
-              <p className="text">
-                <span>Deliveries: </span>
-                {deliveries.map((del, idx) => {
-                  if (idx === deliveries.length - 1) {
-                    return del.status;
-                  }
-                  return del.status + ', ';
-                })}
-              </p>
-            </>
-          ) : null}
+          <div className="flex items-center mb-2">
+            <span>Deliveries: </span>
+            <OrderDeliveriesModal orderId={order.id} provider={order.provider} />
+          </div>
           <div className="flex items-center">
             <div className="grid grid-cols-2 w-2/3 gap-2 mr-2">
               {order.status !== 'DONE' && order.status !== 'RUNNING' && (
@@ -224,13 +214,6 @@ const OrderInfo = ({ token, order, handleDeleteOrder, handleUpdateOrder, expandO
               <button className="secondary-button" onClick={handleParseRequest}>
                 Update UI
               </button>
-              <GetDeliveriesButton
-                id={order.id}
-                token={token}
-                status={order.status}
-                setDeliveries={setDeliveries}
-                updateToFinished={updateToFinished}
-              />
               {order.status === 'DONE' && (
                 <button className="secondary-button secondary-button--wrapped" onClick={handleRequestProcess}>
                   Request on Process API

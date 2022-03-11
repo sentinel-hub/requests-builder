@@ -4,6 +4,8 @@ import Mousetrap from 'mousetrap';
 import ConfirmDialog from './ConfirmDialog';
 import store from '../../store';
 import requestSlice from '../../store/request';
+import { addWarningAlert } from '../../store/alert';
+import { getMessageFromApiError } from '../../api';
 
 //Abstraction of button that sends a request.
 const RequestButton = ({
@@ -76,6 +78,7 @@ const RequestButton = ({
           if (errorHandler) {
             errorHandler(err);
           } else {
+            addWarningAlert(getMessageFromApiError(err));
             console.error(err);
           }
         }

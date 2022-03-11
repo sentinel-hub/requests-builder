@@ -17,9 +17,10 @@ export const getMaxarSearchRequestBody = (state) => {
       {
         dataFilter: {
           ...getTimeRange(state.request, state.tpdi.isSingleDate),
-          ...nonDefaultProperties(state.maxar, maxarInitialState),
+          ...nonDefaultProperties(state.maxar.dataFilterOptions, maxarInitialState.dataFilterOptions),
         },
         productBands: '4BB',
+        productKernel: state.maxar.productKernel,
       },
     ],
   };

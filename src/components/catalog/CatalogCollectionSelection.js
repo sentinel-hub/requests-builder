@@ -7,6 +7,7 @@ import { addWarningAlert } from '../../store/alert';
 import CatalogResource from '../../api/catalog/CatalogResource';
 import { getCatalogOptions } from './const';
 import Select from '../common/Select';
+import { getMessageFromApiError } from '../../api';
 
 const generateCollectionsOptions = (collections) =>
   collections.map((collection) => ({
@@ -39,7 +40,7 @@ const CatalogCollectionSelection = ({ token, selectedCollection, deploymentUrl }
         if (Axios.isCancel(err)) {
           console.error(err);
         } else {
-          addWarningAlert('Something went wrong');
+          addWarningAlert(getMessageFromApiError(err, 'Something went wrong fetching catalog collections.'));
         }
         setIsFetchingCollections(false);
       }

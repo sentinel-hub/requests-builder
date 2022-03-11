@@ -34,22 +34,19 @@ export const dispatchBounds = (parsedBody) => {
         selectedCrs = 'EPSG:4326';
       }
     }
-    //is bbox
-    if (bounds.bbox) {
-      let geometry = bounds.bbox;
-      if (isValidBbox(bounds.bbox)) {
-        store.dispatch(mapSlice.actions.setConvertedGeometryWithCrs({ geometry, crs: selectedCrs }));
-      } else {
-        throw Error('Unvalid bbox');
-      }
-    }
-    //polygon
-    else if (bounds.geometry) {
+    if (bounds.geometry) {
       if (isValidGeometry(bounds.geometry)) {
         let geometry = bounds.geometry;
         store.dispatch(mapSlice.actions.setConvertedGeometryWithCrs({ geometry, crs: selectedCrs }));
       } else {
         throw Error('Unable to parse geometry');
+      }
+    } else if (bounds.bbox) {
+      let geometry = bounds.bbox;
+      if (isValidBbox(bounds.bbox)) {
+        store.dispatch(mapSlice.actions.setConvertedGeometryWithCrs({ geometry, crs: selectedCrs }));
+      } else {
+        throw Error('Unvalid bbox');
       }
     }
   } catch (err) {

@@ -5,6 +5,8 @@ import { isEmpty } from '../utils/commonUtils';
 const DEFAULT_ENDPOINT_CONFIG = {
   authenticated: true,
   endpointHeaders: {},
+  contentType: 'application/json',
+  isFullUrl: false,
 };
 
 const injectParameters = (urlTemplate, data, hasBody) => {
@@ -54,10 +56,11 @@ class Api {
   };
 
   makeMethod(method, hasBody = false) {
-    return (path, endpointConfig = DEFAULT_ENDPOINT_CONFIG, contentType = 'application/json', isFullUrl) => {
+    return (path, endpointConfig) => {
       return (data = undefined, fetchConfig = {}) => {
+        const config = { ...DEFAULT_ENDPOINT_CONFIG, ...endpointConfig };
         const pathWithParams = injectParameters(path, data, hasBody);
-        const { authenticated, endpointHeaders } = endpointConfig;
+        const { authenticated, endpointHeaders, contentType, isFullUrl } = config;
         let headers = {
           Accept: contentType,
           ...defaultHeaders,
@@ -105,6 +108,9 @@ const instance = new Api();
 export default instance;
 
 export const getMessageFromApiError = (error, defaultErrorText = 'Something went wrong') => {
+  if (axios.isCancel(error)) {
+    return;
+  }
   const message = error.response?.data?.error?.message ?? defaultErrorText;
   let errors = error.response?.data?.error?.errors;
   if (!errors) {

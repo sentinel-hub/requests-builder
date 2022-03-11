@@ -45,6 +45,11 @@
   overflow-y: scroll;
   height: 380px; }
 
+.tpdi-subscriptions-preview .CodeMirror-scroll {
+  /* stylelint-disable-line */
+  overflow-y: scroll;
+  height: 500px; }
+
 .tpdi-search-preview .CodeMirror-scroll {
   /* stylelint-disable-line */
   overflow-y: scroll;
@@ -79,9 +84,9 @@
   max-height: 600px; }
 
 .alert {
-  position: sticky;
+  position: fixed;
   top: 5%;
-  right: 0;
+  left: 2%;
   z-index: 100000;
   max-width: 500px;
   align-items: stretch;
@@ -297,48 +302,6 @@ input:checked + .slider::before {
         max-width: 300px;
         max-height: 300px; } }
 
-.saved-requests-container {
-  position: fixed;
-  right: 0;
-  top: 15%;
-  background-color: #dde693;
-  user-select: none;
-  z-index: 10; }
-
-.saved-requests-toggle {
-  width: 65px;
-  height: 65px;
-  color: var(--black); }
-  .saved-requests-toggle__icon {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-evenly;
-    height: 100%;
-    font-size: 1rem;
-    cursor: pointer; }
-    .saved-requests-toggle__icon span {
-      font-size: 0.8rem;
-      font-weight: bold; }
-      @media (max-width: 500px) {
-        .saved-requests-toggle__icon span {
-          display: none; } }
-  @media (max-width: 500px) {
-    .saved-requests-toggle {
-      width: 30px;
-      height: 30px; } }
-
-.saved-requests-body {
-  display: block;
-  position: fixed;
-  right: 0;
-  width: 300px;
-  height: 300px;
-  padding: 1rem;
-  color: var(--black);
-  background-color: #dde693;
-  overflow-y: scroll; }
-
 /* Works on Firefox */
 * {
   scrollbar-width: thin;
@@ -471,9 +434,6 @@ input:checked + .slider::before {
   @media (max-width: 62.5em) {
     .evalscript-editor {
       width: 100%; } }
-
-.byoc-options select {
-  width: 90%; }
 
 .datafusion-options {
   max-height: 570px;

@@ -1,8 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleDoubleLeft, faAngleDoubleRight } from '@fortawesome/free-solid-svg-icons';
-import { SaveIcon } from '@heroicons/react/solid';
+import { FolderIcon, SaveIcon } from '@heroicons/react/solid';
 import store from '../../../store';
 import savedRequestsSlice from '../../../store/savedRequests';
 import alertSlice, { addWarningAlert } from '../../../store/alert';
@@ -22,6 +20,20 @@ const getUnnamedCollectionName = (collections) => {
 };
 
 const doesModeSupportSaving = (mode) => mode === 'PROCESS' || mode === 'STATISTICAL' || mode === 'BATCH';
+
+const MODE_TO_RIGHT_POS = (mode) => {
+  switch (mode) {
+    case 'PROCESS':
+      return '220px';
+    case 'STATISTICAL':
+      return '230px';
+    case 'WMS':
+    case 'BATCH':
+      return '10px';
+    default:
+      return 0;
+  }
+};
 
 const handleUploadedCollectionParsing = (parsedData, savedRequests) => {
   const overridedCollections = [];
@@ -108,55 +120,53 @@ const SavedRequests = ({ savedRequests, mode, expandedSidebar, token }) => {
   };
 
   return (
-    <div className="saved-requests-container">
-      <div className="saved-requests-toggle">
-        <div className="saved-requests-toggle__icon" onClick={handleExpand}>
-          <span>Requests</span>
-          <FontAwesomeIcon icon={expandedSidebar ? faAngleDoubleRight : faAngleDoubleLeft} />
-        </div>
-        {expandedSidebar && (
-          <div className="block fixed right-0 w-96 h-96 p-2 text-black bg-primary-lighter overflow-y-scroll">
-            <button className="tertiary-button my-2 flex items-center" onClick={handleSaveToIndexedDb}>
-              <SaveIcon className="w-6 mr-1" /> Save locally
-            </button>
-            {savedRequests.map((collection) => (
-              <SavedCollection collection={collection} token={token} key={collection.primaryKey} />
-            ))}
-            {savedRequests.length === 0 && (
-              <p className="text">
-                <span>Send a request and save it to see it here!</span>
-              </p>
-            )}
-            <p className="text mt-1 mb-1">
-              <span className="block">
-                <i>Note: Saved request are stored locally and can be removed by deleting the cache.</i>
-              </span>
-              <span className="block">
-                <i>Saved requests are not tied to your account but to your browser.</i>
-              </span>
-              <span className="block" style={{ display: 'block' }}>
-                <i>
-                  Remember to click the <b>Save locally</b> to persist them or export them to a local file.
-                </i>
-              </span>
+    <div className="ml-2 fixed z-50" style={{ right: MODE_TO_RIGHT_POS(mode) }}>
+      <button className="primary-button flex items-center" onClick={handleExpand}>
+        <FolderIcon className="w-5 mr-1" />
+        Requests
+      </button>
+      {expandedSidebar && (
+        <div className="block fixed right-0 w-96 h-96 p-2 text-black bg-primary-lighter overflow-y-scroll">
+          <button className="tertiary-button my-2 flex items-center" onClick={handleSaveToIndexedDb}>
+            <SaveIcon className="w-6 mr-1" /> Save locally
+          </button>
+          {savedRequests.map((collection) => (
+            <SavedCollection collection={collection} token={token} key={collection.primaryKey} />
+          ))}
+          {savedRequests.length === 0 && (
+            <p className="text">
+              <span>Send a request and save it to see it here!</span>
             </p>
-            <div className="flex flex-col">
-              <div className="flex items-center">
-                {!hasUnnamedCollections && <ExportCollection savedCollections={savedRequests} />}
-                <input
-                  type="file"
-                  id="collection-file-input"
-                  onChange={handleImport}
-                  style={{ display: 'none' }}
-                />
-                <button className="tertiary-button mt-2" onClick={handleImportButtonClick}>
-                  Upload collection
-                </button>
-              </div>
+          )}
+          <p className="text mt-1 mb-1">
+            <span className="block">
+              <i>Note: Saved request are stored locally and can be removed by deleting the cache.</i>
+            </span>
+            <span className="block">
+              <i>Saved requests are not tied to your account but to your browser.</i>
+            </span>
+            <span className="block" style={{ display: 'block' }}>
+              <i>
+                Remember to click the <b>Save locally</b> to persist them or export them to a local file.
+              </i>
+            </span>
+          </p>
+          <div className="flex flex-col">
+            <div className="flex items-center">
+              {!hasUnnamedCollections && <ExportCollection savedCollections={savedRequests} />}
+              <input
+                type="file"
+                id="collection-file-input"
+                onChange={handleImport}
+                style={{ display: 'none' }}
+              />
+              <button className="tertiary-button mt-2" onClick={handleImportButtonClick}>
+                Upload collection
+              </button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

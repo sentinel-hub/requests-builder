@@ -1,6 +1,6 @@
 import store from '../../../store';
 import requestSlice from '../../../store/request';
-import tpdiSlice, { airbusSlice, planetSlice } from '../../../store/tpdi';
+import tpdiSlice, { airbusSlice, maxarSlice, planetSlice } from '../../../store/tpdi';
 import omit from 'lodash.omit';
 import { constellationToStateConstellation } from '../utils';
 import mapSlice from '../../../store/map';
@@ -26,6 +26,47 @@ const dispatchBounds = (bounds) => {
   }
 };
 
+const parseMaxarOptions = (dataObj) => {
+  const { productKernel } = dataObj;
+  if (productKernel) {
+    store.dispatch(maxarSlice.actions.setProductKernel(productKernel));
+  }
+  if (dataObj?.dataFilter) {
+    const {
+      maxCloudCoverage,
+      minOffNadir,
+      maxOffNadir,
+      minSunElevation,
+      maxSunElevation,
+      sensor,
+    } = dataObj.dataFilter;
+    if (maxCloudCoverage) {
+      store.dispatch(
+        maxarSlice.actions.setMaxarDataFilterParam({ key: 'maxCloudCoverage', value: maxCloudCoverage }),
+      );
+    }
+    if (minOffNadir) {
+      store.dispatch(maxarSlice.actions.setMaxarDataFilterParam({ key: 'minOffNadir', value: minOffNadir }));
+    }
+    if (maxOffNadir) {
+      store.dispatch(maxarSlice.actions.setMaxarDataFilterParam({ key: 'maxOffNadir', value: maxOffNadir }));
+    }
+    if (minSunElevation) {
+      store.dispatch(
+        maxarSlice.actions.setMaxarDataFilterParam({ key: 'minSunElevation', value: minSunElevation }),
+      );
+    }
+    if (maxSunElevation) {
+      store.dispatch(
+        maxarSlice.actions.setMaxarDataFilterParam({ key: 'maxSunElevation', value: maxSunElevation }),
+      );
+    }
+    if (sensor) {
+      store.dispatch(maxarSlice.actions.setMaxarDataFilterParam({ key: 'sensor', value: sensor }));
+    }
+  }
+};
+
 const dispatchTimerange = (timeRange) => {
   if (timeRange && timeRange.from && timeRange.to) {
     store.dispatch(requestSlice.actions.setTimeFrom({ idx: 0, timeFrom: timeRange.from }));
@@ -33,7 +74,6 @@ const dispatchTimerange = (timeRange) => {
   }
 };
 export const parseTPDIRequest = (order) => {
-  store.dispatch(tpdiSlice.actions.setTpdiParsing(true));
   const { name, input, collectionId } = order;
   //name
   store.dispatch(tpdiSlice.actions.setName(name));
@@ -44,8 +84,10 @@ export const parseTPDIRequest = (order) => {
     if (constellation) {
       store.dispatch(tpdiSlice.actions.setProvider(constellation));
     }
-  } else {
+  } else if (provider === 'PLANET') {
     store.dispatch(tpdiSlice.actions.setProvider('PLANET'));
+  } else if (provider === 'MAXAR') {
+    store.dispatch(tpdiSlice.actions.setProvider('MAXAR'));
   }
   //collectionID
   if (collectionId) {
@@ -87,11 +129,41 @@ export const parseTPDIRequest = (order) => {
     if (planetCC) {
       store.dispatch(planetSlice.actions.setMaxCloudCoverage(planetCC));
     }
+  } else if (provider === 'MAXAR') {
+    // products
+    const selectedImages = data[0]?.selectedImages;
+    if (selectedImages) {
+      store.dispatch(tpdiSlice.actions.setProducts(selectedImages));
+    } else {
+      store.dispatch(tpdiSlice.actions.setIsUsingQuery(true));
+    }
+    parseMaxarOptions(data[0] ?? {});
   }
+};
+
+export const parseSubscriptionsRequest = (subscription) => {
+  const { bounds, data } = subscription;
+  const { dataFilter } = data[0];
+  const { timeRange } = dataFilter;
+
+  if (dataFilter.maxCloudCoverage) {
+    store.dispatch(planetSlice.actions.setMaxCloudCoverage(dataFilter.maxCloudCoverage));
+  }
+  if (subscription.planetApiKey) {
+    store.dispatch(planetSlice.actions.setApiKey(subscription.planetApiKey));
+  }
+  if (subscription.collectionId) {
+    store.dispatch(tpdiSlice.actions.setCollectionId(subscription.collectionId));
+  }
+  dispatchBounds(bounds);
+  dispatchTimerange(timeRange);
 };
 
 export const parseSearchRequest = (parsedRequest) => {
   const { provider, bounds, data } = parsedRequest;
+  if (!data) {
+    return;
+  }
   const { constellation, dataFilter } = data[0];
   const { timeRange } = dataFilter;
   if (provider === 'AIRBUS') {
@@ -101,11 +173,14 @@ export const parseSearchRequest = (parsedRequest) => {
     }
     const dataFilterOptions = omit(dataFilter, ['timeRange']);
     store.dispatch(airbusSlice.actions.setDataFilterOptions({ ...dataFilterOptions }));
-  } else {
+  } else if (provider === 'PLANET') {
     store.dispatch(tpdiSlice.actions.setProvider('PLANET'));
     if (dataFilter.maxCloudCoverage) {
       store.dispatch(planetSlice.actions.setMaxCloudCoverage(dataFilter.maxCloudCoverage));
     }
+  } else if (provider === 'MAXAR') {
+    store.dispatch(tpdiSlice.actions.setProvider('MAXAR'));
+    parseMaxarOptions(data[0]);
   }
 
   dispatchBounds(bounds);

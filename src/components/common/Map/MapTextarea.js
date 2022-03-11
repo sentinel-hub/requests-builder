@@ -6,7 +6,7 @@ import { addWarningAlert } from '../../../store/alert';
 import { crsByUrl } from '../../process/requests/parseRequest';
 import Tooltip from '../Tooltip/Tooltip';
 import SaveGeometry from './SaveGeometry';
-import { appendPolygon, getFeatureCollectionMultiPolygon } from './utils/geoUtils';
+import { appendPolygon, getFeatureCollectionMultiPolygon, isValidGeometry } from './utils/geoUtils';
 
 const isFeatureCollection = (parsedGeometry) => parsedGeometry.type === 'FeatureCollection';
 const isFeature = (parsedGeometry) => parsedGeometry.type === 'Feature';
@@ -38,7 +38,7 @@ const MapTextarea = ({ fitToMainBounds, extraGeometry, geometry, setParsedError,
     try {
       let parsedGeo = JSON.parse(text);
       // Geojson
-      if (isGeojson) {
+      if (isGeojson(parsedGeo)) {
         if (containsCrs(parsedGeo)) {
           const selectedCrs = crsByUrl(getCrsUrl(parsedGeo));
           if (selectedCrs) {
@@ -49,14 +49,18 @@ const MapTextarea = ({ fitToMainBounds, extraGeometry, geometry, setParsedError,
         }
         if (isFeatureCollection(parsedGeo)) {
           const multiPolygon = getFeatureCollectionMultiPolygon(parsedGeo);
-          console.log(multiPolygon);
           parsedGeo = multiPolygon;
         }
         if (isFeature(parsedGeo)) {
           parsedGeo = parsedGeo.geometry;
         }
       }
-      store.dispatch(mapSlice.actions.setTextGeometry(parsedGeo));
+      if (!isValidGeometry(parsedGeo)) {
+        addWarningAlert('Invalid geometry!');
+        setGeometryText(JSON.stringify(geometry, null, 2));
+      } else {
+        store.dispatch(mapSlice.actions.setTextGeometry(parsedGeo));
+      }
     } catch (err) {
       addWarningAlert('Error parsing the geometry');
       console.error('Error Parsing Geometry', err);

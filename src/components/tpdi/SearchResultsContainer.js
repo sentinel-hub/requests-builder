@@ -102,7 +102,7 @@ const SearchResultsContainer = ({ featuresWithProvider, geometry }) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <h2 className="heading-secondary">Search Results (Products Found)</h2>
-      <div className="form" style={{ overflowY: 'scroll', maxHeight: '500px' }} ref={containerRef}>
+      <div className="form" style={{ overflowY: 'scroll', maxHeight: '600px' }} ref={containerRef}>
         {featuresWithProvider.features.length > 0 ? (
           <>
             <div className="flex items-center justify-between">

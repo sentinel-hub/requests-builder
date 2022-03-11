@@ -14,6 +14,8 @@ import {
   EU_CENTRAL_DEPLOYMENT,
   US_WEST_DEPLOYMENT,
 } from '../../../utils/const/const';
+import { addWarningAlert } from '../../../store/alert';
+import { getMessageFromApiError } from '../../../api';
 
 const generateCollectionDatalist = (collections) => {
   return (
@@ -29,6 +31,7 @@ const byocTypeOptions = [
   { value: '', name: 'Select a type' },
   { value: 'BYOC', name: 'BYOC' },
   { value: 'BATCH', name: 'BATCH' },
+  { value: 'ZARR', name: 'ZARR' },
 ];
 
 const BLANK_LOCATION_OPTION = {
@@ -97,7 +100,7 @@ const BYOCOptions = ({
         );
       }
     } catch (err) {
-      console.error('Unable to load custom collections', err);
+      addWarningAlert(getMessageFromApiError(err, 'Unable to load custom collections'));
     }
   }, []);
 
@@ -134,7 +137,7 @@ const BYOCOptions = ({
   };
 
   return (
-    <div className="form byoc-options" style={{ padding: '0 0 0 1rem' }}>
+    <div className="form p-0">
       <label htmlFor={`collection-id-${idx}`} className="form__label mt-2">
         Collection Id
       </label>
@@ -145,19 +148,14 @@ const BYOCOptions = ({
           value={byocCollectionId}
           onChange={handleCollectionIdChange}
           type="text"
-          className="form__input"
+          className="form__input mr-2"
           placeholder="Write your collection Id"
           list="collections-list"
-          style={{ marginBottom: '0' }}
         />
         {token && collections.length > 0 && generateCollectionDatalist(collections)}
 
         {token && (
-          <button
-            className="secondary-button"
-            onClick={handleRefreshCollections}
-            style={{ marginTop: '0', marginLeft: '0.5rem' }}
-          >
+          <button className="secondary-button" onClick={handleRefreshCollections}>
             <FontAwesomeIcon icon={faSync} />
           </button>
         )}

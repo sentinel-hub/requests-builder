@@ -3,7 +3,13 @@ import { connect } from 'react-redux';
 
 import store from '../../store';
 import { maxarSlice } from '../../store/tpdi';
+import Select from '../common/Select';
 
+const MAXAR_KERNEL_OPTIONS = [
+  { name: 'Nearest Neighbour (NN)', value: 'NN' },
+  { name: '4x4 cubic convolution (CC)', value: 'CC' },
+  { name: 'MTF', value: 'MTF' },
+];
 const MaxarOptions = ({
   maxCloudCoverage,
   minOffNadir,
@@ -11,13 +17,20 @@ const MaxarOptions = ({
   minSunElevation,
   maxSunElevation,
   sensor,
+  productKernel,
 }) => {
   const handleParamChange = (key, toNumber = false) => (e) => {
     store.dispatch(
-      maxarSlice.actions.setMaxarParam({ key, value: toNumber ? Number(e.target.value) : e.target.value }),
+      maxarSlice.actions.setMaxarDataFilterParam({
+        key,
+        value: toNumber ? Number(e.target.value) : e.target.value,
+      }),
     );
   };
 
+  const handleKernelChange = (value) => {
+    store.dispatch(maxarSlice.actions.setProductKernel(value));
+  };
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <label htmlFor="maxar-maxcc" className="form__label">
@@ -37,7 +50,11 @@ const MaxarOptions = ({
           {maxCloudCoverage} %
         </p>
       </div>
-      <label htmlFor="maxar-minnadir" className="form__label">
+      <label htmlFor="maxar-kernel" className="form__label">
+        Kernel
+      </label>
+      <Select options={MAXAR_KERNEL_OPTIONS} onChange={handleKernelChange} selected={productKernel} />
+      <label htmlFor="maxar-minnadir" className="form__label mt-2">
         Min Off Nadir
       </label>
       <div className="flex items-center">
@@ -126,11 +143,12 @@ const MaxarOptions = ({
 };
 
 const mapStateToProps = (state) => ({
-  maxCloudCoverage: state.maxar.maxCloudCoverage,
-  minOffNadir: state.maxar.minOffNadir,
-  maxOffNadir: state.maxar.maxOffNadir,
-  minSunElevation: state.maxar.minSunElevation,
-  maxSunElevation: state.maxar.maxSunElevation,
-  sensor: state.maxar.sensor,
+  maxCloudCoverage: state.maxar.dataFilterOptions.maxCloudCoverage,
+  minOffNadir: state.maxar.dataFilterOptions.minOffNadir,
+  maxOffNadir: state.maxar.dataFilterOptions.maxOffNadir,
+  minSunElevation: state.maxar.dataFilterOptions.minSunElevation,
+  maxSunElevation: state.maxar.dataFilterOptions.maxSunElevation,
+  sensor: state.maxar.dataFilterOptions.sensor,
+  productKernel: state.maxar.productKernel,
 });
 export default connect(mapStateToProps)(MaxarOptions);

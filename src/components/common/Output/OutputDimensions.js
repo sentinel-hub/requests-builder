@@ -170,7 +170,7 @@ const OutputDimensions = ({
       {heightOrRes === 'HEIGHT' ? (
         <div className="flex items-center mb-2">
           <label htmlFor="auto" className="form__label cursor-pointer mr-2">
-            Keep ratio automatically
+            Keep auto ratio
           </label>
           <Toggle id="auto" checked={isAutoRatio} onChange={handleSetAutoRatio} />
         </div>

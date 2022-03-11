@@ -15,6 +15,9 @@ import {
   LETML1,
   LMSSL1,
   LETML2,
+  EU_CENTRAL_DEPLOYMENT,
+  CREODIAS_DEPLOYMENT,
+  US_WEST_DEPLOYMENT,
 } from '../../../utils/const/const';
 import { generateSHBbox } from './generateShjsRequest';
 import { isBbox, isPolygon } from '../../common/Map/utils/geoUtils';
@@ -146,11 +149,31 @@ const crsToSHPYCrs = (crs) => {
 
 export const versionComment = `# This is script may only work with sentinelhub.__version__ >= '3.4.0'\n`;
 
-export const getSHPYCredentials = () => {
-  return `\n# Credentials
+// optional argument
+export const getSHPYCredentials = (dataCollections) => {
+  const deploymentToConfigInstanceId = (deployment) => {
+    switch (deployment) {
+      case CREODIAS_DEPLOYMENT:
+        return '\nconfig.instance_id = "creodias.sentinel-hub.com/api/"';
+      case US_WEST_DEPLOYMENT:
+        return '\nconfig.instance_id = "services-uswest2.sentinel-hub.com/api/"';
+      default:
+        return '';
+    }
+  };
+
+  let config = `\n# Credentials
 config = SHConfig()
 config.sh_client_id = '<your client id here>'
 config.sh_client_secret = '<your client secret here>'`;
+  if (
+    dataCollections &&
+    dataCollections[0].type === CUSTOM &&
+    dataCollections[0].byocCollectionLocation !== EU_CENTRAL_DEPLOYMENT
+  ) {
+    config += deploymentToConfigInstanceId(dataCollections[0].byocCollectionLocation);
+  }
+  return config;
 };
 
 export const getSHPYBounds = (mapState, oneOrTheOther = false) => {
@@ -269,7 +292,7 @@ export const getSHPYCode = (requestState, mapState) => {
   let shpyCode = versionComment;
   shpyCode += `${getSHPYImports()}`;
   //Credentials
-  shpyCode += getSHPYCredentials();
+  shpyCode += getSHPYCredentials(requestState.dataCollections);
   // add evalscript
   shpyCode += `\nevalscript = """\n${requestState.evalscript}\n"""\n`;
   //add geometry/bounds

@@ -32,7 +32,9 @@ export const handleStatisticalParse = (text) => {
     dispatchStatisticsState(request);
   } catch (err) {
     console.error('Something went wrong while parsing the request', err);
-    addWarningAlert('Error parsing the request json');
+    addWarningAlert(
+      'Error parsing the request. \nRemember that only the body of the request and the generated curl commands by the app can be parsed.',
+    );
   }
 };
 

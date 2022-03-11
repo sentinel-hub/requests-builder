@@ -16,6 +16,7 @@ const S2L1COptions = ({ reduxPreviewMode, idx }) => {
       <Select
         label="Preview Mode"
         selected={reduxPreviewMode}
+        buttonClassNames="mb-2"
         onChange={handlePreviewChange}
         options={[
           { value: 'DEFAULT', name: 'Default' },

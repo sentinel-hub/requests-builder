@@ -9,7 +9,6 @@ import WmsModeSelector from '../components/wms/WmsModeSelector';
 import TimeRangeContainer from '../components/common/TimeRange/TimeRangeContainer';
 import RunningRequestIndicator from '../components/common/RunningRequestIndicator';
 import { ogcAnalyticsPage } from '../utils/initAnalytics';
-import FisAdvancedOptions from '../components/wms/FisAdvancedOptions';
 import WfsAdvancedOptions from '../components/wms/WfsAdvancedOptions';
 import WmtsAdvancedOptions from '../components/wms/WmtsAdvancedOptions';
 
@@ -19,9 +18,6 @@ const WMSRequestForm = ({ wmsMode }) => {
   }, []);
 
   const advancedOptions = useMemo(() => {
-    if (wmsMode === 'FIS') {
-      return <FisAdvancedOptions />;
-    }
     if (wmsMode === 'WFS') {
       return <WfsAdvancedOptions />;
     }
@@ -33,6 +29,10 @@ const WMSRequestForm = ({ wmsMode }) => {
 
   return (
     <div className="wms-request-form">
+      <div className="info-banner w-full mb-2">
+        FIS mode is starting to enter the deprecation phase, thus not available in the app. We encourage
+        everyone to use Statistical API.
+      </div>
       <div>
         <WmsModeSelector />
       </div>

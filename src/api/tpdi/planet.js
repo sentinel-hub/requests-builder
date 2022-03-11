@@ -21,6 +21,57 @@ export const getPlanetSearchRequestBody = (state) => {
   return request;
 };
 
+const generateSubscriptionsTimeRange = (requestState) => {
+  if (!requestState.timeTo[0]) {
+    return {
+      timeRange: {
+        from: requestState.timeFrom[0],
+      },
+    };
+  }
+  return {
+    timeRange: {
+      from: requestState.timeFrom[0],
+      to: requestState.timeTo[0],
+    },
+  };
+};
+export const getPlanetSubscriptionBody = (mapState, planetState, requestState, tpdiState) => {
+  const payload = {
+    input: {
+      provider: 'PLANET',
+      planetApiKey: planetState.planetApiKey,
+      bounds: {
+        ...generateBounds(mapState),
+      },
+      data: [
+        {
+          itemType: 'PSScene4Band',
+          productBundle: planetState.productBundle,
+          dataFilter: {
+            ...generateSubscriptionsTimeRange(requestState),
+            maxCloudCoverage: planetState.maxCloudCoverage,
+          },
+        },
+      ],
+    },
+  };
+
+  if (!tpdiState.isCreatingCollection && tpdiState.collectionId) {
+    payload.collectionId = tpdiState.collectionId;
+  }
+
+  if (tpdiState.name) {
+    payload.name = tpdiState.name;
+  }
+
+  if (planetState.harmonizeTo) {
+    payload.input.data[0].harmonizeTo = planetState.harmonizeTo;
+  }
+
+  return payload;
+};
+
 export const getPlanetOrderBody = (state) => {
   const requestBody = {};
   requestBody.input = getPlanetSearchRequestBody(state);

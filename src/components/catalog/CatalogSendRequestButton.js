@@ -3,24 +3,14 @@ import RequestButton from '../common/RequestButton';
 import { connect } from 'react-redux';
 import store from '../../store';
 import catalogSlice from '../../store/catalog';
-import alertSlice from '../../store/alert';
+import { addWarningAlert } from '../../store/alert';
 import CatalogResource from '../../api/catalog/CatalogResource';
 import { getCatalogRequestBody } from '../../api/catalog/utils';
-import { errorCatalogReqEvent, successfulCatalogReqEvent } from '../../utils/initAnalytics';
+import { successfulCatalogReqEvent } from '../../utils/initAnalytics';
+import { getMessageFromApiError } from '../../api';
 
 export const catalogErrorHandler = (error) => {
-  errorCatalogReqEvent();
-  if (error.response && error.response.data) {
-    store.dispatch(
-      alertSlice.actions.addAlert({
-        type: 'WARNING',
-        text: 'Error: ' + error.response.data.code + ' - ' + error.response.data.description,
-      }),
-    );
-  } else {
-    store.dispatch(alertSlice.actions.addAlert({ type: 'WARNING', text: 'Something went wrong' }));
-  }
-  console.error(error);
+  addWarningAlert(getMessageFromApiError(error));
 };
 
 const CatalogSendRequestButton = ({

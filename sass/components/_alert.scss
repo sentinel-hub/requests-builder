@@ -1,7 +1,7 @@
 .alert {
-  position: sticky;
+  position: fixed;
   top: 5%;
-  right: 0;
+  left: 2%;
   z-index: 100000;
   max-width: 500px;
   align-items: stretch;

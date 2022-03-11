@@ -5,7 +5,7 @@ import RequestButton from '../common/RequestButton';
 import store from '../../store';
 import responsesSlice from '../../store/responses';
 import { calculatePixelSize } from '../common/Map/utils/bboxRatio';
-import { errorOgcReqEvent, successfulOgcReqEvent } from '../../utils/initAnalytics';
+import { successfulOgcReqEvent } from '../../utils/initAnalytics';
 
 const SendWmsRequest = ({ wmsState, requestState, mapState, token, mode }) => {
   const validateWmsSendRequest = () => {
@@ -46,7 +46,6 @@ const SendWmsRequest = ({ wmsState, requestState, mapState, token, mode }) => {
   };
 
   const errorHandler = (err) => {
-    errorOgcReqEvent(mode);
     store.dispatch(responsesSlice.actions.setError('Something went wrong'));
     store.dispatch(responsesSlice.actions.setDisplayResponse(true));
     console.error('Something went wrong', err);
@@ -91,7 +90,7 @@ const SendWmsRequest = ({ wmsState, requestState, mapState, token, mode }) => {
     <RequestButton
       buttonText="Send Request"
       className="primary-button"
-      additionalClassNames={['mr-2']}
+      additionalClassNames={['mr-2 fixed right-2']}
       request={request}
       args={[wmsState, requestState, mapState, token]}
       validation={validateWmsSendRequest()}

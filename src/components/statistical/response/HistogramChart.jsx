@@ -54,6 +54,7 @@ const Chart = ({ histogram, percentiles, onEnter, onLeave, onMove, bandName }) =
     const xScale = scaleLinear()
       .domain([minEdge, maxEdge])
       .range([margin.left, width - margin.right]);
+
     const yScale = scaleLinear()
       .domain([histoMax, 0])
       .range([height - margin.bottom, 0]);
@@ -69,16 +70,17 @@ const Chart = ({ histogram, percentiles, onEnter, onLeave, onMove, bandName }) =
       .scale(yAxisScale)
       .tickFormat((d) => `${d}`);
 
-    const barWidth = (width - margin.left - margin.right) / histogram.length - 1;
-    const bars = histogram.map((hist, idx) => {
+    const bars = histogram.map((hist) => {
       const barHeight = yScale(hist.count);
+      const x = xScale(hist.lowEdge);
+      const x2 = xScale(hist.highEdge);
       return {
-        x: xScale(hist.lowEdge),
+        x,
         height: barHeight,
         y: height - margin.bottom - barHeight,
         fill: colorScale(hist.count),
         count: hist.count,
-        width: barWidth,
+        width: x2 - x,
       };
     });
     setBars(bars);

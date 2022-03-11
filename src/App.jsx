@@ -3,7 +3,6 @@ import React, { useEffect, lazy, Suspense } from 'react';
 import configureAxios, { edcResponseInterceptor } from './utils/configureAxios';
 import ModeSelector from './components/common/ModeSelector';
 import { connect } from 'react-redux';
-import { getFID, getLCP } from 'web-vitals';
 
 import ProcessHeaderButtons from './components/process/ProcessHeaderButtons';
 import BatchHeaderButtons from './components/batch/BatchHeaderButtons';
@@ -21,9 +20,8 @@ import TPDIBannerInfo from './components/tpdi/TPDIBannerInfo';
 import { configureParams, getUrlParams } from './params';
 import StatisticalRequestForm from './forms/StatisticalRequestForm';
 import StatisticalAuthHeader from './components/statistical/StatisticalAuthHeader';
-import SavedRequests from './components/process/Collections/SavedRequests';
-import { sendToGoogleAnalytics } from './utils/initAnalytics';
 import { configureIndexedDb } from './indexeddb';
+import ConfirmationModal from './components/common/ConfirmationModal';
 import { addInfoAlert } from './store/alert';
 
 const BatchRequestForm = lazy(() => import('./forms/BatchRequestForm'));
@@ -93,15 +91,15 @@ function App({ mode }) {
     const setParams = async () => {
       await configureParams(getUrlParams());
     };
-    const sendWebVitals = () => {
-      getLCP(sendToGoogleAnalytics);
-      getFID(sendToGoogleAnalytics);
-    };
+    // const sendWebVitals = () => {
+    //   getLCP(sendToGoogleAnalytics);
+    //   getFID(sendToGoogleAnalytics);
+    // };
     fetchTokenEdc();
     configureAxios();
     configureIndexedDb();
     setParams();
-    sendWebVitals();
+    // sendWebVitals();
     setTimeout(() => {
       addInfoAlert(
         'A friendly reminder! \n If you find any problem with the app or any suggestions to further improve it, please create a ticket to the forum!',
@@ -114,8 +112,9 @@ function App({ mode }) {
     <div className="App">
       <Alert />
       <OverlayResponse />
-      <SavedRequests />
-      <div className="flex items-center justify-between">
+      <ConfirmationModal />
+      <div id="code-editor-modal"></div>
+      <div className="flex items-center justify-between lg:flex-row flex-col">
         <div className="flex items-center">
           <HeaderLogo />
         </div>

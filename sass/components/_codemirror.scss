@@ -31,6 +31,14 @@
   }
 }
 
+.tpdi-subscriptions-preview {
+
+  .CodeMirror-scroll { /* stylelint-disable-line */
+    overflow-y: scroll;
+    height: 500px;
+  }
+}
+
 .tpdi-search-preview {
 
   .CodeMirror-scroll { /* stylelint-disable-line */

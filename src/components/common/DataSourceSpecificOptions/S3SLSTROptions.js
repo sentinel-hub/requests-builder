@@ -31,6 +31,7 @@ const S3SLSTROptions = ({ reduxOrbitDirection, reduxView, idx }) => {
       <Select
         label="View"
         selected={reduxView}
+        buttonClassNames="mb-2"
         onChange={handleViewChange}
         options={[
           { value: 'DEFAULT', name: 'Default' },

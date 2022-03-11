@@ -7,8 +7,12 @@ import requestSlice from '../../store/request';
 import Toggle from '../common/Toggle';
 import { utcDateToYYYYMMDDFormat } from '../common/TimeRange/TimeRange';
 import moment from 'moment';
+import { ORDERS_MODE } from '../../forms/TPDIRequestForm';
 
-const TPDITimerange = ({ isSingleDate, timeTo, timeFrom }) => {
+const timeFromDisabledDays = (isSingleDate, timeTo) => {
+  return !isSingleDate ? { after: new Date(timeTo) } : {};
+};
+const TPDITimerange = ({ isSingleDate, timeTo, timeFrom, tpdiMode }) => {
   const handleSingleDate = () => {
     store.dispatch(tpdiSlice.actions.setIsSingleDate(!isSingleDate));
   };
@@ -22,6 +26,8 @@ const TPDITimerange = ({ isSingleDate, timeTo, timeFrom }) => {
     if (d) {
       let date = moment(d).utc().endOf('day').format();
       store.dispatch(requestSlice.actions.setTimeTo({ timeTo: date, idx: 0 }));
+    } else {
+      store.dispatch(requestSlice.actions.setTimeTo({ timeTo: '', idx: 0 }));
     }
   };
   return (
@@ -37,13 +43,13 @@ const TPDITimerange = ({ isSingleDate, timeTo, timeFrom }) => {
 
         <div className="tpdi-timerange-container">
           <label htmlFor="timefrom" className="form__label">
-            {isSingleDate ? 'Date:' : 'From:'}
+            From
           </label>
           <DayPickerInput
             value={utcDateToYYYYMMDDFormat(timeFrom)}
             dayPickerProps={{
               selectedDay: timeFrom,
-              disabledDays: { after: new Date() },
+              disabledDays: timeFromDisabledDays(isSingleDate, timeTo),
               showOutsideDays: true,
             }}
             onDayChange={handleTimeFromChange}
@@ -62,7 +68,10 @@ const TPDITimerange = ({ isSingleDate, timeTo, timeFrom }) => {
                 value={utcDateToYYYYMMDDFormat(timeTo)}
                 dayPickerProps={{
                   selectedDay: timeTo,
-                  disabledDays: { after: new Date(), before: new Date(timeFrom) },
+                  disabledDays:
+                    tpdiMode === ORDERS_MODE
+                      ? { after: new Date(), before: new Date(timeFrom) }
+                      : { before: new Date(timeFrom) },
                   showOutsideDays: true,
                 }}
                 onDayChange={handleTimeToChange}

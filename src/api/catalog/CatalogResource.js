@@ -1,17 +1,25 @@
 import Api from '..';
 import { collectionIdToUrl, datasourceToCollection } from '../../components/catalog/const';
+import { getBaseUrlByDeployment } from '../../utils/const/const';
 
-const CATALOG_PATH = '/api/v1/catalog';
+const CATALOG_PATH = 'api/v1/catalog';
 
 const { GET, POST } = Api;
 
 const CatalogResource = {
-  search: (deploymentUrl) => POST(`${deploymentUrl}search`, undefined, undefined, true),
-  getCollections: (deploymentUrl) => GET(`${deploymentUrl}collections`, undefined, undefined, true),
+  search: (deploymentUrl) => POST(`${deploymentUrl}search`, { isFullUrl: true }),
+  getCollections: (deploymentUrl) => GET(`${deploymentUrl}collections`, { isFullUrl: true }),
 
-  fetchBounds: GET(`${CATALOG_PATH}/search?bbox=-180,-90,180,90&collections=:collectionType-:collectionId`),
+  fetchBounds: (location) => {
+    return GET(
+      `${getBaseUrlByDeployment(
+        location,
+      )}${CATALOG_PATH}/search?bbox=-180,-90,180,90&collections=:collectionType-:collectionId&datetime=../..`,
+      { isFullUrl: true },
+    );
+  },
   fetchDates: (datasource) =>
-    POST(`${collectionIdToUrl[datasourceToCollection[datasource]]}search`, undefined, undefined, true),
+    POST(`${collectionIdToUrl(datasourceToCollection[datasource])}search`, { isFullUrl: true }),
 };
 
 export default CatalogResource;

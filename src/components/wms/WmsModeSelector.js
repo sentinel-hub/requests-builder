@@ -6,7 +6,6 @@ import RadioSelector from '../common/RadioSelector';
 
 const WMS_MODE_OPTIONS = [
   { name: 'WMS', value: 'WMS' },
-  { name: 'FIS', value: 'FIS' },
   { name: 'WCS', value: 'WCS' },
   { name: 'WFS', value: 'WFS' },
   { name: 'WMTS', value: 'WMTS' },
@@ -14,7 +13,6 @@ const WMS_MODE_OPTIONS = [
 
 const WmsModeSelector = ({ mode }) => {
   const handleWmsModeChange = (e) => {
-    console.log(e.target.value);
     store.dispatch(wmsSlice.actions.setMode(e.target.value));
   };
 

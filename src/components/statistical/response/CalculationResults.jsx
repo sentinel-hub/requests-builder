@@ -10,8 +10,7 @@ const CalculationResults = ({ calculation, selectedBand, containerRef, setSelect
       <h3 className="heading-tertiary mt-2">Band</h3>
       {Object.keys(calculation.bands).map((bandKey) => (
         <button
-          className={`secondary-button ${bandKey === selectedBand ? 'secondary-button--disabled' : ''}`}
-          disabled={bandKey === selectedBand}
+          className={`secondary-button ${bandKey === selectedBand ? 'secondary-button--selected' : ''}`}
           onClick={handleBandChangeClick(bandKey)}
           key={bandKey}
           style={{ marginRight: '1.5rem', marginBottom: '1rem' }}

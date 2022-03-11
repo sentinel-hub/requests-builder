@@ -4,7 +4,13 @@ import { S2L2A, S2L1C, S1GRD, S5PL2, S3SLSTR, S3OLCI } from '../../utils/const/c
 export const S2L1C_CATALOG_ID = 'sentinel-2-l1c';
 export const S2L2A_CATALOG_ID = 'sentinel-2-l2a';
 export const S1GRD_CATALOG_ID = 'sentinel-1-grd';
-export const LANDSAT_8_CATALOG_ID = 'landsat-8-l1c';
+export const LANDSAT_8_1_CATALOG_ID = 'landsat-ot-l1';
+export const LANDSAT_8_2_CATALOG_ID = 'landsat-ot-l2';
+export const LANDSAT_7_1_CATALOG_ID = 'landsat-etm-l1';
+export const LANDSAT_7_2_CATALOG_ID = 'landsat-etm-l2';
+export const LANDSAT_TM_2_CATALOG_ID = 'landsat-tm-l2';
+export const LANDSAT_TM_1_CATALOG_ID = 'landsat-tm-l1';
+export const LANDSAT_MSS_1_CATALOG_ID = 'landsat-mss-l1';
 export const S5PL2_CATALOG_ID = 'sentinel-5p-l2';
 export const S3SLSTR_CATALOG_ID = 'sentinel-3-slstr';
 export const S3OLCI_CATALOG_ID = 'sentinel-3-olci';
@@ -96,7 +102,13 @@ export const collectionToOptions = {
   [S2L1C_CATALOG_ID]: CatalogCloudOptions,
   [S2L2A_CATALOG_ID]: CatalogCloudOptions,
   [S1GRD_CATALOG_ID]: S1OPTIONS,
-  [LANDSAT_8_CATALOG_ID]: CatalogCloudOptions,
+  [LANDSAT_8_1_CATALOG_ID]: CatalogCloudOptions,
+  [LANDSAT_8_2_CATALOG_ID]: CatalogCloudOptions,
+  [LANDSAT_7_1_CATALOG_ID]: CatalogCloudOptions,
+  [LANDSAT_7_2_CATALOG_ID]: CatalogCloudOptions,
+  [LANDSAT_TM_1_CATALOG_ID]: CatalogCloudOptions,
+  [LANDSAT_TM_2_CATALOG_ID]: CatalogCloudOptions,
+  [LANDSAT_MSS_1_CATALOG_ID]: CatalogCloudOptions,
   [S5PL2_CATALOG_ID]: S5Options,
   [S3SLSTR_CATALOG_ID]: S3SLSTR_CATALOG_OPTIONS,
 };
@@ -112,12 +124,24 @@ export const getCatalogOptions = () => [
   { url: CATALOG_WEST_URL, name: 'US-WEST' },
 ];
 
-export const collectionIdToUrl = {
-  [S2L1C_CATALOG_ID]: CATALOG_BASE_URL(),
-  [S2L2A_CATALOG_ID]: CATALOG_BASE_URL(),
-  [S1GRD_CATALOG_ID]: CATALOG_BASE_URL(),
-  [LANDSAT_8_CATALOG_ID]: CATALOG_WEST_URL,
-  [S5PL2_CATALOG_ID]: CATALOG_WEST_URL,
-  [S3OLCI_CATALOG_ID]: CATALOG_CREO_URL,
-  [S3SLSTR_CATALOG_ID]: CATALOG_CREO_URL,
+export const collectionIdToUrl = (dataCollection) => {
+  switch (dataCollection) {
+    case S2L1C_CATALOG_ID:
+      return CATALOG_BASE_URL();
+    case S2L2A_CATALOG_ID:
+      return CATALOG_BASE_URL();
+    case S1GRD_CATALOG_ID:
+      return CATALOG_BASE_URL();
+    case LANDSAT_8_1_CATALOG_ID:
+    case LANDSAT_8_2_CATALOG_ID:
+      return CATALOG_WEST_URL;
+    case S5PL2_CATALOG_ID:
+      return CATALOG_WEST_URL;
+    case S3OLCI_CATALOG_ID:
+      return CATALOG_CREO_URL;
+    case S3SLSTR_CATALOG_ID:
+      return CATALOG_CREO_URL;
+    default:
+      CATALOG_BASE_URL();
+  }
 };

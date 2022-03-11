@@ -34,6 +34,7 @@ const buildSearchCompatibleCollectionsPayload = (provider, productBundle) => {
     payload.input.data[0].constellation = provider.split('_').slice(-1)[0];
   }
   if (provider === 'PLANET') {
+    payload.input.provider = 'PLANET';
     payload.input.data[0].productBundle = productBundle;
     payload.input.data[0].itemType = 'PSScene4Band';
   }
@@ -41,7 +42,7 @@ const buildSearchCompatibleCollectionsPayload = (provider, productBundle) => {
   return payload;
 };
 
-const TPDICollectionSelection = ({ provider, token, collectionId, isCreatingCollection }) => {
+const TPDICollectionSelection = ({ provider, token, productBundle, collectionId, isCreatingCollection }) => {
   const [tpdiCollections, setTpdiCollections] = useState([]);
 
   useEffect(() => {
@@ -49,7 +50,7 @@ const TPDICollectionSelection = ({ provider, token, collectionId, isCreatingColl
     const fetchTpdiCollections = async () => {
       try {
         let res = await TpdiResource.searchCompatibleCollections(
-          buildSearchCompatibleCollectionsPayload(provider),
+          buildSearchCompatibleCollectionsPayload(provider, productBundle),
           { cancelToken: source.token },
         );
         if (res.data) {
@@ -72,7 +73,7 @@ const TPDICollectionSelection = ({ provider, token, collectionId, isCreatingColl
         source.cancel();
       }
     };
-  }, [token, provider]);
+  }, [token, provider, productBundle]);
 
   const handleTpdiCollectionChange = (value) => {
     store.dispatch(tpdiSlice.actions.setCollectionId(value));

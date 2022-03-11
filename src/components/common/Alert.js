@@ -30,11 +30,14 @@ const generateEmoji = (type) => {
 
 const Alert = ({ alert }) => {
   const { type, text } = alert;
-  const splittedText = text.split('\n');
+  const splittedText = text?.split('\n');
   const removeAlertHandler = () => {
     store.dispatch(alertSlice.actions.removeAlert(alert.id));
   };
 
+  if (!splittedText) {
+    return null;
+  }
   return (
     <>
       {alert.id ? (

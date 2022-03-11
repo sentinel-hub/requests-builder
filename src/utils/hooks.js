@@ -1,5 +1,6 @@
-import { useEffect, useState, useRef, useLayoutEffect, useCallback } from 'react';
+import { useEffect, useState, useRef, useLayoutEffect, useCallback, useMemo } from 'react';
 import Mousetrap from 'mousetrap';
+import { getMessageFromApiError } from '../api';
 
 // Hook
 export function useDebounce(value, delay) {
@@ -219,4 +220,140 @@ export const useDownloadLink = (response, type = 'application/json') => {
   }, []);
 
   return downloadLink;
+};
+
+const hasNextPage = (res) => res.data?.links?.next !== undefined || res.data?.links?.nextToken !== undefined;
+
+export function useFetchAllPaginatedData(request, options) {
+  const [isFetching, setIsFetching] = useState(false);
+  const [data, setData] = useState(() => (options?.flat ? [] : [[]]));
+  const [error, setError] = useState();
+  const [maxPage, setMaxPage] = useState(0);
+  const flat = useMemo(() => {
+    return options?.flat ?? false;
+  }, [options?.flat]);
+
+  const fetchAll = useCallback(async () => {
+    setIsFetching(true);
+    setError(undefined);
+
+    let results = [];
+    let maxPage = 0;
+    let done = false;
+
+    while (!done) {
+      try {
+        // eslint-disable-next-line
+        const res = await request({
+          viewtoken: maxPage * 100,
+          sort: 'created:desc',
+        });
+        if (flat) {
+          results = results.concat(res.data.data);
+        } else {
+          results.push(res.data.data);
+        }
+        if (hasNextPage(res)) {
+          maxPage += 1;
+        } else {
+          done = true;
+        }
+      } catch (err) {
+        setError(getMessageFromApiError(err));
+        break;
+      }
+    }
+
+    setMaxPage(maxPage);
+    setData(results);
+    setIsFetching(false);
+    // eslint-disable-next-line
+  }, []);
+
+  return { data, error, maxPage, isFetching, fetchAll, setData };
+}
+
+export const usePaginatedData = (paginatedRequest, deps, order) => {
+  const [currentPage, setCurrentPage] = useState(0);
+  const [maxPage, setMaxPage] = useState(0);
+  const [results, setResults] = useState([]);
+  const [isFetching, setIsFetching] = useState(false);
+  const [search, setSearch] = useState('');
+  const [sortOrder] = useState(order);
+  const [hasError, setHasError] = useState(false);
+  const debouncedSearch = useDebounce(search, 500);
+
+  const fetchAndSet = useCallback(
+    async (page, debouncedSearch, results) => {
+      try {
+        setHasError(false);
+        setIsFetching(true);
+        const res = await paginatedRequest({
+          viewtoken: page * 100,
+          search: debouncedSearch !== '' ? debouncedSearch : undefined,
+          sort: sortOrder,
+        });
+        if (hasNextPage(res)) {
+          setMaxPage((prev) => {
+            if (page === prev) {
+              return prev + 1;
+            }
+            return prev;
+          });
+        }
+        setResults(res.data.data);
+        setIsFetching(false);
+      } catch (err) {
+        setIsFetching(false);
+        setHasError(true);
+      }
+    },
+    [paginatedRequest, sortOrder],
+  );
+
+  const refetch = useCallback(() => {
+    setMaxPage(0);
+    setCurrentPage(0);
+    setResults([]);
+    fetchAndSet(0, '', []);
+  }, [fetchAndSet]);
+
+  useEffect(() => {
+    fetchAndSet(currentPage, debouncedSearch, results);
+    // eslint-disable-next-line
+  }, [currentPage, debouncedSearch]);
+
+  useEffect(() => {
+    setCurrentPage(0);
+    setMaxPage(0);
+  }, [debouncedSearch]);
+
+  useDidMountEffect(() => {
+    setCurrentPage(0);
+    setMaxPage(0);
+    if (currentPage === 0) {
+      fetchAndSet(0, debouncedSearch, results);
+    }
+    // eslint-disable-next-line
+  }, deps);
+
+  const setSearchQuery = useCallback((value) => {
+    setSearch(value);
+  }, []);
+
+  const setPage = useCallback((newPage) => {
+    setCurrentPage(newPage);
+  }, []);
+
+  return {
+    currentPage,
+    maxPage,
+    results,
+    search,
+    hasError,
+    isFetching,
+    setSearchQuery,
+    setPage,
+    refetch,
+  };
 };

@@ -1,25 +1,31 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { ORDERS_MODE } from '../forms/TPDIRequestForm';
+
+const EMPTY_PRODUCTS = [
+  {
+    idx: 0,
+    id: '',
+    geometry: '',
+  },
+];
 
 const tpdiSlice = createSlice({
   name: 'tpdi',
   initialState: {
+    mode: ORDERS_MODE,
     provider: 'AIRBUS_PHR', // airbus or planet.
     name: '',
     collectionId: '',
-    products: [
-      {
-        idx: 0,
-        id: '',
-        geometry: '',
-      },
-    ],
-    isParsing: false,
+    products: EMPTY_PRODUCTS,
     isSingleDate: false,
     isUsingQuery: false,
     isCreatingCollection: false,
     extraMapGeometry: null,
   },
   reducers: {
+    setTpdiMode: (state, action) => {
+      state.mode = action.payload;
+    },
     setProvider: (state, action) => {
       state.provider = action.payload;
     },
@@ -55,13 +61,7 @@ const tpdiSlice = createSlice({
       state.products.push({ id: '', geometry: undefined, idx: state.products.length });
     },
     clearProducts: (state) => {
-      state.products = [
-        {
-          idx: 0,
-          id: '',
-          geometry: '',
-        },
-      ];
+      state.products = EMPTY_PRODUCTS;
     },
     removeProductId: (state, action) => {
       state.products = state.products.filter((prod) => prod.idx !== parseInt(action.payload));
@@ -71,9 +71,6 @@ const tpdiSlice = createSlice({
     },
     setExtraMapGeometry: (state, action) => {
       state.extraMapGeometry = action.payload;
-    },
-    setTpdiParsing: (state, action) => {
-      state.isParsing = action.payload;
     },
     setIsSingleDate: (state, action) => {
       state.isSingleDate = action.payload;
@@ -146,21 +143,27 @@ export const planetSlice = createSlice({
 });
 
 export const maxarInitialState = {
-  maxCloudCoverage: 100,
-  minOffNadir: 0,
-  maxOffNadir: 45,
-  minSunElevation: 0,
-  maxSunElevation: 90,
-  sensor: null,
+  dataFilterOptions: {
+    maxCloudCoverage: 100,
+    minOffNadir: 0,
+    maxOffNadir: 45,
+    minSunElevation: 0,
+    maxSunElevation: 90,
+    sensor: '',
+  },
+  productKernel: 'CC',
 };
 
 export const maxarSlice = createSlice({
   name: 'maxar',
   initialState: maxarInitialState,
   reducers: {
-    setMaxarParam: (state, action) => {
+    setMaxarDataFilterParam: (state, action) => {
       const { key, value } = action.payload;
-      state[key] = value;
+      state.dataFilterOptions[key] = value;
+    },
+    setProductKernel: (state, action) => {
+      state.productKernel = action.payload;
     },
   },
 });

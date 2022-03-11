@@ -23,7 +23,7 @@ const initialCalcState = {
 const statisticalSlice = createSlice({
   name: 'statistical',
   initialState: {
-    aggregationInterval: 'P30D',
+    aggregationInterval: 'P10D',
     lastIntervalBehavior: '',
     calculations: [initialCalcState],
   },

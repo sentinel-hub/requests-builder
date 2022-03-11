@@ -8,20 +8,30 @@ import {
   S2L1C_CATALOG_ID,
   S1GRD_CATALOG_ID,
   S1OPTIONS,
-  LANDSAT_8_CATALOG_ID,
   S5PL2_CATALOG_ID,
   S5Options,
   CatalogCloudOptions,
   collectionToOptions,
   S3SLSTR_CATALOG_ID,
   S3SLSTR_CATALOG_OPTIONS,
+  LANDSAT_8_2_CATALOG_ID,
+  LANDSAT_7_1_CATALOG_ID,
+  LANDSAT_7_2_CATALOG_ID,
+  LANDSAT_TM_1_CATALOG_ID,
+  LANDSAT_TM_2_CATALOG_ID,
+  LANDSAT_MSS_1_CATALOG_ID,
 } from './const';
 
 const generateOptionsByCollectionId = (collectionId, idx) => {
   switch (collectionId) {
     case S2L2A_CATALOG_ID:
     case S2L1C_CATALOG_ID:
-    case LANDSAT_8_CATALOG_ID:
+    case LANDSAT_8_2_CATALOG_ID:
+    case LANDSAT_7_1_CATALOG_ID:
+    case LANDSAT_7_2_CATALOG_ID:
+    case LANDSAT_TM_1_CATALOG_ID:
+    case LANDSAT_TM_2_CATALOG_ID:
+    case LANDSAT_MSS_1_CATALOG_ID:
       return <CatalogOptions options={CatalogCloudOptions} idx={idx} />;
     case S1GRD_CATALOG_ID:
       return <CatalogOptions options={S1OPTIONS} idx={idx} />;

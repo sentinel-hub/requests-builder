@@ -5,7 +5,7 @@ import store from '../../store';
 import responsesSlice from '../../store/responses';
 import savedRequestsSlice from '../../store/savedRequests';
 import { calculatePixelSize } from './Map/utils/bboxRatio';
-import { errorProcessReqEvent, successfulProcessReqEvent } from '../../utils/initAnalytics';
+import { successfulProcessReqEvent } from '../../utils/initAnalytics';
 
 //Abstraction of Request Button.
 const ProcessRequestOverlayButton = ({
@@ -69,7 +69,6 @@ const ProcessRequestOverlayButton = ({
   };
 
   const errorHandler = (err) => {
-    errorProcessReqEvent();
     if (err.response) {
       readerRef.current.readAsText(err.response.data);
     } else {

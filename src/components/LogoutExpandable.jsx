@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 
-const LogoutExpandable = ({ userdata, logoutEvent, doLogout }) => {
+const LogoutExpandable = ({ userdata, doLogout, marginRight }) => {
   const [isHovering, setIsHovering] = useState(false);
 
   const handleLogout = () => {
     doLogout();
-    logoutEvent();
   };
   return (
     <div
@@ -13,6 +12,7 @@ const LogoutExpandable = ({ userdata, logoutEvent, doLogout }) => {
       onMouseLeave={() => {
         setIsHovering(false);
       }}
+      style={{ marginRight }}
     >
       <div
         className={`bg-primary-light p-4 rounded-md font-bold ${isHovering ? 'z-20 rounded-b-none' : ''}`}

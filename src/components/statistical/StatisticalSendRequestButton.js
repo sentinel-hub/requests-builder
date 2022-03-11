@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import store from '../../store';
 import responsesSlice from '../../store/responses';
-import alertSlice from '../../store/alert';
+import { addWarningAlert } from '../../store/alert';
 import RequestButton from '../common/RequestButton';
 import { statisticalRequestStateSelector } from './utils/utils';
 import StatisticalResource from '../../api/statistical/StatisticalResource';
@@ -10,7 +10,7 @@ import { getStatisticalRequestBody } from '../../api/statistical/utils';
 import { getMessageFromApiError } from '../../api';
 import { isInvalidDatafusionState } from '../../store/request';
 import { getStatisticalUrl } from '../../api/url';
-import { errorStatReqEvent, successfulStatReqEvent } from '../../utils/initAnalytics';
+import { successfulStatReqEvent } from '../../utils/initAnalytics';
 
 export const statisticsResponseHandler = (response, stringRequest) => {
   successfulStatReqEvent();
@@ -29,9 +29,7 @@ export const statisticsResponseHandler = (response, stringRequest) => {
 };
 
 const statisticsErrorHandler = (err) => {
-  errorStatReqEvent();
-  const msg = getMessageFromApiError(err);
-  store.dispatch(alertSlice.actions.addAlert({ type: 'WARNING', text: msg }));
+  addWarningAlert(getMessageFromApiError(err));
 };
 
 const StatisticalSendRequestButton = ({
@@ -67,10 +65,10 @@ const StatisticalSendRequestButton = ({
 
   return (
     <RequestButton
-      className="primary-button"
+      className="primary-button btn-send-request"
       buttonText="Send Request"
       request={StatisticalResource.statisticalRequest(getStatisticalUrl(dataCollections[0]))}
-      additionalClassNames={['mr-2']}
+      additionalClassNames={['mr-2 w-52 fixed right-2']}
       args={[
         getStatisticalRequestBody(
           dataCollections,

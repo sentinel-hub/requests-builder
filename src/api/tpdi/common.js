@@ -5,20 +5,17 @@ import { getMaxarOrderBody, getMaxarSearchRequestBody } from './maxar';
 import { getPlanetOrderBody, getPlanetSearchRequestBody } from './planet';
 
 export const getTimeRange = (requestState, isSingleDate) => {
-  if (isSingleDate) {
-    return {
-      timeRange: {
-        from: requestState.timeFrom[0],
-        to: moment.utc(requestState.timeFrom[0]).endOf('day').format(),
-      },
-    };
-  }
-  return {
+  const timerange = {
     timeRange: {
       from: requestState.timeFrom[0],
-      to: requestState.timeTo[0],
     },
   };
+  if (isSingleDate) {
+    timerange.timeRange.to = moment.utc(requestState.timeFrom[0]).endOf('day').format();
+  } else if (requestState.timeTo[0]) {
+    timerange.timeRange.to = moment.utc(requestState.timeTo[0]).endOf('day').format();
+  }
+  return timerange;
 };
 
 export const getSearchTpdiBody = (state) => {

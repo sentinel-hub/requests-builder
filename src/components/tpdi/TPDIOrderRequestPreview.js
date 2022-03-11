@@ -11,6 +11,7 @@ import debounceRender from 'react-debounce-render';
 import CommonRequestPreview from '../common/CommonRequestPreview';
 import { getRequestBody } from '../process/requests/parseRequest';
 import { parseTPDIRequest } from './parse';
+import { addWarningAlert } from '../../store/alert';
 
 const TPDIOrderRequestPreview = ({
   state,
@@ -23,6 +24,9 @@ const TPDIOrderRequestPreview = ({
       const parsed = JSON.parse(getRequestBody(text));
       parseTPDIRequest(parsed);
     } catch (err) {
+      addWarningAlert(
+        'Error while parsing!\nRemember that only the body of the request and the generated curl commands by the app can be parsed.',
+      );
       console.error(err);
     }
   };

@@ -54,9 +54,9 @@ const SendRequest = ({ token, requestState, mapState }) => {
   });
   return (
     <ProcessRequestOverlayButton
-      className="primary-button"
-      additionalClassNames={['mr-2 mb-2 lg:mb-0']}
-      buttonText={!token ? 'Log in to send a request' : 'Send request'}
+      className="primary-button "
+      additionalClassNames={['ml-2 mb-2 lg:mb-0 fixed w-52 right-2 btn-send-request z-50']}
+      buttonText="Send request"
       request={ProcessResource.stateRequest(requestState)}
       args={[getRequestObject(requestState, mapState)]}
       validation={Boolean(isValid && token && !isInvalidDatafusion)}
@@ -65,6 +65,7 @@ const SendRequest = ({ token, requestState, mapState }) => {
       wgs84Geometry={mapState.wgs84Geometry}
       reqConfig={{ responseType: 'blob' }}
       useShortcut
+      disabledTitle="Log in to send the request"
     />
   );
 };

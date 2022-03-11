@@ -3,7 +3,8 @@ import {
   tpdiCreateOrderBodyViaDataFilter,
   tpdiCreateOrderBodyViaProducts,
 } from '../../../api/tpdi/common';
-import { TPDI_PATH } from '../../../api/tpdi/TpdiResource';
+import { getPlanetSubscriptionBody } from '../../../api/tpdi/planet';
+import { SUBSCRIPTIONS_PATH, TPDI_PATH } from '../../../api/tpdi/TpdiResource';
 import { getBaseUrl } from '../../../api/url';
 
 const getTpdiUrl = () => getBaseUrl() + TPDI_PATH;
@@ -75,4 +76,47 @@ export const getDeleteOrderTpdiCurlCommand = (state) => {
 export const getQuotaCurlCommand = (token) => {
   const url = getTpdiUrl() + '/quotas';
   return `curl -X GET ${url} \n -H 'Authorization: Bearer ${token ? token : '<your-token-here>'}'\n`;
+};
+
+// Subscriptions
+
+export const getCreateSubscriptionCurlCommand = (mapState, planetState, requestState, tpdiState, token) => {
+  const url = getBaseUrl() + SUBSCRIPTIONS_PATH;
+  const body = JSON.stringify(
+    getPlanetSubscriptionBody(mapState, planetState, requestState, tpdiState),
+    null,
+    2,
+  );
+  const curlCommand = `curl -X POST ${url} \n -H 'Content-Type: application/json' \n -H 'Authorization: Bearer ${
+    token ? token : '<your token here>'
+  }' \n -d '${body}'`;
+
+  return curlCommand;
+};
+
+export const getConfirmSubscriptionCurlCommand = (token) => {
+  const url = `${getBaseUrl()}${SUBSCRIPTIONS_PATH}/<subscriptionId>/confirm`;
+  const curlCommand = `curl -X POST ${url} \n -H 'Content-Type: application/json' \n -H 'Authorization: Bearer ${
+    token ? token : '<your token here>'
+  }'`;
+
+  return curlCommand;
+};
+
+export const getDeleteSubscriptionCurlCommand = (token) => {
+  const url = `${getBaseUrl()}${SUBSCRIPTIONS_PATH}/<subscriptionId>`;
+  const curlCommand = `curl -X DELETE ${url} \n -H 'Content-Type: application/json' \n -H 'Authorization: Bearer ${
+    token ? token : '<your token here>'
+  }'`;
+
+  return curlCommand;
+};
+
+export const getFetchSubscriptionCurlCommand = (token) => {
+  const url = `${getBaseUrl()}${SUBSCRIPTIONS_PATH}/<subscriptionId>`;
+  const curlCommand = `curl -X GET ${url} \n -H 'Content-Type: application/json' \n -H 'Authorization: Bearer ${
+    token ? token : '<your token here>'
+  }'`;
+
+  return curlCommand;
 };

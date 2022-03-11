@@ -102,7 +102,7 @@ const CalculationHistogram = ({ histogram, histIdx, idx }) => {
       <div className="flex justify-between mb-2">
         <button
           className={`secondary-button h-full ${
-            histogramBinsMethod === 'NBINS' ? 'secondary-button--disabled' : ''
+            histogramBinsMethod === 'NBINS' ? 'secondary-button--selected' : ''
           }`}
           value="NBINS"
           disabled={histogramBinsMethod === 'NBINS'}
@@ -113,7 +113,7 @@ const CalculationHistogram = ({ histogram, histIdx, idx }) => {
         </button>
         <button
           className={`secondary-button ${
-            histogramBinsMethod === 'BINWIDTH' ? 'secondary-button--disabled' : ''
+            histogramBinsMethod === 'BINWIDTH' ? 'secondary-button--selected' : ''
           }`}
           value="BINWIDTH"
           onClick={handleHistogramTextParamChange}
@@ -123,7 +123,7 @@ const CalculationHistogram = ({ histogram, histIdx, idx }) => {
         </button>
         <button
           value="BINS"
-          className={`secondary-button ${histogramBinsMethod === 'BINS' ? 'secondary-button--disabled' : ''}`}
+          className={`secondary-button ${histogramBinsMethod === 'BINS' ? 'secondary-button--selected' : ''}`}
           onClick={handleHistogramTextParamChange}
           name="histogramBinsMethod"
         >

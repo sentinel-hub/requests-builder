@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useLayoutEffect, useRef, useMemo } from 'react';
 import store from '../../store';
-import alertSlice from '../../store/alert';
+import alertSlice, { addWarningAlert } from '../../store/alert';
 import { getTransformedGeometryFromBounds } from '../common/Map/utils/crsTransform';
 import RequestButton from '../common/RequestButton';
 import { dispatchChanges, getProperDataCollectionType } from '../process/requests/parseRequest';
@@ -14,6 +14,7 @@ import BatchResource from '../../api/batch/BatchResource';
 import TileResource from '../../api/batch/TileResource';
 import { DATASOURCES, EU_CENTRAL_DEPLOYMENT } from '../../utils/const/const';
 import { focusMap } from '../common/Map/utils/geoUtils';
+import { getMessageFromApiError } from '../../api';
 
 export const fetchTilesBatchRequest = async (id, deployment) => {
   let res = await TileResource.getTiles(deployment)({ orderId: id });
@@ -178,16 +179,7 @@ const BatchRequestSummary = ({
   };
 
   const deleteErrorHandler = (err) => {
-    const errMsg = err.message;
-    store.dispatch(
-      alertSlice.actions.addAlert({
-        type: 'WARNING',
-        text: `Something went wrong while trying to delete the request. ${
-          errMsg ?? 'Check console for more details.'
-        }`,
-      }),
-    );
-    console.error(err);
+    addWarningAlert(getMessageFromApiError(err, 'Something went wrong deleting the request'));
   };
 
   return (

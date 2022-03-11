@@ -119,7 +119,7 @@ const DataSourceSelect = ({ dataCollections, appMode }) => {
             idx={idx}
           />
         ))}
-        <button className="secondary-button w-fit mt-4" onClick={handleAddDataCollection}>
+        <button className="secondary-button w-fit mt-4 wrapped" onClick={handleAddDataCollection}>
           {!isOnDatafusion ? 'Start Data Fusion request' : 'Add Data Collection'}
         </button>
         {isInvalidDatafusion && (

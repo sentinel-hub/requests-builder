@@ -1,17 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
+import { CodeEditor, themeEoBrowserDark, themeEoBrowserLight } from '@sentinel-hub/evalscript-code-editor';
 import store from '../../../store';
 import requestSlice from '../../../store/request';
-import { Controlled as CodeMirror } from 'react-codemirror2';
 import { CUSTOM, datasourceToCustomRepoLink, getDefaultEvalscript } from '../../../utils/const/const';
-import { JSHINT } from 'jshint';
 import Toggle from '../Toggle';
 import DataProductSelection from './DataProductSelection';
 import Tooltip from '../Tooltip/Tooltip';
 import EvalscriptGui from './EvalscriptGui/index';
 import { addWarningAlert } from '../../../store/alert';
-import { debounce } from '../../../utils/debounceAndThrottle';
-import { useDidMountEffect } from '../../../utils/hooks';
 
 require('codemirror/lib/codemirror.css');
 require('codemirror/theme/eclipse.css');
@@ -29,25 +26,6 @@ require('codemirror/addon/hint/show-hint.css');
 require('codemirror/addon/hint/show-hint.js');
 require('codemirror/addon/hint/javascript-hint.js');
 
-window.JSHINT = JSHINT;
-
-const evaluatePixelParams = {
-  inputMetadata: {
-    serviceVersion: 0,
-    normalizationFactor: 0,
-  },
-  outputMetadata: {},
-  scenes: {},
-};
-
-const scope = {
-  sample: {
-    B02: 0,
-    B03: 0,
-    B04: 0,
-  },
-};
-
 const canUseEvalscriptGui = (dataCollection, mode) =>
   dataCollection !== CUSTOM && (mode === 'PROCESS' || mode === 'BATCH');
 
@@ -62,8 +40,6 @@ const EvalscriptEditor = ({
 }) => {
   const [toggledConsole, setToggledConsole] = useState(false);
   const [usingEvalscriptGui, setUsingEvalscriptGui] = useState(false);
-  const [globalScope, setGlobalScope] = useState({ ...scope });
-  const [lintingErrors, setLintingErrors] = useState(false);
 
   useEffect(() => {
     if (consoleValue) {
@@ -78,7 +54,7 @@ const EvalscriptEditor = ({
     }
   }, [usingEvalscriptGui, dataCollection, isOnDatafusion, mode]);
 
-  const handleTextChange = (_, __, code) => {
+  const handleTextChange = (code) => {
     store.dispatch(requestSlice.actions.setEvalscript(code));
   };
 
@@ -90,47 +66,6 @@ const EvalscriptEditor = ({
   const handleToggleConsole = () => {
     setToggledConsole(!toggledConsole);
   };
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleUpdateScope = useCallback(
-    debounce((evalscript) => {
-      try {
-        const res = eval(evalscript + '\n setup()'); // eslint-disable-line
-        if (Array.isArray(res?.input)) {
-          setGlobalScope({
-            sample: res.input.reduce((acc, band) => {
-              acc[band] = 0;
-              return acc;
-            }, {}),
-          });
-        }
-      } catch (err) {
-        // fail silently
-      }
-    }, 500),
-    [],
-  );
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleLintingErrors = useCallback(
-    debounce((lintStuff) => {
-      const errors = lintStuff && lintStuff.filter((lintWarn) => lintWarn.severity === 'error');
-      if (errors && errors.length > 0 && !lintingErrors) {
-        setLintingErrors(true);
-        return;
-      }
-      if ((!errors || errors.length === 0) && lintingErrors) {
-        setLintingErrors(false);
-      }
-    }, 500),
-    [lintingErrors],
-  );
-
-  useDidMountEffect(() => {
-    if (!lintingErrors) {
-      handleUpdateScope(evalscript);
-    }
-  }, [lintingErrors, evalscript]);
 
   return (
     <>
@@ -172,44 +107,16 @@ const EvalscriptEditor = ({
         {usingEvalscriptGui ? (
           <EvalscriptGui setUsingEvalscriptGui={setUsingEvalscriptGui} />
         ) : (
-          <CodeMirror
+          <CodeEditor
+            defaultEditorTheme="light"
+            themeDark={themeEoBrowserDark}
+            themeLight={themeEoBrowserLight}
+            shouldDisplayRunEvalscriptButton={mode === 'BATCH' ? false : true}
             value={evalscript}
-            options={{
-              mode: 'javascript',
-              theme: 'eclipse',
-              lint: {
-                esversion: 6,
-                onUpdateLinting: handleLintingErrors,
-                options: {},
-              },
-              lineNumbers: true,
-              matchBrackets: true,
-              autoCloseBrackets: true,
-              gutters: ['CodeMirror-lint-markers'],
-              styleActiveLine: true,
-              extraKeys: {
-                Tab: (cm) => {
-                  var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
-                  cm.replaceSelection(spaces);
-                },
-                'Ctrl-Space': 'autocomplete',
-              },
-              hintOptions: {
-                globalScope: {
-                  ...globalScope,
-                  ...evaluatePixelParams,
-                },
-                completeSingle: false,
-              },
-            }}
-            onBeforeChange={handleTextChange}
-            className={
-              className
-                ? className
-                : `process-editor process-editor--evalscript ${
-                    !toggledConsole ? 'process-editor--console' : ''
-                  }`
-            }
+            onChange={handleTextChange}
+            zIndex={20}
+            portalId="code-editor-modal"
+            onRunEvalscriptClick={() => document.querySelector('.btn-send-request').click()}
           />
         )}
 

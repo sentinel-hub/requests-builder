@@ -5,59 +5,34 @@ import { getBatchUrl } from '../url';
 const { GET, POST, DELETE } = Api;
 
 const BatchResource = {
-  createOrder: (requestState) => POST(`${getBatchUrl(requestState)}/process`, undefined, undefined, true),
+  createOrder: (requestState) => POST(`${getBatchUrl(requestState)}/process`, { isFullUrl: true }),
   getSingleOrder: (deploymentState) =>
-    GET(
-      `${getBaseUrlByDeployment(deploymentState)}api/v1/batch/process/:orderId`,
-      undefined,
-      undefined,
-      true,
-    ),
+    GET(`${getBaseUrlByDeployment(deploymentState)}api/v1/batch/process/:orderId`, { isFullUrl: true }),
   getOrders: (deploymentState) =>
-    GET(`${getBaseUrlByDeployment(deploymentState)}api/v1/batch/process`, undefined, undefined, true),
-  getNextOrders: (url) => GET(url, undefined, undefined, true),
+    GET(`${getBaseUrlByDeployment(deploymentState)}api/v1/batch/process`, { isFullUrl: true }),
+  getNextOrders: (url) => GET(url, { isFullUrl: true }),
   deleteOrder: (orderDeployement) =>
-    DELETE(
-      `${getBaseUrlByDeployment(orderDeployement)}api/v1/batch/process/:orderId`,
-      undefined,
-      undefined,
-      true,
-    ),
+    DELETE(`${getBaseUrlByDeployment(orderDeployement)}api/v1/batch/process/:orderId`, { isFullUrl: true }),
   analyseOrder: (orderDeployement) =>
-    POST(
-      `${getBaseUrlByDeployment(orderDeployement)}api/v1/batch/process/:orderId/analyse`,
-      undefined,
-      undefined,
-      true,
-    ),
+    POST(`${getBaseUrlByDeployment(orderDeployement)}api/v1/batch/process/:orderId/analyse`, {
+      isFullUrl: true,
+    }),
   startOrder: (orderDeployement) =>
-    POST(
-      `${getBaseUrlByDeployment(orderDeployement)}api/v1/batch/process/:orderId/start`,
-      undefined,
-      undefined,
-      true,
-    ),
+    POST(`${getBaseUrlByDeployment(orderDeployement)}api/v1/batch/process/:orderId/start`, {
+      isFullUrl: true,
+    }),
   cancelOrder: (orderDeployment) =>
-    POST(
-      `${getBaseUrlByDeployment(orderDeployment)}api/v1/batch/process/:orderId/cancel`,
-      undefined,
-      undefined,
-      true,
-    ),
+    POST(`${getBaseUrlByDeployment(orderDeployment)}api/v1/batch/process/:orderId/cancel`, {
+      isFullUrl: true,
+    }),
   restartOrder: (orderDeployment) =>
-    POST(
-      `${getBaseUrlByDeployment(orderDeployment)}api/v1/batch/process/:orderId/restartpartial`,
-      undefined,
-      undefined,
-      true,
-    ),
+    POST(`${getBaseUrlByDeployment(orderDeployment)}api/v1/batch/process/:orderId/restartpartial`, {
+      isFullUrl: true,
+    }),
   getLatestOrders: (stateDeployment) =>
-    GET(
-      `${getBaseUrlByDeployment(stateDeployment)}api/v1/batch/process?sort=created%3Adesc`,
-      undefined,
-      undefined,
-      true,
-    ),
+    GET(`${getBaseUrlByDeployment(stateDeployment)}api/v1/batch/process?sort=created%3Adesc`, {
+      isFullUrl: true,
+    }),
 };
 
 export default BatchResource;

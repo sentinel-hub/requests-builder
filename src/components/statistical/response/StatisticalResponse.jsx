@@ -86,11 +86,10 @@ const StatisticalResponse = ({ response, containerRef }) => {
           {Object.keys(calculations).map((calculationKey) => (
             <button
               className={`secondary-button ${
-                selectedCalculation?.name === calculationKey ? 'secondary-button--disabled' : ''
+                selectedCalculation?.name === calculationKey ? 'secondary-button--selected' : ''
               }`}
               key={calculationKey}
               onClick={handleCalculationClickChange(calculationKey)}
-              disabled={selectedCalculation?.name === calculationKey}
               style={{ marginRight: '1.5rem' }}
             >
               {calculationKey}

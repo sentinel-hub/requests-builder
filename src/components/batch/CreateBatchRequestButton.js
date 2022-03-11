@@ -6,7 +6,7 @@ import { validateRequestState } from '../../utils/validator';
 import BatchResource from '../../api/batch/BatchResource';
 import { generateBatchBodyRequest } from '../../api/batch/utils';
 import { isInvalidDatafusionState } from '../../store/request';
-import { errorBatchCreationEvent, successfulBatchCreationEvent } from '../../utils/initAnalytics';
+import { successfulBatchCreationEvent } from '../../utils/initAnalytics';
 
 const isCreatePossible = (batchState, requestState, token) => {
   const { tillingGrid, resolution, bucketName } = batchState;
@@ -36,7 +36,6 @@ const CreateBatchRequestButton = ({
   };
   const errorHandler = useCallback((err) => {
     addAlertOnError(err, 'Something went wrong while creating a batch request');
-    errorBatchCreationEvent();
   }, []);
 
   const isInvalidDatafusion = isInvalidDatafusionState(requestState);
