@@ -1,0 +1,1 @@
+import{j as t}from"./index-d8344bbc.js";const o=({properties:p,propertyStyle:i={},skippedProperties:a=[]})=>Object.entries(p).filter(([e,s])=>{const r=typeof s;return!a.includes(e)&&(r==="string"||r==="number")}).map(([e,s])=>t("p",{className:"text",style:i,children:[t("span",{children:[e," :"]})," ",s]},e));export{o as D};
